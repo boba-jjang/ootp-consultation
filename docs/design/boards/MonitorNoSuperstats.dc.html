@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Regression monitor without pitching superstats</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#0A1118}
+*,*::before,*::after{box-sizing:border-box}
+a{color:#F5F7FA}a:hover{color:#E5A93C}
+:focus-visible{outline:2px solid #E5A93C;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 920px; height: 960px; padding: 20px; background: #0A1118; color: #F5F7FA; font-family: 'Chakra Petch', 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.5">
+<section aria-labelledby="monitor-title" style="display: flex; flex-direction: column; gap: 14px; padding: 20px; background: #121D24; border: 1px solid rgba(245,247,250,0.08); border-radius: 6px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px">
+<h2 id="monitor-title" style="margin: 0; font-size: 17px; font-weight: 600">Pitching regression monitor</h2>
+<ul style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin: 0; padding: 0; list-style: none; font-size: 13px; color: #9AA7B4">
+<li style="display: flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 50%; border: 2px solid #F5F7FA"></span>ERA</li>
+<li style="display: flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 50%; background: #9AA7B4"></span>FIP</li>
+<li style="color: #2ECC71">▲ Should improve</li>
+<li style="color: #E8706C">▼ Should decline</li>
+</ul>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 10px 12px; background: rgba(229,169,60,0.08); border: 1px solid rgba(229,169,60,0.45); border-radius: 4px">
+<span style="padding: 2px 8px; border-radius: 3px; background: rgba(229,169,60,0.16); font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; font-weight: 600; white-space: nowrap; color: #E5A93C">Fallback: ERA vs. FIP</span>
+<p style="flex: 1 1 320px; margin: 0; font-size: 14px; color: #C9D2DB">Upload pitching_superstats_1 to switch to xERA and add contact-quality analysis.</p>
+<a href="Clubhouse.dc.html" style="flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border: 1px solid rgba(229,169,60,0.55); border-radius: 4px; font-size: 14px; font-weight: 600; color: #E5A93C; text-decoration: none">Upload view</a>
+</div>
+
+<div style="display: flex; flex-direction: column">
+<div aria-hidden="true" style="display: grid; grid-template-columns: minmax(150px, 1.3fr) 34px 46px 44px 44px 40px minmax(150px, 2fr) 128px; gap: 10px; align-items: end; padding-bottom: 8px; border-bottom: 1px solid rgba(245,247,250,0.16); font-size: 12px; color: #9AA7B4">
+<span>Pitcher</span><span>Role</span><span style="text-align: right">IP</span><span style="text-align: right">ERA</span><span style="text-align: right">FIP</span><span style="text-align: right">pLI</span>
+<span style="position: relative; display: block; height: 18px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace"><span style="position: absolute; left: 0%">0</span><span style="position: absolute; left: 26.67%; transform: translateX(-50%)">2</span><span style="position: absolute; left: 53.33%; transform: translateX(-50%)">4</span><span style="position: absolute; left: 80%; transform: translateX(-50%)">6</span></span>
+<span>Next</span>
+</div>
+
+<p style="margin: 0; padding: 14px 0 4px; font-size: 13px; font-weight: 600; color: #9AA7B4">Rotation</p>
+<sc-for list="{{rotation}}" as="p" hint-placeholder-count="5">
+<div style="display: grid; grid-template-columns: minmax(150px, 1.3fr) 34px 46px 44px 44px 40px minmax(150px, 2fr) 128px; gap: 10px; align-items: center; min-height: 44px; padding: 6px 0; border-bottom: 1px solid rgba(245,247,250,0.08)">
+<span style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.name}}</span><span style="font-size: 11px; line-height: 1.3; color: #9AA7B4">{{p.tag}}</span></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #9AA7B4">{{p.role}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right">{{p.ip}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right">{{p.eraS}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; font-weight: 600; text-align: right">{{p.fipS}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right; color: #9AA7B4">{{p.pli}}</span>
+<span aria-hidden="true" style="position: relative; display: block; height: 20px">
+<span style="position: absolute; left: 0; right: 0; top: 9px; height: 2px; background: rgba(245,247,250,0.08)"></span>
+<span style="position: absolute; top: 8px; height: 4px; left: {{p.barL}}%; width: {{p.barW}}%; background: {{p.tone}}; opacity: 0.5; border-radius: 2px"></span>
+<span style="position: absolute; top: 4px; left: {{p.eraX}}%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; border: 2px solid #F5F7FA; background: #121D24"></span>
+<span style="position: absolute; top: 4px; left: {{p.fX}}%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: {{p.tone}}"></span>
+</span>
+<span style="font-size: 13px; font-weight: 600; white-space: nowrap; color: {{p.sigColor}}">{{p.sig}}</span>
+</div>
+</sc-for>
+
+<p style="margin: 0; padding: 14px 0 4px; font-size: 13px; font-weight: 600; color: #9AA7B4">Bullpen, by leverage</p>
+<sc-for list="{{bullpen}}" as="p" hint-placeholder-count="8">
+<div style="display: grid; grid-template-columns: minmax(150px, 1.3fr) 34px 46px 44px 44px 40px minmax(150px, 2fr) 128px; gap: 10px; align-items: center; min-height: 44px; padding: 6px 0; border-bottom: 1px solid rgba(245,247,250,0.08)">
+<span style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.name}}</span><span style="font-size: 11px; line-height: 1.3; color: #9AA7B4">{{p.tag}}</span></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #9AA7B4">{{p.role}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right">{{p.ip}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right">{{p.eraS}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; font-weight: 600; text-align: right">{{p.fipS}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right; color: #9AA7B4">{{p.pli}}</span>
+<span aria-hidden="true" style="position: relative; display: block; height: 20px">
+<span style="position: absolute; left: 0; right: 0; top: 9px; height: 2px; background: rgba(245,247,250,0.08)"></span>
+<span style="position: absolute; top: 8px; height: 4px; left: {{p.barL}}%; width: {{p.barW}}%; background: {{p.tone}}; opacity: 0.5; border-radius: 2px"></span>
+<span style="position: absolute; top: 4px; left: {{p.eraX}}%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; border: 2px solid #F5F7FA; background: #121D24"></span>
+<span style="position: absolute; top: 4px; left: {{p.fX}}%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: {{p.tone}}"></span>
+</span>
+<span style="font-size: 13px; font-weight: 600; white-space: nowrap; color: {{p.sigColor}}">{{p.sig}}</span>
+</div>
+</sc-for>
+</div>
+
+<p style="margin: 0; font-size: 13px; color: #9AA7B4">Until xERA is available, a signal fires when ERA and FIP sit a full run apart.</p>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":920,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var MAX = 7.5;
+    function pct(v) {
+      return Math.round((v / MAX) * 1000) / 10;
+    }
+    function innings(s) {
+      var parts = s.split('.');
+      return Number(parts[0]) + (parts[1] ? Number(parts[1]) / 3 : 0);
+    }
+    function arm(name, role, ip, era, fip, pli) {
+      var gap = fip - era;
+      var dir = gap >= 1 ? 'down' : (gap <= -1 ? 'up' : 'flat');
+      return {
+        name: name,
+        role: role,
+        ip: ip,
+        pli: pli,
+        eraS: era.toFixed(2),
+        fipS: fip.toFixed(2),
+        eraX: pct(era),
+        fX: pct(fip),
+        barL: pct(Math.min(era, fip)),
+        barW: pct(Math.abs(era - fip)),
+        tone: dir === 'down' ? '#D9534F' : (dir === 'up' ? '#2ECC71' : '#9AA7B4'),
+        sig: dir === 'down' ? '▼ Should decline' : (dir === 'up' ? '▲ Should improve' : 'Holding steady'),
+        sigColor: dir === 'down' ? '#E8706C' : (dir === 'up' ? '#2ECC71' : '#9AA7B4'),
+        tag: innings(ip) < 20 ? 'Small sample' : ''
+      };
+    }
+    return {
+      rotation: [
+        arm('Su-shun Nie', 'SP', '57.1', 2.51, 4.19, '1.03'),
+        arm('Chua chay Niu', 'SP', '53.0', 3.74, 3.93, '0.95'),
+        arm('Hajime Ito', 'SP', '52.2', 3.59, 4.24, '1.08'),
+        arm('Jeong Lee', 'SP', '45.0', 5.20, 4.18, '0.98'),
+        arm('Yasuhiro Katayama', 'SP', '37.1', 5.30, 4.67, '1.06')
+      ],
+      bullpen: [
+        arm('Jimmy Hsia', 'RP', '15.2', 0.57, 0.06, '1.83'),
+        arm('Hwi-gon Chun', 'RP', '12.1', 3.65, 4.38, '1.52'),
+        arm('Xiong Loh', 'RP', '18.0', 1.00, 2.81, '1.23'),
+        arm('Yoichibei Inouye', 'CL', '25.0', 6.84, 4.85, '1.12'),
+        arm('Kiyohiro Kaneshiro', 'RP', '32.1', 4.73, 4.70, '1.04'),
+        arm('Tse-peng Gong', 'RP', '19.0', 4.74, 5.51, '0.86'),
+        arm('Midori Murakami', 'RP', '6.1', 0.00, 0.88, '0.84'),
+        arm('Hyun-koo Ka', 'RP', '21.0', 5.14, 4.11, '0.72')
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

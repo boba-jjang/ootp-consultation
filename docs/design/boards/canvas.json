@@ -1,0 +1,150 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Bullpen.dc.html": {
+      "expand": "fill",
+      "h": 1440,
+      "is_interactive": true,
+      "title": "Bullpen, tactics and Dev Lab (all views loaded)",
+      "w": 1440,
+      "x": 3040,
+      "y": 0
+    },
+    "Clubhouse.dc.html": {
+      "expand": "fill",
+      "h": 2450,
+      "is_interactive": true,
+      "title": "Clubhouse (today: 9 of 11 views)",
+      "w": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "DevLabLocked.dc.html": {
+      "h": 460,
+      "is_interactive": true,
+      "title": "Dev Lab without ratings or potentials",
+      "w": 1000,
+      "x": 1700,
+      "y": 2830
+    },
+    "DiamondNoRatings.dc.html": {
+      "h": 580,
+      "is_interactive": true,
+      "title": "Diamond without defensive ratings",
+      "w": 620,
+      "x": 0,
+      "y": 2830
+    },
+    "Main.dc.html": {
+      "expand": "fill",
+      "h": 1200,
+      "is_interactive": true,
+      "title": "The Dugout (all views loaded)",
+      "w": 1440,
+      "x": 1520,
+      "y": 0
+    },
+    "MonitorNoSuperstats.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Regression monitor without pitching superstats",
+      "w": 920,
+      "x": 700,
+      "y": 2830
+    },
+    "SetupFilesRead.dc.html": {
+      "expand": "fill",
+      "h": 1240,
+      "is_interactive": true,
+      "title": "Setup 1: files read",
+      "w": 1440,
+      "x": 2020,
+      "y": 4170
+    },
+    "SetupLeague.dc.html": {
+      "expand": "fill",
+      "h": 1380,
+      "is_interactive": true,
+      "title": "Setup 2: team and league",
+      "w": 1440,
+      "x": 3540,
+      "y": 4170
+    },
+    "SetupReview.dc.html": {
+      "expand": "fill",
+      "h": 860,
+      "is_interactive": true,
+      "title": "Setup 3: review",
+      "w": 1440,
+      "x": 5060,
+      "y": 4170
+    },
+    "SetupStart.dc.html": {
+      "expand": "fill",
+      "h": 940,
+      "is_interactive": true,
+      "title": "Setup 1: add exports",
+      "w": 1440,
+      "x": 500,
+      "y": 4170
+    },
+    "TeamMenu.dc.html": {
+      "h": 320,
+      "is_interactive": true,
+      "title": "Team menu (entry point)",
+      "w": 420,
+      "x": 0,
+      "y": 4170
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-03T17:55:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "create": {
+      "kind": "title1",
+      "maxW": 6500,
+      "text": "Create a team",
+      "w": 240,
+      "x": 0,
+      "y": 3910
+    },
+    "screens": {
+      "kind": "title1",
+      "maxW": 4480,
+      "text": "Screens",
+      "w": 240,
+      "x": 0,
+      "y": -260
+    },
+    "states": {
+      "kind": "title1",
+      "maxW": 2700,
+      "text": "When data is missing",
+      "w": 240,
+      "x": 0,
+      "y": 2570
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Clubhouse.dc.html",
+    "Bullpen.dc.html",
+    "DiamondNoRatings.dc.html",
+    "MonitorNoSuperstats.dc.html",
+    "DevLabLocked.dc.html",
+    "TeamMenu.dc.html",
+    "SetupStart.dc.html",
+    "SetupFilesRead.dc.html",
+    "SetupLeague.dc.html",
+    "SetupReview.dc.html"
+  ],
+  "pages": [],
+  "title": "Front Office Command Center"
+}

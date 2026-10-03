@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Team setup: add exports</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#0A1118}
+*,*::before,*::after{box-sizing:border-box}
+a{color:#F5F7FA}a:hover{color:#E5A93C}
+button,input,select{font:inherit}
+:focus-visible{outline:2px solid #E5A93C;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #0A1118; color: #F5F7FA; font-family: 'Chakra Petch', 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.5; color-scheme: dark">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 24px; min-height: 56px; padding: 4px clamp(16px, 3vw, 32px); border-bottom: 1px solid rgba(245,247,250,0.08)">
+<span style="display: flex; align-items: center; gap: 10px">
+<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M12 3 L21 12 L12 21 L3 12 Z M12 8.5 L15.5 12 L12 15.5 L8.5 12 Z" style="fill: none; stroke: #E5A93C; stroke-width: 1.8; stroke-linejoin: round"></path></svg>
+<span style="font-size: 17px; font-weight: 700; letter-spacing: 0.02em">Front Office Command Center</span>
+</span>
+<span style="font-size: 13px; color: #9AA7B4">Team setup</span>
+</header>
+
+<main style="max-width: 1040px; margin: 0 auto; padding: 40px clamp(16px, 3vw, 32px) 48px; display: flex; flex-direction: column; gap: 28px">
+
+<nav aria-label="Setup steps">
+<ol style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 0; padding: 0; list-style: none">
+<li aria-current="step" style="display: flex; align-items: center; gap: 10px"><span style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 2px solid #E5A93C; border-radius: 50%; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; font-weight: 600; color: #E5A93C">1</span><span style="font-size: 14px; font-weight: 600">Add exports</span></li>
+<li style="display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="width: 40px; height: 1px; background: rgba(245,247,250,0.20)"></span><span style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid rgba(245,247,250,0.25); border-radius: 50%; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; color: #9AA7B4">2</span><span style="font-size: 14px; color: #9AA7B4">Team and league</span></li>
+<li style="display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="width: 40px; height: 1px; background: rgba(245,247,250,0.20)"></span><span style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid rgba(245,247,250,0.25); border-radius: 50%; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; color: #9AA7B4">3</span><span style="font-size: 14px; color: #9AA7B4">Review</span></li>
+</ol>
+</nav>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-size: 36px; line-height: 1.1; font-weight: 600">Create a team</h1>
+<p style="margin: 0; max-width: 62ch; font-size: 16px; color: #9AA7B4">Start with your OOTP exports. The team, league and roster are read from them, so there's less to type.</p>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: stretch; gap: 20px">
+<div style="flex: 3 1 480px; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 360px; padding: 32px; background: #0D161D; border: 1.5px dashed rgba(245,247,250,0.30); border-radius: 6px; text-align: center">
+<svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true" focusable="false"><path d="M12 15 L12 4 M7.5 8.5 L12 4 L16.5 8.5 M4 14 L4 19 L20 19 L20 14" style="fill: none; stroke: #9AA7B4; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round"></path></svg>
+<p style="margin: 0; font-size: 22px; font-weight: 600">Drop your OOTP exports here</p>
+<p style="margin: 0; max-width: 44ch; font-size: 15px; color: #9AA7B4">Any mix of views, one file or a whole folder. Each file is recognized by its columns, so names don't matter.</p>
+<a href="SetupFilesRead.dc.html" style="display: inline-flex; align-items: center; min-height: 48px; margin-top: 6px; padding: 0 20px; background: #E5A93C; color: #0A1118; border-radius: 4px; font-weight: 700; text-decoration: none">Choose files</a>
+</div>
+
+<section aria-labelledby="best-title" style="flex: 2 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 14px; padding: 20px; background: #121D24; border: 1px solid rgba(245,247,250,0.08); border-radius: 6px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h2 id="best-title" style="margin: 0; font-size: 17px; font-weight: 600">Best first upload</h2>
+<p style="margin: 0; font-size: 14px; color: #9AA7B4">Any export works. Each layer you add raises confidence in the analysis.</p>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid rgba(245,247,250,0.08)">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px"><h3 style="margin: 0; font-size: 15px; font-weight: 600">Stats</h3><span style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #E8706C"><span aria-hidden="true" style="display: flex; gap: 3px"><span style="width: 12px; height: 5px; border-radius: 1px; background: #E8706C"></span><span style="width: 12px; height: 5px; border-radius: 1px; background: rgba(245,247,250,0.16)"></span><span style="width: 12px; height: 5px; border-radius: 1px; background: rgba(245,247,250,0.16)"></span></span>Low</span></div>
+<p style="margin: 0; font-size: 13px; color: #9AA7B4">Results, rates and run creation.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span style="padding: 2px 8px; border: 1px solid rgba(245,247,250,0.16); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #C9D2DB">default</span><span style="padding: 2px 8px; border: 1px solid rgba(245,247,250,0.16); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #C9D2DB">batting_stats_1</span><span style="padding: 2px 8px; border: 1px solid rgba(245,247,250,0.16); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #C9D2DB">batting_stats_2</span><span style="padding: 2px 8px; border: 1px solid rgba(245,247,250,0.16); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #C9D2DB">pitching_stats_1</span><span style="padding: 2px 8px; border: 1px solid rgba(245,247,250,0.16); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #C9D2DB">pitching_stats_2</span></div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid rgba(245,247,250,0.08)">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px"><h3 style="margin: 0; font-size: 15px; font-weight: 600">Superstats</h3><span style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #E5A93C"><span aria-hidden="true" style="display: flex; gap: 3px"><span style="width: 12px; height: 5px; border-radius: 1px; background: #E5A93C"></span><span style="width: 12px; height: 5px; border-radius: 1px; background: #E5A93C"></span><span style="width: 12px; height: 5px; border-radius: 1px; background: rgba(245,247,250,0.16)"></span></span>Moderate</span></div>
+<p style="margin: 0; font-size: 13px; color: #9AA7B4">Contact quality and swing decisions.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span style="padding: 2px 8px; border: 1px solid rgba(245,247,250,0.16); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #C9D2DB">batting_superstats_1</span><span style="padding: 2px 8px; border: 1px solid rgba(245,247,250,0.16); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #C9D2DB">batting_superstats_2</span><span style="padding: 2px 8px; border: 1px solid rgba(245,247,250,0.16); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #C9D2DB">pitching_superstats_1</span><span style="padding: 2px 8px; border: 1px solid rgba(245,247,250,0.16); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #C9D2DB">pitching_superstats_2</span></div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid rgba(245,247,250,0.08)">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px"><h3 style="margin: 0; font-size: 15px; font-weight: 600">Ratings and potentials</h3><span style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #2ECC71"><span aria-hidden="true" style="display: flex; gap: 3px"><span style="width: 12px; height: 5px; border-radius: 1px; background: #2ECC71"></span><span style="width: 12px; height: 5px; border-radius: 1px; background: #2ECC71"></span><span style="width: 12px; height: 5px; border-radius: 1px; background: #2ECC71"></span></span>High</span></div>
+<p style="margin: 0; font-size: 13px; color: #9AA7B4">Defense, tactical settings and the Dev Lab.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span style="padding: 2px 8px; border: 1px solid rgba(245,247,250,0.16); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #C9D2DB">custom_bat_pot</span><span style="padding: 2px 8px; border: 1px solid rgba(245,247,250,0.16); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #C9D2DB">cus_pitch_pot</span></div>
+</div>
+
+<p style="margin: 0; padding-top: 12px; border-top: 1px solid rgba(245,247,250,0.08); font-size: 13px; color: #9AA7B4">Also useful: the pitchers' default view, for ages and contracts.</p>
+</section>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding-top: 20px; border-top: 1px solid rgba(245,247,250,0.08)">
+<a href="SetupLeague.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; color: #9AA7B4; text-decoration: underline; text-underline-offset: 3px">Set up without files</a>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px">
+<span style="font-size: 13px; color: #9AA7B4">Add at least one export to continue</span>
+<button type="button" disabled="{{ true }}" style="min-height: 48px; padding: 0 22px; background: rgba(229,169,60,0.25); color: rgba(10,17,24,0.8); border: 0; border-radius: 4px; font-weight: 700; cursor: not-allowed">Continue</button>
+</div>
+</div>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":940}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -28,7 +28,17 @@ Update this section when a phase's gate passes.
 
 ## Commands
 
-Fill these in as the scaffold lands, and keep them current: install, dev server, lint, typecheck, test, build.
+Keep these current. Run them from the repo root on Node 24 (`.nvmrc`). The pnpm version comes from `packageManager` in `package.json`.
+
+- Install: `pnpm install` (CI uses `pnpm install --frozen-lockfile`)
+- Dev server: `pnpm dev` (Vite, `apps/web`)
+- Lint: `pnpm lint` (ESLint, type-aware)
+- Format: `pnpm format` to fix, `pnpm format:check` to check (Prettier)
+- Typecheck: `pnpm typecheck` (`tsc --build` over every package)
+- Test: `pnpm test` (Vitest with the coverage floor on `packages/core`); `pnpm test:watch` while working
+- Build: `pnpm build`
+
+CI (`.github/workflows/ci.yml`, job `ci`) runs install, lint, format check, typecheck, test and build, in that order.
 
 ## Working rules
 

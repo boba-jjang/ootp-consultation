@@ -1,0 +1,4 @@
+* text=auto eol=lf
+
+# Raw OOTP exports are golden test data and are stored byte for byte (CRLF included).
+fixtures/** -text

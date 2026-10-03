@@ -1,0 +1,11 @@
+# Generated
+pnpm-lock.yaml
+dist/
+coverage/
+
+# Raw OOTP exports are golden test data, stored verbatim
+fixtures/
+
+# Docs are edited as prose, and the boards are reference markup exported from the canvas
+*.md
+docs/design/boards/

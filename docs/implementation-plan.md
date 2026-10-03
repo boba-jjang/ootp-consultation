@@ -91,9 +91,9 @@ ootp-consultation/
 | Supabase CLI | Migrations, generated database types, policy tests |
 
 - [ ] Create the repo under your personal account, default branch `main`.
-- [ ] Scaffold the pnpm workspace: `apps/web` from the Vite React TypeScript template, `packages/core` as a library.
-- [ ] Add the shared strict tsconfig, ESLint, Prettier and `.editorconfig`.
-- [ ] Add Vitest at the workspace root with a coverage floor on `packages/core`.
+- [x] Scaffold the pnpm workspace: `apps/web` from the Vite React TypeScript template, `packages/core` as a library.
+- [x] Add the shared strict tsconfig, ESLint, Prettier and `.editorconfig`.
+- [x] Add Vitest at the workspace root with a coverage floor on `packages/core`.
 - [ ] Commit `.env.example`; gitignore `.env*.local`.
 - [ ] Write `docs/adr/0001-platform.md` once the decisions table is confirmed.
 - [ ] Use Conventional Commits and squash merges, so `main` reads as one change per pull request.
@@ -140,9 +140,9 @@ A pull request merges only after lint, type checks, unit and golden tests, a pro
 | `keepalive.yml` | Weekly schedule, or by hand | One read request to each Supabase project, to avoid the 1-week inactivity pause | No |
 | `dependabot.yml` | Weekly | Grouped npm and GitHub Actions updates, each one a pull request through CI | Not a workflow |
 
-- [ ] Set `concurrency` with `cancel-in-progress`, so a new push cancels the previous run.
-- [ ] Give every job a unique name; [required checks match on job name](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
-- [ ] Pin third-party actions to a commit SHA.
+- [x] Set `concurrency` with `cancel-in-progress`, so a new push cancels the previous run.
+- [x] Give every job a unique name; [required checks match on job name](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
+- [x] Pin third-party actions to a commit SHA.
 - [ ] Add a secret scan (for example gitleaks) to `ci.yml`.
 - [ ] Protect `main` with a ruleset: pull request required, the three checks required, linear history. On GitHub Free this needs a public repo.
 - [ ] Keep a pull-request run under five minutes, so private-repo minutes would also last.
@@ -316,7 +316,7 @@ Frontend coding starts in Phase 3, after the platform and data foundation. A pha
 Phase 1, in order:
 
 - [ ] Create the GitHub repo under your personal account.
-- [ ] Scaffold the workspace and push `ci.yml`; get the first green run.
+- [x] Scaffold the workspace and push `ci.yml`; get the first green run.
 - [ ] Import the repo into Vercel and confirm a preview on a test pull request.
 - [ ] Create the two Supabase projects and turn on GitHub sign-in for each.
 - [ ] Add migration `0001` (all five tables and their policies) with `db.yml` to test and apply it.

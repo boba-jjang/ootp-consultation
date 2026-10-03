@@ -140,7 +140,7 @@ A pull request merges only after lint, type checks, unit and golden tests, a pro
 | `keepalive.yml` | Weekly schedule, or by hand | One read request to each Supabase project, to avoid the 1-week inactivity pause | No |
 | `dependabot.yml` | Weekly | Grouped npm and GitHub Actions updates, each one a pull request through CI | Not a workflow |
 
-- [x] Set `concurrency` with `cancel-in-progress`, so a new push cancels the previous run.
+- [ ] Set `concurrency` with `cancel-in-progress`, so a new push to a pull request cancels its previous run; pushes to `main` each keep their own run. Done in `ci.yml`; keep it in each new workflow.
 - [ ] Give every job a unique name; [required checks match on job name](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches). Done in `ci.yml`; keep it in each new workflow.
 - [ ] Pin third-party actions to a commit SHA. Done in `ci.yml`; keep it in each new workflow.
 - [ ] Add a secret scan (for example gitleaks) to `ci.yml`.

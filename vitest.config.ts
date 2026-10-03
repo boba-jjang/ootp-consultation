@@ -16,11 +16,12 @@ export default defineConfig({
       provider: 'v8',
       // Every calculation lives in packages/core, so that is where the floor applies.
       // Listing the sources also counts files that no test imports yet.
-      // Run the floor with `pnpm test:core`: its path filter keeps app tests from
-      // covering core code. Don't use --project here, because Vitest then matches this
-      // glob against the project root, finds nothing and passes at 0/0.
-      include: ['packages/core/src/**/*.ts'],
-      exclude: ['**/*.test.ts'],
+      // `pnpm test:core` runs it with --project @ootp/core, so app tests can't cover core
+      // code. Under --project, Vitest matches this glob against the project root rather
+      // than the workspace root, so it accepts both forms. A glob that matches nothing
+      // passes at 0/0, so keep it matching the core sources.
+      include: ['{packages/core/,}src/**/*.{ts,mts,cts,tsx,js,mjs,cjs,jsx}'],
+      exclude: ['**/*.test.*'],
       reporter: ['text', 'html'],
       thresholds: {
         lines: 80,

@@ -79,7 +79,9 @@ export default defineConfig([
         'error',
         {
           // Exact names, so local folders such as ./domain or ./events stay allowed.
-          paths: builtinModules.map((name) => ({ name, message: NODE_ONLY })),
+          paths: builtinModules
+            .filter((name) => !name.startsWith('node:'))
+            .map((name) => ({ name, message: NODE_ONLY })),
           patterns: [
             { regex: '^node:', message: NODE_ONLY },
             {
@@ -105,17 +107,25 @@ export default defineConfig([
           '__dirname',
           '__filename',
           'global',
+          'globalThis',
+          'self',
           'fetch',
+          'Request',
+          'Response',
+          'Headers',
           'XMLHttpRequest',
           'WebSocket',
+          'EventSource',
           'window',
           'document',
+          'location',
           'navigator',
           'localStorage',
           'sessionStorage',
           'indexedDB',
         ].map((name) => ({ name, message: CORE_GLOBALS })),
       ],
+      '@typescript-eslint/triple-slash-reference': ['error', { types: 'never' }],
       'no-restricted-syntax': [
         'error',
         { selector: 'ImportExpression', message: 'packages/core uses static imports only.' },

@@ -14,7 +14,7 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc --build",
     "test": "pnpm run test:core && pnpm run test:apps",
-    "test:core": "vitest run --coverage packages/core/",
+    "test:core": "vitest run --coverage --project @ootp/core",
     "test:apps": "vitest run --project \"!@ootp/core\" --passWithNoTests",
     "test:watch": "vitest"
   },

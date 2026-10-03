@@ -141,8 +141,8 @@ A pull request merges only after lint, type checks, unit and golden tests, a pro
 | `dependabot.yml` | Weekly | Grouped npm and GitHub Actions updates, each one a pull request through CI | Not a workflow |
 
 - [x] Set `concurrency` with `cancel-in-progress`, so a new push cancels the previous run.
-- [x] Give every job a unique name; [required checks match on job name](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
-- [x] Pin third-party actions to a commit SHA.
+- [ ] Give every job a unique name; [required checks match on job name](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches). Done in `ci.yml`; keep it in each new workflow.
+- [ ] Pin third-party actions to a commit SHA. Done in `ci.yml`; keep it in each new workflow.
 - [ ] Add a secret scan (for example gitleaks) to `ci.yml`.
 - [ ] Protect `main` with a ruleset: pull request required, the three checks required, linear history. On GitHub Free this needs a public repo.
 - [ ] Keep a pull-request run under five minutes, so private-repo minutes would also last.
@@ -202,6 +202,8 @@ One function, `/api/advisor`, holds the Gemini key. The browser sends a question
 The system prompt carries the design handoff's contract. Answers cite the numbers they use, say when data is missing and never invent a rating. They also keep data coverage and estimate confidence apart.
 
 Hobby functions can run for [300 seconds](https://vercel.com/docs/functions/limitations), and time spent waiting on the model doesn't count toward Active CPU. Request and response bodies cap at 4.5 MB, far above a snapshot's fact list.
+
+`packages/core` exports its TypeScript source with no build step, which Vite bundles for the browser. Vercel's Node builder doesn't: a function that imports runtime values from `@ootp/core` builds green and then fails with `ERR_MODULE_NOT_FOUND`. Until core gets a JavaScript build, the function uses `import type` only. A Vercel build also doesn't fail on a function's type errors, so `api/` needs its own tsconfig (Node types, no DOM) referenced from the root `tsconfig.json`.
 
 - [ ] Define an `AdvisorProvider` interface with one Gemini implementation, so another model can swap in without touching the UI.
 - [ ] Set `maxDuration` to 60 seconds, with a matching client timeout.
@@ -279,7 +281,7 @@ End-to-end tests can't click through GitHub sign-in. Staging gets one email-and-
 - [ ] Write the test for each special-handling row before the parser code for it.
 - [ ] Run the identity checks as property tests over every fixture.
 - [ ] Create the staging test user and store its credentials as secrets.
-- [ ] Set the coverage floor on `packages/core` at 80% and raise it as modules settle.
+- [ ] Set the coverage floor on `packages/core` at 80% and raise it as modules settle. The 80% floor is set in `vitest.config.ts`.
 
 ## Operations
 

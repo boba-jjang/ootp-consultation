@@ -246,6 +246,7 @@ These acceptance criteria differ from the canvas or from the Basis as written; t
 - [x] Keep the older superstats copies in `fixtures/legacy/`, to test header-version handling.
 - [x] Detect each export's view and header version from its header row, with every version in the header manifest (Knowledge Base › Import contract › Header manifest).
 - [x] Route each export: read the CSV and file name, and route it as primary, supplemental or rejected, with its scope, side and import events (Knowledge Base › Import contract).
+- [x] Validate a snapshot across its files: names and positions, repeated columns, identities, the rating scale and league rows (Knowledge Base › Import contract › Invariants).
 - [ ] Stamp every import with `importer_version`, so re-reading raw files is deterministic.
 - [ ] Import the league sortable files: name joins, duplicate flags, rows with G = 0 dropped (Knowledge Base › Import contract › Joins and snapshots).
 - [ ] Build league percentiles: usage-based peer pools, sample floors, metric directions and the mid-rank formula (Knowledge Base › League percentiles).
@@ -288,7 +289,7 @@ The Seattle game-42 exports are the golden fixtures: every parser rule, identity
 End-to-end tests can't click through GitHub sign-in. Staging gets one email-and-password test user, with its credentials stored as GitHub secrets; production stays GitHub-only.
 
 - [x] Write the test for each special-handling row before the parser code for it.
-- [ ] Run the identity checks as property tests over every fixture, skipping pitcher rows with G = 0, which carry no data.
+- [x] Run the identity checks as property tests over every fixture, skipping pitcher rows with G = 0, which carry no data.
 - [ ] Create the staging test user and store its credentials as secrets.
 - [ ] Set the coverage floor on `packages/core` at 80% and raise it as modules settle. The 80% floor is set in `vitest.config.ts`.
 

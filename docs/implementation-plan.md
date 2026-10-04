@@ -263,17 +263,25 @@ Frontend coding starts with what every screen shares: design tokens, the app she
 | Design tokens | The handoff's palette as CSS variables (navy `#0A1118`, slate `#121D24`, chalk `#F5F7FA`, gold `#E5A93C`, crimson `#D9534F`, emerald `#2ECC71` and the rest); Chakra Petch for UI text and IBM Plex Mono for numbers, both self-hosted |
 | Component rules | Emerald ▲ and crimson ▼ always carry the arrow; a dashed gold outline means empty; locked features stay visible with a lock and name what unlocks them; 44 px minimum targets |
 | App shell | Top bar with team, league, snapshot selector (previous and next), data-coverage badge, DH and advisor status; tabs for Clubhouse, Talent radar, Lineup card, Bullpen & tactics and Dev lab |
-| Routing | `/teams`, `/teams/new`, and `/t/:team/s/:snapshot/` plus one path per tab |
+| Routing | `/sign-in`, `/teams`, `/teams/new`, `/t/:team/settings`, and `/t/:team/s/:snapshot/` plus one path per tab |
 | Data loading | TanStack Query over Supabase; derived data computed by `packages/core` and cached per snapshot and importer version |
-| Lock framework | Each module declares the data sets it needs; a shared wrapper renders the locked state and names the export that unlocks it, so no screen ever breaks |
+| Lock framework | Each module declares the data sets it needs; a shared wrapper renders the locked state and names the export that unlocks it, so no screen ever breaks. Tabs whose screens arrive in Phase 4 render the same locked state, naming the phase |
+| Styling | Plain CSS: the tokens as custom properties in three layers (primitive, semantic, component), CSS Modules per component, no utility framework. A test fails on a raw color outside the token file. Motion is CSS transitions that respect `prefers-reduced-motion`; React's view transitions wait for a stable release |
+| Data coverage | A `packages/core` module: each player's five data sets (bio, stats, batted ball, swing decisions, ratings), the team badge, what to upload next, and the view descriptions the screens show. League files count separately |
 | Vocabulary | "Data coverage" is the top-bar badge (Low, Moderate, High). "Estimate confidence" is the band on a recommendation. |
 
-The canvas's Dugout alignment, batting order and luck reads are placeholders, so they get built from the models, not copied. Talent radar with its league percentiles, the situational strategy view, trends and the league-file upload still need designs before Phase 4 reaches them.
+The canvas's Dugout alignment, batting order and luck reads are placeholders, so they get built from the models, not copied. Talent radar with its league percentiles, the situational strategy view, trends and the league-file upload still need designs before Phase 4 reaches them. Until the league upload is designed, league files go through the same drop zones as team views and show up in the import log.
 
-- [ ] Build the token file and a component sheet page, checked against the canvas.
-- [ ] Build the shell, routes and an error boundary.
-- [ ] Build the Team menu and Create a Team (add exports, team and league, review).
-- [ ] Build the Clubhouse: upload, snapshot list, coverage matrix, what to upload next, import log.
+Build order, one pull request each:
+
+- [ ] Design tokens, self-hosted fonts and a component sheet page (`/sheet`), checked against the canvas. A test keeps raw colors out of components.
+- [ ] Routing, the sign-in screen, data loading with TanStack Query over the Supabase store, and an error boundary per screen.
+- [ ] Data coverage in `packages/core`, with tests on the fixtures: the Seattle snapshot is High with 12 hitters at 5 of 5 data sets and 13 pitchers at 4 of 5 (no pitcher bio view).
+- [ ] App shell: top bar (team menu, snapshot selector, coverage badge, DH, advisor status), module tabs with locked states, and the lock framework.
+- [ ] Team menu and Create a Team: add exports (drop or choose files, folders included), files read, team and league prefilled from the files, review, create.
+- [ ] The Clubhouse: upload, snapshot timeline, what to upload next, coverage matrices, import log, how columns were read, Run analysis.
+- [ ] Team settings, Export team and restore from a zip.
+- [ ] End-to-end and accessibility tests in `e2e.yml`: Create a Team from the fixtures yields a Game 42 snapshot with High coverage; locked states render; no serious axe violations; 44 px targets. Needs the staging test user below.
 - [ ] Ask the design chat for Talent radar (with league percentiles), the situational strategy view, trends and where league files are uploaded.
 
 ## Testing and quality

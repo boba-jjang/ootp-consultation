@@ -28,6 +28,11 @@ describe('assembleSnapshot on the Seattle game-42 files (the Phase 2 gate)', () 
     expect(snapshot.league.pitchers).toHaveLength(415);
   });
 
+  it('measures High coverage', () => {
+    expect(snapshot.coverage.level).toBe('high');
+    expect(snapshot.coverage.views.onFile).toHaveLength(11);
+  });
+
   it('finds no problem', () => {
     expect(snapshot.events.map((event) => event.code)).toEqual(['dropped-no-appearances']);
   });

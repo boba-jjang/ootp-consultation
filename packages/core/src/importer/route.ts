@@ -47,7 +47,7 @@ export interface RoutingSettings {
 export const DEFAULT_ROUTING_SETTINGS: RoutingSettings = { leagueRowThreshold: 60 };
 
 /** The only views the league exports as sortable stats (Knowledge Base › Data sources). */
-const LEAGUE_VIEWS: ReadonlySet<ViewId> = new Set([
+export const LEAGUE_VIEWS: ReadonlySet<ViewId> = new Set([
   'batting_superstats_1',
   'batting_superstats_2',
   'pitching_superstats_1',

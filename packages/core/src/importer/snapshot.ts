@@ -1,4 +1,5 @@
 import { RATING_COLUMNS } from '../ratings/columns.ts';
+import { measureCoverage, type Coverage } from './coverage.ts';
 import { scaleBounds, toTwentyEighty, type RatingScale } from '../ratings/scale.ts';
 import { importLeague } from './league.ts';
 import { VIEW_MANIFESTS, type Side, type ViewId } from './manifest.ts';
@@ -20,6 +21,8 @@ export interface Snapshot {
   hitters: ExportRow[];
   pitchers: ExportRow[];
   league: { hitters: ExportRow[]; pitchers: ExportRow[] };
+  /** The badge, the matrices and what to upload next. */
+  coverage: Coverage;
   events: SnapshotEvent[];
 }
 
@@ -35,7 +38,8 @@ const nameOf = (row: ExportRow) => (typeof row.Name === 'string' ? row.Name : ''
  * Assembles one snapshot from its routed files: Knowledge Base › Import contract › Joins and
  * snapshots. Team views join on name within each side, the hitter capture adding DEF Pot;
  * ratings move to 20–80; the league files join into league tables; and the files are
- * validated against each other. Rejected files are left out.
+ * validated against each other, and their coverage is measured. Rejected files are left
+ * out.
  */
 export function assembleSnapshot(
   files: readonly RoutedExport[],
@@ -70,6 +74,7 @@ export function assembleSnapshot(
     hitters,
     pitchers,
     league: { hitters: league.hitters, pitchers: league.pitchers },
+    coverage: measureCoverage(files),
     events,
   };
 }

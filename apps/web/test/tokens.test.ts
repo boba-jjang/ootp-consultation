@@ -5,8 +5,12 @@ import { describe, expect, it } from 'vitest';
 const SRC = new URL('../src/', import.meta.url);
 const TOKENS = 'styles/tokens.css';
 
-/** A color written out: hex, rgb(), rgba(), hsl() or hsla(). */
-const RAW_COLOR = /(?<![\w-])#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?)\(/gi;
+/** A color written out: hex, a color function with literal channels, or a named color as a CSS value. */
+const RAW_COLOR = [
+  /(?<![\w-])#[0-9a-f]{3,8}\b/gi,
+  /\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color|color-mix)\(/gi,
+  /:\s*(?:white|black|red|blue|green|yellow|orange|purple|pink|gray|grey|silver|gold|navy|teal|cyan|magenta|lime|maroon|olive|aqua|fuchsia|brown|beige|ivory|tan|khaki|coral|salmon|crimson|indigo|violet|turquoise|whitesmoke|gainsboro|lightgray|darkgray|dimgray|slategray)\b/gi,
+];
 
 const sourceFiles = () =>
   readdirSync(SRC, { recursive: true, encoding: 'utf8' })
@@ -19,7 +23,9 @@ describe('design tokens', () => {
       .filter((file) => file !== TOKENS)
       .flatMap((file) => {
         const text = readFileSync(new URL(file, SRC), 'utf8');
-        return [...text.matchAll(RAW_COLOR)].map((match) => `${file}: ${match[0]}`);
+        return RAW_COLOR.flatMap((pattern) =>
+          [...text.matchAll(pattern)].map((match) => `${file}: ${match[0]}`),
+        );
       });
     expect(offenders).toEqual([]);
   });
@@ -41,9 +47,12 @@ describe('design tokens', () => {
 
   it('builds every semantic and component token from other tokens, not raw values', () => {
     const tokens = readFileSync(new URL(TOKENS, SRC), 'utf8');
-    const semantic = tokens.slice(tokens.indexOf('---- Semantic'));
-    const raw = [...semantic.matchAll(/^\s*(--[\w-]+):\s*([^;]+);/gm)]
-      .filter(([, , value]) => /#[0-9a-f]{3,8}\b/i.test(value ?? ''))
+    const start = tokens.indexOf('---- Semantic');
+    expect(start).toBeGreaterThan(0);
+    const raw = [...tokens.slice(start).matchAll(/^\s*(--[\w-]+):\s*([^;]+);/gm)]
+      .filter(([, , value]) =>
+        /#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|oklch|oklab|hwb)\(\s*\d/i.test(value ?? ''),
+      )
       .map(([, name]) => name);
     expect(raw).toEqual([]);
   });

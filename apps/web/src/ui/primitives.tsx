@@ -159,10 +159,11 @@ export function Panel({
   title,
   meta,
   children,
+  className,
   ...props
 }: ComponentProps<'section'> & { title: ReactNode; meta?: ReactNode }) {
   return (
-    <section className={styles.panel} {...props}>
+    <section className={classes(styles.panel, className)} {...props}>
       <div className={styles.panelHead}>
         <h2 className={styles.panelTitle}>{title}</h2>
         {meta === undefined ? null : <p className={styles.panelMeta}>{meta}</p>}
@@ -172,9 +173,9 @@ export function Panel({
   );
 }
 
-export function Card({ children, ...props }: ComponentProps<'article'>) {
+export function Card({ children, className, ...props }: ComponentProps<'article'>) {
   return (
-    <article className={styles.card} {...props}>
+    <article className={classes(styles.card, className)} {...props}>
       {children}
     </article>
   );
@@ -234,6 +235,7 @@ export function Field({
   help,
   error,
   font,
+  className,
   ...input
 }: ComponentProps<'input'> & {
   id: string;
@@ -253,7 +255,7 @@ export function Field({
       </label>
       <input
         id={id}
-        className={styles.input}
+        className={classes(styles.input, className)}
         data-mono={font === 'mono'}
         aria-describedby={describedBy}
         aria-invalid={error ? true : undefined}
@@ -291,8 +293,9 @@ export function Choices<T extends string>({
   help?: ReactNode;
   font?: 'mono';
 }) {
+  const helpId = `${name}-help`;
   return (
-    <fieldset className={styles.field}>
+    <fieldset className={styles.field} aria-describedby={help ? helpId : undefined}>
       <legend className={styles.label}>{legend}</legend>
       <div className={styles.choices}>
         {options.map((option) => (
@@ -310,7 +313,11 @@ export function Choices<T extends string>({
           </label>
         ))}
       </div>
-      {help ? <span className={styles.help}>{help}</span> : null}
+      {help ? (
+        <span id={helpId} className={styles.help}>
+          {help}
+        </span>
+      ) : null}
     </fieldset>
   );
 }
@@ -323,7 +330,8 @@ export function Timeline({
   games: number;
   snapshots: readonly { game: number; label: string }[];
 }) {
-  const at = (game: number) => `${(Math.min(game, games) / games) * 100}%`;
+  const span = Math.max(games, 1);
+  const at = (game: number) => `${(Math.min(game, span) / span) * 100}%`;
   return (
     <div className={styles.timeline}>
       <span className={styles.timelineTrack} aria-hidden="true" />
@@ -343,10 +351,10 @@ export function Timeline({
         G1
       </span>
       <span className={styles.timelineTick} style={{ left: '50%', transform: 'translateX(-50%)' }}>
-        G{Math.round(games / 2)}
+        G{Math.round(span / 2)}
       </span>
       <span className={styles.timelineTick} style={{ right: 0 }}>
-        G{games}
+        G{span}
       </span>
     </div>
   );

@@ -44,7 +44,7 @@ The Knowledge Base refers to its own sections by number.
 ## Rules for a task
 
 1. One task is one unchecked checklist item in `docs/implementation-plan.md`, built on one branch as one pull request that ticks that box. Quote the item. If an item is too big for one session, split it into tasks that each leave CI green; only the last one ticks the box.
-2. Work the specs call for that has no checklist item yet, such as the league sortable files or the percentile pools, adds its item to the plan in the same pull request, under the section and phase it belongs to. Say so in the task. Changing a platform decision, adding a provider or touching production data needs the owner first (`CLAUDE.md` › Ask the owner first).
+2. Work the Knowledge Base calls for that has no checklist item yet adds its item to the plan in the same pull request, under the section and phase that Knowledge Base › Delivery plan gives it. Say so in the task. Changing a platform decision, adding a provider or touching production data needs the owner first (`CLAUDE.md` › Ask the owner first).
 3. Order work by the current phase in `CLAUDE.md`, then the plan's checklists, then the build order (Knowledge Base › Delivery plan › Modules by phase). Never schedule a module before its inputs exist; name what it waits for under Dependencies.
 4. Cite the sections a task implements by document and heading, for example "Knowledge Base › Import contract › Columns that need special handling".
 5. A task that touches an open question (Knowledge Base § 14; plan › Risks and open questions) either records the owner's answer or builds behind a setting whose default comes from Knowledge Base › Assumptions. Say which.

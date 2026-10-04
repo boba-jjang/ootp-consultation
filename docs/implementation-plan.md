@@ -220,17 +220,19 @@ Hobby functions can run for [300 seconds](https://vercel.com/docs/functions/limi
 | Order | Module | Spec in the Knowledge Base | First screen that needs it | Phase |
 | --- | --- | --- | --- | --- |
 | 1 | Importer: header detection, synonym table, unit and enum normalization, identity checks, routing | Import contract (§ 5) | Create a Team, Clubhouse | 2 |
-| 2 | Canonical tables and league config, stored on 20–80 | Ratings model › Scale conversion (§ 7) | Every screen | 2 |
-| 3 | Metrics and luck gaps | Metrics and league context (§ 6) | Talent radar, Bullpen & tactics | 4 |
-| 4 | Talent estimator v0 | Ratings model › Talent estimator (§ 7) | Talent radar, Lineup card | 4 |
-| 5 | Defensive model and eligibility matrix | Defensive model (§ 9) | Lineup card | 4 |
-| 6 | Strategy rules engine | Strategy rules (§ 10) | Bullpen & tactics | 4 |
-| 7 | Lineup optimizer, in a Web Worker | Lineup optimization (§ 11) | Lineup card | 4 |
-| 8 | Development planner | Development planner (§ 12) | Dev lab | 4 |
-| 9 | Consultation output and the manager's card | Product vision and scope (§ 2) | Every screen, advisor | 4–5 |
-| 10 | Backtest | Delivery plan (§ 15) | Trends | 6 |
+| 2 | League file import: name joins and duplicate flags | Data sources (§ 4); Import contract › Joins and snapshots (§ 5) | Clubhouse (league upload not yet designed) | 2 |
+| 3 | Canonical tables and league config, stored on 20–80 | Ratings model › Scale conversion (§ 7) | Every screen | 2 |
+| 4 | Metrics and luck gaps | Metrics and league context (§ 6) | Talent radar, Bullpen & tactics | 4 |
+| 5 | League percentiles | League percentiles (§ 8) | Talent radar | 4 |
+| 6 | Talent estimator v0 | Ratings model › Talent estimator (§ 7) | Talent radar, Lineup card | 4 |
+| 7 | Defensive model and eligibility matrix | Defensive model (§ 9) | Lineup card | 4 |
+| 8 | Strategy rules engine | Strategy rules (§ 10) | Bullpen & tactics | 4 |
+| 9 | Lineup optimizer, in a Web Worker | Lineup optimization (§ 11) | Lineup card | 4 |
+| 10 | Development planner | Development planner (§ 12) | Dev lab | 4 |
+| 11 | Consultation output and the manager's card | Product vision and scope (§ 2) | Every screen, advisor | 4–5 |
+| 12 | Backtest | Delivery plan (§ 15) | Trends | 6 |
 
-These acceptance criteria differ from the canvas or from the Basis as written:
+These acceptance criteria differ from the canvas or from the Basis as written; the Knowledge Base already includes them:
 
 - The pitching view run on hitters routes as supplemental and keeps DEF Pot; it isn't rejected.
 - Each luck comparison gets its own baseline from the import. Seattle's BACON runs below xBACON, yet team wOBA runs .008 above xwOBA and staff ERA 0.15 above xERA.
@@ -243,6 +245,8 @@ These acceptance criteria differ from the canvas or from the Basis as written:
 - [x] Add the four league sortable superstats exports to `fixtures/seattle-g42/` (Knowledge Base › Data sources › League sortable stats).
 - [x] Keep the older superstats copies in `fixtures/legacy/`, to test header-version handling.
 - [ ] Stamp every import with `importer_version`, so re-reading raw files is deterministic.
+- [ ] Import the league sortable files: name joins, duplicate flags, rows with G = 0 dropped (Knowledge Base › Import contract › Joins and snapshots).
+- [ ] Build league percentiles: usage-based peer pools, sample floors, metric directions and the mid-rank formula (Knowledge Base › League percentiles).
 
 ## Frontend foundation
 
@@ -258,13 +262,13 @@ Frontend coding starts with what every screen shares: design tokens, the app she
 | Lock framework | Each module declares the data sets it needs; a shared wrapper renders the locked state and names the export that unlocks it, so no screen ever breaks |
 | Vocabulary | "Data coverage" is the top-bar badge (Low, Moderate, High). "Estimate confidence" is the band on a recommendation. |
 
-The canvas's Dugout alignment, batting order and luck reads are placeholders, so they get built from the models, not copied. Talent radar, the situational strategy view and trends still need designs before Phase 4 reaches them.
+The canvas's Dugout alignment, batting order and luck reads are placeholders, so they get built from the models, not copied. Talent radar with its league percentiles, the situational strategy view, trends and the league-file upload still need designs before Phase 4 reaches them.
 
 - [ ] Build the token file and a component sheet page, checked against the canvas.
 - [ ] Build the shell, routes and an error boundary.
 - [ ] Build the Team menu and Create a Team (add exports, team and league, review).
 - [ ] Build the Clubhouse: upload, snapshot list, coverage matrix, what to upload next, import log.
-- [ ] Ask the design chat for Talent radar, the situational strategy view and trends.
+- [ ] Ask the design chat for Talent radar (with league percentiles), the situational strategy view, trends and where league files are uploaded.
 
 ## Testing and quality
 
@@ -312,9 +316,9 @@ Frontend coding starts in Phase 3, after the platform and data foundation. A pha
 | --- | --- | --- |
 | 0. Decisions and accounts | Confirm the decisions table; open GitHub, Vercel, Supabase and AI Studio | Decisions confirmed or knowingly left open; four accounts, none with a card on file |
 | 1. Walking skeleton | Repo, CI, Vercel deploys, GitHub sign-in; two Supabase projects, migration 0001 | Sign in on production, save and reload a team; a pull request shows green checks and a preview |
-| 2. Data foundation | Importer, golden fixtures, full policy tests; upload, import log and Export team | The 11 Seattle files make a Game 42 snapshot; the hitter capture routes as supplemental |
+| 2. Data foundation | Importer for the team views and the league files, golden fixtures, full policy tests; upload, import log and Export team | The 11 Seattle files make a Game 42 snapshot; the hitter capture routes as supplemental; the four league files load |
 | 3. Frontend foundation | Tokens, shell, routing, lock framework; Team menu, Create a Team, Clubhouse | Setup and Clubhouse match the canvas on real data; end-to-end and accessibility tests pass |
-| 4. Models and screens | Metrics, estimator, defense, strategy, optimizer, development; each with its screen | Every screen shows model output with evidence and confidence; no placeholders left |
+| 4. Models and screens | Metrics, percentiles, estimator, defense, strategy, optimizer, development; each with its screen | Every screen shows model output with evidence and confidence; no placeholders left |
 | 5. Advisor | Advisor function, prompt contract, daily cap; manager's card export | Answers cite snapshot numbers and name any missing data |
 | 6. Trends and backtest | Snapshot comparisons and trend views; backtest against later exports | A second snapshot shows trends; the backtest scores the Game 42 projections |
 

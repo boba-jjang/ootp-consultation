@@ -14,7 +14,7 @@ OOTP CSV Consultation is a personal, free-tier web app. It turns one team's Out 
 
 ## Current phase
 
-Phase 2, data foundation. Exit gate: the 11 Seattle files make a Game 42 snapshot; the hitter capture routes as supplemental.
+Phase 2, data foundation. Exit gate: the 11 Seattle files make a Game 42 snapshot; the hitter capture routes as supplemental; the four league files load.
 
 Phase 1 (walking skeleton) passed its gate on 4 October 2026 and is tagged `v0.1`. Its one open item, the `main` ruleset, is a repository setting for the owner.
 
@@ -69,10 +69,12 @@ CI (`.github/workflows/ci.yml`, job `ci`) runs install, lint, format check, type
 
 ## Corrections that override the canvas or the Basis as written
 
+The Knowledge Base already includes these.
+
 - The pitching ratings view run on hitters (`cus_pitch_pot` listing hitters) is a supplemental source. Keep its DEF Pot column, drop the rest, and log it as supplemental, not rejected.
 - Luck baselines are measured per metric pair from the import: BACON vs xBACON, wOBA vs xwOBA, ERA vs xERA. In the Seattle data, BACON runs below xBACON while team wOBA and staff ERA run above their expected values, so one offset can't serve all three.
 - Pitcher regression signals come from the talent estimator (FIP, SIERA, ratings); xERA is one input.
-- Small-sample flags use each stat's stabilization point from the Basis, not one innings cutoff.
+- Small-sample flags use each stat's stabilization point from the Knowledge Base, not one innings cutoff.
 - Pitcher age comes from `cus_pitch_pot`.
 - At a position other than the listed one, show component-based ceilings, not the listed position's DEF.
 - The canvas's Dugout alignment, batting order and luck reads are placeholders. Build them from the models.

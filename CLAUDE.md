@@ -31,7 +31,7 @@ Update this section when a phase's gate passes.
 Keep these current. Run them from the repo root on Node 24. The Node major is set in three places that must agree: `.nvmrc` (CI), and `engines.node` in the root and `apps/web` `package.json` files (Vercel reads the `apps/web` one). The pnpm version comes from `packageManager` in the root `package.json`.
 
 - Install: `pnpm install` (CI uses `pnpm install --frozen-lockfile`)
-- Dev server: `pnpm dev` (Vite, `apps/web`)
+- Dev server: `pnpm dev` (Vite, `apps/web`, on http://localhost:5173). It talks to the staging project: copy `apps/web/.env.example` to `apps/web/.env.local` and fill in staging's URL and publishable key.
 - Lint: `pnpm lint` (ESLint, type-aware; warnings fail)
 - Format: `pnpm format` to fix, `pnpm format:check` to check (Prettier)
 - Typecheck: `pnpm typecheck` (`tsc --build` over every project referenced from the root `tsconfig.json`; add each new tsconfig there)

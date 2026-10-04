@@ -1,0 +1,76 @@
+import { describe, expect, it } from 'vitest';
+
+import { DEFAULT_TEAM_SETTINGS, parseTeamRow, parseTeamSettings } from './index.ts';
+
+describe('DEFAULT_TEAM_SETTINGS', () => {
+  it('uses the design handoff defaults and is itself valid', () => {
+    expect(DEFAULT_TEAM_SETTINGS).toEqual({
+      name: '',
+      league: '',
+      rating_scale: '1-10',
+      league_shows: 'potentials_only',
+      dh_enabled: true,
+      games_per_season: 162,
+      dev_lab_slots: 4,
+    });
+    const filledIn = { ...DEFAULT_TEAM_SETTINGS, name: 'Seattle Arrows', league: 'ABL' };
+    expect(parseTeamSettings(filledIn)).toEqual({ ok: true, value: filledIn });
+  });
+});
+
+describe('parseTeamSettings', () => {
+  const valid = { ...DEFAULT_TEAM_SETTINGS, name: 'Seattle Arrows', league: 'ABL' };
+
+  it('trims the name and league', () => {
+    const result = parseTeamSettings({ ...valid, name: '  Seattle Arrows ', league: ' ABL ' });
+    expect(result).toEqual({ ok: true, value: valid });
+  });
+
+  it.each([
+    ['an empty name', { name: '   ' }, 'name'],
+    ['an empty league', { league: '' }, 'league'],
+    ['an unknown rating scale', { rating_scale: '1-7' }, 'rating_scale'],
+    ['an unknown league display', { league_shows: 'everything' }, 'league_shows'],
+    ['zero games per season', { games_per_season: 0 }, 'games_per_season'],
+    ['fractional games per season', { games_per_season: 161.5 }, 'games_per_season'],
+    ['no Dev Lab slots', { dev_lab_slots: 0 }, 'dev_lab_slots'],
+    ['more than 30 Dev Lab slots', { dev_lab_slots: 31 }, 'dev_lab_slots'],
+  ])('rejects %s and names the field', (_case, change, field) => {
+    const result = parseTeamSettings({ ...valid, ...change });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(Object.keys(result.errors)).toEqual([field]);
+    }
+  });
+
+  it('accepts the Dev Lab slot range ends, 1 and 30', () => {
+    expect(parseTeamSettings({ ...valid, dev_lab_slots: 1 }).ok).toBe(true);
+    expect(parseTeamSettings({ ...valid, dev_lab_slots: 30 }).ok).toBe(true);
+  });
+
+  it('drops fields it does not know, such as owner_id', () => {
+    const result = parseTeamSettings({ ...valid, owner_id: 'someone-else' });
+    expect(result).toEqual({ ok: true, value: valid });
+  });
+});
+
+describe('parseTeamRow', () => {
+  const row = {
+    id: '7b0e5a5e-3c1b-4f5e-9a64-2f6f0d6f9a10',
+    owner_id: '0d7f3c2a-5b9e-4f1a-8c3d-6e2b1a4f9c87',
+    created_at: '2026-10-04T01:30:00.123456+00:00',
+    ...DEFAULT_TEAM_SETTINGS,
+    name: 'Seattle Arrows',
+    league: 'ABL',
+  };
+
+  it('reads a teams row as stored', () => {
+    expect(parseTeamRow(row)).toEqual(row);
+  });
+
+  it('rejects a row missing its id', () => {
+    const withoutId: Partial<typeof row> = { ...row };
+    delete withoutId.id;
+    expect(() => parseTeamRow(withoutId)).toThrow();
+  });
+});

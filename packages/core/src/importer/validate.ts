@@ -1,6 +1,7 @@
 import type { Side, ViewId } from './manifest.ts';
 import type { ExportRow, ImportEvent, RoutedExport, Scope } from './route.ts';
 import type { CellValue } from './values.ts';
+import { RATING_COLUMNS } from '../ratings/columns.ts';
 
 /**
  * Snapshot validation: Knowledge Base › Import contract › Invariants, checked across the
@@ -60,40 +61,6 @@ const SHARED_COLUMNS: Record<Side, readonly string[]> = {
   pitchers: ['G', 'GS', 'IP', '#', 'B', 'T'],
 };
 
-/** Rating columns, by canonical name, that must fall inside the league's scale. */
-const RATING_COLUMNS = new Set([
-  'Contact P',
-  'HT P',
-  'K P',
-  'GAP P',
-  'POW P',
-  'EYE P',
-  'BUN',
-  'BFH',
-  'C ABI',
-  'C FRM',
-  'C ARM',
-  'IF RNG',
-  'IF ERR',
-  'IF ARM',
-  'TDP',
-  'OF RNG',
-  'OF ERR',
-  'OF ARM',
-  'SPE',
-  'STE',
-  'SR',
-  'RUN',
-  'DEF',
-  'STU P',
-  'MOV P',
-  'HRA P',
-  'PBABIP P',
-  'Control P',
-  'STM',
-  'Hold runners',
-  'DEF Pot',
-]);
 const RATING_VIEWS: ReadonlySet<ViewId> = new Set(['custom_bat_pot', 'cus_pitch_pot']);
 
 /** Rounding slack for comparing floating-point sums. */

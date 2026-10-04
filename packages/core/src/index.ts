@@ -51,3 +51,5 @@ export {
   toTwentyEighty,
   type RatingScale,
 } from './ratings/scale.ts';
+export { RATING_COLUMNS } from './ratings/columns.ts';
+export { assembleSnapshot, type Snapshot, type SnapshotSettings } from './importer/snapshot.ts';

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router';
 
 import { useAuthActions, useSessionState } from '../session.ts';
@@ -12,16 +12,29 @@ export function SignIn() {
   const location = useLocation();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const from = (location.state as { from?: string } | null)?.from ?? null;
+
+  // Back from GitHub can restore this page from the back-forward cache, button and all.
+  useEffect(() => {
+    const restore = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        setBusy(false);
+      }
+    };
+    window.addEventListener('pageshow', restore);
+    return () => {
+      window.removeEventListener('pageshow', restore);
+    };
+  }, []);
 
   if (session) {
-    const from = (location.state as { from?: string } | null)?.from;
     return <Navigate to={from ?? '/teams'} replace />;
   }
 
   return (
     <>
       <header className={styles.header}>
-        <span className={styles.brand}>
+        <span className={styles.brand} translate="no">
           <DiamondMark className={styles.mark} />
           Front Office Command Center
         </span>
@@ -38,6 +51,7 @@ export function SignIn() {
               </p>
               <SignInButton
                 client={client}
+                returnTo={from}
                 busy={busy}
                 onStart={() => {
                   setBusy(true);
@@ -68,11 +82,13 @@ export function SignIn() {
 
 function SignInButton({
   client,
+  returnTo,
   busy,
   onStart,
   onFail,
 }: {
   client: NonNullable<ReturnType<typeof useSessionState>['client']>;
+  returnTo: string | null;
   busy: boolean;
   onStart: () => void;
   onFail: (message: string) => void;
@@ -84,7 +100,7 @@ function SignInButton({
       disabled={busy}
       onClick={() => {
         onStart();
-        void signIn().then((message) => {
+        void signIn(returnTo).then((message) => {
           if (message) {
             onFail(message);
           }

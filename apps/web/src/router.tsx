@@ -1,7 +1,8 @@
-import { createBrowserRouter, Navigate, Outlet } from 'react-router';
+import { createBrowserRouter, Outlet } from 'react-router';
 
 import { RequireSession } from './auth.tsx';
 import { ComingSoon } from './screens/ComingSoon.tsx';
+import { Home } from './screens/Home.tsx';
 import { NotFound } from './screens/NotFound.tsx';
 import { Root } from './screens/Root.tsx';
 import { RouteError } from './screens/RouteError.tsx';
@@ -19,7 +20,7 @@ export const router = createBrowserRouter([
     element: <Root />,
     errorElement: <RouteError />,
     children: [
-      { index: true, element: <Navigate to="/teams" replace /> },
+      { index: true, element: <Home /> },
       { path: 'sheet', element: <Sheet />, errorElement: <RouteError /> },
       { path: 'sign-in', element: <SignIn />, errorElement: <RouteError /> },
       {

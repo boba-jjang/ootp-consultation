@@ -28,6 +28,29 @@ test.describe('sign-in', () => {
     const unconfigured = page.getByRole('alert');
     await expect(button.or(unconfigured)).toBeVisible();
   });
+
+  test('remembers where sign-in started, survives Back from GitHub, forgets on return', async ({
+    page,
+  }) => {
+    // GitHub itself is out of reach here: the authorize request gets a stub page instead.
+    await page.route('**/auth/v1/authorize**', (route) =>
+      route.fulfill({ status: 200, contentType: 'text/html', body: '<title>GitHub stub</title>' }),
+    );
+    await page.goto('/t/abc/settings?tab=x');
+    await expect(page).toHaveURL(/\/sign-in$/);
+    const button = page.getByRole('button', { name: 'Sign in with GitHub' });
+    test.skip(!(await button.isVisible()), 'needs Supabase settings in .env.local');
+    await button.click();
+    await expect(page).toHaveTitle('GitHub stub');
+    await page.goBack();
+    await expect(button).toBeEnabled();
+    expect(await page.evaluate(() => sessionStorage.getItem('ootp.return-to'))).toBe(
+      '/t/abc/settings?tab=x',
+    );
+    await page.goto('/');
+    await expect(page).toHaveURL(/\/sign-in$/);
+    expect(await page.evaluate(() => sessionStorage.getItem('ootp.return-to'))).toBeNull();
+  });
 });
 
 test.describe('not found', () => {

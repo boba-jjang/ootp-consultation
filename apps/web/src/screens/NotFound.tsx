@@ -8,7 +8,7 @@ export function NotFound() {
     <main id="main" className={styles.main}>
       <h1 className={styles.title}>Page not found</h1>
       <p className={styles.text}>
-        There's nothing at <code>{pathname}</code>.
+        There's nothing at <code translate="no">{pathname}</code>.
       </p>
       <p className={styles.actions}>
         <Link to="/teams">Go to your teams</Link>

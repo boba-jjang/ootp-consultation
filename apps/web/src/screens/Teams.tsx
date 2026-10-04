@@ -25,6 +25,17 @@ const EMPTY_FORM: TeamForm = {
   dev_lab_slots: String(DEFAULT_TEAM_SETTINGS.dev_lab_slots),
 };
 
+/** The form's fields, top to bottom, so the first error gets the focus. */
+const FIELD_ORDER: readonly (keyof TeamSettings)[] = [
+  'name',
+  'league',
+  'rating_scale',
+  'league_shows',
+  'dh_enabled',
+  'games_per_season',
+  'dev_lab_slots',
+];
+
 const LEAGUE_SHOWS_LABELS: Record<(typeof LEAGUE_SHOWS)[number], string> = {
   potentials_only: 'Potentials only',
   current_and_potential: 'Current and potential',
@@ -51,6 +62,11 @@ export function TeamsScreen() {
     });
     if (!parsed.ok) {
       setFieldErrors(parsed.errors);
+      const first = FIELD_ORDER.find((field) => parsed.errors[field] !== undefined);
+      const control = first ? event.currentTarget.elements.namedItem(first) : null;
+      if (control instanceof HTMLElement) {
+        control.focus();
+      }
       return;
     }
     setFieldErrors({});
@@ -83,7 +99,7 @@ export function TeamsScreen() {
         {teams.isError ? <p role="alert">{teams.error.message}</p> : null}
         {teams.data?.length === 0 ? <p>No teams yet.</p> : null}
         {teams.data && teams.data.length > 0 ? (
-          <ul>
+          <ul className={styles.list}>
             {teams.data.map((team) => (
               <li key={team.id}>
                 <Link to={`/t/${team.id}/settings`}>{team.name}</Link> ({team.league}):{' '}

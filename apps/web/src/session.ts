@@ -3,6 +3,7 @@ import { createContext, use } from 'react';
 
 import type { SnapshotStore } from '@ootp/core';
 
+import { rememberReturnTo } from './returnTo.ts';
 import type { Client } from './supabase.ts';
 
 /**
@@ -28,10 +29,14 @@ export function useSessionState(): SessionState {
   return state;
 }
 
-/** Sign-in and sign-out, each returning a message when it fails. */
+/**
+ * Sign-in and sign-out, each returning a message when it fails. Sign-in leaves for GitHub and
+ * comes back to the app's root, which then goes to returnTo, or to the teams.
+ */
 export function useAuthActions(client: Client) {
   return {
-    signIn: async (): Promise<string | null> => {
+    signIn: async (returnTo: string | null): Promise<string | null> => {
+      rememberReturnTo(returnTo);
       const { error } = await client.auth.signInWithOAuth({
         provider: 'github',
         options: { redirectTo: window.location.origin },

@@ -19,7 +19,12 @@ if (!container) {
 createRoot(container).render(
   <StrictMode>
     <ErrorBoundary>
-      <SessionProvider client={supabase}>
+      <SessionProvider
+        client={supabase}
+        onSignOut={() => {
+          queryClient.clear();
+        }}
+      >
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} />
         </QueryClientProvider>

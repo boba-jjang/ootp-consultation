@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { isRouteErrorResponse, Link, useRouteError } from 'react-router';
 
 import { Button } from '../ui/primitives.tsx';
@@ -11,15 +12,19 @@ export function RouteError() {
     : error instanceof Error
       ? error.message
       : String(error);
-  // Vercel's runtime logs don't see the browser, so the console is where details go for now.
-  console.error('Screen error', error);
+  useEffect(() => {
+    // Vercel's runtime logs don't see the browser, so the console is where details go for now.
+    console.error('Screen error', error);
+  }, [error]);
   return (
-    <main id="main" className={styles.main} role="alert">
-      <h1 className={styles.title}>This screen hit an error</h1>
-      <p className={styles.text}>
-        The rest of the app still works, and your saved data is safe. The error was:{' '}
-        <code>{message}</code>
-      </p>
+    <main id="main" className={styles.main}>
+      <div role="alert" className={styles.notice}>
+        <h1 className={styles.title}>This screen hit an error</h1>
+        <p className={styles.text}>
+          The rest of the app still works, and your saved data is safe. The error was:{' '}
+          <code translate="no">{message}</code>
+        </p>
+      </div>
       <p className={styles.actions}>
         <Button
           variant="primary"

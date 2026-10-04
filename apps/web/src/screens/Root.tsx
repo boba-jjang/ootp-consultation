@@ -14,7 +14,7 @@ export function Root() {
       </a>
       <Outlet />
       <footer className={styles.footer}>
-        <small>
+        <small translate="no">
           Importer v{IMPORTER_VERSION}
           {projectRef ? ` · Database ${projectRef}` : ''}
         </small>

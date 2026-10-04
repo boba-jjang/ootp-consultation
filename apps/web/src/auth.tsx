@@ -1,20 +1,28 @@
 import type { Session } from '@supabase/supabase-js';
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useEffectEvent, useMemo, useState, type ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router';
 
+import styles from './screens/Message.module.css';
 import { SessionContext, useSessionState, type SessionState } from './session.ts';
 import { supabaseStore } from './store.ts';
 import type { Client } from './supabase.ts';
 
-/** Keeps the session current from Supabase Auth and hands it, with the store, to every screen. */
+/**
+ * Keeps the session current from Supabase Auth and hands it, with the store, to every screen.
+ * onSignOut runs when the session ends, however it ends: the caller drops what it cached for
+ * the signed-out user there.
+ */
 export function SessionProvider({
   client,
+  onSignOut,
   children,
 }: {
   client: Client | null;
+  onSignOut: () => void;
   children: ReactNode;
 }) {
   const [session, setSession] = useState<Session | null | undefined>(client ? undefined : null);
+  const signedOut = useEffectEvent(onSignOut);
 
   useEffect(() => {
     if (!client) {
@@ -23,8 +31,11 @@ export function SessionProvider({
     void client.auth.getSession().then(({ data }) => {
       setSession(data.session);
     });
-    const { data } = client.auth.onAuthStateChange((_event, next) => {
+    const { data } = client.auth.onAuthStateChange((event, next) => {
       setSession(next);
+      if (event === 'SIGNED_OUT') {
+        signedOut();
+      }
     });
     return () => {
       data.subscription.unsubscribe();
@@ -38,7 +49,7 @@ export function SessionProvider({
   return <SessionContext value={value}>{children}</SessionContext>;
 }
 
-/** Sends a visitor to the sign-in screen and brings them back afterwards. */
+/** Sends a visitor to the sign-in screen, remembering where they were headed. */
 export function RequireSession({ children }: { children: ReactNode }) {
   const { client, session } = useSessionState();
   const location = useLocation();
@@ -46,14 +57,21 @@ export function RequireSession({ children }: { children: ReactNode }) {
     return <Navigate to="/sign-in" replace />;
   }
   if (session === undefined) {
-    return (
-      <p role="status" style={{ padding: 'var(--gutter)' }}>
-        Checking sign-in…
-      </p>
-    );
+    return <CheckingSignIn />;
   }
   if (session === null) {
-    return <Navigate to="/sign-in" replace state={{ from: location.pathname }} />;
+    return <Navigate to="/sign-in" replace state={{ from: location.pathname + location.search }} />;
   }
   return children;
+}
+
+/** Shown while the stored session is being read. */
+export function CheckingSignIn() {
+  return (
+    <main id="main" className={styles.main}>
+      <p role="status" className={styles.text}>
+        Checking sign-in…
+      </p>
+    </main>
+  );
 }

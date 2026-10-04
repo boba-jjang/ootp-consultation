@@ -199,6 +199,7 @@ The league sortable files reuse the superstats headers: the league batting\_supe
 | B, T | L, R, S in most views; Left, Right, Switch in default | Map to L, R, S |
 | Inf, Mor, OVR, POT | Icon or hidden columns; blank, or "-" for OVR | Drop |
 | ERA+ | 999 is a display cap | Treat as capped; exclude from averages |
+| GB/FB | Ground balls per fly ball; 999.99 when there are no fly balls, a division by zero | Null when there are no fly balls |
 | Signed stats (UBR, WPA, run values) | Negative zero appears as "-0.0" | Normalize to 0 |
 | "-" and zeros in league pitching files | Rows with no appearances (G = 0, BIP = 0) carry no data: superstats 1 shows "-" in some columns and 0 in the rest, superstats 2 shows 0 everywhere | Null; drop rows with G = 0 |
 | RV-FB, RV-BR, RV-OFF, RV | Run value by pitch group; RV is their sum | Positive is good for the player on both sides; results-based, not luck-free |

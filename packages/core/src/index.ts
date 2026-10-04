@@ -11,3 +11,15 @@ export {
 export { IMPORTER_VERSION } from './version.ts';
 export { detectView, readHeader, type Detection } from './importer/detect.ts';
 export { VIEW_MANIFESTS, type Side, type ViewId, type ViewManifest } from './importer/manifest.ts';
+export {
+  DROPPED_COLUMNS,
+  ERA_PLUS_CAP,
+  canonicalColumn,
+  parseCell,
+  type CellResult,
+  type CellValue,
+  type Contract,
+  type ContractStatus,
+  type Hand,
+  type VelocityRange,
+} from './importer/values.ts';

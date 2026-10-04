@@ -286,7 +286,7 @@ The Seattle game-42 exports are the golden fixtures: every parser rule, identity
 
 End-to-end tests can't click through GitHub sign-in. Staging gets one email-and-password test user, with its credentials stored as GitHub secrets; production stays GitHub-only.
 
-- [ ] Write the test for each special-handling row before the parser code for it.
+- [x] Write the test for each special-handling row before the parser code for it.
 - [ ] Run the identity checks as property tests over every fixture, skipping pitcher rows with G = 0, which carry no data.
 - [ ] Create the staging test user and store its credentials as secrets.
 - [ ] Set the coverage floor on `packages/core` at 80% and raise it as modules settle. The 80% floor is set in `vitest.config.ts`.

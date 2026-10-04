@@ -8,6 +8,7 @@ OOTP CSV Consultation is a personal, free-tier web app. It turns one team's Out 
 
 - `docs/implementation-plan.md`: platform, CI/CD, database, phases and task checklists. Work in its phase order.
 - `docs/implementation-basis.md`: the spec for data, import rules and models. If code and the Basis disagree, follow the Basis and flag the conflict.
+- `docs/agent-knowledge-base.md`: the same spec restated for task generation, with league files, percentiles and research reliability added. Tasks cite its sections; `docs/tasks/` holds the task template and its authoring guide.
 - `docs/design-handoff.md` and `docs/design/boards/`: screens, states, copy and design tokens. Board HTML is reference markup, not code to run.
 - `fixtures/`: real exports used as golden test data. See `fixtures/README.md` for what's present and what's still missing.
 

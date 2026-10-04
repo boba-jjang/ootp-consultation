@@ -20,11 +20,11 @@ When sources disagree, the higher one wins. Record the conflict as an unresolved
 2. `CLAUDE.md`: the current phase, the working rules, and "Corrections that override the canvas or the Basis as written".
 3. `docs/implementation-plan.md`: platform decisions, phases and exit gates, checklists, CI/CD, database and environments. Its platform facts supersede platform text in both specs.
 4. The specs:
-   - `docs/agent-knowledge-base.md` (the Knowledge Base) restates the Basis for task generation. It is newer and general, with no Seattle player names, and adds the league sortable files, league percentiles, versioned header manifests and research reliability.
-   - `docs/implementation-basis.md` (the Basis) is the spec `CLAUDE.md` names. It keeps the Seattle reference data and player reads, which give fixture tests their expected values.
-   - Cite the Knowledge Base for rules and the Basis for Seattle values. Where both state a rule, they agreed when exported on 4 October 2026; a later difference is an unresolved fact.
+   - `docs/agent-knowledge-base.md` (the Knowledge Base) is the spec of record. It restates the Basis for task generation; it is newer and general, with no Seattle player names, and adds the league sortable files, league percentiles, versioned header manifests and research reliability.
+   - `docs/implementation-basis.md` (the Basis) keeps the Seattle reference data and player reads, which give fixture tests their expected values.
+   - Cite the Knowledge Base for rules and the Basis for Seattle values. Where the Basis states a rule differently, the Knowledge Base wins.
 5. `docs/design-handoff.md` and `docs/design/boards/README.md` for screens (the `screens` pack).
-6. `fixtures/README.md` for which exports exist and which are still missing.
+6. `fixtures/README.md` for which exports exist. An export that isn't there is assumed not to exist.
 
 ### Knowledge Base sections by number
 

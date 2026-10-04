@@ -6,7 +6,7 @@
 
 Platform work comes first: a deployed, signed-in walking skeleton with CI/CD and a database. Frontend coding starts in Phase 3, once that foundation and the importer exist. Everything runs on free plans for personal, non-commercial use.
 
-This plan says what to build and in what order; it doesn't repeat the specs. Data, import rules and models live in `docs/implementation-basis.md`. Screens and their states live in `docs/design-handoff.md` and `docs/design/boards/`.
+This plan says what to build and in what order; it doesn't repeat the specs. Data, import rules and models live in `docs/agent-knowledge-base.md`, the spec of record, and Seattle's reference data in `docs/implementation-basis.md`. Screens and their states live in `docs/design-handoff.md` and `docs/design/boards/`.
 
 Tasks are checkboxes to tick off as you go. Service limits were checked on 3 October 2026 and are linked where they're used.
 
@@ -268,7 +268,7 @@ The canvas's Dugout alignment, batting order and luck reads are placeholders, so
 
 ## Testing and quality
 
-The Seattle game-42 exports are the golden fixtures: every parser rule, identity check and model output is tested against them. Each row of the Basis's "Columns that need special handling" table becomes at least one test.
+The Seattle game-42 exports are the golden fixtures: every parser rule, identity check and model output is tested against them. Each row of the "Columns that need special handling" tables in the Knowledge Base and the Basis becomes at least one test.
 
 | Layer | Tool | What it proves | Runs |
 | --- | --- | --- | --- |
@@ -282,7 +282,7 @@ The Seattle game-42 exports are the golden fixtures: every parser rule, identity
 End-to-end tests can't click through GitHub sign-in. Staging gets one email-and-password test user, with its credentials stored as GitHub secrets; production stays GitHub-only.
 
 - [ ] Write the test for each special-handling row before the parser code for it.
-- [ ] Run the identity checks as property tests over every fixture.
+- [ ] Run the identity checks as property tests over every fixture, skipping league pitching rows with G = 0, which carry no data.
 - [ ] Create the staging test user and store its credentials as secrets.
 - [ ] Set the coverage floor on `packages/core` at 80% and raise it as modules settle. The 80% floor is set in `vitest.config.ts`.
 
@@ -348,7 +348,7 @@ The biggest risk is a quiet failure on a free tier, so each mitigation either ke
 - [ ] Do you need the app on more than one device? If not, browser storage could replace Supabase.
 - [ ] Gemini for the advisor, or another model?
 
-League questions (DH, scout view, per-position ratings) stay tracked in the Basis.
+League questions (DH, scout view) stay tracked in the Knowledge Base. Per-position ratings aren't available.
 
 ## Sources
 

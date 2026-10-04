@@ -6,25 +6,26 @@ Oct 4, 2026 · @Jay
 
 ## Agent brief
 
-This doc is the single source of truth for the task-generation agent. Its job is to turn the specification below into implementation tasks for the OOTP CSV Consultation app, one reviewable unit of work per task.
+This doc is the project's spec of record and the single source of truth for the task-generation agent. Its job is to turn the specification below into implementation tasks for the OOTP CSV Consultation app, one reviewable unit of work per task.
 
 ### Who reads this
 
-- The task-generator agent in the user's OpenCode workspace, which writes task handoff charters in the workspace's Task Handoff Template v2. The template's fields govern; this doc supplies the project content that fills them.
-- The agents that receive those charters: architect, implementation developer, QA validator, code reviewer and repository publisher.
-- For now, tasks are built in Claude Code on the web against the user's jjang3.github.io repository.
+- The task-generation agent: an AI host connected to the `cao-task-author-ootp` task-authoring server. It drafts each task in the repository's template, `docs/tasks/task-template.md`, following `docs/tasks/authoring-guide.md`. The template's fields govern; this doc supplies the project content that fills them.
+- The session that receives a task: one Claude Code session, usually on the web, that builds it on a branch and opens a pull request. Each task names a suggested role (architect, implementation developer, QA validator or code reviewer), and the owner merges.
+- Tasks are built against the boba-jjang/ootp-consultation repository, deployed to ootp-consultation.vercel.app.
 
 ### How to use this doc
 
-- Sections 2–3 say what to build and where it runs. Sections 4–13 are the domain specification. Section 14 holds decisions and open questions, 15 seeds the backlog, and 16 defines terms.
+- Sections 2–3 say what to build and where it runs. Sections 4–13 are the domain specification. Section 14 holds decisions and open questions, 15 maps the modules onto the implementation plan's phases, and 16 defines terms.
 - Statements are binding unless marked proposed, starting setting or open. Proposed values become configuration, never constants in code.
 - Player names appear only as worked examples. The app must work for any team in any league.
+- Where the Implementation Basis (`docs/implementation-basis.md`) states a rule differently, this doc wins. The Basis remains the source of the Seattle reference data and player reads.
 
 ### Rules for generating tasks
 
 1. One task is one reviewable change that a single agent session can finish and test.
 2. Every task cites the sections it implements and states acceptance criteria as checks a reviewer can run.
-3. Order tasks by dependency (section 15). Never schedule a module before its inputs exist.
+3. Order tasks by the implementation plan's phases and the dependencies in section 15. Never schedule a module before its inputs exist.
 4. A task that touches an open question (section 14) either resolves it first or builds behind a configuration switch.
 5. Thresholds, weights, scales and floors live in configuration. A task that hard-codes them fails review.
 6. Domain math ships with unit tests on fixtures cut from the sample exports.
@@ -38,7 +39,7 @@ This doc is the single source of truth for the task-generation agent. Its job is
 | Inputs | Files, tables or configuration it reads |
 | Outputs | Tables, functions, endpoints or screens it produces |
 | Acceptance checks | Fixture tests, invariants from section 5, expected values |
-| Dependencies | Task IDs that must land first |
+| Dependencies | Plan items or pull requests that must land first |
 | Open questions | Items from section 14 it touches, and how it handles them |
 | Suggested role | Architect, implementation developer, QA validator or code reviewer |
 
@@ -110,8 +111,8 @@ Exports pass validation into the team store. The store feeds metrics, percentile
 
 ### Platform direction
 
-- Free services only. The direction is GitHub (the jjang3.github.io repository and GitHub Pages) plus Vercel, with CI/CD set up before any frontend code.
-- Persistence is an open decision (section 14): a free hosted database, or browser storage with team export and import files. Browser storage needs no server and fits a single user.
+- Free services only, decided in the implementation plan and built in Phase 1: the boba-jjang/ootp-consultation repository with CI on GitHub Actions, the app and the advisor function on Vercel Hobby, and Postgres and Auth on Supabase Free.
+- Persistence is Supabase Postgres with row-level security. Raw exports are stored verbatim and the browser recomputes everything else. Export team, due in Phase 2, downloads a zip of the raw files and settings, and re-importing it restores the team.
 - The data is small: tens of players per team and a few hundred per league file. Every module, including the lineup solver, can run in the browser.
 - Building happens in Claude Code on the web for now. If local containers are ever used, the user's machine blocks Docker host bind mounts, so container workflows must bake files into images or use named volumes.
 
@@ -132,10 +133,12 @@ The user exports these from the team's Lineups overview screen, one view per CSV
 | batting\_superstats\_2 | Hitters | Plate-discipline rates, pitch mix faced, run values by pitch group |
 | custom\_bat\_pot (custom) | Hitters | Work ethic, IQ, batting potentials, bunting, batted-ball tendencies, every fielding component, baserunning, DEF, development risk |
 | pitching\_stats\_1 | Pitchers | Pitching line, rate stats, ERA+, FIP, WAR |
-| pitching\_stats\_2 | Pitchers | Saves and holds, batters faced, relief usage, inherited runners, leverage, quality starts, run support, GO%, SIERA, SB and CS against, WPA |
+| pitching\_stats\_2 | Pitchers | Save percentage and blown saves, batters faced, relief usage, inherited runners, leverage, quality starts, run support, GO%, SIERA, SB and CS against, WPA |
 | pitching\_superstats\_1 | Pitchers | Batted-ball mix allowed, contact quality allowed, expected stats, xERA |
 | pitching\_superstats\_2 | Pitchers | Pitch, swing, whiff and chase counts, discipline rates, run values |
 | cus\_pitch\_pot (custom) | Pitchers | Age, work ethic, IQ, pitching potentials, velocity now and potential, stamina, arm slot, pitcher type, GB/FB tendency, hold, DEF Pot, development risk |
+
+Run on the hitters, cus\_pitch\_pot becomes a supplemental capture: only its DEF Pot column is used, as the hitters' DEF ceiling (section 9).
 
 ### League sortable stats
 
@@ -143,7 +146,7 @@ The user exports these from the league's player statistics screen, one file per 
 
 | Files | Rows | Notes |
 | --- | --- | --- |
-| Batting superstats 1 and 2 | Qualified hitters only: 214 in the sample, each with at least 77 balls in play | Carry team and league columns. The sample lacks the contact-only expected stats (xBACON, xSLGCON, xwOBACON) |
+| Batting superstats 1 and 2 | Qualified hitters only, by plate appearances: 214 in the sample, including one pitcher who batted | Carry team and league columns. The sample lacks the contact-only expected stats (xBACON, xSLGCON, xwOBACON) |
 | Pitching superstats 1 and 2 | Every listed pitcher: 446 in the sample, including 31 with no appearances and 4 position players | No team column, so rows match on name; the app applies its own sample floors (section 8) |
 
 ### Sample data set
@@ -155,7 +158,7 @@ The user exports these from the league's player statistics screen, one file per 
 ### Not yet used
 
 - OOTP database dumps: full league tables keyed by player ID, including ratings (later, per section 2).
-- Opponent rosters, handedness splits, league totals and park factors (section 14).
+- Opponent rosters, handedness splits, per-position ratings, league totals, league standard stats and park factors. None has been provided, so the app treats them as unavailable (section 14).
 
 ## Import contract
 
@@ -163,7 +166,7 @@ The importer recognizes each file by its header, normalizes units and labels, va
 
 ### Header manifest
 
-Headers below are the latest seen. Views carry a version, because OOTP views can gain columns: batting\_superstats\_1 v1 lacks xBACON, xSLGCON and xwOBACON, which v2 inserts before xBA.
+Headers below are the latest seen. Views carry a version, because OOTP views can gain columns: batting\_superstats\_1 v1 lacks xBACON, xSLGCON and xwOBACON, which v2 inserts before xBA. The pitching superstats changed the same way: pitching\_superstats\_1 v1 (19 columns) lacks mEV, BAR% and HHi%, which v2 inserts after EV, and xBACON, xSLGCON and xwOBACON, which it inserts before xBA; pitching\_superstats\_2 v1 (21 columns) lacks OSW, inserted after WH, and CTC%, inserted after ZC%. The v1 files are in fixtures/legacy/.
 
 | View | Columns in export order |
 | --- | --- |
@@ -179,7 +182,7 @@ Headers below are the latest seen. Views carry a version, because OOTP views can
 | pitching\_superstats\_2 | POS, Name, G, GS, PI, SW, WH, OSW, CH, OS%, ZS%, SW%, OC%, ZC%, CTC%, Z%, WH%, CH%, CL%, RV-FB, RV-BR, RV-OFF, RV |
 | cus\_pitch\_pot | POS, Name, Age, T, WE, INT, STU P, MOV P, HRA P, PBABIP P, CON P, VELO, STM, VT, Slot, PT, G/F, HLD, DEF Pot, Risk |
 
-The league sortable files reuse the superstats headers: the league batting file is batting\_superstats\_1 v1, and the pitching files match the team versions.
+The league sortable files reuse the superstats headers: the league batting\_superstats\_1 is v1, and the other three match the team versions. Five pairs of files share a header line, so a header names the view but not always the scope or side: the file-name prefix and the rows tell a league file from a team view, and the POS values tell the hitter capture from the staff cus\_pitch\_pot.
 
 ### Columns that need special handling
 
@@ -196,19 +199,19 @@ The league sortable files reuse the superstats headers: the league batting file 
 | B, T | L, R, S in most views; Left, Right, Switch in default | Map to L, R, S |
 | Inf, Mor, OVR, POT | Icon or hidden columns; blank, or "-" for OVR | Drop |
 | ERA+ | 999 is a display cap | Treat as capped; exclude from averages |
-| Signed stats (UBR, WPA) | Negative zero appears as "-0.0" | Normalize to 0 |
-| "-" in league pitching files | Missing value on rows with no balls in play | Null; drop rows with BIP = 0 |
+| Signed stats (UBR, WPA, run values) | Negative zero appears as "-0.0" | Normalize to 0 |
+| "-" and zeros in league pitching files | Rows with no appearances (G = 0, BIP = 0) carry no data: superstats 1 shows "-" in some columns and 0 in the rest, superstats 2 shows 0 everywhere | Null; drop rows with G = 0 |
 | RV-FB, RV-BR, RV-OFF, RV | Run value by pitch group; RV is their sum | Positive is good for the player on both sides; results-based, not luck-free |
 | WH, WH%, CTC% | Whiffs; WH% = WH / swings; CTC% = 100 − WH% | None |
 | OSW, CH, CH% | OSW = chase swings; CH = chase whiffs = OSW × (1 − OC%); CH% = CH / pitches outside the zone | CH% is not O-Swing% |
 | Z%, ZS%, OS%, SW%, OC%, ZC%, CL% | Zone rate, zone swing, chase swing, swing, chase contact, zone contact; CL% presumably called-strike rate | Z% is not Z-Swing% |
 | FF%, BR%, OFF% | Pitch mix faced: fastballs, breaking balls, offspeed; sums to 100 | None |
-| BIP | Balls in play including home runs; for pitchers BF − K − BB − HBP | Actual BACON = H / BIP, comparable to xBACON |
+| BIP | Balls in play including home runs; for pitchers about BF − K − BB − HBP (one sample pitcher is off by 1) | Use the exported BIP; actual BACON = H / BIP, comparable to xBACON |
 | xBACON, xSLGCON, xwOBACON | Expected stats on contact only | None |
 | EV, mEV, LA | Average and max exit velocity in mph; average launch angle in degrees (hitters only) | None |
 | BAR, BAR%, HHi, HHi% | Barrels and hard-hit balls (95+ mph) | None |
 | Avg% and Med% | The same middle contact bucket, hitter and pitcher labels | One canonical name |
-| CON P | Contact for hitters, Control for pitchers | Resolve by side |
+| CON P, HLD | Same header, different meaning: CON P is Contact for hitters, Control for pitchers; HLD is holds (a count) in pitching\_stats\_1, the hold-runners rating in cus\_pitch\_pot | CON P resolves by side; HLD resolves by view |
 | DEF | Current position rating at the listed position | Link to POS |
 | DEF Pot | Position-rating potential at the listed position; P for pitchers | Ceiling for DEF |
 | C ABI, C FRM, C ARM | Catcher ability, framing, arm; non-catchers show 1 | 1 on a non-catcher means "can't catch" |
@@ -221,7 +224,7 @@ The league sortable files reuse the superstats headers: the league batting file 
 
 | Field | Values seen | Canonical form |
 | --- | --- | --- |
-| POS | Hitters: C, 1B, 2B, 3B, SS, LF, CF, RF, DH. Pitchers: SP, RP, CL; league pitching files also list position players who pitched | Same |
+| POS | Hitters: C, 1B, 2B, 3B, SS, LF, CF, RF, DH. Pitchers: SP, RP, CL; league pitching files also list position players who pitched, and league batting files can list a pitcher who batted | Same |
 | B, T | L, R, S; Left, Right, Switch | L, R, S |
 | BBT | Normal, Flyball, Line Drive, Groundball | Same |
 | GBT, FBT | Normal, Pull, Spray; older exports wrote Pull Hitter and Spray Hitter | Normal, Pull, Spray |
@@ -231,15 +234,15 @@ The league sortable files reuse the superstats headers: the league batting file 
 | YL status | auto., arbitr., none | Auto-renew, arbitration, signed |
 | SctAcc | V.High in the sample | Ordinal scouting accuracy |
 | WE, INT | Low, Normal, High | Ordinal 0–2; more levels may exist |
-| Risk | Very Low and Low in the sample; OOTP's full scale is Very Low, Low, Medium, High, Very High, Extreme | Ordinal 0–5 |
+| Risk | Very Low, Low and Medium in the sample; OOTP's full scale is Very Low, Low, Medium, High, Very High, Extreme | Ordinal 0–5 |
 
 ### Invariants
 
 - Each file matches its view's manifest version; label variants map through a synonym table.
-- Each file lists its own side's roster. A pitching view that lists hitters is rejected; this happened once in the sample.
+- Each file lists its own side's roster; a league file can also list a few players from the other side, such as position players who pitched or a pitcher who batted. The one view that lists the other side's roster is the pitching ratings view run on hitters (cus\_pitch\_pot listing hitters): it routes as a supplemental source that keeps only its DEF Pot column. Any other view that lists the wrong side is rejected.
 - Every view of a side in one snapshot has the same names and positions.
 - Duplicated columns agree: G, PA, BB, K, GIDP and ISO for hitters; G, GS and IP for pitchers; handedness everywhere.
-- Identities hold: RV = RV-FB + RV-BR + RV-OFF (±0.15), WH% = WH / SW, CTC% = 100 − WH%, CH = OSW × (1 − OC%), FF% + BR% + OFF% = 100.
+- Identities hold, within rounding, on every row with appearances (league pitching rows with G = 0 carry no data and drop first): RV = RV-FB + RV-BR + RV-OFF (±0.15), WH% = WH / SW, CTC% = 100 − WH%, CH = OSW × (1 − OC%), FF% + BR% + OFF% = 100. A pitcher's BIP is checked against BF − K − BB − HBP with a tolerance of 1.
 - Ratings fall inside the league's declared scale.
 - League rows for the team's players equal the team views from the same snapshot.
 
@@ -247,7 +250,7 @@ The league sortable files reuse the superstats headers: the league batting file 
 
 - Team views join on Name within the team; jersey number, in five views, is a cross-check.
 - League batting files join on team plus name. League pitching files have no team column, so they join on name and flag duplicates.
-- A name can appear on both sides when a position player pitches; each side keeps its own record.
+- A name can appear on both sides when a position player pitches or a pitcher bats; each side keeps its own record.
 - Hitter age comes from default; pitcher age comes from cus\_pitch\_pot.
 - Every upload is stamped with team, snapshot date, view and manifest version. A re-export of the same view and date replaces the old one; a later date adds a snapshot and keeps history. Views from different dates are never merged into one snapshot.
 
@@ -260,11 +263,11 @@ Use OOTP's exported metrics where they exist and compute only what's missing. wR
 | wOBA | Exported | OOTP uses its own league weights; the sample landed within .007 of the FanGraphs-constant calculation, so trust the export |
 | OPS+ | Exported | League and park adjusted. Not wRC+, which the research mislabeled |
 | wRC+ | Missing | Needs league wOBA, league runs per PA and park factors |
-| wRAA | Computable once league wOBA is known | Formula below |
+| wRAA | Missing | Needs league wOBA, which no export carries; formula below |
 | xBA, xSLG, xwOBA | Exported | Expected stats including strikeouts and walks |
 | xBACON, xSLGCON, xwOBACON | Exported | Contact-only; isolate batted-ball quality from plate discipline |
 | RC, RC/27, WAR, WPA, UBR | Exported | Use as reported |
-| FIP | Exported | Formula below, for recalibrating to the league |
+| FIP | Exported | Formula below; recalibrating it to the league needs league totals, which no export carries |
 | xFIP | Missing | Needs fly balls (BIP × FB%) and league HR/FB |
 | SIERA | Exported | Penalizes low strikeout rates heavily |
 | xERA | Exported | Expected ERA from contact quality allowed |
@@ -273,7 +276,7 @@ Use OOTP's exported metrics where they exist and compute only what's missing. wR
 
 ### Formulas
 
-Constants are the research's FanGraphs values. An OOTP league has its own run environment, so derive league constants from league totals once an export provides them.
+Constants are the research's FanGraphs values. An OOTP league has its own run environment, but no export provides league totals, so league constants can't be derived from them.
 
 ```latex
 \text{wOBA} = \frac{0.698\,uBB + 0.729\,HBP + 0.890\,1B + 1.261\,2B + 1.596\,3B + 2.049\,HR}{AB + BB - IBB + SF + HBP}
@@ -297,9 +300,10 @@ Constants are the research's FanGraphs values. An OOTP league has its own run en
 
 ### Luck baselines
 
-- In the sample, actual contact results ran below xBACON on both sides: hitters .342 against .364 expected, pitchers .327 against .355.
-- So contact luck is measured against that offset, not against zero.
-- League pitching files carry xBACON but no hits, so the league-wide offset needs an export with hits.
+- Each luck pair gets its own baseline, measured from the import: BACON against xBACON, wOBA against xwOBA and ERA against xERA. One offset can't serve all three.
+- In the sample, contact results ran below xBACON on both sides (hitters .342 against .364 expected, pitchers .327 against .355), while team wOBA ran .008 above xwOBA and staff ERA 0.15 above xERA.
+- A pitcher's regression signal comes from the talent estimator (FIP, SIERA and ratings), with xERA as one input, because pitchers' contact superstats don't track their contact ratings (section 7).
+- League pitching files carry xBACON but no hits, and no export with league hits is available, so there is no league-wide contact baseline.
 
 ### Stabilization
 
@@ -320,7 +324,7 @@ About 42 games in, no sample player was near either BABIP point. That is why the
 
 ### League context
 
-- Available now: league-wide distributions of every superstats metric, for percentiles and league averages.
+- Available now: league-wide distributions of the superstats metrics the league files carry, for percentiles and league averages.
 - Missing: league totals (league wOBA, runs per PA, HR/FB), park factors, and league hits for contact-luck baselines.
 
 ## Ratings model
@@ -410,7 +414,7 @@ Percentiles rank each player against the league in three peer pools: qualified h
 
 | Pool | Members | Size in the sample | Sample floor |
 | --- | --- | --- | --- |
-| Hitters | Every row of the league batting files, which are already qualified | 214 | As exported (77+ balls in play in the sample) |
+| Hitters | Every row of the league batting files, which are already qualified | 214 | As exported: qualified by plate appearances (the fewest balls in play in the sample is 77) |
 | Starters | Pitchers with at least half their games as starts | 151 | Starting setting: 60 balls in play, which keeps 144 |
 | Relievers | Everyone else who pitched, closers included | 260 | Starting setting: 30 balls in play, which keeps 218 |
 
@@ -445,8 +449,8 @@ P_i = 100 \times \frac{\#\{j : v_j \text{ worse than } v_i\} + \tfrac{1}{2}\,\#\
 
 ### Gaps for percentiles
 
-- The league batting file lacks contact-only expected stats; a re-export with xBACON, xSLGCON and xwOBACON fills them in.
-- Percentiles for standard stats (K%, BB%, wOBA) need league exports of the standard stats views, not just superstats.
+- The league batting file lacks contact-only expected stats, and no export with xBACON, xSLGCON and xwOBACON is available, so hitters get no league percentiles for them.
+- Percentiles for standard stats (K%, BB%, wOBA) need league exports of the standard stats views, which aren't available, so there are none.
 
 ## Defensive model
 
@@ -470,7 +474,7 @@ Weights come from the research, which took them from community reverse-engineeri
 ### DEF, DEF Pot and components
 
 - DEF is the current rating at the listed position; DEF Pot is its ceiling. For pitchers, the position is P.
-- DEF can't be rebuilt from components. In the sample, a left fielder with equal or better components than a teammate rated 6 sat at DEF 3, with DEF Pot 5: the gap is experience at the position.
+- DEF can't be rebuilt from components. In the sample, a left fielder with better range and arm than a teammate rated 6 sat at DEF 3, with DEF Pot 5: the gap is experience at the position.
 - DEF can hide framing. Two sample catchers both showed DEF 7 while framing at 9 and 7.
 - OOTP 27 exports have no separate blocking rating, so blocking logic keys off C ABI.
 - Non-catchers carry 1 in every catcher column, which means "can't catch".
@@ -480,7 +484,7 @@ Weights come from the research, which took them from community reverse-engineeri
 
 - Rows are players; columns are C, 1B, 2B, 3B, SS, LF, CF and RF, plus DH, which anyone can fill.
 - The listed position uses DEF, with DEF Pot as its ceiling.
-- Every other position uses a component-based ceiling from the weights above, discounted for inexperience until per-position ratings are exported.
+- Every other position uses a component-based ceiling from the weights above, discounted for inexperience, since no export carries per-position ratings.
 - A player without catcher ratings is ineligible at C. A critical component below its neutral floor is flagged, and excluded only when configured.
 - The matrix produces the fielding-run estimates the lineup optimizer uses.
 
@@ -510,11 +514,11 @@ Every gate is a research claim without supporting data, so each is a setting val
 | Hold runners | Catcher arm, pitcher hold | 8–10 behind a weak arm (about 35); costs some stuff and control | Arm 3 or lower; 4 borderline |
 | Infield shift | Middle-infield range; opposing hitters' pull tendency | 10 only with 65+ middle-infield range | Range 8+ |
 | Guard lines | SS and 2B range | High only with 70+ at both | Range 9+ at both |
-| Pinch hitting and platoons | Handedness splits | Player-level rules by pitcher hand | Not stated |
+| Pinch hitting and platoons | Handedness splits, which no export provides | Player-level rules by pitcher hand | Not stated |
 
 In the sample, a shortstop at range 8 cleared the shift gate while all three second basemen sat at a borderline 7, so the rule produced a moderate shift.
 
-Shift and steal decisions also depend on the opponent's pull tendencies and catcher arms. That input arrives with opponent exports, later.
+Shift and steal decisions also depend on the opponent's pull tendencies and catcher arms. That input needs opponent exports, which aren't available.
 
 ## Lineup optimization
 
@@ -562,7 +566,7 @@ E is expected runs from each state, b the runs scored on each transition, and F 
 | 7–8 | Remaining hitters in descending wOBA |
 | 9 | Slight OBP preference over #8, to set up the top of the order |
 
-Platoon decisions need handedness splits and the opposing starter's hand, neither of which is exported yet.
+Platoon decisions need handedness splits and the opposing starter's hand, and no export provides either.
 
 ## Development planner
 
@@ -584,7 +588,6 @@ The planner turns potentials, development risk, work ethic, IQ and age into prio
 | Work ethic, IQ | Development odds; the research names work ethic as a Lab factor. Both weights are settings |
 | Velocity now vs potential | Headroom for velocity programs |
 | DEF vs DEF Pot | Headroom from experience at the listed position |
-| Coaching quality | Affects odds per the research; not exported |
 
 ### Research priorities
 
@@ -663,8 +666,11 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 | Development risk | Replaces a fixed age cut in the estimator; age is only the fallback |
 | Percentile pools | Pitchers split into starters and relievers, closers with relievers |
 | Team model | A persistent team that accumulates dated snapshots |
-| Platform | Free services only: GitHub (jjang3.github.io) and Vercel, with CI/CD and any database set up before the frontend |
-| Build tooling | Claude Code on the web for now; tasks come from a dedicated task-generation agent fed by this doc |
+| Platform | Free services only: GitHub (boba-jjang/ootp-consultation) with GitHub Actions, Vercel Hobby for the app and the advisor function, and Supabase Free for Postgres and Auth, all set up before the frontend |
+| Build tooling | Claude Code on the web for now; tasks come from the cao-task-author-ootp authoring server, fed by this doc |
+| Spec of record | This doc. The Implementation Basis keeps the Seattle reference data and player reads; where its rules differ, this doc wins |
+| Consultation surface | Dashboard screens with an advisor drawer, plus a downloadable manager's card (design handoff) |
+| League scope | League sortable exports and percentiles are in v1: the league files import with the team views in Phase 2, and percentiles arrive with the Phase 4 models |
 
 ### Assumptions
 
@@ -681,48 +687,43 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 ### Open questions
 
 - [ ] Does the league use the DH?
-- [ ] How often will exports be refreshed during the season?
-- [ ] Where should the consultation appear: a chat-style advisor, a written report, or a dashboard?
-- [ ] Persistence: a free hosted database, or browser storage with team export and import?
-- [ ] Hosting split: GitHub Pages, Vercel, or both with a defined role for each?
+- [ ] How often will exports be refreshed during the season? Each upload becomes a dated snapshot (design handoff); the cadence is still open.
+- [x] Where should the consultation appear: a chat-style advisor, a written report, or a dashboard? Answered: dashboard screens with an advisor drawer, plus the manager's card (design handoff).
+- [x] Persistence: a free hosted database, or browser storage with team export and import? Answered: Supabase Postgres (implementation plan).
+- [x] Hosting split: GitHub Pages, Vercel, or both with a defined role for each? Answered: Vercel hosts the app and the advisor function; GitHub holds the source and runs CI (implementation plan).
 - [ ] Which scout's view do the exports use, the head scout or OSA? Development risk can differ between them.
 - [ ] Does the league merge stats into scouting reports? If so, the estimator weights stats less.
-- [ ] Does the view editor offer per-position ratings and handedness splits?
-- [ ] Re-export the pitching ratings view with the staff listed, to get pitchers' work ethic, IQ and risk.
-- [ ] Can league standard stats and totals be exported, for wRC+, xFIP, luck baselines and standard-stat percentiles?
+- [x] Does the view editor offer per-position ratings and handedness splits? Answered: neither has been provided, so both are treated as unavailable (sections 9–11).
+- [x] Re-export the pitching ratings view with the staff listed, to get pitchers' work ethic, IQ and risk. Done: the staff cus\_pitch\_pot, the latest upload of that view, carries work ethic, IQ and risk for all 13 pitchers and is treated as part of the same snapshot.
+- [x] Can league standard stats and totals be exported, for wRC+, xFIP, luck baselines and standard-stat percentiles? Answered: they haven't been provided, so treat them as unavailable; wRC+, wRAA, xFIP, a league-wide contact baseline and standard-stat percentiles are left out.
 
 ## Delivery plan
 
-The build runs in seven milestones, platform first and calibration last; each closes on a gate the QA validator can check. The seed tasks below are a starting backlog for the agent to split, refine and extend.
+The implementation plan (`docs/implementation-plan.md`) is the backlog: its phases and exit gates set the order, and each unchecked checklist item is one task. Phase 1, the walking skeleton, passed its gate on 4 October 2026 and covered the platform work: repository, CI, hosting and the database. The table maps the remaining modules onto the plan's phases, with the check each must pass.
 
-*Diagram in the Claude Doc: build roadmap · 7 milestones, T01–T20.*
+Phase gates close in order. Inside a phase, modules follow the Depends on column, so some can start early.
 
-Gates close milestones in order. Inside a milestone, tasks follow the dependencies in the seed table, so some can start early.
+### Modules by phase
 
-### Seed tasks
-
-| ID | Task | Depends on | Acceptance check |
-| --- | --- | --- | --- |
-| T01 | Repository skeleton with linting, a test runner and CI on every push | None | CI runs and passes on main |
-| T02 | Hosting and deploy pipeline, per the hosting decision | T01 | A merge to main deploys a placeholder page |
-| T03 | Persistence decision record and a storage adapter interface | T01 | Decision recorded; adapter with an in-memory implementation and tests |
-| T04 | Fixture set: commit the sample exports with a provenance note | T01 | Fixtures load in tests |
-| T05 | Header manifest and view detection, with versions and synonyms | T04 | Every fixture file maps to the right view and version |
-| T06 | Value parsers for every rule in section 5 | T05 | One unit test per parse rule |
-| T07 | Snapshot validation: side check, names and positions, duplicate columns, identities, scale | T06 | Fixtures pass; mutated fixtures fail with named errors, including a pitching view that lists hitters |
-| T08 | Team store: teams, dated snapshots, latest merged record, history | T03, T07 | Re-importing a date replaces it; a later date adds history |
-| T09 | League file import with name-join rules and duplicate flags | T06 | 214 hitter rows and 446 pitcher rows load; zero-appearance rows drop |
-| T10 | Metrics: pass-through, BACON, luck gaps against the offset | T08 | Fixture BACON and offsets match section 6 |
-| T11 | Percentiles: usage-based pools, floors, directions, mid-rank formula | T09 | Pools of 214, 151 and 260; 144 starters and 218 relievers after floors |
-| T12 | Scale conversion module | T06 | Round-trip tests between 1–10 and 20–80 |
-| T13 | Talent estimator v0 | T10, T12 | Every fixture player gets an estimate and band; disagreements over one step are flagged |
-| T14 | Defensive model and eligibility matrix | T12 | Every slot covered, DH included; non-catchers ineligible at C; DEF Pot caps the listed position |
-| T15 | Strategy rules engine | T13, T14 | Gates read from configuration; the fixture yields a moderate shift |
-| T16 | Lineup selection with the assignment model | T13, T14 | A legal nine on the fixture, with CF and DH filled when enabled |
-| T17 | Batting order: Markov model with The Book fallback | T16 | Run expectancy matches a hand-computed toy lineup |
-| T18 | Development planner | T13, T14 | Selection rules from section 12 reproduce the sample example |
-| T19 | Consultation output | T15, T16, T17, T18 | Every recommendation shows its evidence and confidence |
-| T20 | Backtest across snapshots | T08, T13 | Adding a second snapshot reports estimator error per player |
+| Module | Sections | Phase | Depends on | Acceptance check |
+| --- | --- | --- | --- | --- |
+| Fixtures: every team view, the hitter capture and the four league files, with a provenance note | 4 | 2 | The owner's exports | Every fixture loads in tests |
+| Header manifest and view detection, with versions and synonyms | 5 | 2 | Fixtures | Every fixture file maps to the right view and version |
+| Value parsers for every rule in section 5 | 5 | 2 | Header manifest | One unit test per parse rule |
+| Snapshot validation: side check, names and positions, duplicate columns, identities, scale | 5 | 2 | Value parsers | Fixtures pass; mutated fixtures fail with named errors; the pitching view run on hitters routes as supplemental |
+| Team store: teams, dated snapshots, latest merged record, history | 3, 5 | 2 | Snapshot validation | Re-importing a date replaces it; a later date adds history |
+| League file import with name-join rules and duplicate flags | 4, 5 | 2 | Value parsers | 214 hitter rows and 446 pitcher rows load; zero-appearance rows drop |
+| Scale conversion | 7 | 2 | Value parsers | Round-trip tests between 1–10 and 20–80 |
+| Metrics: pass-through, BACON, luck gaps against each pair's baseline | 6 | 4 | Team store | Fixture BACON and each pair's baseline match section 6 |
+| Percentiles: usage-based pools, floors, directions, mid-rank formula | 8 | 4 | League file import | Pools of 214, 151 and 260; 144 starters and 218 relievers after floors |
+| Talent estimator v0 | 7 | 4 | Metrics, scale conversion | Every fixture player gets an estimate and band; disagreements over one step are flagged |
+| Defensive model and eligibility matrix | 9 | 4 | Scale conversion | Every slot covered, DH included; non-catchers ineligible at C; DEF Pot caps the listed position |
+| Strategy rules engine | 10 | 4 | Talent estimator, defensive model | Gates read from configuration; the fixture yields a moderate shift |
+| Lineup selection with the assignment model | 11 | 4 | Talent estimator, defensive model | A legal nine on the fixture, with CF and DH filled when enabled |
+| Batting order: Markov model with The Book fallback | 11 | 4 | Lineup selection | Run expectancy matches a hand-computed toy lineup |
+| Development planner | 12 | 4 | Talent estimator, defensive model | Selection rules from section 12 reproduce the sample example |
+| Consultation output | 3 | 4–5 | Strategy rules, lineup and batting order, development planner | Every recommendation shows its evidence and confidence |
+| Backtest across snapshots | 2 | 6 | Team store, talent estimator | Adding a second snapshot reports estimator error per player |
 
 Tasks that depend on an open question (section 14) carry it in their charter and build behind a setting until it is answered.
 
@@ -787,7 +788,7 @@ Tasks that depend on an open question (section 14) carry it in their charter and
 | Screen view | A CSV export of one view of an OOTP screen |
 | Snapshot | All exports for one team from one date |
 | SPE, STE, SR, RUN | Speed, steal ability, steal rate (how often he runs), baserunning |
-| STM, HLD | Stamina; holding runners |
+| STM, HLD | Stamina; holding runners (in pitching\_stats\_1, HLD is holds) |
 | STU, MOV, HRA, PBABIP | Stuff, movement, home-run avoidance, BABIP allowed |
 | Superstats | OOTP's Statcast-style views: batted balls, plate discipline, expected stats |
 | TCR | Talent change randomness, a league setting for random talent swings |

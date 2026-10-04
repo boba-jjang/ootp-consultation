@@ -18,25 +18,25 @@ Canvas: https://claude.ai/artifact/Q1MymJ7UG3qEdLxVXEq2D5 (11 boards). The Imple
   - Dev Lab slots (4, from the wireframe; league range 1–30)
 
 ## Where the canvas and the Basis disagree
-- The canvas was built from the design project's 9 CSVs: older superstats copies and no ratings views. The Clubhouse's "9 of 11 views" state and its column counts come from those. With the canonical 11 views the team is at High coverage, with one gap: staff work ethic, IQ and risk.
-- Pitcher ages: the canvas says no pitching view has age. Per the Basis, age comes from cus_pitch_pot, so the canvas's "pitcher bio and contract" upload prompt should only be about contracts.
+- The canvas was built from the design project's 9 CSVs: older superstats copies and no ratings views. The Clubhouse's "9 of 11 views" state and its column counts come from those. With the canonical 11 views the team is at High coverage, and cus_pitch_pot carries the staff's work ethic, IQ and risk.
+- Pitcher ages: the canvas says no pitching view has age. Per the Basis, age comes from cus_pitch_pot. The canvas's "pitcher bio and contract" upload prompt names a view that isn't available, so pitchers' contract data stays a gap.
 - The Dugout's alignment and batting order are placeholders from the original wireframe, not optimizer output (Yamanaka LF, Shinn DH, Obata CF, Geng RF). The Basis reads Yamanaka as DH-first.
 - The diamond's position cards show DEF from each player's listed position even when he's playing elsewhere. Obata's DEF 8 is his RF rating and Geng's DEF 7 is his 2B rating. At non-listed positions the cards should show component ceilings, per the eligibility matrix.
 - The regression monitor flags a pitcher when xERA and ERA are 1+ run apart, falling back to FIP without superstats. But the Basis found that pitchers' contact superstats don't track their contact ratings. So the signal should come from the estimator (FIP, SIERA, ratings), with xERA as only one input.
 - The monitor's "small sample" tag kicks in under 20 IP. It should use the Basis's stabilization points instead.
-- Luck reads on the canvas (ERA vs xERA, wOBA vs xwOBA) are judged against zero. The Basis judges contact luck against the league offset: expected contact quality runs .02–.03 above actual results.
+- Luck reads on the canvas (ERA vs xERA, wOBA vs xwOBA) are judged against zero. The Basis judges contact luck against Seattle's own offset: expected contact quality runs .02–.03 above actual results.
 - Tactical settings show one value per slider. The Basis's strategy model varies by inning band and score state, with per-player overrides. The design still needs a view for that.
 - The Dev Lab card for Eng is a development-slider change, not a Lab program. The Basis also lists Gong (stuff 7, control 4) as an Improve Control candidate.
 
 ## What the design needs from the build
 - Data model: team → snapshots → view files (type detected by headers; original file name kept to show where data came from) → per-player coverage across five data sets (bio, stats, batted ball/contact, swing decisions, ratings). The Clubhouse matrix and the confidence badge read from coverage.
-- Import log: for each file, where it was routed, how many players matched, and the rejection reason if any (e.g., a pitching view that lists hitters).
+- Import log: for each file, where it was routed, how many players matched, and the rejection reason if any (e.g., an unrecognized or mismatched file).
 - Column mapping: the Clubhouse shows how ambiguous headers were read (RA = relief appearances, GO% sent as a fraction). The importer needs to expose its synonym table for that.
 - Degradation rules:
   - Defensive alignment needs custom_bat_pot. Without it: listed positions only, batting order from hitting alone, CF unassigned (nobody is listed there).
   - Regression monitor needs pitching_superstats_1 for xERA. Without it: ERA vs FIP.
   - Tactical settings need ratings and are locked without them.
-  - Dev Lab needs both ratings views. Pitcher picks fall back to age, which comes with cus_pitch_pot.
+  - Dev Lab needs both ratings views. Pitcher picks use the work ethic, IQ and risk that come with cus_pitch_pot; age is the fallback only for an export without a Risk column.
 - The top bar has a snapshot selector with previous/next buttons; trend views compare snapshots.
 
 ## Platform notes (hosting is undecided)
@@ -77,5 +77,5 @@ Canvas: https://claude.ai/artifact/Q1MymJ7UG3qEdLxVXEq2D5 (11 boards). The Imple
 Notes added after review in the planning chat (3 October 2026):
 
 - Import log: the pitching view run on hitters is not rejected. It is routed as a supplemental source for hitters' DEF Pot, which no batting view carries. See `CLAUDE.md`.
-- Luck reads: the .02–.03 offset is Seattle's own BACON vs xBACON gap, standing in until league data exists. It does not carry over to wOBA vs xwOBA or ERA vs xERA, which run the other way in this data; each pair gets its own baseline.
+- Luck reads: the .02–.03 offset is Seattle's own BACON vs xBACON gap, and the league files carry no hits to give a league offset. It does not carry over to wOBA vs xwOBA or ERA vs xERA, which run the other way in this data; each pair gets its own baseline.
 - Hosting is now decided in `docs/implementation-plan.md` (Vercel, Supabase, Gemini free tier), pending the open questions listed there.

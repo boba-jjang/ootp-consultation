@@ -43,6 +43,7 @@ Keep these current. Run them from the repo root on Node 24. The Node major is se
 - Typecheck: `pnpm typecheck` (`tsc --build` over every project referenced from the root `tsconfig.json`; add each new tsconfig there)
 - Test: `pnpm test`, which runs `test:core` (core's own tests, with the coverage floor on `packages/core`), then `test:apps` (every other project). `pnpm test` takes no extra arguments, so pass a filter or `-u` to `test:core`, `test:apps` or `test:watch` instead.
 - Build: `pnpm build`
+- End-to-end and accessibility: `pnpm e2e` (Playwright with axe, in `e2e/`; it starts the dev server itself, so `apps/web/.env.local` must exist). Once per machine: `pnpm exec playwright install chromium`.
 - Database tests: `supabase db start`, then `supabase test db` (pgTAP in `supabase/tests/`). These need Docker and the Supabase CLI, so they're optional locally; CI runs them.
 - Database types: `apps/web/src/database.types.ts` is generated from the migrations; never edit it by hand. After a migration change, CI's `db` job fails and uploads the regenerated file as the `database-types` artifact: commit that file. Without a pull request, run the DB workflow by hand on the branch (`gh workflow run db.yml --ref <branch>`).
 

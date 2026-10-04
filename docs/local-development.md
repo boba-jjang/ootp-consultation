@@ -70,6 +70,7 @@ Run these from the repo root.
 | `pnpm typecheck` | TypeScript over every project |
 | `pnpm test` | Core tests with the coverage floor, then everything else; `pnpm test:watch` while working |
 | `pnpm build` | Production build |
+| `pnpm e2e` | The end-to-end and accessibility tests in `e2e/`, in headless Chromium against the dev server (it starts one if none is running). Once per machine: `pnpm exec playwright install chromium`. |
 | `pnpm check-setup` | Checks your machine and `.env.local` |
 
 CI runs lint, format check, typecheck, test and build on every pull request, so running them before you push saves a round trip.

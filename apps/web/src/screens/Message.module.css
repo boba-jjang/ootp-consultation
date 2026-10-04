@@ -1,0 +1,75 @@
+/* A screen that is one message: not found, an error, a screen that isn't built yet. */
+
+.main {
+  max-width: var(--width-setup);
+  margin: 0 auto;
+  padding: var(--space-10) var(--gutter) var(--space-12);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.title {
+  font-size: var(--text-36);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-semibold);
+  text-wrap: balance;
+}
+
+.text {
+  max-width: 62ch;
+  font-size: var(--text-16);
+  color: var(--color-text-secondary);
+}
+
+.text code {
+  font-family: var(--font-mono);
+  color: var(--color-text-body);
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.select {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+  font-size: var(--text-14);
+  font-weight: var(--weight-semibold);
+}
+
+.select select {
+  min-height: var(--control);
+  padding: 0 var(--space-3);
+  border: var(--input-border);
+  border-radius: var(--input-radius);
+  font-size: var(--text-15);
+  font-weight: var(--weight-regular);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control);
+  font-size: var(--text-14);
+  font-weight: var(--weight-semibold);
+}
+
+.check input {
+  margin: 0;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-accent);
+}

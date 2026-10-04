@@ -1,0 +1,97 @@
+import { useState } from 'react';
+import { Navigate, useLocation } from 'react-router';
+
+import { useAuthActions, useSessionState } from '../session.ts';
+import { DiamondMark } from '../ui/icons.tsx';
+import { Button } from '../ui/primitives.tsx';
+import styles from './SignIn.module.css';
+
+/** The one way in: GitHub, through Supabase Auth. Sign-ups are closed, so only the owner gets through. */
+export function SignIn() {
+  const { client, session } = useSessionState();
+  const location = useLocation();
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  if (session) {
+    const from = (location.state as { from?: string } | null)?.from;
+    return <Navigate to={from ?? '/teams'} replace />;
+  }
+
+  return (
+    <>
+      <header className={styles.header}>
+        <span className={styles.brand}>
+          <DiamondMark className={styles.mark} />
+          Front Office Command Center
+        </span>
+      </header>
+      <main id="main" className={styles.main}>
+        <section className={styles.panel} aria-labelledby="sign-in-title">
+          <h1 id="sign-in-title" className={styles.title}>
+            Sign in
+          </h1>
+          {client ? (
+            <>
+              <p className={styles.text}>
+                Your teams and their snapshots are yours alone. Sign in with GitHub to reach them.
+              </p>
+              <SignInButton
+                client={client}
+                busy={busy}
+                onStart={() => {
+                  setBusy(true);
+                  setError(null);
+                }}
+                onFail={(message) => {
+                  setBusy(false);
+                  setError(message);
+                }}
+              />
+              {error ? (
+                <p className={styles.error} role="alert">
+                  {error}
+                </p>
+              ) : null}
+            </>
+          ) : (
+            <p className={styles.error} role="alert">
+              This build has no Supabase settings. Set VITE_SUPABASE_URL and
+              VITE_SUPABASE_PUBLISHABLE_KEY, then rebuild.
+            </p>
+          )}
+        </section>
+      </main>
+    </>
+  );
+}
+
+function SignInButton({
+  client,
+  busy,
+  onStart,
+  onFail,
+}: {
+  client: NonNullable<ReturnType<typeof useSessionState>['client']>;
+  busy: boolean;
+  onStart: () => void;
+  onFail: (message: string) => void;
+}) {
+  const { signIn } = useAuthActions(client);
+  return (
+    <Button
+      variant="primary"
+      disabled={busy}
+      onClick={() => {
+        onStart();
+        void signIn().then((message) => {
+          if (message) {
+            onFail(message);
+          }
+        });
+      }}
+    >
+      {busy ? 'Opening GitHub…' : 'Sign in with GitHub'}
+    </Button>
+  );
+}

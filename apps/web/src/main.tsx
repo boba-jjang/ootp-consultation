@@ -1,10 +1,15 @@
 import './styles/global.css';
 
+import { QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { RouterProvider } from 'react-router/dom';
 
-import { App } from './App.tsx';
+import { SessionProvider } from './auth.tsx';
+import { queryClient } from './data.ts';
 import { ErrorBoundary } from './ErrorBoundary.tsx';
+import { router } from './router.tsx';
+import { supabase } from './supabase.ts';
 
 const container = document.getElementById('root');
 if (!container) {
@@ -14,7 +19,11 @@ if (!container) {
 createRoot(container).render(
   <StrictMode>
     <ErrorBoundary>
-      <App />
+      <SessionProvider client={supabase}>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
+      </SessionProvider>
     </ErrorBoundary>
   </StrictMode>,
 );

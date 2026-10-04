@@ -79,7 +79,7 @@ The app is a persistent franchise assistant for Out of the Park Baseball (OOTP 2
 
 - OOTP database-dump imports (full league tables keyed by player ID).
 - Trade and contract valuation.
-- Opponent-specific advice, which needs opponent exports.
+- Opponent-specific advice, which needs opponent exports, and rules that need handedness splits (platoons and pinch-hitting).
 
 ### Constraints
 
@@ -386,7 +386,7 @@ Development risk is the scout's read on how reliably a player reaches his potent
 
 These are starting settings to calibrate, in 1–10 steps. Very Low risk narrows the band around the talent estimate; it doesn't make stats less noisy. In practice, a Very Low-risk player's stat swings read as luck and regress harder toward his ratings.
 
-- Record which scout's view each export used, since OSA and the head scout can disagree on risk.
+- Record which scout's view each export used, since OSA and the head scout can disagree on risk. In this league the scouting staff is disabled, so every export is OSA's view.
 - OOTP can merge stats into scouting reports. If a league does, scouted ratings already lean on stats, so the estimator weights stats less.
 
 ### Evidence map
@@ -686,12 +686,12 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 
 ### Open questions
 
-- [ ] Does the league use the DH?
+- [x] Does the league use the DH? Answered: yes.
 - [ ] How often will exports be refreshed during the season? Each upload becomes a dated snapshot (design handoff); the cadence is still open.
 - [x] Where should the consultation appear: a chat-style advisor, a written report, or a dashboard? Answered: dashboard screens with an advisor drawer, plus the manager's card (design handoff).
 - [x] Persistence: a free hosted database, or browser storage with team export and import? Answered: Supabase Postgres (implementation plan).
 - [x] Hosting split: GitHub Pages, Vercel, or both with a defined role for each? Answered: Vercel hosts the app and the advisor function; GitHub holds the source and runs CI (implementation plan).
-- [ ] Which scout's view do the exports use, the head scout or OSA? Development risk can differ between them.
+- [x] Which scout's view do the exports use, the head scout or OSA? Development risk can differ between them. Answered: OSA. The scouting staff is disabled, so every export shows the same OSA view.
 - [ ] Does the league merge stats into scouting reports? If so, the estimator weights stats less.
 - [x] Does the view editor offer per-position ratings and handedness splits? Answered: neither has been provided, so both are treated as unavailable (sections 9–11).
 - [x] Re-export the pitching ratings view with the staff listed, to get pitchers' work ethic, IQ and risk. Done: the staff cus\_pitch\_pot, the latest upload of that view, carries work ethic, IQ and risk for all 13 pitchers and is treated as part of the same snapshot.

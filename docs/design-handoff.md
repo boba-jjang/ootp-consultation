@@ -5,7 +5,7 @@ Canvas: https://claude.ai/artifact/Q1MymJ7UG3qEdLxVXEq2D5 (11 boards). The Imple
 ## Decisions (these answer three of the Basis's open questions)
 - Exports get refreshed. The app is a persistent "Create a Team" model, not a one-shot upload. Each upload becomes a snapshot, and new exports add to a team's coverage over time. Game 42 is the first snapshot, labeled from the most games played by any hitter. This changes the Basis's v1 scope line, which assumes one snapshot. Roadmap unchanged: database-dump import, trade valuation, opponent advice.
 - Where consultation appears: dashboard screens (Clubhouse, Talent radar, Lineup card, Bullpen & tactics, Dev lab), with an advisor drawer on the lineup screen. There's also a downloadable "manager's card" of settings to enter by hand in OOTP; no known way to import strategy files into OOTP (unverified). Advisor answers cite their numbers and say when data is missing (e.g., no platoon splits).
-- DH: the original wireframe shows "DH: Active", so the design assumes DH on. Needs confirming.
+- DH: the original wireframe shows "DH: Active", so the design assumes DH on. Confirmed: the league uses the DH.
 - Never a broken screen. Each module degrades and names the export that unlocks it.
 - The top-bar confidence badge measures data coverage: Low (stats views only), Moderate (+ superstats), High (+ both ratings views). It's separate from the estimator's per-recommendation confidence bands. Keep both, and name them so users can tell them apart.
 - Team setup asks for:

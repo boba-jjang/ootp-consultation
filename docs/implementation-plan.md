@@ -352,7 +352,7 @@ The biggest risk is a quiet failure on a free tier, so each mitigation either ke
 - [ ] Do you need the app on more than one device? If not, browser storage could replace Supabase.
 - [ ] Gemini for the advisor, or another model?
 
-League questions (DH, scout view) stay tracked in the Knowledge Base. Per-position ratings aren't available.
+League questions are settled: the league uses the DH, and every export is OSA's view, since the scouting staff is disabled. Per-position ratings aren't available.
 
 ## Sources
 

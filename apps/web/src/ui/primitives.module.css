@@ -71,6 +71,7 @@
 }
 
 .ghost {
+  min-width: var(--control); /* a one-word action still meets the 44 px target */
   padding: 0 var(--space-1);
   color: var(--color-accent);
   font-weight: var(--weight-regular);

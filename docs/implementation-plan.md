@@ -266,7 +266,7 @@ Frontend coding starts with what every screen shares: design tokens, the app she
 | Routing | `/sign-in`, `/teams`, `/teams/new`, `/t/:team/settings`, and `/t/:team/s/:snapshot/` plus one path per tab |
 | Data loading | TanStack Query over Supabase; derived data computed by `packages/core` and cached per snapshot and importer version |
 | Lock framework | Each module declares the data sets it needs; a shared wrapper renders the locked state and names the export that unlocks it, so no screen ever breaks. Tabs whose screens arrive in Phase 4 render the same locked state, naming the phase |
-| Styling | Plain CSS: the tokens as custom properties in three layers (primitive, semantic, component), CSS Modules per component, no utility framework. A test fails on a raw color outside the token file. Motion is CSS transitions that respect `prefers-reduced-motion`; React's view transitions wait for a stable release |
+| Styling | Plain CSS: the tokens as custom properties in three layers (primitive, semantic, component), CSS Modules per component, no utility framework. A test fails on a raw color outside the token file. Motion is CSS transitions that respect `prefers-reduced-motion`; React 19.3 ships `ViewTransition`, for the setup steps and Suspense reveals where motion carries meaning |
 | Data coverage | A `packages/core` module: each player's five data sets (bio, stats, batted ball, swing decisions, ratings), the team badge, what to upload next, and the view descriptions the screens show. League files count separately |
 | Vocabulary | "Data coverage" is the top-bar badge (Low, Moderate, High). "Estimate confidence" is the band on a recommendation. |
 
@@ -275,7 +275,7 @@ The canvas's Dugout alignment, batting order and luck reads are placeholders, so
 Build order, one pull request each:
 
 - [x] Design tokens, self-hosted fonts and a component sheet page (`/sheet`), checked against the canvas. A test keeps raw colors out of components.
-- [ ] Routing, the sign-in screen, data loading with TanStack Query over the Supabase store, and an error boundary per screen.
+- [x] Routing, the sign-in screen, data loading with TanStack Query over the Supabase store, and an error boundary per screen. The Playwright and axe harness lands here too, so every later screen ships with its tests.
 - [ ] Data coverage in `packages/core`, with tests on the fixtures: the Seattle snapshot is High with 12 hitters at 5 of 5 data sets and 13 pitchers at 4 of 5 (no pitcher bio view).
 - [ ] App shell: top bar (team menu, snapshot selector, coverage badge, DH, advisor status), module tabs with locked states, and the lock framework.
 - [ ] Team menu and Create a Team: add exports (drop or choose files, folders included), files read, team and league prefilled from the files, review, create.

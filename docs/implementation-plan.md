@@ -190,7 +190,7 @@ The Free plan has [no automatic backups](https://supabase.com/pricing). The app'
 - [x] Create a GitHub OAuth app per Supabase project; allow redirects for localhost, the preview URL pattern and production.
 - [x] Turn off sign-ups on both projects after your first sign-in.
 - [x] Store and load a team's snapshots: dated by game number, raw files kept verbatim with their import log, a re-export replacing its view and a later game adding history (Knowledge Base › Architecture › Module contracts, Team store).
-- [ ] Build Export team, plus a test that re-imports its zip, in Phase 2.
+- [x] Build Export team, plus a test that re-imports its zip, in Phase 2.
 
 ## Advisor service
 

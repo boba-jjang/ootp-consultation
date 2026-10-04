@@ -94,7 +94,7 @@ ootp-consultation/
 - [x] Scaffold the pnpm workspace: `apps/web` from the Vite React TypeScript template, `packages/core` as a library.
 - [x] Add the shared strict tsconfig, ESLint, Prettier and `.editorconfig`.
 - [x] Add Vitest at the workspace root with a coverage floor on `packages/core`.
-- [ ] Commit `.env.example`; gitignore `.env*.local`.
+- [x] Commit `.env.example`; gitignore `.env*.local`. It lives in `apps/web/`, where Vite reads env files.
 - [ ] Write `docs/adr/0001-platform.md` once the decisions table is confirmed.
 - [ ] Use Conventional Commits and squash merges, so `main` reads as one change per pull request.
 
@@ -122,10 +122,10 @@ Local development points at the cloud staging project, not a local Supabase stac
 
 Two rules keep secrets out of the browser: a `VITE_` prefix means public, and no secret ever gets one. The app never needs Supabase's secret or service-role key, so none is stored anywhere.
 
-- [ ] Create Supabase projects `ootp-staging` and `ootp-prod`, the Free plan's two active projects.
+- [x] Create Supabase projects `ootp-staging` and `ootp-prod`, the Free plan's two active projects.
 - [ ] Create the two Gemini keys in separate AI Studio projects; [rate limits are per project](https://ai.google.dev/gemini-api/docs/rate-limits), so previews can't drain production's quota.
-- [ ] Enter the Vercel variables with Preview and Production scopes.
-- [ ] Enter the GitHub secrets at repository level; environment secrets need a public repo on GitHub Free.
+- [x] Enter the Vercel variables with Preview and Production scopes.
+- [x] Enter the GitHub secrets at repository level; environment secrets need a public repo on GitHub Free.
 - [ ] Keep `.env.example` in sync with this table.
 
 ## CI pipeline
@@ -185,7 +185,7 @@ The Free plan has [no automatic backups](https://supabase.com/pricing). The app'
 - [x] Migration `0001`: the five tables, indexes on every foreign key and `owner_id`, row-level security enabled.
 - [x] pgTAP tests per table: the owner can read and write; a second user and an anonymous caller see nothing.
 - [ ] Generate database types with the Supabase CLI; CI fails if they drift from the migrations.
-- [ ] Create a GitHub OAuth app per Supabase project; allow redirects for localhost, the preview URL pattern and production.
+- [x] Create a GitHub OAuth app per Supabase project; allow redirects for localhost, the preview URL pattern and production.
 - [ ] Turn off sign-ups on both projects after your first sign-in.
 - [ ] Build Export team, plus a test that re-imports its zip, in Phase 2.
 
@@ -320,10 +320,10 @@ Phase 1, in order:
 - [ ] Create the GitHub repo under your personal account.
 - [x] Scaffold the workspace and push `ci.yml`; get the first green run.
 - [x] Import the repo into Vercel and confirm a preview on a test pull request.
-- [ ] Create the two Supabase projects and turn on GitHub sign-in for each.
-- [ ] Add migration `0001` (all five tables and their policies) with `db.yml` to test and apply it. Migration, tests and `db.yml` are in; applying waits on the Supabase projects and their GitHub secrets and variables.
-- [ ] Enter the Supabase variables in Vercel and `.env.local`.
-- [ ] Build one page that signs in, saves a team and reloads it.
+- [x] Create the two Supabase projects and turn on GitHub sign-in for each.
+- [x] Add migration `0001` (all five tables and their policies) with `db.yml` to test and apply it.
+- [x] Enter the Supabase variables in Vercel and `.env.local`.
+- [x] Build one page that signs in, saves a team and reloads it.
 - [ ] Add `keepalive.yml`, the error boundary and the `main` ruleset.
 - [ ] Close sign-ups on both projects and tag `v0.1`.
 

@@ -31,14 +31,14 @@ export function useSessionState(): SessionState {
 /** Sign-in and sign-out, each returning a message when it fails. */
 export function useAuthActions(client: Client) {
   return {
-    async signIn(): Promise<string | null> {
+    signIn: async (): Promise<string | null> => {
       const { error } = await client.auth.signInWithOAuth({
         provider: 'github',
         options: { redirectTo: window.location.origin },
       });
       return error ? `Sign-in failed: ${error.message}` : null;
     },
-    async signOut(): Promise<string | null> {
+    signOut: async (): Promise<string | null> => {
       const { error } = await client.auth.signOut();
       return error ? `Sign-out failed: ${error.message}` : null;
     },

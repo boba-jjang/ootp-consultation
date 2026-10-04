@@ -4,11 +4,7 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
-  "include": [
-    "vitest.config.ts"
-  ]
+  "include": ["vitest.config.ts"]
 }

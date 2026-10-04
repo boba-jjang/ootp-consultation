@@ -18,7 +18,7 @@ export async function expectTargets(page: Page): Promise<void> {
       .filter(({ box }) => box.width > 0 && (box.height < 44 || box.width < 44))
       .map(
         ({ element, box }) =>
-          `${element.tagName.toLowerCase()} "${element.textContent?.trim().slice(0, 40) ?? ''}" ${Math.round(box.width)}×${Math.round(box.height)}`,
+          `${element.tagName.toLowerCase()} "${element.textContent.trim().slice(0, 40)}" ${Math.round(box.width)}×${Math.round(box.height)}`,
       ),
   );
   expect(small).toEqual([]);

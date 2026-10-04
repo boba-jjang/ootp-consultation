@@ -11,6 +11,25 @@ test.describe('the component sheet', () => {
     await expectAccessible(page);
     await expectTargets(page);
   });
+
+  test('shows the app shell, with a team menu the keyboard can work', async ({ page }) => {
+    await page.goto('/sheet');
+    await expect(page.getByRole('navigation', { name: 'Modules' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Dev lab (locked)' })).toBeVisible();
+    const trigger = page.getByRole('button', { name: 'Seattle Arrows RSL' });
+    await trigger.click();
+    const menu = page.getByRole('menu');
+    await expect(menu).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'Seattle Arrows RSL' })).toBeFocused();
+    await page.keyboard.press('ArrowDown');
+    await expect(page.getByRole('menuitem', { name: 'Portland Pines RSL' })).toBeFocused();
+    await page.keyboard.press('End');
+    await expect(page.getByRole('menuitem', { name: 'Sign out' })).toBeFocused();
+    await expectAccessible(page);
+    await page.keyboard.press('Escape');
+    await expect(menu).toBeHidden();
+    await expect(trigger).toBeFocused();
+  });
 });
 
 test.describe('sign-in', () => {

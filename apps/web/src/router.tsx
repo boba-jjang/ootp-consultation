@@ -1,13 +1,16 @@
-import { createBrowserRouter, Outlet } from 'react-router';
+import { createBrowserRouter, Navigate, Outlet } from 'react-router';
 
 import { RequireSession } from './auth.tsx';
 import { ComingSoon } from './screens/ComingSoon.tsx';
 import { Home } from './screens/Home.tsx';
+import { ModuleScreen } from './screens/Module.tsx';
 import { NotFound } from './screens/NotFound.tsx';
 import { Root } from './screens/Root.tsx';
 import { RouteError } from './screens/RouteError.tsx';
 import { SignIn } from './screens/SignIn.tsx';
+import { TeamHome } from './screens/TeamHome.tsx';
 import { TeamsScreen } from './screens/Teams.tsx';
+import { Shell } from './shell/Shell.tsx';
 import { Sheet } from './sheet/Sheet.tsx';
 
 /**
@@ -42,9 +45,15 @@ export const router = createBrowserRouter([
               <ComingSoon screen="Team settings" item="Team settings, Export team and restore" />
             ),
           },
+          { path: 't/:team', element: <TeamHome />, errorElement: <RouteError /> },
           {
-            path: 't/:team/s/:snapshot/:tab?',
-            element: <ComingSoon screen="The app" item="App shell" />,
+            path: 't/:team/s/:snapshot',
+            element: <Shell />,
+            errorElement: <RouteError />,
+            children: [
+              { index: true, element: <Navigate to="clubhouse" replace /> },
+              { path: ':tab', element: <ModuleScreen />, errorElement: <RouteError /> },
+            ],
           },
         ],
       },

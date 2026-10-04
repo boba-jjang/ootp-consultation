@@ -3,7 +3,7 @@
 Oct 3, 2026 · @Jay
 
 > Exported from the [Implementation Basis Claude Doc](https://claude.ai/artifact/WjZ9H3kozCBBy3ziikZjWX) on 4 October 2026.
->
+
 > Since 4 October 2026 the Knowledge Base (`docs/agent-knowledge-base.md`) is the spec of record. This doc stays for its Seattle reference data and player reads; where its rules differ, the Knowledge Base wins.
 
 ## Purpose and pipeline

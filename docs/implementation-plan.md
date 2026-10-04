@@ -272,7 +272,7 @@ The canvas's Dugout alignment, batting order and luck reads are placeholders, so
 
 ## Testing and quality
 
-The Seattle game-42 exports are the golden fixtures: every parser rule, identity check and model output is tested against them. Each row of the "Columns that need special handling" tables in the Knowledge Base and the Basis becomes at least one test.
+The Seattle game-42 exports are the golden fixtures: every parser rule, identity check and model output is tested against them. Each row of the Knowledge Base's "Columns that need special handling" table becomes at least one test; that table is the checklist.
 
 | Layer | Tool | What it proves | Runs |
 | --- | --- | --- | --- |

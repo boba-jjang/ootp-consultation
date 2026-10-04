@@ -45,3 +45,9 @@ export {
   type ValidationSettings,
 } from './importer/validate.ts';
 export { importLeague, type LeagueTables } from './importer/league.ts';
+export {
+  fromTwentyEighty,
+  scaleBounds,
+  toTwentyEighty,
+  type RatingScale,
+} from './ratings/scale.ts';

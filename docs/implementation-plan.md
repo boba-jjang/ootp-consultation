@@ -237,8 +237,9 @@ These acceptance criteria differ from the canvas or from the Basis as written:
 - Pitcher age comes from `cus_pitch_pot`.
 - At a non-listed position, position cards show component ceilings, not the listed position's DEF.
 
-- [ ] Add the six canonical uploads to `fixtures/seattle-g42/`: `custom_bat_pot`, `cus_pitch_pot`, the hitter capture and the newer `batting_superstats_1`, `pitching_superstats_1` and `pitching_superstats_2`.
-- [ ] Keep the older superstats copies in `fixtures/legacy/`, to test header-version handling.
+- [x] Add the six canonical uploads to `fixtures/seattle-g42/`: `custom_bat_pot`, `cus_pitch_pot`, the hitter capture and the newer `batting_superstats_1`, `pitching_superstats_1` and `pitching_superstats_2`.
+- [x] Add the four league sortable superstats exports to `fixtures/seattle-g42/`, for the league import and percentiles (Knowledge Base › Data sources › League sortable stats).
+- [x] Keep the older superstats copies in `fixtures/legacy/`, to test header-version handling.
 - [ ] Stamp every import with `importer_version`, so re-reading raw files is deterministic.
 
 ## Frontend foundation

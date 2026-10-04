@@ -26,6 +26,7 @@ export {
 export { parseCsv } from './importer/csv.ts';
 export {
   DEFAULT_ROUTING_SETTINGS,
+  LEAGUE_VIEWS,
   routeExport,
   type ExportRow,
   type ImportEvent,
@@ -53,6 +54,22 @@ export {
 } from './ratings/scale.ts';
 export { RATING_COLUMNS } from './ratings/columns.ts';
 export { assembleSnapshot, type Snapshot, type SnapshotSettings } from './importer/snapshot.ts';
+export {
+  DATA_SETS,
+  DATA_SET_INFO,
+  LAYERS,
+  VIEW_DESCRIPTIONS,
+  measureCoverage,
+  type Coverage,
+  type CoverageCell,
+  type CoverageLevel,
+  type DataSet,
+  type DataSetInfo,
+  type Layer,
+  type PlayerCoverage,
+  type SideCoverage,
+  type ViewDescription,
+} from './importer/coverage.ts';
 export {
   importUpload,
   loadSnapshot,

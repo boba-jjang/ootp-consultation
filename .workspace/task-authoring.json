@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "project_id": "ootp-consultation",
+  "default_route": "plan-task",
+  "routes": {
+    "plan-task": {
+      "description": "One implementation-plan item as one branch and pull request, built in a Claude Code session. Authoring only: no CAO launcher, coordinator or roles.",
+      "format": "markdown-template-v1",
+      "hub_prompt": "ootp-task-author-v1",
+      "template": "docs/tasks/task-template.md",
+      "authoring_guide": "docs/tasks/authoring-guide.md",
+      "project_guides": [
+        "CLAUDE.md",
+        "docs/implementation-plan.md",
+        "docs/agent-knowledge-base.md",
+        "docs/implementation-basis.md",
+        "fixtures/README.md"
+      ],
+      "inserts": {
+        "core-logic": "docs/tasks/inserts/core-logic.md",
+        "database": "docs/tasks/inserts/database.md",
+        "screen": "docs/tasks/inserts/screen.md"
+      },
+      "prompt_packs": [],
+      "entry_point": null,
+      "coordinator": null,
+      "purpose": null,
+      "required_inserts": [],
+      "allowed_owners": [],
+      "required_reviewers": [],
+      "section_mapping": {
+        "scope": "Scope",
+        "requirements": "Requirements",
+        "checks": "Validation",
+        "acceptance": "Acceptance",
+        "review": "Review",
+        "dependency": "Dependencies",
+        "preparation": "Preparation"
+      },
+      "mandatory_sources": [
+        "hub:prompts/common.md",
+        "hub:prompts/behavior.md",
+        "docs/tasks/authoring-guide.md",
+        "docs/tasks/task-template.md",
+        "CLAUDE.md",
+        "docs/implementation-plan.md"
+      ]
+    }
+  },
+  "prompt_packs": {
+    "screens": {
+      "sources": ["docs/design-handoff.md", "docs/design/boards/README.md"],
+      "applies_to": ["plan-task"]
+    },
+    "local-setup": {
+      "sources": ["docs/local-development.md", "README.md"],
+      "applies_to": ["plan-task"]
+    }
+  },
+  "host_skills": {
+    "policy": "host-selected-and-declared",
+    "required_declaration": true
+  },
+  "source_limits": {
+    "max_files": 64,
+    "max_file_bytes": 262144,
+    "max_total_bytes": 1048576
+  }
+}

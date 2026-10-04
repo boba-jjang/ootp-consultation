@@ -1,0 +1,583 @@
+/* ---- Buttons --------------------------------------------------------------------------- */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control);
+  padding: 0 var(--space-3-5);
+  border: 1px solid transparent;
+  border-radius: var(--button-radius);
+  background: transparent;
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.button:hover {
+  color: var(--color-text);
+}
+
+.primary {
+  min-height: var(--control-lg);
+  padding: 0 var(--space-5-5);
+  background: var(--button-primary-bg);
+  color: var(--button-primary-fg);
+  font-weight: var(--weight-bold);
+}
+
+.primary:hover {
+  color: var(--button-primary-fg);
+  filter: brightness(1.06);
+}
+
+.primary:disabled {
+  background: var(--button-primary-disabled-bg);
+  color: var(--button-primary-disabled-fg);
+  filter: none;
+}
+
+.secondary {
+  min-height: var(--control-lg);
+  padding: 0 var(--space-5);
+  border: var(--button-secondary-border);
+}
+
+.secondary:hover {
+  background: var(--tint-surface-hover);
+}
+
+.outline {
+  border: var(--button-secondary-border);
+}
+
+.outline:hover {
+  background: var(--tint-surface-hover);
+}
+
+.accent {
+  border: var(--button-accent-border);
+  color: var(--button-accent-fg);
+}
+
+.accent:hover {
+  background: var(--tint-accent);
+  color: var(--button-accent-fg);
+}
+
+.ghost {
+  padding: 0 var(--space-1);
+  color: var(--color-accent);
+  font-weight: var(--weight-regular);
+}
+
+.ghost:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link {
+  padding: 0;
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-regular);
+  font-size: var(--text-14);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---- Chips and badges ------------------------------------------------------------------ */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-0-5) var(--space-2);
+  border: var(--chip-border);
+  border-radius: var(--chip-radius);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-12);
+  color: var(--chip-fg);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-0-5) var(--space-2-5);
+  border: var(--border-default);
+  border-radius: var(--chip-radius);
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+
+.badgeValue {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-body);
+}
+
+.leagueTag {
+  padding: 1px var(--space-1-5);
+  border: 1px solid var(--line-connector);
+  border-radius: var(--chip-radius);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-11);
+  color: var(--color-text-secondary);
+}
+
+/* ---- Trend ----------------------------------------------------------------------------- */
+
+.trend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-semibold);
+}
+
+.trendUp {
+  color: var(--color-positive);
+}
+
+.trendDown {
+  color: var(--color-negative);
+}
+
+.trendDownSmall {
+  color: var(--color-negative-text);
+}
+
+/* ---- Coverage bars ------------------------------------------------------------------- */
+
+.coverage {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-13);
+  color: var(--color-text-secondary);
+}
+
+.coverageBars {
+  display: flex;
+  gap: 3px;
+}
+
+.coverageBar {
+  width: 14px;
+  height: 6px;
+  border-radius: var(--radius-1);
+  background: var(--bar-off);
+}
+
+.coverageBar[data-lit='true'] {
+  background: var(--coverage-color);
+}
+
+.coverageLabel {
+  font-weight: var(--weight-semibold);
+  color: var(--coverage-color);
+}
+
+.coverageLow {
+  --coverage-color: var(--color-coverage-low);
+}
+
+.coverageModerate {
+  --coverage-color: var(--color-coverage-moderate);
+}
+
+.coverageHigh {
+  --coverage-color: var(--color-coverage-high);
+}
+
+/* The wide form: three labeled bars, one per data layer. */
+.layers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.layer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+
+.layerBar {
+  height: 6px;
+  border-radius: var(--radius-2);
+  background: var(--bar-off);
+}
+
+.layer[data-lit='true'] {
+  color: var(--color-text);
+}
+
+.layer[data-lit='true'] .layerBar {
+  background: var(--color-coverage-moderate);
+}
+
+.layer[data-lit='true'][data-level='high'] .layerBar {
+  background: var(--color-coverage-high);
+}
+
+/* ---- Matrix cells ------------------------------------------------------------------ */
+
+.matrixCell {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.matrixSwatch {
+  width: 30px;
+  height: 12px;
+  border-radius: var(--radius-2);
+  border: var(--matrix-cell-empty-border);
+}
+
+.matrixSwatch[data-on='true'] {
+  background: var(--matrix-cell-on);
+  border: 1px solid var(--matrix-cell-on);
+}
+
+/* ---- Panels and cards -------------------------------------------------------------- */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--panel-padding);
+  background: var(--panel-bg);
+  border: var(--panel-border);
+  border-radius: var(--panel-radius);
+}
+
+.panelHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+}
+
+.panelTitle {
+  font-size: var(--text-17);
+  font-weight: var(--weight-semibold);
+  text-wrap: balance;
+}
+
+.panelMeta {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-13);
+  color: var(--color-text-secondary);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3-5);
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: var(--panel-radius);
+}
+
+/* A card's action hugs its text, as on the canvas. */
+.card .button {
+  align-self: flex-start;
+}
+
+/* ---- Steps ------------------------------------------------------------------------- */
+
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2-5) var(--space-3-5);
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  font-size: var(--text-14);
+  color: var(--color-text-secondary);
+}
+
+.step[aria-current='step'] {
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+}
+
+.step[data-state='done'] {
+  color: var(--color-text);
+}
+
+.stepConnector {
+  width: 40px;
+  height: 1px;
+  background: var(--line-connector);
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: var(--step-todo-border);
+  border-radius: var(--radius-round);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-13);
+}
+
+.step[aria-current='step'] .stepNumber {
+  border: 2px solid var(--step-current);
+  font-weight: var(--weight-semibold);
+  color: var(--step-current);
+}
+
+.step[data-state='done'] .stepNumber {
+  border: var(--step-done-border);
+  background: var(--step-done-bg);
+  color: var(--color-positive);
+}
+
+/* ---- Locked state ------------------------------------------------------------------ */
+
+.locked {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  padding: var(--space-3);
+  overflow: hidden;
+}
+
+.lockedPlaceholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5);
+  padding: var(--space-5);
+  opacity: 0.6;
+}
+
+.lockedBar {
+  height: 10px;
+  border-radius: var(--radius-2);
+  background: var(--bar-off);
+}
+
+.lockedBar[data-accent='true'] {
+  background: var(--lock-placeholder);
+}
+
+.lockedCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5);
+  max-width: 580px;
+  padding: var(--space-4-5) var(--space-5);
+  background: var(--lock-card-bg);
+  border: var(--lock-card-border);
+  border-radius: var(--panel-radius);
+}
+
+.lockedTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  font-size: var(--text-16);
+  font-weight: var(--weight-semibold);
+}
+
+.lockedTitle svg {
+  color: var(--color-accent);
+}
+
+.lockedText {
+  font-size: var(--text-14);
+  color: var(--color-text-body);
+}
+
+/* ---- Fields ------------------------------------------------------------------------ */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+}
+
+/* A fieldset used as a field: no browser box around it. */
+fieldset.field {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.label {
+  font-size: var(--text-14);
+  font-weight: var(--weight-semibold);
+}
+
+.input {
+  min-height: var(--control);
+  padding: 0 var(--space-3);
+  background: var(--input-bg);
+  border: var(--input-border);
+  border-radius: var(--input-radius);
+  font-size: var(--text-15);
+}
+
+.input[data-mono='true'] {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.help {
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+
+.error {
+  font-size: var(--text-13);
+  color: var(--color-negative-text);
+}
+
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+fieldset.field > legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control);
+  padding: 0 var(--space-3-5);
+  border: var(--input-border);
+  border-radius: var(--input-radius);
+  font-size: var(--text-14);
+  cursor: pointer;
+}
+
+.choice:has(input:checked) {
+  border-color: var(--color-accent);
+  background: var(--tint-accent);
+}
+
+.choice input {
+  margin: 0;
+  accent-color: var(--color-accent);
+}
+
+.choice[data-mono='true'] {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Timeline ---------------------------------------------------------------------- */
+
+.timeline {
+  position: relative;
+  height: 58px;
+}
+
+.timelineTrack {
+  position: absolute;
+  top: 28px;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: var(--line-track);
+}
+
+.timelineLabel {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-12);
+  white-space: nowrap;
+}
+
+.timelineDot {
+  position: absolute;
+  top: 22px;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: var(--radius-round);
+  background: var(--timeline-dot);
+  box-shadow: 0 0 0 4px var(--timeline-halo);
+}
+
+.timelineTick {
+  position: absolute;
+  top: 40px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-11);
+  color: var(--color-text-secondary);
+}
+
+/* ---- Drop zone --------------------------------------------------------------------- */
+
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2-5);
+  min-height: 220px;
+  padding: var(--space-6);
+  background: var(--drop-zone-bg);
+  border: var(--drop-zone-border);
+  border-radius: var(--panel-radius);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.dropZone[data-active='true'] {
+  border-color: var(--color-accent);
+  background: var(--tint-accent);
+}
+
+.dropTitle {
+  font-size: var(--text-19);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+}
+
+.dropText {
+  max-width: 52ch;
+  font-size: var(--text-14);
+}

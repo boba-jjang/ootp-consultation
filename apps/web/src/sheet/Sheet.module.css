@@ -1,0 +1,144 @@
+.sheet {
+  max-width: var(--width-setup);
+  margin: 0 auto;
+  padding: var(--space-10) var(--gutter) var(--space-12);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.title {
+  font-size: var(--text-36);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-semibold);
+  text-wrap: balance;
+}
+
+.lead {
+  max-width: 62ch;
+  font-size: var(--text-16);
+  color: var(--color-text-secondary);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-top: var(--space-5);
+  border-top: var(--border-subtle);
+}
+
+.sectionHead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sectionTitle {
+  scroll-margin-top: var(--space-6);
+  font-size: var(--text-17);
+  font-weight: var(--weight-semibold);
+  text-wrap: balance;
+}
+
+.muted {
+  font-size: var(--text-13);
+  color: var(--color-text-secondary);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-3);
+}
+
+.swatch {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: var(--space-3);
+  align-items: center;
+  font-size: var(--text-13);
+}
+
+.swatchColor {
+  grid-row: span 2;
+  height: 44px;
+  border: var(--border-default);
+  border-radius: var(--radius-4);
+}
+
+.display {
+  font-size: var(--text-44);
+  line-height: var(--leading-display);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-display);
+}
+
+.mono {
+  font-size: var(--text-20);
+  line-height: 1.4;
+  color: var(--color-text-body);
+}
+
+.mono .accent {
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+}
+
+.sizes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sizeName {
+  margin-right: var(--space-3);
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+
+.teamName {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-17);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-brand);
+}
+
+.layersRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-5);
+}
+
+.cardTitle {
+  font-size: var(--text-15);
+  font-weight: var(--weight-semibold);
+}
+
+.cardText {
+  font-size: var(--text-14);
+  color: var(--color-text-body);
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: var(--space-4);
+  max-width: var(--width-form);
+}

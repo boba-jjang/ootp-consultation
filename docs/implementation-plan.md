@@ -245,6 +245,7 @@ These acceptance criteria differ from the canvas or from the Basis as written; t
 - [x] Add the four league sortable superstats exports to `fixtures/seattle-g42/` (Knowledge Base › Data sources › League sortable stats).
 - [x] Keep the older superstats copies in `fixtures/legacy/`, to test header-version handling.
 - [x] Detect each export's view and header version from its header row, with every version in the header manifest (Knowledge Base › Import contract › Header manifest).
+- [x] Route each export: read the CSV and file name, and route it as primary, supplemental or rejected, with its scope, side and import events (Knowledge Base › Import contract).
 - [ ] Stamp every import with `importer_version`, so re-reading raw files is deterministic.
 - [ ] Import the league sortable files: name joins, duplicate flags, rows with G = 0 dropped (Knowledge Base › Import contract › Joins and snapshots).
 - [ ] Build league percentiles: usage-based peer pools, sample floors, metric directions and the mid-rank formula (Knowledge Base › League percentiles).

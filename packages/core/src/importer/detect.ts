@@ -1,3 +1,4 @@
+import { parseCsv } from './csv.ts';
 import { VIEW_MANIFESTS, type Side, type ViewId } from './manifest.ts';
 
 /** Where a header falls short of its closest view, for the import log. */
@@ -28,10 +29,9 @@ export type Detection =
  */
 const MISMATCH_SIMILARITY = 0.5;
 
-/** Reads a CSV export's header row: the first line, split on commas and trimmed. */
+/** Reads a CSV export's header row, trimmed. */
 export function readHeader(text: string): string[] {
-  const firstLine = text.replace(/^\uFEFF/, '').split(/\r?\n/, 1)[0] ?? '';
-  return firstLine === '' ? [] : firstLine.split(',').map((column) => column.trim());
+  return (parseCsv(text)[0] ?? []).map((column) => column.trim());
 }
 
 /**

@@ -186,7 +186,7 @@ The Free plan has [no automatic backups](https://supabase.com/pricing). The app'
 
 - [x] Migration `0001`: the five tables, indexes on every foreign key and `owner_id`, row-level security enabled.
 - [x] pgTAP tests per table: the owner can read and write; a second user and an anonymous caller see nothing.
-- [ ] Generate database types with the Supabase CLI; CI fails if they drift from the migrations.
+- [x] Generate database types with the Supabase CLI; CI fails if they drift from the migrations.
 - [x] Create a GitHub OAuth app per Supabase project; allow redirects for localhost, the preview URL pattern and production.
 - [x] Turn off sign-ups on both projects after your first sign-in.
 - [ ] Build Export team, plus a test that re-imports its zip, in Phase 2.

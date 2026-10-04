@@ -1,9 +1,9 @@
-import type { Session, SupabaseClient } from '@supabase/supabase-js';
+import type { Session } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
 
 import { IMPORTER_VERSION } from '@ootp/core';
 
-import { projectRef, supabase } from './supabase.ts';
+import { projectRef, supabase, type Client } from './supabase.ts';
 import { Teams } from './Teams.tsx';
 
 export function App() {
@@ -46,7 +46,7 @@ function NotFound({ path }: { path: string }) {
   );
 }
 
-function AuthGate({ client }: { client: SupabaseClient }) {
+function AuthGate({ client }: { client: Client }) {
   // undefined while the stored session is still being read.
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);

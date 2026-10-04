@@ -42,6 +42,7 @@ Keep these current. Run them from the repo root on Node 24. The Node major is se
 - Test: `pnpm test`, which runs `test:core` (core's own tests, with the coverage floor on `packages/core`), then `test:apps` (every other project). `pnpm test` takes no extra arguments, so pass a filter or `-u` to `test:core`, `test:apps` or `test:watch` instead.
 - Build: `pnpm build`
 - Database tests: `supabase db start`, then `supabase test db` (pgTAP in `supabase/tests/`). These need Docker and the Supabase CLI, so they're optional locally; CI runs them.
+- Database types: `apps/web/src/database.types.ts` is generated from the migrations; never edit it by hand. After a migration change, CI's `db` job fails and uploads the regenerated file as the `database-types` artifact: commit that file. Without a pull request, run the DB workflow by hand on the branch (`gh workflow run db.yml --ref <branch>`).
 
 CI (`.github/workflows/ci.yml`, job `ci`) runs install, lint, format check, typecheck, test and build, in that order.
 `.github/workflows/db.yml` (job `db`) applies every migration to a fresh database and runs the pgTAP tests when `supabase/` changes. On `main` it pushes migrations to staging, then production (jobs `db-deploy-staging` and `db-deploy-production`), once their GitHub variables and secrets exist.

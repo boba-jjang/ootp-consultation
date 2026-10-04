@@ -21,6 +21,8 @@ export default defineConfig([
     '**/test-results/',
     'fixtures/',
     'docs/',
+    // Generated from the migrations by the Supabase CLI (CLAUDE.md › Commands).
+    'apps/web/src/database.types.ts',
   ]),
 
   {

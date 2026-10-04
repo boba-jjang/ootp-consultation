@@ -1,4 +1,3 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
 import { useEffect, useState, type ReactNode, type SubmitEvent } from 'react';
 
 import {
@@ -10,6 +9,8 @@ import {
   type TeamRow,
   type TeamSettings,
 } from '@ootp/core';
+
+import type { Client } from './supabase.ts';
 
 type NumberField = 'games_per_season' | 'dev_lab_slots';
 
@@ -27,7 +28,7 @@ const LEAGUE_SHOWS_LABELS: Record<(typeof LEAGUE_SHOWS)[number], string> = {
   current_and_potential: 'Current and potential',
 };
 
-export function Teams({ client }: { client: SupabaseClient }) {
+export function Teams({ client }: { client: Client }) {
   const [teams, setTeams] = useState<TeamRow[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [form, setForm] = useState<TeamForm>(EMPTY_FORM);
@@ -77,7 +78,7 @@ export function Teams({ client }: { client: SupabaseClient }) {
       setSaveError(`Couldn't save the team: ${response.error.message}`);
       return;
     }
-    const saved = parseTeamRow(response.data as unknown);
+    const saved = parseTeamRow(response.data);
     setTeams((current) => [...(current ?? []), saved]);
     setForm(EMPTY_FORM);
   }

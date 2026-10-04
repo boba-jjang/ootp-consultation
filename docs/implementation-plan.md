@@ -6,7 +6,7 @@
 
 Platform work comes first: a deployed, signed-in walking skeleton with CI/CD and a database. Frontend coding starts in Phase 3, once that foundation and the importer exist. Everything runs on free plans for personal, non-commercial use.
 
-This plan says what to build and in what order; it doesn't repeat the specs. Data, import rules and models live in `docs/implementation-basis.md`. Screens and their states live in `docs/design-handoff.md` and `docs/design/boards/`.
+This plan says what to build and in what order; it doesn't repeat the specs. Data, import rules and models live in the Knowledge Base, `docs/agent-knowledge-base.md`; `docs/implementation-basis.md` keeps the Seattle reference data. Screens and their states live in `docs/design-handoff.md` and `docs/design/boards/`.
 
 Tasks are checkboxes to tick off as you go. Service limits were checked on 3 October 2026 and are linked where they're used.
 
@@ -213,22 +213,24 @@ Hobby functions can run for [300 seconds](https://vercel.com/docs/functions/limi
 
 ## Core logic package
 
-`packages/core` holds every calculation as pure TypeScript, built in the Basis's order. Only the importer and canonical tables must exist before frontend work starts; each model arrives with the screen that shows it.
+`packages/core` holds every calculation as pure TypeScript, built in the order below (Knowledge Base › Delivery plan). Only the importer and canonical tables must exist before frontend work starts; each model arrives with the screen that shows it.
 
-| Order | Module | Spec in the Basis | First screen that needs it | Phase |
+| Order | Module | Spec in the Knowledge Base | First screen that needs it | Phase |
 | --- | --- | --- | --- | --- |
-| 1 | Importer: header detection, synonym table, unit and enum normalization, identity checks, routing | Import rules | Create a Team, Clubhouse | 2 |
-| 2 | Canonical tables and league config, stored on 20–80 | Ratings model | Every screen | 2 |
-| 3 | Metrics and luck gaps | Metrics | Talent radar, Bullpen & tactics | 4 |
-| 4 | Talent estimator v0 | Talent estimator | Talent radar, Lineup card | 4 |
-| 5 | Defensive model and eligibility matrix | Defensive model | Lineup card | 4 |
-| 6 | Strategy rules engine | Strategy rules | Bullpen & tactics | 4 |
-| 7 | Lineup optimizer, in a Web Worker | Lineup optimization | Lineup card | 4 |
-| 8 | Development planner | Development | Dev lab | 4 |
-| 9 | Consultation output and the manager's card | Purpose and pipeline | Every screen, advisor | 4–5 |
-| 10 | Backtest | Build order | Trends | 6 |
+| 1 | Importer: header detection, synonym table, unit and enum normalization, identity checks, routing | Import contract | Create a Team, Clubhouse | 2 |
+| 2 | League file import: name joins and duplicate flags | Data sources; Import contract | Clubhouse (league upload not yet designed) | 2 |
+| 3 | Canonical tables and league config, stored on 20–80 | Ratings model | Every screen | 2 |
+| 4 | Metrics and luck gaps | Metrics and league context | Talent radar, Bullpen & tactics | 4 |
+| 5 | League percentiles | League percentiles | Talent radar | 4 |
+| 6 | Talent estimator v0 | Ratings model | Talent radar, Lineup card | 4 |
+| 7 | Defensive model and eligibility matrix | Defensive model | Lineup card | 4 |
+| 8 | Strategy rules engine | Strategy rules | Bullpen & tactics | 4 |
+| 9 | Lineup optimizer, in a Web Worker | Lineup optimization | Lineup card | 4 |
+| 10 | Development planner | Development planner | Dev lab | 4 |
+| 11 | Consultation output and the manager's card | Architecture | Every screen, advisor | 4–5 |
+| 12 | Backtest | Delivery plan | Trends | 6 |
 
-These acceptance criteria differ from the canvas or from the Basis as written:
+These acceptance criteria differ from the canvas or from the Basis as written; the Knowledge Base already includes them:
 
 - The pitching view run on hitters routes as supplemental and keeps DEF Pot; it isn't rejected.
 - Each luck comparison gets its own baseline from the import. Seattle's BACON runs below xBACON, yet team wOBA runs .008 above xwOBA and staff ERA 0.15 above xERA.
@@ -237,9 +239,12 @@ These acceptance criteria differ from the canvas or from the Basis as written:
 - Pitcher age comes from `cus_pitch_pot`.
 - At a non-listed position, position cards show component ceilings, not the listed position's DEF.
 
-- [ ] Add the six canonical uploads to `fixtures/seattle-g42/`: `custom_bat_pot`, `cus_pitch_pot`, the hitter capture and the newer `batting_superstats_1`, `pitching_superstats_1` and `pitching_superstats_2`.
+- [ ] Add the six canonical uploads to `fixtures/seattle-g42/`: `custom_bat_pot`, `cus_pitch_pot`, the hitter capture and the newer `batting_superstats_1`, `pitching_superstats_1` and `pitching_superstats_2`. Five are in; `cus_pitch_pot` run on the staff is still missing.
 - [ ] Keep the older superstats copies in `fixtures/legacy/`, to test header-version handling.
 - [ ] Stamp every import with `importer_version`, so re-reading raw files is deterministic.
+- [x] Add the four league sortable exports (batting and pitching superstats 1 and 2) from the same snapshot to `fixtures/seattle-g42/`.
+- [ ] Import the league sortable files: name joins, duplicate flags, zero-appearance rows dropped (Knowledge Base › Import contract › Joins and snapshots).
+- [ ] Build league percentiles: usage-based peer pools, sample floors, metric directions and the mid-rank formula (Knowledge Base › League percentiles).
 
 ## Frontend foundation
 
@@ -255,17 +260,17 @@ Frontend coding starts with what every screen shares: design tokens, the app she
 | Lock framework | Each module declares the data sets it needs; a shared wrapper renders the locked state and names the export that unlocks it, so no screen ever breaks |
 | Vocabulary | "Data coverage" is the top-bar badge (Low, Moderate, High). "Estimate confidence" is the band on a recommendation. |
 
-The canvas's Dugout alignment, batting order and luck reads are placeholders, so they get built from the models, not copied. Talent radar, the situational strategy view and trends still need designs before Phase 4 reaches them.
+The canvas's Dugout alignment, batting order and luck reads are placeholders, so they get built from the models, not copied. Talent radar with its league percentiles, the situational strategy view, trends and the league-file upload still need designs before Phase 4 reaches them.
 
 - [ ] Build the token file and a component sheet page, checked against the canvas.
 - [ ] Build the shell, routes and an error boundary.
 - [ ] Build the Team menu and Create a Team (add exports, team and league, review).
 - [ ] Build the Clubhouse: upload, snapshot list, coverage matrix, what to upload next, import log.
-- [ ] Ask the design chat for Talent radar, the situational strategy view and trends.
+- [ ] Ask the design chat for Talent radar (with league percentiles), the situational strategy view, trends and where league files are uploaded.
 
 ## Testing and quality
 
-The Seattle game-42 exports are the golden fixtures: every parser rule, identity check and model output is tested against them. Each row of the Basis's "Columns that need special handling" table becomes at least one test.
+The Seattle game-42 exports are the golden fixtures: every parser rule, identity check and model output is tested against them. Each row of the Knowledge Base's "Columns that need special handling" table becomes at least one test.
 
 | Layer | Tool | What it proves | Runs |
 | --- | --- | --- | --- |
@@ -309,9 +314,9 @@ Frontend coding starts in Phase 3, after the platform and data foundation. A pha
 | --- | --- | --- |
 | 0. Decisions and accounts | Confirm the decisions table; open GitHub, Vercel, Supabase and AI Studio | Decisions confirmed or knowingly left open; four accounts, none with a card on file |
 | 1. Walking skeleton | Repo, CI, Vercel deploys, GitHub sign-in; two Supabase projects, migration 0001 | Sign in on production, save and reload a team; a pull request shows green checks and a preview |
-| 2. Data foundation | Importer, golden fixtures, full policy tests; upload, import log and Export team | The 11 Seattle files make a Game 42 snapshot; the hitter capture routes as supplemental |
+| 2. Data foundation | Importer for the team views and the league files, golden fixtures, full policy tests; upload, import log and Export team | The 11 Seattle files make a Game 42 snapshot; the hitter capture routes as supplemental; the four league files load |
 | 3. Frontend foundation | Tokens, shell, routing, lock framework; Team menu, Create a Team, Clubhouse | Setup and Clubhouse match the canvas on real data; end-to-end and accessibility tests pass |
-| 4. Models and screens | Metrics, estimator, defense, strategy, optimizer, development; each with its screen | Every screen shows model output with evidence and confidence; no placeholders left |
+| 4. Models and screens | Metrics, percentiles, estimator, defense, strategy, optimizer, development; each with its screen | Every screen shows model output with evidence and confidence; no placeholders left |
 | 5. Advisor | Advisor function, prompt contract, daily cap; manager's card export | Answers cite snapshot numbers and name any missing data |
 | 6. Trends and backtest | Snapshot comparisons and trend views; backtest against later exports | A second snapshot shows trends; the backtest scores the Game 42 projections |
 
@@ -345,7 +350,7 @@ The biggest risk is a quiet failure on a free tier, so each mitigation either ke
 - [ ] Do you need the app on more than one device? If not, browser storage could replace Supabase.
 - [ ] Gemini for the advisor, or another model?
 
-League questions (DH, scout view, per-position ratings) stay tracked in the Basis.
+League questions (DH, scout view, per-position ratings) stay tracked in the Knowledge Base, section 14.
 
 ## Sources
 

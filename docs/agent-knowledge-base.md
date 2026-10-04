@@ -6,25 +6,26 @@ Oct 4, 2026 · @Jay
 
 ## Agent brief
 
-This doc is the single source of truth for the task-generation agent. Its job is to turn the specification below into implementation tasks for the OOTP CSV Consultation app, one reviewable unit of work per task.
+This doc is the project's spec of record and the single source of truth for the task-generation agent. Its job is to turn the specification below into implementation tasks for the OOTP CSV Consultation app, one reviewable unit of work per task.
 
 ### Who reads this
 
-- The task-generator agent in the user's OpenCode workspace, which writes task handoff charters in the workspace's Task Handoff Template v2. The template's fields govern; this doc supplies the project content that fills them.
-- The agents that receive those charters: architect, implementation developer, QA validator, code reviewer and repository publisher.
-- For now, tasks are built in Claude Code on the web against the user's jjang3.github.io repository.
+- The task-generation agent: an AI host connected to the `cao-task-author-ootp` task-authoring server. It drafts each task in the repository's template, `docs/tasks/task-template.md`, following `docs/tasks/authoring-guide.md`. The template's fields govern; this doc supplies the project content that fills them.
+- The session that receives a task: one Claude Code session, usually on the web, that builds it on a branch and opens a pull request. Each task names a suggested role (architect, implementation developer, QA validator or code reviewer), and the owner merges.
+- Tasks are built against the boba-jjang/ootp-consultation repository, deployed to ootp-consultation.vercel.app.
 
 ### How to use this doc
 
-- Sections 2–3 say what to build and where it runs. Sections 4–13 are the domain specification. Section 14 holds decisions and open questions, 15 seeds the backlog, and 16 defines terms.
+- Sections 2–3 say what to build and where it runs. Sections 4–13 are the domain specification. Section 14 holds decisions and open questions, 15 maps the modules onto the implementation plan's phases, and 16 defines terms.
 - Statements are binding unless marked proposed, starting setting or open. Proposed values become configuration, never constants in code.
 - Player names appear only as worked examples. The app must work for any team in any league.
+- Where the Implementation Basis (`docs/implementation-basis.md`) states a rule differently, this doc wins. The Basis remains the source of the Seattle reference data and player reads.
 
 ### Rules for generating tasks
 
 1. One task is one reviewable change that a single agent session can finish and test.
 2. Every task cites the sections it implements and states acceptance criteria as checks a reviewer can run.
-3. Order tasks by dependency (section 15). Never schedule a module before its inputs exist.
+3. Order tasks by the implementation plan's phases and the dependencies in section 15. Never schedule a module before its inputs exist.
 4. A task that touches an open question (section 14) either resolves it first or builds behind a configuration switch.
 5. Thresholds, weights, scales and floors live in configuration. A task that hard-codes them fails review.
 6. Domain math ships with unit tests on fixtures cut from the sample exports.
@@ -38,7 +39,7 @@ This doc is the single source of truth for the task-generation agent. Its job is
 | Inputs | Files, tables or configuration it reads |
 | Outputs | Tables, functions, endpoints or screens it produces |
 | Acceptance checks | Fixture tests, invariants from section 5, expected values |
-| Dependencies | Task IDs that must land first |
+| Dependencies | Plan items or pull requests that must land first |
 | Open questions | Items from section 14 it touches, and how it handles them |
 | Suggested role | Architect, implementation developer, QA validator or code reviewer |
 
@@ -110,8 +111,8 @@ Exports pass validation into the team store. The store feeds metrics, percentile
 
 ### Platform direction
 
-- Free services only. The direction is GitHub (the jjang3.github.io repository and GitHub Pages) plus Vercel, with CI/CD set up before any frontend code.
-- Persistence is an open decision (section 14): a free hosted database, or browser storage with team export and import files. Browser storage needs no server and fits a single user.
+- Free services only, decided in the implementation plan and built in Phase 1: the boba-jjang/ootp-consultation repository with CI on GitHub Actions, the app and the advisor function on Vercel Hobby, and Postgres and Auth on Supabase Free.
+- Persistence is Supabase Postgres with row-level security. Raw exports are stored verbatim and the browser recomputes everything else. Export team, due in Phase 2, downloads a zip of the raw files and settings, and re-importing it restores the team.
 - The data is small: tens of players per team and a few hundred per league file. Every module, including the lineup solver, can run in the browser.
 - Building happens in Claude Code on the web for now. If local containers are ever used, the user's machine blocks Docker host bind mounts, so container workflows must bake files into images or use named volumes.
 
@@ -136,6 +137,8 @@ The user exports these from the team's Lineups overview screen, one view per CSV
 | pitching\_superstats\_1 | Pitchers | Batted-ball mix allowed, contact quality allowed, expected stats, xERA |
 | pitching\_superstats\_2 | Pitchers | Pitch, swing, whiff and chase counts, discipline rates, run values |
 | cus\_pitch\_pot (custom) | Pitchers | Age, work ethic, IQ, pitching potentials, velocity now and potential, stamina, arm slot, pitcher type, GB/FB tendency, hold, DEF Pot, development risk |
+
+Run on the hitters, cus\_pitch\_pot becomes a supplemental capture: only its DEF Pot column is used, as the hitters' DEF ceiling (section 9).
 
 ### League sortable stats
 
@@ -163,7 +166,7 @@ The importer recognizes each file by its header, normalizes units and labels, va
 
 ### Header manifest
 
-Headers below are the latest seen. Views carry a version, because OOTP views can gain columns: batting\_superstats\_1 v1 lacks xBACON, xSLGCON and xwOBACON, which v2 inserts before xBA.
+Headers below are the latest seen. Views carry a version, because OOTP views can gain columns: batting\_superstats\_1 v1 lacks xBACON, xSLGCON and xwOBACON, which v2 inserts before xBA. The pitching superstats changed the same way: pitching\_superstats\_1 v1 (19 columns) lacks mEV, BAR% and HHi%, which v2 inserts after EV, and xBACON, xSLGCON and xwOBACON, which it inserts before xBA; pitching\_superstats\_2 v1 (21 columns) lacks OSW, inserted after WH, and CTC%, inserted after ZC%. The v1 files are in fixtures/legacy/.
 
 | View | Columns in export order |
 | --- | --- |
@@ -236,7 +239,7 @@ The league sortable files reuse the superstats headers: the league batting file 
 ### Invariants
 
 - Each file matches its view's manifest version; label variants map through a synonym table.
-- Each file lists its own side's roster. A pitching view that lists hitters is rejected; this happened once in the sample.
+- Each file lists its own side's roster. The one exception is the pitching ratings view run on hitters (cus\_pitch\_pot listing hitters): it routes as a supplemental source that keeps only its DEF Pot column. Any other view that lists the wrong side is rejected.
 - Every view of a side in one snapshot has the same names and positions.
 - Duplicated columns agree: G, PA, BB, K, GIDP and ISO for hitters; G, GS and IP for pitchers; handedness everywhere.
 - Identities hold: RV = RV-FB + RV-BR + RV-OFF (±0.15), WH% = WH / SW, CTC% = 100 − WH%, CH = OSW × (1 − OC%), FF% + BR% + OFF% = 100.
@@ -297,9 +300,10 @@ Constants are the research's FanGraphs values. An OOTP league has its own run en
 
 ### Luck baselines
 
-- In the sample, actual contact results ran below xBACON on both sides: hitters .342 against .364 expected, pitchers .327 against .355.
-- So contact luck is measured against that offset, not against zero.
-- League pitching files carry xBACON but no hits, so the league-wide offset needs an export with hits.
+- Each luck pair gets its own baseline, measured from the import: BACON against xBACON, wOBA against xwOBA and ERA against xERA. One offset can't serve all three.
+- In the sample, contact results ran below xBACON on both sides (hitters .342 against .364 expected, pitchers .327 against .355), while team wOBA ran .008 above xwOBA and staff ERA 0.15 above xERA.
+- A pitcher's regression signal comes from the talent estimator (FIP, SIERA and ratings), with xERA as one input, because pitchers' contact superstats don't track their contact ratings (section 7).
+- League pitching files carry xBACON but no hits, so a league-wide contact baseline needs an export with hits.
 
 ### Stabilization
 
@@ -663,8 +667,11 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 | Development risk | Replaces a fixed age cut in the estimator; age is only the fallback |
 | Percentile pools | Pitchers split into starters and relievers, closers with relievers |
 | Team model | A persistent team that accumulates dated snapshots |
-| Platform | Free services only: GitHub (jjang3.github.io) and Vercel, with CI/CD and any database set up before the frontend |
-| Build tooling | Claude Code on the web for now; tasks come from a dedicated task-generation agent fed by this doc |
+| Platform | Free services only: GitHub (boba-jjang/ootp-consultation) with GitHub Actions, Vercel Hobby for the app and the advisor function, and Supabase Free for Postgres and Auth, all set up before the frontend |
+| Build tooling | Claude Code on the web for now; tasks come from the cao-task-author-ootp authoring server, fed by this doc |
+| Spec of record | This doc. The Implementation Basis keeps the Seattle reference data and player reads; where its rules differ, this doc wins |
+| Consultation surface | Dashboard screens with an advisor drawer, plus a downloadable manager's card (design handoff) |
+| League scope | League sortable exports and percentiles are in v1: the league files import with the team views in Phase 2, and percentiles arrive with the Phase 4 models |
 
 ### Assumptions
 
@@ -681,10 +688,10 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 ### Open questions
 
 - [ ] Does the league use the DH?
-- [ ] How often will exports be refreshed during the season?
-- [ ] Where should the consultation appear: a chat-style advisor, a written report, or a dashboard?
-- [ ] Persistence: a free hosted database, or browser storage with team export and import?
-- [ ] Hosting split: GitHub Pages, Vercel, or both with a defined role for each?
+- [ ] How often will exports be refreshed during the season? Each upload becomes a dated snapshot (design handoff); the cadence is still open.
+- [x] Where should the consultation appear: a chat-style advisor, a written report, or a dashboard? Answered: dashboard screens with an advisor drawer, plus the manager's card (design handoff).
+- [x] Persistence: a free hosted database, or browser storage with team export and import? Answered: Supabase Postgres (implementation plan).
+- [x] Hosting split: GitHub Pages, Vercel, or both with a defined role for each? Answered: Vercel hosts the app and the advisor function; GitHub holds the source and runs CI (implementation plan).
 - [ ] Which scout's view do the exports use, the head scout or OSA? Development risk can differ between them.
 - [ ] Does the league merge stats into scouting reports? If so, the estimator weights stats less.
 - [ ] Does the view editor offer per-position ratings and handedness splits?
@@ -693,36 +700,31 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 
 ## Delivery plan
 
-The build runs in seven milestones, platform first and calibration last; each closes on a gate the QA validator can check. The seed tasks below are a starting backlog for the agent to split, refine and extend.
+The implementation plan (`docs/implementation-plan.md`) is the backlog: its phases and exit gates set the order, and each unchecked checklist item is one task. Phase 1, the walking skeleton, passed its gate on 4 October 2026 and covered the platform work: repository, CI, hosting and the database. The table maps the remaining modules onto the plan's phases, with the check each must pass.
 
-*Diagram in the Claude Doc: build roadmap · 7 milestones, T01–T20.*
+Phase gates close in order. Inside a phase, modules follow the Depends on column, so some can start early.
 
-Gates close milestones in order. Inside a milestone, tasks follow the dependencies in the seed table, so some can start early.
+### Modules by phase
 
-### Seed tasks
-
-| ID | Task | Depends on | Acceptance check |
-| --- | --- | --- | --- |
-| T01 | Repository skeleton with linting, a test runner and CI on every push | None | CI runs and passes on main |
-| T02 | Hosting and deploy pipeline, per the hosting decision | T01 | A merge to main deploys a placeholder page |
-| T03 | Persistence decision record and a storage adapter interface | T01 | Decision recorded; adapter with an in-memory implementation and tests |
-| T04 | Fixture set: commit the sample exports with a provenance note | T01 | Fixtures load in tests |
-| T05 | Header manifest and view detection, with versions and synonyms | T04 | Every fixture file maps to the right view and version |
-| T06 | Value parsers for every rule in section 5 | T05 | One unit test per parse rule |
-| T07 | Snapshot validation: side check, names and positions, duplicate columns, identities, scale | T06 | Fixtures pass; mutated fixtures fail with named errors, including a pitching view that lists hitters |
-| T08 | Team store: teams, dated snapshots, latest merged record, history | T03, T07 | Re-importing a date replaces it; a later date adds history |
-| T09 | League file import with name-join rules and duplicate flags | T06 | 214 hitter rows and 446 pitcher rows load; zero-appearance rows drop |
-| T10 | Metrics: pass-through, BACON, luck gaps against the offset | T08 | Fixture BACON and offsets match section 6 |
-| T11 | Percentiles: usage-based pools, floors, directions, mid-rank formula | T09 | Pools of 214, 151 and 260; 144 starters and 218 relievers after floors |
-| T12 | Scale conversion module | T06 | Round-trip tests between 1–10 and 20–80 |
-| T13 | Talent estimator v0 | T10, T12 | Every fixture player gets an estimate and band; disagreements over one step are flagged |
-| T14 | Defensive model and eligibility matrix | T12 | Every slot covered, DH included; non-catchers ineligible at C; DEF Pot caps the listed position |
-| T15 | Strategy rules engine | T13, T14 | Gates read from configuration; the fixture yields a moderate shift |
-| T16 | Lineup selection with the assignment model | T13, T14 | A legal nine on the fixture, with CF and DH filled when enabled |
-| T17 | Batting order: Markov model with The Book fallback | T16 | Run expectancy matches a hand-computed toy lineup |
-| T18 | Development planner | T13, T14 | Selection rules from section 12 reproduce the sample example |
-| T19 | Consultation output | T15, T16, T17, T18 | Every recommendation shows its evidence and confidence |
-| T20 | Backtest across snapshots | T08, T13 | Adding a second snapshot reports estimator error per player |
+| Module | Sections | Phase | Depends on | Acceptance check |
+| --- | --- | --- | --- | --- |
+| Fixtures: every team view, the hitter capture and the four league files, with a provenance note | 4 | 2 | The owner's exports | Every fixture loads in tests |
+| Header manifest and view detection, with versions and synonyms | 5 | 2 | Fixtures | Every fixture file maps to the right view and version |
+| Value parsers for every rule in section 5 | 5 | 2 | Header manifest | One unit test per parse rule |
+| Snapshot validation: side check, names and positions, duplicate columns, identities, scale | 5 | 2 | Value parsers | Fixtures pass; mutated fixtures fail with named errors; the pitching view run on hitters routes as supplemental |
+| Team store: teams, dated snapshots, latest merged record, history | 3, 5 | 2 | Snapshot validation | Re-importing a date replaces it; a later date adds history |
+| League file import with name-join rules and duplicate flags | 4, 5 | 2 | Value parsers | 214 hitter rows and 446 pitcher rows load; zero-appearance rows drop |
+| Scale conversion | 7 | 2 | Value parsers | Round-trip tests between 1–10 and 20–80 |
+| Metrics: pass-through, BACON, luck gaps against each pair's baseline | 6 | 4 | Team store | Fixture BACON and each pair's baseline match section 6 |
+| Percentiles: usage-based pools, floors, directions, mid-rank formula | 8 | 4 | League file import | Pools of 214, 151 and 260; 144 starters and 218 relievers after floors |
+| Talent estimator v0 | 7 | 4 | Metrics, scale conversion | Every fixture player gets an estimate and band; disagreements over one step are flagged |
+| Defensive model and eligibility matrix | 9 | 4 | Scale conversion | Every slot covered, DH included; non-catchers ineligible at C; DEF Pot caps the listed position |
+| Strategy rules engine | 10 | 4 | Talent estimator, defensive model | Gates read from configuration; the fixture yields a moderate shift |
+| Lineup selection with the assignment model | 11 | 4 | Talent estimator, defensive model | A legal nine on the fixture, with CF and DH filled when enabled |
+| Batting order: Markov model with The Book fallback | 11 | 4 | Lineup selection | Run expectancy matches a hand-computed toy lineup |
+| Development planner | 12 | 4 | Talent estimator, defensive model | Selection rules from section 12 reproduce the sample example |
+| Consultation output | 3 | 4–5 | Strategy rules, lineup and batting order, development planner | Every recommendation shows its evidence and confidence |
+| Backtest across snapshots | 2 | 6 | Team store, talent estimator | Adding a second snapshot reports estimator error per player |
 
 Tasks that depend on an open question (section 14) carry it in their charter and build behind a setting until it is answered.
 

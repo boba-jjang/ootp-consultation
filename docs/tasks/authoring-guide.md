@@ -18,13 +18,11 @@ When sources disagree, the higher one wins. Record the conflict as an unresolved
 
 1. The owner's request: scope and Git authority.
 2. `CLAUDE.md`: the current phase, the working rules, and "Corrections that override the canvas or the Basis as written".
-3. `docs/implementation-plan.md`: platform decisions, phases and exit gates, checklists, CI/CD, database and environments. Its platform facts supersede platform text in both specs.
-4. The specs:
-   - `docs/agent-knowledge-base.md` (the Knowledge Base) restates the Basis for task generation. It is newer and general, with no Seattle player names, and adds the league sortable files, league percentiles, versioned header manifests and research reliability.
-   - `docs/implementation-basis.md` (the Basis) is the spec `CLAUDE.md` names. It keeps the Seattle reference data and player reads, which give fixture tests their expected values.
-   - Cite the Knowledge Base for rules and the Basis for Seattle values. Where both state a rule, they agreed when exported on 4 October 2026; a later difference is an unresolved fact.
-5. `docs/design-handoff.md` and `docs/design/boards/README.md` for screens (the `screens` pack).
-6. `fixtures/README.md` for which exports exist and which are still missing.
+3. `docs/implementation-plan.md`: platform decisions, phases and exit gates, checklists, CI/CD, database and environments.
+4. `docs/agent-knowledge-base.md` (the Knowledge Base): the spec of record for data, import rules and models. Cite its sections for every rule.
+5. `docs/implementation-basis.md` (the Basis): the earlier spec, kept for the Seattle reference data and player reads that give fixture tests their expected values. Where its rules differ from the Knowledge Base, the Knowledge Base wins.
+6. `docs/design-handoff.md` and `docs/design/boards/README.md` for screens (the `screens` pack).
+7. `fixtures/README.md` for which exports exist, where they live and which are still missing.
 
 ### Knowledge Base sections by number
 
@@ -41,24 +39,11 @@ The Knowledge Base refers to its own sections by number.
 | 7   | Ratings model              | 15  | Delivery plan                             |
 | 8   | League percentiles         | 16  | Glossary                                  |
 
-### Superseded statements
-
-Parts of the Knowledge Base predate this repository. Use the current fact.
-
-| The Knowledge Base says | Current fact | Recorded in |
-| --- | --- | --- |
-| A task-generator agent in an OpenCode workspace writes charters in a "Task Handoff Template v2" | This authoring server and `docs/tasks/task-template.md` | This guide |
-| Tasks are built against the jjang3.github.io repository | This repository, `boba-jjang/ootp-consultation`, deployed to https://ootp-consultation.vercel.app | `CLAUDE.md` › Deployments |
-| Platform direction is GitHub Pages plus Vercel; persistence and the hosting split are open | Vercel Hobby hosts the app and the advisor function, Supabase Free holds Postgres and Auth, and GitHub runs CI | Plan › Platform decisions; `CLAUDE.md` › Stack |
-| The backlog is seed tasks T01–T20 in seven milestones | The plan's phases and checklists are the backlog; ticked boxes show what shipped. Use T numbers only as cross-references. | Plan › Phases and exit criteria |
-| Refresh frequency and where consultation appears are open | Snapshots accumulate per team; consultation appears on dashboard screens with an advisor drawer. The DH is assumed on and still needs confirming. | `docs/design-handoff.md` › Decisions |
-| A repository publisher agent | The session pushes its branch and opens the pull request; the owner merges | `.claude/commands/next-task.md` |
-
 ## Rules for a task
 
 1. One task is one unchecked checklist item in `docs/implementation-plan.md`, built on one branch as one pull request that ticks that box. Quote the item. If an item is too big for one session, split it into tasks that each leave CI green; only the last one ticks the box.
-2. Work the specs call for that has no checklist item yet, such as the league sortable files or the percentile pools, adds its item to the plan in the same pull request, under the section and phase it belongs to. Say so in the task. Changing a platform decision, adding a provider or touching production data needs the owner first (`CLAUDE.md` › Ask the owner first).
-3. Order work by the current phase in `CLAUDE.md`, then the plan's checklists, then the build order (Basis › Build order; Knowledge Base › Module contracts). Never schedule a module before its inputs exist; name what it waits for under Dependencies.
+2. Work the Knowledge Base calls for that has no checklist item yet adds its item to the plan in the same pull request, under the section and phase that Knowledge Base › Delivery plan gives it. Say so in the task. Changing a platform decision, adding a provider or touching production data needs the owner first (`CLAUDE.md` › Ask the owner first).
+3. Order work by the current phase in `CLAUDE.md`, then the plan's checklists, then Knowledge Base › Delivery plan › Modules by phase. Never schedule a module before its inputs exist; name what it waits for under Dependencies.
 4. Cite the sections a task implements by document and heading, for example "Knowledge Base › Import contract › Columns that need special handling".
 5. A task that touches an open question (Knowledge Base § 14; plan › Risks and open questions) either records the owner's answer or builds behind a setting whose default comes from Knowledge Base › Assumptions. Say which.
 6. Thresholds, weights, scales, floors, gates and stabilization points are settings, each with a default, a one-line description and its source, such as "research value" or "Seattle sample". A task that hard-codes one fails review.

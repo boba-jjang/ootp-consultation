@@ -7,14 +7,14 @@ OOTP CSV Consultation is a personal, free-tier web app. It turns one team's Out 
 ## Read before working
 
 - `docs/implementation-plan.md`: platform, CI/CD, database, phases and task checklists. Work in its phase order.
-- `docs/implementation-basis.md`: the spec for data, import rules and models. If code and the Basis disagree, follow the Basis and flag the conflict.
-- `docs/agent-knowledge-base.md`: the same spec restated for task generation, with league files, percentiles and research reliability added. Tasks cite its sections; `docs/tasks/` holds the task template and its authoring guide.
+- `docs/agent-knowledge-base.md` (the Knowledge Base): the spec for data, import rules and models. If code and the Knowledge Base disagree, follow the Knowledge Base and flag the conflict. Tasks cite its sections; `docs/tasks/` holds the task template and its authoring guide.
+- `docs/implementation-basis.md` (the Basis): the earlier spec, kept for its Seattle reference data and player reads. Where its rules differ from the Knowledge Base, the Knowledge Base wins.
 - `docs/design-handoff.md` and `docs/design/boards/`: screens, states, copy and design tokens. Board HTML is reference markup, not code to run.
 - `fixtures/`: real exports used as golden test data. See `fixtures/README.md` for what's present and what's still missing.
 
 ## Current phase
 
-Phase 2, data foundation. Exit gate: the 11 Seattle files make a Game 42 snapshot; the hitter capture routes as supplemental.
+Phase 2, data foundation. Exit gate: the 11 Seattle files make a Game 42 snapshot; the hitter capture routes as supplemental; the four league files load.
 
 Phase 1 (walking skeleton) passed its gate on 4 October 2026 and is tagged `v0.1`. Its one open item, the `main` ruleset, is a repository setting for the owner.
 
@@ -59,7 +59,7 @@ CI (`.github/workflows/ci.yml`, job `ci`) runs install, lint, format check, type
 - One plan checklist item per branch and pull request. Tick its box in `docs/implementation-plan.md` in the same pull request.
 - Before writing code, state the task's acceptance check. If a step needs something only the owner can do (an account, a dashboard setting, a secret), stop and list it.
 - `packages/core` imports no DOM, network or UI framework code. Every calculation lives there, with tests.
-- For each import rule, write the test against `fixtures/` before the parser code. Each row of the Basis table "Columns that need special handling" gets at least one test.
+- For each import rule, write the test against `fixtures/` before the parser code. Each row of the Knowledge Base table "Columns that need special handling" gets at least one test.
 - Raw export files are the source of truth. Store them verbatim, derive everything else, and never depend on CSV row order.
 - Anything prefixed `VITE_` ships to the browser, so secrets never get that prefix. Never commit `.env` files, keys or tokens.
 - Database changes go only through new files in `supabase/migrations/`, applied by CI. Never edit a migration that has run, and keep each one backward compatible.
@@ -69,10 +69,12 @@ CI (`.github/workflows/ci.yml`, job `ci`) runs install, lint, format check, type
 
 ## Corrections that override the canvas or the Basis as written
 
+The Knowledge Base already includes these.
+
 - The pitching ratings view run on hitters (`cus_pitch_pot` listing hitters) is a supplemental source. Keep its DEF Pot column, drop the rest, and log it as supplemental, not rejected.
 - Luck baselines are measured per metric pair from the import: BACON vs xBACON, wOBA vs xwOBA, ERA vs xERA. In the Seattle data, BACON runs below xBACON while team wOBA and staff ERA run above their expected values, so one offset can't serve all three.
 - Pitcher regression signals come from the talent estimator (FIP, SIERA, ratings); xERA is one input.
-- Small-sample flags use each stat's stabilization point from the Basis, not one innings cutoff.
+- Small-sample flags use each stat's stabilization point from the Knowledge Base, not one innings cutoff.
 - Pitcher age comes from `cus_pitch_pot`.
 - At a position other than the listed one, show component-based ceilings, not the listed position's DEF.
 - The canvas's Dugout alignment, batting order and luck reads are placeholders. Build them from the models.

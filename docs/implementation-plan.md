@@ -186,7 +186,7 @@ The Free plan has [no automatic backups](https://supabase.com/pricing). The app'
 - [x] pgTAP tests per table: the owner can read and write; a second user and an anonymous caller see nothing.
 - [ ] Generate database types with the Supabase CLI; CI fails if they drift from the migrations.
 - [x] Create a GitHub OAuth app per Supabase project; allow redirects for localhost, the preview URL pattern and production.
-- [ ] Turn off sign-ups on both projects after your first sign-in.
+- [x] Turn off sign-ups on both projects after your first sign-in.
 - [ ] Build Export team, plus a test that re-imports its zip, in Phase 2.
 
 ## Advisor service
@@ -297,8 +297,8 @@ Operations stay small: keep Supabase awake, see errors, keep dependencies curren
 | Cost | No payment method on Vercel, Supabase, GitHub or Google AI Studio, so nothing can bill. |
 | Usage | Check the four usage pages monthly against the free-tier budget above. |
 
-- [ ] Add `keepalive.yml` in Phase 1, before the first idle week.
-- [ ] Add the error boundary and a not-found route in Phase 1.
+- [x] Add `keepalive.yml` in Phase 1, before the first idle week.
+- [x] Add the error boundary and a not-found route in Phase 1.
 - [ ] Set a monthly calendar reminder for the usage check and an export.
 
 ## Phases and exit criteria
@@ -324,8 +324,8 @@ Phase 1, in order:
 - [x] Add migration `0001` (all five tables and their policies) with `db.yml` to test and apply it.
 - [x] Enter the Supabase variables in Vercel and `.env.local`.
 - [x] Build one page that signs in, saves a team and reloads it.
-- [ ] Add `keepalive.yml`, the error boundary and the `main` ruleset.
-- [ ] Close sign-ups on both projects and tag `v0.1`.
+- [ ] Add `keepalive.yml`, the error boundary and the `main` ruleset. `keepalive.yml`, the error boundary and the not-found page are in; the ruleset is a repository setting for the owner.
+- [x] Close sign-ups on both projects and tag `v0.1`.
 
 ## Risks and open questions
 

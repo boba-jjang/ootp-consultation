@@ -1,0 +1,61 @@
+name: Keepalive
+
+# Supabase's Free plan pauses a project after a week without activity. One read a week from
+# each project's database keeps both awake. In a public repo, GitHub disables scheduled
+# workflows after 60 days without repository activity; re-enable this one after a long break.
+on:
+  schedule:
+    - cron: '17 9 * * 1' # Mondays, 09:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Keep in step with db.yml.
+  SUPABASE_CLI_VERSION: 2.119.0
+  SUPABASE_CLI_SHA256: bf1c3ae93be98533eb8a3105dbf4564bd0b2d9dc24690d8a920f980ef975c1b4
+
+jobs:
+  keepalive:
+    name: keepalive-${{ matrix.project }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: staging
+            ref: SUPABASE_REF_STAGING
+            password: SUPABASE_DB_PASSWORD_STAGING
+          - project: production
+            ref: SUPABASE_REF_PROD
+            password: SUPABASE_DB_PASSWORD_PROD
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets[matrix.password] }}
+      PROJECT_REF: ${{ vars[matrix.ref] }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install the Supabase CLI
+        run: |
+          asset="supabase_${SUPABASE_CLI_VERSION}_linux_amd64.tar.gz"
+          curl -fsSL -o "$RUNNER_TEMP/$asset" \
+            "https://github.com/supabase/cli/releases/download/v${SUPABASE_CLI_VERSION}/$asset"
+          echo "$SUPABASE_CLI_SHA256  $RUNNER_TEMP/$asset" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/supabase-cli"
+          tar -xzf "$RUNNER_TEMP/$asset" -C "$RUNNER_TEMP/supabase-cli" supabase
+          echo "$RUNNER_TEMP/supabase-cli" >> "$GITHUB_PATH"
+
+      # Reads the applied-migrations table, which is a real query against the database.
+      - name: Read from the ${{ matrix.project }} database
+        run: |
+          if [ -z "$PROJECT_REF" ]; then
+            echo "::error::The ${{ matrix.ref }} repository variable is missing."
+            exit 1
+          fi
+          supabase link --project-ref "$PROJECT_REF"
+          supabase migration list --linked

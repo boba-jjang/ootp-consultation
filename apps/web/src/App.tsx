@@ -7,10 +7,14 @@ import { projectRef, supabase } from './supabase.ts';
 import { Teams } from './Teams.tsx';
 
 export function App() {
+  // The only page so far is the start page; real routes arrive with the app shell in Phase 3.
+  const path = window.location.pathname;
   return (
     <main>
       <h1>OOTP Consultation</h1>
-      {supabase ? (
+      {path !== '/' ? (
+        <NotFound path={path} />
+      ) : supabase ? (
         <AuthGate client={supabase} />
       ) : (
         <p role="alert">
@@ -25,6 +29,20 @@ export function App() {
         </small>
       </footer>
     </main>
+  );
+}
+
+function NotFound({ path }: { path: string }) {
+  return (
+    <section>
+      <h2>Page not found</h2>
+      <p>
+        There's nothing at <code>{path}</code>.
+      </p>
+      <p>
+        <a href="/">Go to the start page</a>
+      </p>
+    </section>
   );
 }
 

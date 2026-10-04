@@ -13,7 +13,9 @@ OOTP CSV Consultation is a personal, free-tier web app. It turns one team's Out 
 
 ## Current phase
 
-Phase 1, walking skeleton. Exit gate: sign in on production, save and reload a team; a pull request shows green checks and a Vercel preview.
+Phase 2, data foundation. Exit gate: the 11 Seattle files make a Game 42 snapshot; the hitter capture routes as supplemental.
+
+Phase 1 (walking skeleton) passed its gate on 4 October 2026 and is tagged `v0.1`. Its one open item, the `main` ruleset, is a repository setting for the owner.
 
 Update this section when a phase's gate passes.
 
@@ -42,6 +44,7 @@ Keep these current. Run them from the repo root on Node 24. The Node major is se
 
 CI (`.github/workflows/ci.yml`, job `ci`) runs install, lint, format check, typecheck, test and build, in that order.
 `.github/workflows/db.yml` (job `db`) applies every migration to a fresh database and runs the pgTAP tests when `supabase/` changes. On `main` it pushes migrations to staging, then production (jobs `db-deploy-staging` and `db-deploy-production`), once their GitHub variables and secrets exist.
+`.github/workflows/keepalive.yml` reads from each Supabase database every Monday, because the Free plan pauses a project after a week without activity. Run it by hand after a long break.
 
 ## Deployments
 

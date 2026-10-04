@@ -48,7 +48,7 @@ The browser loads the app from Vercel and reads and writes Supabase directly, gu
 
 ## Free-tier budget
 
-Every service stays free because none has a payment method on file, so each stops at its limit instead of billing. Expected use is a small fraction of each allowance: a full snapshot of raw exports is about 20 KB of team views, plus about 170 KB of league files.
+Every service stays free because none has a payment method on file, so each stops at its limit instead of billing. Expected use is a small fraction of each allowance: a full snapshot of raw exports is about 17 KB of team views (18 KB with the hitter capture), plus about 170 KB of league files.
 
 | Service | Limits that matter | Expected use | When a limit is hit |
 | --- | --- | --- | --- |

@@ -9,3 +9,5 @@ export {
   type TeamSettings,
 } from './team.ts';
 export { IMPORTER_VERSION } from './version.ts';
+export { detectView, readHeader, type Detection } from './importer/detect.ts';
+export { VIEW_MANIFESTS, type Side, type ViewId, type ViewManifest } from './importer/manifest.ts';

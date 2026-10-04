@@ -39,7 +39,8 @@ jobs:
         run: |
           if [ -z "$BASE" ] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
             changed=true
-          elif git diff --quiet "$BASE" HEAD -- supabase .github/workflows/db.yml; then
+          elif git diff --quiet "$BASE" HEAD -- supabase .github/workflows/db.yml \
+            apps/web/src/database.types.ts; then
             changed=false
           else
             changed=true
@@ -65,6 +66,24 @@ jobs:
       - name: Run the pgTAP policy tests
         if: steps.changes.outputs.changed == 'true'
         run: supabase test db
+
+      # apps/web/src/database.types.ts is generated from the migrations. When it drifts, this
+      # fails and uploads the regenerated file as the database-types artifact to commit.
+      - name: Check the generated database types
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          supabase gen types typescript --local > "$RUNNER_TEMP/database.types.ts"
+          if ! diff -u apps/web/src/database.types.ts "$RUNNER_TEMP/database.types.ts"; then
+            echo "::error file=apps/web/src/database.types.ts::The database types differ from the migrations. Commit the database-types artifact."
+            exit 1
+          fi
+
+      - name: Upload the regenerated database types
+        if: failure() && steps.changes.outputs.changed == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: database-types
+          path: ${{ runner.temp }}/database.types.ts
 
   # Pushes to main apply pending migrations to staging, then production. `db push` is a no-op
   # when a project is up to date, so these run on every push to main (and by hand), which also

@@ -14,7 +14,7 @@ The app turns one team's OOTP screen-view CSV exports into consultation: who pla
 
 - Input: the 11 screen-view exports listed under Data sources, for one team at one point in the season.
 - Output: a starting nine with positions and batting order, slider settings by game situation, pitcher usage notes, and development priorities.
-- Later: opponent-specific advice, trade and contract valuation, and OOTP's database-dump import path.
+- Later: opponent-specific advice, rules that need handedness splits (platoons and pinch-hitting), trade and contract valuation, and OOTP's database-dump import path.
 
 *Diagram in the Claude Doc: consultation pipeline · 2 inputs, 8 modules.*
 
@@ -271,7 +271,7 @@ Development risk is the scout's read on how reliably a player will reach his pot
 
 These are starting settings to calibrate, in 1–10 steps. A Very Low risk narrows the band around the talent estimate; it doesn't make the stats less noisy. In practice, a Very Low-risk player's stat swings read as luck and regress harder toward what his ratings imply.
 
-- Record which scout's view each export used, since OSA and the head scout can disagree on risk. Every Seattle hitter shows Very High scouting accuracy.
+- Record which scout's view each export used, since OSA and the head scout can disagree on risk. In this league the scouting staff is disabled, so every export is OSA's view. Every Seattle hitter shows Very High scouting accuracy.
 - OOTP can merge stats into scouting reports. If this league does, scouted ratings already lean on stats, so the estimator should weight stats less.
 - All 12 Seattle hitters are Very Low (8) or Low (4) risk, so hitter potentials read as near-current. Three of the four Low-risk hitters are 25–26; Yamanaka (29) is the exception.
 
@@ -410,7 +410,7 @@ Development advice combines potentials, age and OOTP's two levers: the developme
 - The offseason Development Lab has 1–30 slots per league setting, with programs such as Improve Infield Defense, Improve Control, Increase Velocity, Learn New Pitch and Generate Batspeed.
 - Programs run Easy to Very Hard and end Poor, No Improvement, Successful or Outstanding; progress shows as Red, Orange, Green or Blue.
 - The league's Program Improvement Magnitude (Smaller, Default, Larger) sets how far a success moves a rating.
-- Odds depend on age and work ethic. The league runs with the coaching staff disabled, so coaching quality plays no part. Work ethic and IQ are exported for hitters and pitchers.
+- Odds depend on age and work ethic. The league runs with its coaching and scouting staff disabled, so coaching quality plays no part. Work ethic and IQ are exported for hitters and pitchers.
 
 ### Research priorities
 
@@ -631,11 +631,11 @@ The current data supports a v1. The gaps below limit confidence rather than bloc
 
 ### Open questions
 
-- [ ] Does the league use the DH?
+- [x] Does the league use the DH? Answered: yes.
 - [ ] Will exports be refreshed during the season, so the estimator can be calibrated and trends tracked? Each upload becomes a dated snapshot (design handoff); the cadence is still open.
 - [x] Where should the consultation appear: a chat-style advisor, a written report, or a dashboard? Answered: dashboard screens with an advisor drawer, plus the manager's card (design handoff).
 - [x] Does the view editor offer per-position ratings and handedness splits? Answered: treat neither as available, since the owner hasn't provided them.
-- [ ] Which scout's view do the exports use, the head scout or OSA? Development risk can differ between them.
+- [x] Which scout's view do the exports use, the head scout or OSA? Development risk can differ between them. Answered: OSA. The scouting staff is disabled, so every export shows the same OSA view.
 - [ ] Does the league merge stats into scouting reports? If so, the estimator weights stats less.
 
 ### Build order

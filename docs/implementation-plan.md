@@ -48,12 +48,12 @@ The browser loads the app from Vercel and reads and writes Supabase directly, gu
 
 ## Free-tier budget
 
-Every service stays free because none has a payment method on file, so each stops at its limit instead of billing. Expected use is a small fraction of each allowance: a full snapshot of raw exports is about 20 KB.
+Every service stays free because none has a payment method on file, so each stops at its limit instead of billing. Expected use is a small fraction of each allowance: a full snapshot of raw exports is about 20 KB of team views, plus about 170 KB of league files.
 
 | Service | Limits that matter | Expected use | When a limit is hit |
 | --- | --- | --- | --- |
 | [Vercel Hobby](https://vercel.com/docs/limits/fair-use-guidelines) | 100 GB data transfer, 1M function invocations and 4 hours of Active CPU a month; [100 deployments a day, one build at a time](https://vercel.com/docs/limits) | A few deployments a day; advisor calls in the dozens | No on-demand billing on Hobby; usage over the allotment can pause the project |
-| [Supabase Free](https://supabase.com/pricing) | 500 MB database, 1 GB file storage, 5 GB egress, 2 active projects; pauses after 1 week without activity; no automatic backups | About 0.5 MB of raw files a season at weekly snapshots | A paused project is resumed from the dashboard; the app shows a reconnect message |
+| [Supabase Free](https://supabase.com/pricing) | 500 MB database, 1 GB file storage, 5 GB egress, 2 active projects; pauses after 1 week without activity; no automatic backups | About 5 MB of raw files a season at weekly snapshots | A paused project is resumed from the dashboard; the app shows a reconnect message |
 | [GitHub Actions](https://docs.github.com/en/billing/concepts/product-billing/github-actions) | Public repo: standard runners free. Private repo: 2,000 minutes and 500 MB of artifacts a month | A few minutes per pull request | With no payment method on file, runs are blocked until the quota resets |
 | [Gemini API free tier](https://ai.google.dev/gemini-api/docs/rate-limits) | Per-project rate limits, shown in AI Studio; the daily quota resets at midnight Pacific | One call per advisor question | Calls fail with a rate-limit error; the advisor says so and every other screen keeps working |
 
@@ -71,7 +71,9 @@ ootp-consultation/
 ├── supabase/
 │   ├── migrations/           SQL, applied by CI only
 │   └── tests/                pgTAP policy tests
-├── fixtures/seattle-g42/     canonical exports + legacy variants
+├── fixtures/
+│   ├── seattle-g42/          team views, hitter capture, league files
+│   └── legacy/               older superstats versions
 ├── e2e/                      Playwright specs
 ├── docs/adr/                 one record per decision
 └── .github/
@@ -238,7 +240,7 @@ These acceptance criteria differ from the canvas or from the Basis as written:
 - At a non-listed position, position cards show component ceilings, not the listed position's DEF.
 
 - [x] Add the six canonical uploads to `fixtures/seattle-g42/`: `custom_bat_pot`, `cus_pitch_pot`, the hitter capture and the newer `batting_superstats_1`, `pitching_superstats_1` and `pitching_superstats_2`.
-- [x] Add the four league sortable superstats exports to `fixtures/seattle-g42/`, for the league import and percentiles (Knowledge Base › Data sources › League sortable stats).
+- [x] Add the four league sortable superstats exports to `fixtures/seattle-g42/` (Knowledge Base › Data sources › League sortable stats).
 - [x] Keep the older superstats copies in `fixtures/legacy/`, to test header-version handling.
 - [ ] Stamp every import with `importer_version`, so re-reading raw files is deterministic.
 
@@ -338,7 +340,7 @@ The biggest risk is a quiet failure on a free tier, so each mitigation either ke
 | A free tier changes its terms | A service stops being free | Portable stack: static build, plain Postgres SQL, raw files as the source of truth. GitHub Pages, another Postgres host or browser storage can each take over one piece. |
 | Gemini's free-tier limits or terms change | No advisor | The advisor is optional; every screen works without it, and the provider interface allows a swap |
 | Vercel and the migration job race on merge | A brief mismatch between app and schema | Backward-compatible migrations only |
-| The canonical uploads stay missing | The importer is tested on the wrong file versions | Add the six files to the fixtures before Phase 2 |
+| The canonical uploads stay missing | The importer is tested on the wrong file versions | Resolved: all six are in `fixtures/seattle-g42/` |
 | Docker isn't available for local development | No local database | Develop against staging; the Docker stack runs in CI |
 
 - [ ] Public or private repo? This decides branch protection, environment secrets and Actions minutes.

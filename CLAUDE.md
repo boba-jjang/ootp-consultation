@@ -14,7 +14,9 @@ OOTP CSV Consultation is a personal, free-tier web app. It turns one team's Out 
 
 ## Current phase
 
-Phase 2, data foundation. Exit gate: the 11 Seattle files make a Game 42 snapshot; the hitter capture routes as supplemental; the four league files load.
+Phase 3, frontend foundation. Exit gate: Setup and the Clubhouse match the canvas on real data; end-to-end and accessibility tests pass.
+
+Phase 2 (data foundation) passed its gate on 4 October 2026 and is tagged `v0.2`. The importer, snapshot assembly, league tables, team store and Export team live in `packages/core`; `apps/web/src/store.ts` is the Supabase store.
 
 Phase 1 (walking skeleton) passed its gate on 4 October 2026 and is tagged `v0.1`. Its one open item, the `main` ruleset, is a repository setting for the owner.
 

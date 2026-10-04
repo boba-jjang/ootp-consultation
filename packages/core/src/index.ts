@@ -34,3 +34,13 @@ export {
   type RoutingSettings,
   type Scope,
 } from './importer/route.ts';
+export {
+  DEFAULT_IDENTITY_TOLERANCES,
+  DEFAULT_VALIDATION_SETTINGS,
+  checkIdentities,
+  validateSnapshot,
+  type IdentityFailure,
+  type IdentityTolerances,
+  type SnapshotEvent,
+  type ValidationSettings,
+} from './importer/validate.ts';

@@ -13,12 +13,15 @@ export const leagueView = (view: string) =>
 
 export type FixtureRow = Record<string, string>;
 
+/** A fixture file's text, byte for byte. */
+export const readFixtureText = (path: string) => readFileSync(new URL(path, FIXTURES), 'utf8');
+
 /**
  * Reads a fixture CSV into rows keyed by header. The exports quote nothing and no value
  * holds a comma, so splitting on commas is exact; a quote would make this throw.
  */
 export function readFixture(path: string): FixtureRow[] {
-  const text = readFileSync(new URL(path, FIXTURES), 'utf8');
+  const text = readFixtureText(path);
   if (text.includes('"')) {
     throw new Error(`${path} quotes a value; use a real CSV parser`);
   }

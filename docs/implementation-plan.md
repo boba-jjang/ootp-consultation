@@ -158,7 +158,7 @@ Vercel deploys every pull request to its own preview URL and every merge to `mai
 
 The two jobs in step 3 run in parallel, so every migration must work with both the old and the new app. Add columns and tables first, ship the code that uses them, then drop old ones in a later release.
 
-- [ ] Import the repo in Vercel: root directory `apps/web`, Vite preset, pnpm install from the workspace root, Node version pinned.
+- [x] Import the repo in Vercel: root directory `apps/web`, Vite preset, pnpm install from the workspace root, Node version pinned.
 - [ ] Turn on pull-request comments in the Vercel GitHub integration.
 - [ ] Add an Ignored Build Step so docs-only changes don't deploy; Hobby builds [one deployment at a time](https://vercel.com/docs/limits).
 - [ ] Practice one rollback before Phase 3, while there's nothing to lose.
@@ -319,7 +319,7 @@ Phase 1, in order:
 
 - [ ] Create the GitHub repo under your personal account.
 - [x] Scaffold the workspace and push `ci.yml`; get the first green run.
-- [ ] Import the repo into Vercel and confirm a preview on a test pull request.
+- [x] Import the repo into Vercel and confirm a preview on a test pull request.
 - [ ] Create the two Supabase projects and turn on GitHub sign-in for each.
 - [ ] Add migration `0001` (all five tables and their policies) with `db.yml` to test and apply it.
 - [ ] Enter the Supabase variables in Vercel and `.env.local`.

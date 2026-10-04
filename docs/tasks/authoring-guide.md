@@ -18,11 +18,13 @@ When sources disagree, the higher one wins. Record the conflict as an unresolved
 
 1. The owner's request: scope and Git authority.
 2. `CLAUDE.md`: the current phase, the working rules, and "Corrections that override the canvas or the Basis as written".
-3. `docs/implementation-plan.md`: platform decisions, phases and exit gates, checklists, CI/CD, database and environments.
-4. `docs/agent-knowledge-base.md` (the Knowledge Base): the spec of record for data, import rules and models. Cite its sections for every rule.
-5. `docs/implementation-basis.md` (the Basis): the earlier spec, kept for the Seattle reference data and player reads that give fixture tests their expected values. Where its rules differ from the Knowledge Base, the Knowledge Base wins.
-6. `docs/design-handoff.md` and `docs/design/boards/README.md` for screens (the `screens` pack).
-7. `fixtures/README.md` for which exports exist, where they live and which are still missing.
+3. `docs/implementation-plan.md`: platform decisions, phases and exit gates, checklists, CI/CD, database and environments. Its platform facts supersede platform text in both specs.
+4. The specs:
+   - `docs/agent-knowledge-base.md` (the Knowledge Base) is the spec of record. It restates the Basis for task generation; it is newer and general, with no Seattle player names, and adds the league sortable files, league percentiles, versioned header manifests and research reliability.
+   - `docs/implementation-basis.md` (the Basis) keeps the Seattle reference data and player reads, which give fixture tests their expected values.
+   - Cite the Knowledge Base for rules and the Basis for Seattle values. Where the Basis states a rule differently, the Knowledge Base wins.
+5. `docs/design-handoff.md` and `docs/design/boards/README.md` for screens (the `screens` pack).
+6. `fixtures/README.md` for which exports exist. An export that isn't there is assumed not to exist.
 
 ### Knowledge Base sections by number
 
@@ -43,14 +45,14 @@ The Knowledge Base refers to its own sections by number.
 
 1. One task is one unchecked checklist item in `docs/implementation-plan.md`, built on one branch as one pull request that ticks that box. Quote the item. If an item is too big for one session, split it into tasks that each leave CI green; only the last one ticks the box.
 2. Work the Knowledge Base calls for that has no checklist item yet adds its item to the plan in the same pull request, under the section and phase that Knowledge Base › Delivery plan gives it. Say so in the task. Changing a platform decision, adding a provider or touching production data needs the owner first (`CLAUDE.md` › Ask the owner first).
-3. Order work by the current phase in `CLAUDE.md`, then the plan's checklists, then Knowledge Base › Delivery plan › Modules by phase. Never schedule a module before its inputs exist; name what it waits for under Dependencies.
+3. Order work by the current phase in `CLAUDE.md`, then the plan's checklists, then the build order (Knowledge Base › Delivery plan › Modules by phase). Never schedule a module before its inputs exist; name what it waits for under Dependencies.
 4. Cite the sections a task implements by document and heading, for example "Knowledge Base › Import contract › Columns that need special handling".
 5. A task that touches an open question (Knowledge Base § 14; plan › Risks and open questions) either records the owner's answer or builds behind a setting whose default comes from Knowledge Base › Assumptions. Say which.
 6. Thresholds, weights, scales, floors, gates and stabilization points are settings, each with a default, a one-line description and its source, such as "research value" or "Seattle sample". A task that hard-codes one fails review.
 7. Tests come first and run on the fixtures. Each import rule's test is written before its parser code, and each row of "Columns that need special handling" that the task touches gets at least one test. Expected values come from the fixtures or the Basis's Seattle reference data, never from memory.
 8. No logic keyed to a specific player, team or league. Names appear only in tests and examples.
 9. Items the Knowledge Base marks as later (database dumps, trade and contract valuation, opponent-specific advice) get no tasks unless the owner promotes them.
-10. Steps only the owner can do (an account, a dashboard or repository setting, a secret, an export added to `fixtures/`) are blocking preparation gaps. The session stops and lists them; it never works around them.
+10. Steps only the owner can do (an account, a dashboard or repository setting, a secret) are blocking preparation gaps. The session stops and lists them; it never works around them. An export that isn't in `fixtures/` is unavailable, not a gap: build without it, as the Knowledge Base specifies.
 11. `CLAUDE.md` loads into every session, so a task doesn't restate its rules. It names the ones that decide this task's acceptance.
 
 ## Filling the template

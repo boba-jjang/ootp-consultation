@@ -7,10 +7,10 @@ OOTP CSV Consultation is a personal, free-tier web app. It turns one team's Out 
 ## Read before working
 
 - `docs/implementation-plan.md`: platform, CI/CD, database, phases and task checklists. Work in its phase order.
-- `docs/agent-knowledge-base.md` (the Knowledge Base): the spec for data, import rules and models. If code and the Knowledge Base disagree, follow the Knowledge Base and flag the conflict. Tasks cite its sections; `docs/tasks/` holds the task template and its authoring guide.
-- `docs/implementation-basis.md` (the Basis): the earlier spec, kept for its Seattle reference data and player reads. Where its rules differ from the Knowledge Base, the Knowledge Base wins.
+- `docs/implementation-basis.md`: the source of the Seattle reference data and player reads. Where it states a rule differently from the Knowledge Base, the Knowledge Base wins.
+- `docs/agent-knowledge-base.md`: the spec of record for data, import rules and models, with league files, percentiles and research reliability. If code and the Knowledge Base disagree, follow the Knowledge Base and flag the conflict. Tasks cite its sections; `docs/tasks/` holds the task template and its authoring guide.
 - `docs/design-handoff.md` and `docs/design/boards/`: screens, states, copy and design tokens. Board HTML is reference markup, not code to run.
-- `fixtures/`: real exports used as golden test data. See `fixtures/README.md` for what's present and what's still missing.
+- `fixtures/`: real exports used as golden test data. See `fixtures/README.md` for what's present; an export that isn't there is assumed not to exist.
 
 ## Current phase
 
@@ -59,7 +59,7 @@ CI (`.github/workflows/ci.yml`, job `ci`) runs install, lint, format check, type
 - One plan checklist item per branch and pull request. Tick its box in `docs/implementation-plan.md` in the same pull request.
 - Before writing code, state the task's acceptance check. If a step needs something only the owner can do (an account, a dashboard setting, a secret), stop and list it.
 - `packages/core` imports no DOM, network or UI framework code. Every calculation lives there, with tests.
-- For each import rule, write the test against `fixtures/` before the parser code. Each row of the Knowledge Base table "Columns that need special handling" gets at least one test.
+- For each import rule, write the test against `fixtures/` before the parser code. Each row of the "Columns that need special handling" tables in the Knowledge Base and the Basis gets at least one test.
 - Raw export files are the source of truth. Store them verbatim, derive everything else, and never depend on CSV row order.
 - Anything prefixed `VITE_` ships to the browser, so secrets never get that prefix. Never commit `.env` files, keys or tokens.
 - Database changes go only through new files in `supabase/migrations/`, applied by CI. Never edit a migration that has run, and keep each one backward compatible.

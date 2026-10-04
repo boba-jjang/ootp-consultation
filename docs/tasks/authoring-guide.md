@@ -41,31 +41,18 @@ The Knowledge Base refers to its own sections by number.
 | 7   | Ratings model              | 15  | Delivery plan                             |
 | 8   | League percentiles         | 16  | Glossary                                  |
 
-### Superseded statements
-
-Parts of the Knowledge Base predate this repository. Use the current fact.
-
-| The Knowledge Base says | Current fact | Recorded in |
-| --- | --- | --- |
-| A task-generator agent in an OpenCode workspace writes charters in a "Task Handoff Template v2" | This authoring server and `docs/tasks/task-template.md` | This guide |
-| Tasks are built against the jjang3.github.io repository | This repository, `boba-jjang/ootp-consultation`, deployed to https://ootp-consultation.vercel.app | `CLAUDE.md` › Deployments |
-| Platform direction is GitHub Pages plus Vercel; persistence and the hosting split are open | Vercel Hobby hosts the app and the advisor function, Supabase Free holds Postgres and Auth, and GitHub runs CI | Plan › Platform decisions; `CLAUDE.md` › Stack |
-| The backlog is seed tasks T01–T20 in seven milestones | The plan's phases and checklists are the backlog; ticked boxes show what shipped. Use T numbers only as cross-references. | Plan › Phases and exit criteria |
-| Refresh frequency and where consultation appears are open | Snapshots accumulate per team; consultation appears on dashboard screens with an advisor drawer. The DH is assumed on and still needs confirming. | `docs/design-handoff.md` › Decisions |
-| A repository publisher agent | The session pushes its branch and opens the pull request; the owner merges | `.claude/commands/next-task.md` |
-
 ## Rules for a task
 
 1. One task is one unchecked checklist item in `docs/implementation-plan.md`, built on one branch as one pull request that ticks that box. Quote the item. If an item is too big for one session, split it into tasks that each leave CI green; only the last one ticks the box.
 2. Work the specs call for that has no checklist item yet, such as the league sortable files or the percentile pools, adds its item to the plan in the same pull request, under the section and phase it belongs to. Say so in the task. Changing a platform decision, adding a provider or touching production data needs the owner first (`CLAUDE.md` › Ask the owner first).
-3. Order work by the current phase in `CLAUDE.md`, then the plan's checklists, then the build order (Basis › Build order; Knowledge Base › Module contracts). Never schedule a module before its inputs exist; name what it waits for under Dependencies.
+3. Order work by the current phase in `CLAUDE.md`, then the plan's checklists, then the build order (Knowledge Base › Delivery plan › Modules by phase). Never schedule a module before its inputs exist; name what it waits for under Dependencies.
 4. Cite the sections a task implements by document and heading, for example "Knowledge Base › Import contract › Columns that need special handling".
 5. A task that touches an open question (Knowledge Base § 14; plan › Risks and open questions) either records the owner's answer or builds behind a setting whose default comes from Knowledge Base › Assumptions. Say which.
 6. Thresholds, weights, scales, floors, gates and stabilization points are settings, each with a default, a one-line description and its source, such as "research value" or "Seattle sample". A task that hard-codes one fails review.
 7. Tests come first and run on the fixtures. Each import rule's test is written before its parser code, and each row of "Columns that need special handling" that the task touches gets at least one test. Expected values come from the fixtures or the Basis's Seattle reference data, never from memory.
 8. No logic keyed to a specific player, team or league. Names appear only in tests and examples.
 9. Items the Knowledge Base marks as later (database dumps, trade and contract valuation, opponent-specific advice) get no tasks unless the owner promotes them.
-10. Steps only the owner can do (an account, a dashboard or repository setting, a secret, an export added to `fixtures/`) are blocking preparation gaps. The session stops and lists them; it never works around them.
+10. Steps only the owner can do (an account, a dashboard or repository setting, a secret) are blocking preparation gaps. The session stops and lists them; it never works around them. An export that isn't in `fixtures/` is unavailable, not a gap: build without it, as the Knowledge Base specifies.
 11. `CLAUDE.md` loads into every session, so a task doesn't restate its rules. It names the ones that decide this task's acceptance.
 
 ## Filling the template

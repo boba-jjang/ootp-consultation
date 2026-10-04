@@ -215,20 +215,20 @@ Hobby functions can run for [300 seconds](https://vercel.com/docs/functions/limi
 
 ## Core logic package
 
-`packages/core` holds every calculation as pure TypeScript, built in the Basis's order. Only the importer and canonical tables must exist before frontend work starts; each model arrives with the screen that shows it.
+`packages/core` holds every calculation as pure TypeScript, built in the order of Knowledge Base › Delivery plan. Only the importer and canonical tables must exist before frontend work starts; each model arrives with the screen that shows it.
 
-| Order | Module | Spec in the Basis | First screen that needs it | Phase |
+| Order | Module | Spec in the Knowledge Base | First screen that needs it | Phase |
 | --- | --- | --- | --- | --- |
-| 1 | Importer: header detection, synonym table, unit and enum normalization, identity checks, routing | Import rules | Create a Team, Clubhouse | 2 |
-| 2 | Canonical tables and league config, stored on 20–80 | Ratings model | Every screen | 2 |
-| 3 | Metrics and luck gaps | Metrics | Talent radar, Bullpen & tactics | 4 |
-| 4 | Talent estimator v0 | Talent estimator | Talent radar, Lineup card | 4 |
-| 5 | Defensive model and eligibility matrix | Defensive model | Lineup card | 4 |
-| 6 | Strategy rules engine | Strategy rules | Bullpen & tactics | 4 |
-| 7 | Lineup optimizer, in a Web Worker | Lineup optimization | Lineup card | 4 |
-| 8 | Development planner | Development | Dev lab | 4 |
-| 9 | Consultation output and the manager's card | Purpose and pipeline | Every screen, advisor | 4–5 |
-| 10 | Backtest | Build order | Trends | 6 |
+| 1 | Importer: header detection, synonym table, unit and enum normalization, identity checks, routing | Import contract (§ 5) | Create a Team, Clubhouse | 2 |
+| 2 | Canonical tables and league config, stored on 20–80 | Ratings model › Scale conversion (§ 7) | Every screen | 2 |
+| 3 | Metrics and luck gaps | Metrics and league context (§ 6) | Talent radar, Bullpen & tactics | 4 |
+| 4 | Talent estimator v0 | Ratings model › Talent estimator (§ 7) | Talent radar, Lineup card | 4 |
+| 5 | Defensive model and eligibility matrix | Defensive model (§ 9) | Lineup card | 4 |
+| 6 | Strategy rules engine | Strategy rules (§ 10) | Bullpen & tactics | 4 |
+| 7 | Lineup optimizer, in a Web Worker | Lineup optimization (§ 11) | Lineup card | 4 |
+| 8 | Development planner | Development planner (§ 12) | Dev lab | 4 |
+| 9 | Consultation output and the manager's card | Product vision and scope (§ 2) | Every screen, advisor | 4–5 |
+| 10 | Backtest | Delivery plan (§ 15) | Trends | 6 |
 
 These acceptance criteria differ from the canvas or from the Basis as written:
 
@@ -282,7 +282,7 @@ The Seattle game-42 exports are the golden fixtures: every parser rule, identity
 End-to-end tests can't click through GitHub sign-in. Staging gets one email-and-password test user, with its credentials stored as GitHub secrets; production stays GitHub-only.
 
 - [ ] Write the test for each special-handling row before the parser code for it.
-- [ ] Run the identity checks as property tests over every fixture, skipping league pitching rows with G = 0, which carry no data.
+- [ ] Run the identity checks as property tests over every fixture, skipping pitcher rows with G = 0, which carry no data.
 - [ ] Create the staging test user and store its credentials as secrets.
 - [ ] Set the coverage floor on `packages/core` at 80% and raise it as modules settle. The 80% floor is set in `vitest.config.ts`.
 

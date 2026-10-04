@@ -126,7 +126,7 @@ The user exports these from the team's Lineups overview screen, one view per CSV
 
 | View | Side | Carries |
 | --- | --- | --- |
-| default | Hitters | Age, nationality, height, weight, handedness, salary, contract years, service time, scouting accuracy; OVR, POT, Inf and Mor export blank where the league hides them |
+| default | Hitters | Age, nationality, height, weight, handedness, salary, contract years, service time, scouting accuracy; POT, Inf and Mor export blank and OVR exports "-" where the league hides them |
 | batting\_stats\_1 | Hitters | Batting line, slash line, ISO, OPS, OPS+, BABIP, WAR, SB, CS |
 | batting\_stats\_2 | Hitters | BB%, K%, sacrifices, extra-base hits, total bases, runs created, wOBA, WPA, pitches per PA, UBR |
 | batting\_superstats\_1 | Hitters | Batted-ball mix and direction, exit velocity, launch angle, barrels, hard-hit balls, expected stats overall and on contact |
@@ -158,7 +158,7 @@ The user exports these from the league's player statistics screen, one file per 
 ### Not yet used
 
 - OOTP database dumps: full league tables keyed by player ID, including ratings (later, per section 2).
-- Opponent rosters, handedness splits, per-position ratings, league totals, league standard stats and park factors. None has been provided, so the app treats them as unavailable (section 14).
+- Opponent rosters, handedness splits, per-position ratings, league totals, league standard stats, park factors, a pitcher bio and contract view, injury proneness and coaching data. None has been provided, so the app treats them as unavailable (section 14).
 
 ## Import contract
 
@@ -211,7 +211,7 @@ The league sortable files reuse the superstats headers: the league batting\_supe
 | EV, mEV, LA | Average and max exit velocity in mph; average launch angle in degrees (hitters only) | None |
 | BAR, BAR%, HHi, HHi% | Barrels and hard-hit balls (95+ mph) | None |
 | Avg% and Med% | The same middle contact bucket, hitter and pitcher labels | One canonical name |
-| CON P, HLD | Same header, different meaning: CON P is Contact for hitters, Control for pitchers; HLD is holds (a count) in pitching\_stats\_1, the hold-runners rating in cus\_pitch\_pot | CON P resolves by side; HLD resolves by view |
+| CON P, HLD | Same header, different meaning: CON P is Contact in custom\_bat\_pot and Control in cus\_pitch\_pot, hitter capture included; HLD is holds (a count) in pitching\_stats\_1, the hold-runners rating in cus\_pitch\_pot | Both resolve by view |
 | DEF | Current position rating at the listed position | Link to POS |
 | DEF Pot | Position-rating potential at the listed position; P for pitchers | Ceiling for DEF |
 | C ABI, C FRM, C ARM | Catcher ability, framing, arm; non-catchers show 1 | 1 on a non-catcher means "can't catch" |
@@ -256,18 +256,18 @@ The league sortable files reuse the superstats headers: the league batting\_supe
 
 ## Metrics and league context
 
-Use OOTP's exported metrics where they exist and compute only what's missing. wRC+, wRAA and xFIP need league totals that no current export carries.
+Use OOTP's exported metrics where they exist and compute only what's missing. wRC+ and wRAA need league totals that no current export carries; xFIP's league HR/FB comes from the league pitching file.
 
 | Metric | Status | Notes |
 | --- | --- | --- |
 | wOBA | Exported | OOTP uses its own league weights; the sample landed within .007 of the FanGraphs-constant calculation, so trust the export |
 | OPS+ | Exported | League and park adjusted. Not wRC+, which the research mislabeled |
 | wRC+ | Missing | Needs league wOBA, league runs per PA and park factors |
-| wRAA | Missing | Needs league wOBA, which no export carries; formula below |
+| wRAA | Missing | Needs league wOBA, which isn't available; formula below |
 | xBA, xSLG, xwOBA | Exported | Expected stats including strikeouts and walks |
 | xBACON, xSLGCON, xwOBACON | Exported | Contact-only; isolate batted-ball quality from plate discipline |
 | RC, RC/27, WAR, WPA, UBR | Exported | Use as reported |
-| FIP | Exported | Formula below; recalibrating it to the league needs league totals, which no export carries |
+| FIP | Exported | Formula below, for recalibrating to the league |
 | xFIP | Missing | Needs fly balls (BIP × FB%) and league HR/FB |
 | SIERA | Exported | Penalizes low strikeout rates heavily |
 | xERA | Exported | Expected ERA from contact quality allowed |
@@ -276,7 +276,7 @@ Use OOTP's exported metrics where they exist and compute only what's missing. wR
 
 ### Formulas
 
-Constants are the research's FanGraphs values. An OOTP league has its own run environment, but no export provides league totals, so league constants can't be derived from them.
+Constants are the research's FanGraphs values. An OOTP league has its own run environment. The exported FIP implies the league's FIP constant (3.25 for every team pitcher in the sample), and the league pitching file gives league HR/FB (11.8% in the sample: the sum of BIP × FB% × HR/FB over the sum of BIP × FB%). The wOBA and run constants need league totals, which aren't available.
 
 ```latex
 \text{wOBA} = \frac{0.698\,uBB + 0.729\,HBP + 0.890\,1B + 1.261\,2B + 1.596\,3B + 2.049\,HR}{AB + BB - IBB + SF + HBP}
@@ -325,7 +325,7 @@ About 42 games in, no sample player was near either BABIP point. That is why the
 ### League context
 
 - Available now: league-wide distributions of the superstats metrics the league files carry, for percentiles and league averages.
-- Missing: league totals (league wOBA, runs per PA, HR/FB), park factors, and league hits for contact-luck baselines.
+- Missing: league totals (league wOBA, runs per PA), park factors, and league hits for contact-luck baselines.
 
 ## Ratings model
 
@@ -484,7 +484,7 @@ Weights come from the research, which took them from community reverse-engineeri
 
 - Rows are players; columns are C, 1B, 2B, 3B, SS, LF, CF and RF, plus DH, which anyone can fill.
 - The listed position uses DEF, with DEF Pot as its ceiling.
-- Every other position uses a component-based ceiling from the weights above, discounted for inexperience, since no export carries per-position ratings.
+- Every other position uses a component-based ceiling from the weights above, discounted for inexperience, since per-position ratings aren't available.
 - A player without catcher ratings is ineligible at C. A critical component below its neutral floor is flagged, and excluded only when configured.
 - The matrix produces the fielding-run estimates the lineup optimizer uses.
 
@@ -514,7 +514,7 @@ Every gate is a research claim without supporting data, so each is a setting val
 | Hold runners | Catcher arm, pitcher hold | 8–10 behind a weak arm (about 35); costs some stuff and control | Arm 3 or lower; 4 borderline |
 | Infield shift | Middle-infield range; opposing hitters' pull tendency | 10 only with 65+ middle-infield range | Range 8+ |
 | Guard lines | SS and 2B range | High only with 70+ at both | Range 9+ at both |
-| Pinch hitting and platoons | Handedness splits, which no export provides | Player-level rules by pitcher hand | Not stated |
+| Pinch hitting and platoons | Handedness splits, which aren't available | Player-level rules by pitcher hand | Not stated |
 
 In the sample, a shortstop at range 8 cleared the shift gate while all three second basemen sat at a borderline 7, so the rule produced a moderate shift.
 
@@ -566,7 +566,7 @@ E is expected runs from each state, b the runs scored on each transition, and F 
 | 7–8 | Remaining hitters in descending wOBA |
 | 9 | Slight OBP preference over #8, to set up the top of the order |
 
-Platoon decisions need handedness splits and the opposing starter's hand, and no export provides either.
+Platoon decisions need handedness splits and the opposing starter's hand, and neither is available.
 
 ## Development planner
 
@@ -660,7 +660,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 | --- | --- |
 | Import path | Screen-view exports first; OOTP database dumps later |
 | Rating scale | Varies by league; an approximate conversion to 20–80 is fine |
-| Shared headers | Columns such as CON P resolve by side, hitter or pitcher |
+| Shared headers | Columns such as CON P and HLD resolve by view: the same header can mean different things in different views |
 | DEF semantics | DEF is the rating at the listed position; DEF Pot is its ceiling, at P for pitchers |
 | Hidden current ratings | The app estimates current batting and pitching ratings |
 | Development risk | Replaces a fixed age cut in the estimator; age is only the fallback |
@@ -695,7 +695,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 - [ ] Does the league merge stats into scouting reports? If so, the estimator weights stats less.
 - [x] Does the view editor offer per-position ratings and handedness splits? Answered: neither has been provided, so both are treated as unavailable (sections 9–11).
 - [x] Re-export the pitching ratings view with the staff listed, to get pitchers' work ethic, IQ and risk. Done: the staff cus\_pitch\_pot, the latest upload of that view, carries work ethic, IQ and risk for all 13 pitchers and is treated as part of the same snapshot.
-- [x] Can league standard stats and totals be exported, for wRC+, xFIP, luck baselines and standard-stat percentiles? Answered: they haven't been provided, so treat them as unavailable; wRC+, wRAA, xFIP, a league-wide contact baseline and standard-stat percentiles are left out.
+- [x] Can league standard stats and totals be exported, for wRC+, xFIP, luck baselines and standard-stat percentiles? Answered: they haven't been provided, so treat them as unavailable; wRC+, wRAA, a league-wide contact baseline and standard-stat percentiles are left out; xFIP takes league HR/FB from the league pitching file.
 
 ## Delivery plan
 

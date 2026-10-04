@@ -65,3 +65,11 @@ export {
   type UploadResult,
   type UploadedFile,
 } from './store/store.ts';
+export {
+  TEAM_EXPORT_FORMAT,
+  exportTeam,
+  readTeamExport,
+  restoreTeam,
+  type TeamExport,
+  type TeamExportResult,
+} from './store/export.ts';

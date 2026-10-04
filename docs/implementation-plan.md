@@ -248,6 +248,7 @@ These acceptance criteria differ from the canvas or from the Basis as written; t
 - [x] Route each export: read the CSV and file name, and route it as primary, supplemental or rejected, with its scope, side and import events (Knowledge Base › Import contract).
 - [x] Validate a snapshot across its files: names and positions, repeated columns, identities, the rating scale and league rows (Knowledge Base › Import contract › Invariants).
 - [x] Stamp every import with `importer_version`, so re-reading raw files is deterministic.
+- [x] Convert ratings between the league's display scale and 20–80 (Knowledge Base › Ratings model › Scale conversion).
 - [x] Import the league sortable files: name joins, duplicate flags, rows with G = 0 dropped (Knowledge Base › Import contract › Joins and snapshots).
 - [ ] Build league percentiles: usage-based peer pools, sample floors, metric directions and the mid-rank formula (Knowledge Base › League percentiles).
 

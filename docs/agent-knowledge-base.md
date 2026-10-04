@@ -158,7 +158,7 @@ The user exports these from the league's player statistics screen, one file per 
 ### Not yet used
 
 - OOTP database dumps: full league tables keyed by player ID, including ratings (later, per section 2).
-- Opponent rosters, handedness splits, per-position ratings, league totals, league standard stats, park factors, a pitcher bio and contract view, injury proneness and coaching data. None has been provided, so the app treats them as unavailable (section 14).
+- Opponent rosters, handedness splits, per-position ratings, league totals, league standard stats, park factors, a pitcher bio and contract view, and injury proneness. None has been provided, so the app treats them as unavailable (section 14).
 
 ## Import contract
 
@@ -217,6 +217,7 @@ The league sortable files reuse the superstats headers: the league batting\_supe
 | C ABI, C FRM, C ARM | Catcher ability, framing, arm; non-catchers show 1 | 1 on a non-catcher means "can't catch" |
 | VELO, VT | Ranges such as "95-97 Mph"; VT reads as velocity potential | Low, high and midpoint |
 | SR | Steal rate: how often he tries to run | Separate from STE, the success skill |
+| TM, LG | Team and league, in the batting superstats views; a league file's rows span every team | Use as the namespace; league batting rows join on team plus name |
 | WE, INT | Work ethic and intelligence (baseball IQ) | Ordinal |
 | Risk | Development risk, Very Low to Extreme | Ordinal |
 
@@ -588,6 +589,8 @@ The planner turns potentials, development risk, work ethic, IQ and age into prio
 | Work ethic, IQ | Development odds; the research names work ethic as a Lab factor. Both weights are settings |
 | Velocity now vs potential | Headroom for velocity programs |
 | DEF vs DEF Pot | Headroom from experience at the listed position |
+
+The league runs with its coaching staff disabled, so coaching quality plays no part in development.
 
 ### Research priorities
 

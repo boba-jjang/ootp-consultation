@@ -274,7 +274,7 @@ The canvas's Dugout alignment, batting order and luck reads are placeholders, so
 
 Build order, one pull request each:
 
-- [ ] Design tokens, self-hosted fonts and a component sheet page (`/sheet`), checked against the canvas. A test keeps raw colors out of components.
+- [x] Design tokens, self-hosted fonts and a component sheet page (`/sheet`), checked against the canvas. A test keeps raw colors out of components.
 - [ ] Routing, the sign-in screen, data loading with TanStack Query over the Supabase store, and an error boundary per screen.
 - [ ] Data coverage in `packages/core`, with tests on the fixtures: the Seattle snapshot is High with 12 hitters at 5 of 5 data sets and 13 pitchers at 4 of 5 (no pitcher bio view).
 - [ ] App shell: top bar (team menu, snapshot selector, coverage badge, DH, advisor status), module tabs with locked states, and the lock framework.

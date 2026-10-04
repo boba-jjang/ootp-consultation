@@ -25,7 +25,7 @@ Update this section when a phase's gate passes.
 ## Stack
 
 - pnpm workspaces; TypeScript in strict mode everywhere
-- `apps/web`: React + Vite single-page app; Vercel Functions in `apps/web/api/`
+- `apps/web`: React + Vite single-page app; Vercel Functions in `apps/web/api/`. Styling is plain CSS: the tokens in `apps/web/src/styles/tokens.css` (the only file with raw colors), CSS Modules per component, fonts self-hosted from `@fontsource`. `/sheet` shows every primitive.
 - `packages/core`: pure TypeScript domain logic (importer, metrics, models)
 - Supabase: Postgres, Auth (GitHub sign-in in production), row-level security; migrations in `supabase/migrations/`
 - Tests: Vitest (unit and golden), pgTAP (database policies), Playwright with axe (end-to-end, from Phase 3)

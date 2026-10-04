@@ -1,0 +1,218 @@
+/*
+ * Design tokens, from docs/design-handoff.md and the canvas boards in docs/design/boards/.
+ *
+ * Three layers (the design-system skill's token architecture):
+ *   primitive  raw values with no meaning of their own: --navy, --text-13, --space-4
+ *   semantic   what a value is for: --color-text-secondary, --border-subtle
+ *   component  one component's knobs: --button-primary-bg, --matrix-cell-empty-border
+ *
+ * Components use semantic and component tokens only. apps/web/test/tokens.test.ts fails on a
+ * raw color anywhere else under src/, so this is the one file that holds them.
+ */
+
+:root {
+  /* ---- Primitive: colors ------------------------------------------------------------- */
+  --navy: #0a1118; /* the base background */
+  --navy-deep: #0d161d; /* drawers, inputs, drop zones */
+  --slate: #121d24; /* panels */
+  --chalk: #f5f7fa; /* text */
+  --mist: #c9d2db; /* body text on dark */
+  --steel: #9aa7b4; /* secondary text */
+  --steel-dim: #7d8a97; /* tertiary text, locked tabs */
+  --stone: #a9b8c4; /* "on file" cells in the coverage matrix */
+  --gold: #e5a93c; /* actions and attention */
+  --crimson: #d9534f; /* expected to decline, errors */
+  --crimson-soft: #e8706c; /* crimson for small text */
+  --emerald: #2ecc71; /* expected to improve, done */
+  --field-grass: #13282d; /* the diamond's grass (lineup card) */
+  --field-dirt: #2b241b; /* the diamond's dirt (lineup card) */
+
+  /* The same colors as channels, for tints: rgb(var(--chalk-rgb) / 0.08). */
+  --navy-rgb: 10 17 24;
+  --navy-deep-rgb: 13 22 29;
+  --chalk-rgb: 245 247 250;
+  --gold-rgb: 229 169 60;
+  --emerald-rgb: 46 204 113;
+  --black-rgb: 0 0 0;
+
+  /* ---- Primitive: type --------------------------------------------------------------- */
+  --font-ui: 'Chakra Petch', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+
+  --text-10: 0.625rem;
+  --text-11: 0.6875rem;
+  --text-12: 0.75rem;
+  --text-13: 0.8125rem;
+  --text-14: 0.875rem;
+  --text-15: 0.9375rem;
+  --text-16: 1rem;
+  --text-17: 1.0625rem;
+  --text-19: 1.1875rem;
+  --text-20: 1.25rem;
+  --text-22: 1.375rem;
+  --text-32: 2rem;
+  --text-36: 2.25rem;
+  --text-44: 2.75rem;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --leading-body: 1.5;
+  --leading-snug: 1.3;
+  --leading-tight: 1.15;
+  --leading-heading: 1.1;
+  --leading-display: 1.05;
+
+  --tracking-brand: 0.02em;
+  --tracking-display: 0.01em;
+
+  /* ---- Primitive: space and shape ---------------------------------------------------- */
+  --space-0-5: 2px;
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-2-5: 10px;
+  --space-3: 12px;
+  --space-3-5: 14px;
+  --space-4: 16px;
+  --space-4-5: 18px;
+  --space-5: 20px;
+  --space-5-5: 22px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  --radius-1: 1px;
+  --radius-2: 2px;
+  --radius-3: 3px;
+  --radius-4: 4px;
+  --radius-6: 6px;
+  --radius-round: 50%;
+
+  --duration-fast: 120ms;
+  --duration: 200ms;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ---- Semantic: surfaces ------------------------------------------------------------ */
+  --color-bg: var(--navy);
+  --color-surface: var(--slate);
+  --color-surface-sunken: var(--navy-deep);
+  --color-overlay: rgb(var(--navy-rgb) / 0.92);
+  --color-overlay-strong: rgb(var(--navy-deep-rgb) / 0.97);
+
+  /* ---- Semantic: text ---------------------------------------------------------------- */
+  --color-text: var(--chalk);
+  --color-text-body: var(--mist);
+  --color-text-secondary: var(--steel);
+  --color-text-tertiary: var(--steel-dim);
+  --color-text-on-accent: var(--navy);
+  --color-text-on-accent-disabled: rgb(var(--navy-rgb) / 0.8);
+
+  /* ---- Semantic: meaning ------------------------------------------------------------- */
+  --color-accent: var(--gold);
+  --color-positive: var(--emerald); /* ▲ expected to improve, done */
+  --color-negative: var(--crimson); /* ▼ expected to decline, errors */
+  --color-negative-text: var(--crimson-soft); /* crimson at small sizes */
+  --color-on-file: var(--stone);
+  --color-coverage-low: var(--crimson-soft);
+  --color-coverage-moderate: var(--gold);
+  --color-coverage-high: var(--emerald);
+
+  /* ---- Semantic: borders and lines --------------------------------------------------- */
+  --border-hairline: 1px solid rgb(var(--chalk-rgb) / 0.06); /* table rows */
+  --border-subtle: 1px solid rgb(var(--chalk-rgb) / 0.08); /* panels, headers */
+  --border-muted: 1px solid rgb(var(--chalk-rgb) / 0.1); /* cards inside panels */
+  --border-default: 1px solid rgb(var(--chalk-rgb) / 0.14); /* badges, menus */
+  --border-medium: 1px solid rgb(var(--chalk-rgb) / 0.16); /* chips, table heads */
+  --border-input: 1px solid rgb(var(--chalk-rgb) / 0.18);
+  --border-strong: 1px solid rgb(var(--chalk-rgb) / 0.25); /* step circles */
+  --border-control: 1px solid rgb(var(--chalk-rgb) / 0.3); /* secondary buttons */
+  --border-dashed-drop: 1.5px dashed rgb(var(--chalk-rgb) / 0.28); /* drop zones */
+  --line-connector: rgb(var(--chalk-rgb) / 0.2); /* between steps */
+  --line-track: rgb(var(--chalk-rgb) / 0.14); /* the snapshot timeline */
+  --line-marker: rgb(var(--chalk-rgb) / 0.55); /* timeline ticks */
+  --bar-off: rgb(var(--chalk-rgb) / 0.16); /* an unlit coverage bar */
+
+  /* ---- Semantic: accent tints -------------------------------------------------------- */
+  --tint-accent-faint: rgb(var(--gold-rgb) / 0.08); /* the current team in the menu */
+  --tint-accent: rgb(var(--gold-rgb) / 0.1); /* a selected choice */
+  --tint-accent-glow: rgb(var(--gold-rgb) / 0.2); /* the timeline dot's halo */
+  --tint-accent-muted: rgb(var(--gold-rgb) / 0.35); /* placeholder bars behind a lock */
+  --border-accent-muted: 1px solid rgb(var(--gold-rgb) / 0.35);
+  --border-accent: 1px solid rgb(var(--gold-rgb) / 0.55);
+  --border-accent-strong: 1px solid rgb(var(--gold-rgb) / 0.5);
+  --border-accent-dashed: 1px dashed rgb(var(--gold-rgb) / 0.75); /* an empty cell */
+  --tint-positive: rgb(var(--emerald-rgb) / 0.12);
+  --border-positive: 1px solid rgb(var(--emerald-rgb) / 0.6);
+  --tint-surface-hover: rgb(var(--chalk-rgb) / 0.06);
+
+  --shadow-menu: 0 12px 32px rgb(var(--black-rgb) / 0.45);
+  --focus-ring: 2px solid var(--color-accent);
+  --focus-ring-offset: 2px;
+
+  /* ---- Semantic: layout -------------------------------------------------------------- */
+  --gutter: clamp(16px, 3vw, 32px);
+  --width-form: 760px;
+  --width-setup: 1040px;
+  --width-app: 1440px;
+  --control-sm: 40px; /* list rows */
+  --control: 44px; /* the minimum target */
+  --control-lg: 48px; /* primary buttons, tabs */
+  --control-xl: 52px; /* team menu items */
+  --header-height: 56px;
+
+  /* ---- Component --------------------------------------------------------------------- */
+  --button-primary-bg: var(--color-accent);
+  --button-primary-fg: var(--color-text-on-accent);
+  --button-primary-disabled-bg: rgb(var(--gold-rgb) / 0.25);
+  --button-primary-disabled-fg: var(--color-text-on-accent-disabled);
+  --button-secondary-border: var(--border-control);
+  --button-accent-border: var(--border-accent);
+  --button-accent-fg: var(--color-accent);
+  --button-radius: var(--radius-4);
+
+  --input-bg: var(--color-surface-sunken);
+  --input-border: var(--border-input);
+  --input-radius: var(--radius-4);
+
+  --panel-bg: var(--color-surface);
+  --panel-border: var(--border-subtle);
+  --panel-radius: var(--radius-6);
+  --panel-padding: var(--space-5);
+  --card-bg: var(--color-surface-sunken);
+  --card-border: var(--border-muted);
+
+  --drop-zone-bg: var(--color-surface-sunken);
+  --drop-zone-border: var(--border-dashed-drop);
+
+  --chip-border: var(--border-medium);
+  --chip-fg: var(--color-text-body);
+  --chip-radius: var(--radius-3);
+
+  --matrix-cell-on: var(--color-on-file);
+  --matrix-cell-empty-border: var(--border-accent-dashed);
+
+  --step-current: var(--color-accent);
+  --step-done-bg: var(--tint-positive);
+  --step-done-border: var(--border-positive);
+  --step-todo-border: var(--border-strong);
+
+  --tab-active: var(--color-accent);
+  --tab-locked-fg: var(--color-text-tertiary);
+
+  --menu-bg: var(--color-surface);
+  --menu-border: var(--border-default);
+  --menu-shadow: var(--shadow-menu);
+  --menu-active-bg: var(--tint-accent-faint);
+
+  --lock-card-bg: var(--color-overlay-strong);
+  --lock-card-border: var(--border-accent-strong);
+  --lock-placeholder: var(--tint-accent-muted);
+
+  --timeline-dot: var(--color-accent);
+  --timeline-halo: var(--tint-accent-glow);
+}

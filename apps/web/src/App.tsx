@@ -4,11 +4,15 @@ import { useEffect, useState } from 'react';
 import { IMPORTER_VERSION } from '@ootp/core';
 
 import { projectRef, supabase, type Client } from './supabase.ts';
+import { Sheet } from './sheet/Sheet.tsx';
 import { Teams } from './Teams.tsx';
 
 export function App() {
-  // The only page so far is the start page; real routes arrive with the app shell in Phase 3.
+  // The only pages so far are the start page and the component sheet; routes arrive next.
   const path = window.location.pathname;
+  if (path === '/sheet') {
+    return <Sheet />;
+  }
   return (
     <main>
       <h1>OOTP Consultation</h1>

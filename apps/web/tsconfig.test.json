@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
+    /* Tests run in Node and read files from disk. */
+    "types": ["node"]
+  },
+  "include": ["test/**/*.ts", "src/**/*.test.ts"]
+}

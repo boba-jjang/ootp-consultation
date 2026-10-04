@@ -28,7 +28,17 @@ Update this section when a phase's gate passes.
 
 ## Commands
 
-Fill these in as the scaffold lands, and keep them current: install, dev server, lint, typecheck, test, build.
+Keep these current. Run them from the repo root on Node 24. The Node major is set in three places that must agree: `.nvmrc` (CI), and `engines.node` in the root and `apps/web` `package.json` files (Vercel reads the `apps/web` one). The pnpm version comes from `packageManager` in the root `package.json`.
+
+- Install: `pnpm install` (CI uses `pnpm install --frozen-lockfile`)
+- Dev server: `pnpm dev` (Vite, `apps/web`)
+- Lint: `pnpm lint` (ESLint, type-aware; warnings fail)
+- Format: `pnpm format` to fix, `pnpm format:check` to check (Prettier)
+- Typecheck: `pnpm typecheck` (`tsc --build` over every project referenced from the root `tsconfig.json`; add each new tsconfig there)
+- Test: `pnpm test`, which runs `test:core` (core's own tests, with the coverage floor on `packages/core`), then `test:apps` (every other project). `pnpm test` takes no extra arguments, so pass a filter or `-u` to `test:core`, `test:apps` or `test:watch` instead.
+- Build: `pnpm build`
+
+CI (`.github/workflows/ci.yml`, job `ci`) runs install, lint, format check, typecheck, test and build, in that order.
 
 ## Working rules
 

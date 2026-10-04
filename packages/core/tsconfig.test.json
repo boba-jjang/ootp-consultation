@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
+    /* Tests run in Node and may read fixtures from disk. Shared test helpers go in test/. */
+    "types": ["node"]
+  },
+  "include": ["src/**/*.test.ts", "test/**/*.ts"]
+}

@@ -91,9 +91,9 @@ ootp-consultation/
 | Supabase CLI | Migrations, generated database types, policy tests |
 
 - [ ] Create the repo under your personal account, default branch `main`.
-- [ ] Scaffold the pnpm workspace: `apps/web` from the Vite React TypeScript template, `packages/core` as a library.
-- [ ] Add the shared strict tsconfig, ESLint, Prettier and `.editorconfig`.
-- [ ] Add Vitest at the workspace root with a coverage floor on `packages/core`.
+- [x] Scaffold the pnpm workspace: `apps/web` from the Vite React TypeScript template, `packages/core` as a library.
+- [x] Add the shared strict tsconfig, ESLint, Prettier and `.editorconfig`.
+- [x] Add Vitest at the workspace root with a coverage floor on `packages/core`.
 - [ ] Commit `.env.example`; gitignore `.env*.local`.
 - [ ] Write `docs/adr/0001-platform.md` once the decisions table is confirmed.
 - [ ] Use Conventional Commits and squash merges, so `main` reads as one change per pull request.
@@ -140,9 +140,9 @@ A pull request merges only after lint, type checks, unit and golden tests, a pro
 | `keepalive.yml` | Weekly schedule, or by hand | One read request to each Supabase project, to avoid the 1-week inactivity pause | No |
 | `dependabot.yml` | Weekly | Grouped npm and GitHub Actions updates, each one a pull request through CI | Not a workflow |
 
-- [ ] Set `concurrency` with `cancel-in-progress`, so a new push cancels the previous run.
-- [ ] Give every job a unique name; [required checks match on job name](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
-- [ ] Pin third-party actions to a commit SHA.
+- [ ] Set `concurrency` with `cancel-in-progress`, so a new push to a pull request cancels its previous run; pushes to `main` each keep their own run. Done in `ci.yml`; keep it in each new workflow.
+- [ ] Give every job a unique name; [required checks match on job name](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches). Done in `ci.yml`; keep it in each new workflow.
+- [ ] Pin third-party actions to a commit SHA. Done in `ci.yml`; keep it in each new workflow.
 - [ ] Add a secret scan (for example gitleaks) to `ci.yml`.
 - [ ] Protect `main` with a ruleset: pull request required, the three checks required, linear history. On GitHub Free this needs a public repo.
 - [ ] Keep a pull-request run under five minutes, so private-repo minutes would also last.
@@ -202,6 +202,8 @@ One function, `/api/advisor`, holds the Gemini key. The browser sends a question
 The system prompt carries the design handoff's contract. Answers cite the numbers they use, say when data is missing and never invent a rating. They also keep data coverage and estimate confidence apart.
 
 Hobby functions can run for [300 seconds](https://vercel.com/docs/functions/limitations), and time spent waiting on the model doesn't count toward Active CPU. Request and response bodies cap at 4.5 MB, far above a snapshot's fact list.
+
+`packages/core` exports its TypeScript source with no build step, which Vite bundles for the browser. Vercel's Node builder doesn't: a function that imports runtime values from `@ootp/core` builds green and then fails with `ERR_MODULE_NOT_FOUND`. Until core gets a JavaScript build, the function uses `import type` only. A Vercel build also doesn't fail on a function's type errors, so `api/` needs its own tsconfig (Node types, no DOM) referenced from the root `tsconfig.json`.
 
 - [ ] Define an `AdvisorProvider` interface with one Gemini implementation, so another model can swap in without touching the UI.
 - [ ] Set `maxDuration` to 60 seconds, with a matching client timeout.
@@ -279,7 +281,7 @@ End-to-end tests can't click through GitHub sign-in. Staging gets one email-and-
 - [ ] Write the test for each special-handling row before the parser code for it.
 - [ ] Run the identity checks as property tests over every fixture.
 - [ ] Create the staging test user and store its credentials as secrets.
-- [ ] Set the coverage floor on `packages/core` at 80% and raise it as modules settle.
+- [ ] Set the coverage floor on `packages/core` at 80% and raise it as modules settle. The 80% floor is set in `vitest.config.ts`.
 
 ## Operations
 
@@ -316,7 +318,7 @@ Frontend coding starts in Phase 3, after the platform and data foundation. A pha
 Phase 1, in order:
 
 - [ ] Create the GitHub repo under your personal account.
-- [ ] Scaffold the workspace and push `ci.yml`; get the first green run.
+- [x] Scaffold the workspace and push `ci.yml`; get the first green run.
 - [ ] Import the repo into Vercel and confirm a preview on a test pull request.
 - [ ] Create the two Supabase projects and turn on GitHub sign-in for each.
 - [ ] Add migration `0001` (all five tables and their policies) with `db.yml` to test and apply it.

@@ -31,6 +31,7 @@ Update this section when a phase's gate passes.
 Keep these current. Run them from the repo root on Node 24. The Node major is set in three places that must agree: `.nvmrc` (CI), and `engines.node` in the root and `apps/web` `package.json` files (Vercel reads the `apps/web` one). The pnpm version comes from `packageManager` in the root `package.json`.
 
 - Install: `pnpm install` (CI uses `pnpm install --frozen-lockfile`)
+- Check a machine's setup: `pnpm check-setup` (Node, pnpm, dependencies and `apps/web/.env.local`). The full local guide is `docs/local-development.md`.
 - Dev server: `pnpm dev` (Vite, `apps/web`, on http://localhost:5173). It talks to the staging project: copy `apps/web/.env.example` to `apps/web/.env.local` and fill in staging's URL and publishable key.
 - Lint: `pnpm lint` (ESLint, type-aware; warnings fail)
 - Format: `pnpm format` to fix, `pnpm format:check` to check (Prettier)
@@ -46,6 +47,7 @@ CI (`.github/workflows/ci.yml`, job `ci`) runs install, lint, format check, type
 
 - Vercel project `ootp-consultation` (Hobby): Root Directory `apps/web`, Vite preset, files outside the Root Directory included in the build, Node from `apps/web/package.json`.
 - Production: https://ootp-consultation.vercel.app, deployed from `main`.
+- Supabase project refs: staging `kcmjeivksnptmvemusma`, production `piswvhjbbzeogclbulwp`. The app's footer shows which one a build uses.
 - Previews: one per pull request, its URL posted on the pull request. Each deployment gets `https://ootp-consultation-<hash>-boba18.vercel.app` and each branch `https://ootp-consultation-git-<branch>-boba18.vercel.app`, so allow `https://ootp-consultation-*-boba18.vercel.app` wherever redirects are listed (Supabase Auth).
 
 ## Working rules

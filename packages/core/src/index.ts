@@ -53,3 +53,15 @@ export {
 } from './ratings/scale.ts';
 export { RATING_COLUMNS } from './ratings/columns.ts';
 export { assembleSnapshot, type Snapshot, type SnapshotSettings } from './importer/snapshot.ts';
+export {
+  importUpload,
+  loadSnapshot,
+  type NewViewFile,
+  type SnapshotStore,
+  type StoredSnapshot,
+  type StoredViewFile,
+  type Upload,
+  type UploadOptions,
+  type UploadResult,
+  type UploadedFile,
+} from './store/store.ts';

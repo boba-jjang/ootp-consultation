@@ -1,3 +1,4 @@
+import { IMPORTER_VERSION } from '../version.ts';
 import { parseCsv } from './csv.ts';
 import { detectView } from './detect.ts';
 import { VIEW_MANIFESTS, type Side, type ViewId } from './manifest.ts';
@@ -30,6 +31,8 @@ export interface RoutedExport {
   /** Empty for a rejected file. */
   rows: ExportRow[];
   events: ImportEvent[];
+  /** The import rules this result came from, stored as view_files.importer_version. */
+  importerVersion: string;
 }
 
 export interface RoutingSettings {
@@ -80,6 +83,7 @@ export function routeExport(
     routing: 'rejected',
     rows: [],
     events,
+    importerVersion: IMPORTER_VERSION,
   };
   const reject = (code: string, message: string, details?: Record<string, unknown>) => {
     events.push({ level: 'error', code, message, ...(details ? { details } : {}) });

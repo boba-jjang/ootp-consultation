@@ -2,7 +2,7 @@ import { readdirSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { parseCsv, routeExport, type ViewId } from '../index.ts';
+import { IMPORTER_VERSION, parseCsv, routeExport, type ViewId } from '../index.ts';
 import { FIXTURES, leagueView, readFixtureText, teamView } from '../../test/fixtures.ts';
 
 const fileName = (path: string) => path.split('/').at(-1) ?? path;
@@ -80,6 +80,13 @@ describe('routeExport on the fixtures', () => {
     expect(result).toMatchObject({ view, scope, side, routing });
     expect(result.events.filter((event) => event.level === 'error')).toEqual([]);
     expect(result.rows.length).toBe(readFixtureText(path).trim().split('\r\n').length - 1);
+  });
+
+  it('stamps every export with the importer version, a rejected one included', () => {
+    for (const path of Object.keys(EXPECTED)) {
+      expect(route(path).importerVersion).toBe(IMPORTER_VERSION);
+    }
+    expect(routeExport('export.csv', '').importerVersion).toBe(IMPORTER_VERSION);
   });
 
   it('warns once about each older header version, and only those', () => {

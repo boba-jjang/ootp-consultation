@@ -37,8 +37,10 @@ Keep these current. Run them from the repo root on Node 24. The Node major is se
 - Typecheck: `pnpm typecheck` (`tsc --build` over every project referenced from the root `tsconfig.json`; add each new tsconfig there)
 - Test: `pnpm test`, which runs `test:core` (core's own tests, with the coverage floor on `packages/core`), then `test:apps` (every other project). `pnpm test` takes no extra arguments, so pass a filter or `-u` to `test:core`, `test:apps` or `test:watch` instead.
 - Build: `pnpm build`
+- Database tests: `supabase db start`, then `supabase test db` (pgTAP in `supabase/tests/`). These need Docker and the Supabase CLI, so they're optional locally; CI runs them.
 
 CI (`.github/workflows/ci.yml`, job `ci`) runs install, lint, format check, typecheck, test and build, in that order.
+`.github/workflows/db.yml` (job `db`) applies every migration to a fresh database and runs the pgTAP tests when `supabase/` changes. On `main` it pushes migrations to staging, then production (jobs `db-deploy-staging` and `db-deploy-production`), once their GitHub variables and secrets exist.
 
 ## Deployments
 

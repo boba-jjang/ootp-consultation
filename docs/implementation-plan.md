@@ -182,8 +182,8 @@ Row-level security is on for every table, with one policy shape: `owner_id = (se
 
 The Free plan has [no automatic backups](https://supabase.com/pricing). The app's Export team action downloads a zip of every raw file plus the team settings, and re-importing that zip is the restore.
 
-- [ ] Migration `0001`: the five tables, indexes on every foreign key and `owner_id`, row-level security enabled.
-- [ ] pgTAP tests per table: the owner can read and write; a second user and an anonymous caller see nothing.
+- [x] Migration `0001`: the five tables, indexes on every foreign key and `owner_id`, row-level security enabled.
+- [x] pgTAP tests per table: the owner can read and write; a second user and an anonymous caller see nothing.
 - [ ] Generate database types with the Supabase CLI; CI fails if they drift from the migrations.
 - [ ] Create a GitHub OAuth app per Supabase project; allow redirects for localhost, the preview URL pattern and production.
 - [ ] Turn off sign-ups on both projects after your first sign-in.
@@ -321,7 +321,7 @@ Phase 1, in order:
 - [x] Scaffold the workspace and push `ci.yml`; get the first green run.
 - [x] Import the repo into Vercel and confirm a preview on a test pull request.
 - [ ] Create the two Supabase projects and turn on GitHub sign-in for each.
-- [ ] Add migration `0001` (all five tables and their policies) with `db.yml` to test and apply it.
+- [ ] Add migration `0001` (all five tables and their policies) with `db.yml` to test and apply it. Migration, tests and `db.yml` are in; applying waits on the Supabase projects and their GitHub secrets and variables.
 - [ ] Enter the Supabase variables in Vercel and `.env.local`.
 - [ ] Build one page that signs in, saves a team and reloads it.
 - [ ] Add `keepalive.yml`, the error boundary and the `main` ruleset.

@@ -1,0 +1,123 @@
+name: DB
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Bump both together. The checksum is the release's linux_amd64 tarball from checksums.txt.
+  SUPABASE_CLI_VERSION: 2.119.0
+  SUPABASE_CLI_SHA256: bf1c3ae93be98533eb8a3105dbf4564bd0b2d9dc24690d8a920f980ef975c1b4
+
+jobs:
+  # Runs on every pull request, so the required check always reports. The database steps run
+  # only when supabase/ or this workflow changed.
+  db:
+    name: db
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: db-${{ github.event.pull_request.number || github.sha }}
+      cancel-in-progress: true
+    outputs:
+      changed: ${{ steps.changes.outputs.changed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Detect database changes
+        id: changes
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ -z "$BASE" ] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            changed=true
+          elif git diff --quiet "$BASE" HEAD -- supabase .github/workflows/db.yml; then
+            changed=false
+          else
+            changed=true
+          fi
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+          echo "Database changes: $changed"
+
+      - name: Install the Supabase CLI
+        if: steps.changes.outputs.changed == 'true'
+        run: &install-cli |
+          asset="supabase_${SUPABASE_CLI_VERSION}_linux_amd64.tar.gz"
+          curl -fsSL -o "$RUNNER_TEMP/$asset" \
+            "https://github.com/supabase/cli/releases/download/v${SUPABASE_CLI_VERSION}/$asset"
+          echo "$SUPABASE_CLI_SHA256  $RUNNER_TEMP/$asset" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/supabase-cli"
+          tar -xzf "$RUNNER_TEMP/$asset" -C "$RUNNER_TEMP/supabase-cli" supabase
+          echo "$RUNNER_TEMP/supabase-cli" >> "$GITHUB_PATH"
+
+      - name: Start Postgres and apply every migration from scratch
+        if: steps.changes.outputs.changed == 'true'
+        run: supabase db start
+
+      - name: Run the pgTAP policy tests
+        if: steps.changes.outputs.changed == 'true'
+        run: supabase test db
+
+  # Pushes to main apply pending migrations to staging, then production. `db push` is a no-op
+  # when a project is up to date, so these run on every push to main (and by hand), which also
+  # catches up a project whose secrets were added after its migrations merged. They're skipped
+  # until the project's variables exist.
+  staging:
+    name: db-deploy-staging
+    needs: db
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.SUPABASE_REF_STAGING != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: db-deploy-staging
+      cancel-in-progress: false
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD_STAGING }}
+      PROJECT_REF: ${{ vars.SUPABASE_REF_STAGING }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install the Supabase CLI
+        run: *install-cli
+
+      - name: Push migrations to staging
+        run: |
+          supabase link --project-ref "$PROJECT_REF"
+          supabase db push
+
+  production:
+    name: db-deploy-production
+    needs: staging
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.SUPABASE_REF_PROD != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: db-deploy-production
+      cancel-in-progress: false
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD_PROD }}
+      PROJECT_REF: ${{ vars.SUPABASE_REF_PROD }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install the Supabase CLI
+        run: *install-cli
+
+      - name: Push migrations to production
+        run: |
+          supabase link --project-ref "$PROJECT_REF"
+          supabase db push

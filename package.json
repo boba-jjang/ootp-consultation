@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "pnpm --filter @ootp/web dev",
+    "check-setup": "node scripts/check-setup.mjs",
     "build": "pnpm --recursive build",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",

@@ -44,3 +44,4 @@ export {
   type SnapshotEvent,
   type ValidationSettings,
 } from './importer/validate.ts';
+export { importLeague, type LeagueTables } from './importer/league.ts';

@@ -40,6 +40,12 @@ Keep these current. Run them from the repo root on Node 24. The Node major is se
 
 CI (`.github/workflows/ci.yml`, job `ci`) runs install, lint, format check, typecheck, test and build, in that order.
 
+## Deployments
+
+- Vercel project `ootp-consultation` (Hobby): Root Directory `apps/web`, Vite preset, files outside the Root Directory included in the build, Node from `apps/web/package.json`.
+- Production: https://ootp-consultation.vercel.app, deployed from `main`.
+- Previews: one per pull request, its URL posted on the pull request. Each deployment gets `https://ootp-consultation-<hash>-boba18.vercel.app` and each branch `https://ootp-consultation-git-<branch>-boba18.vercel.app`, so allow `https://ootp-consultation-*-boba18.vercel.app` wherever redirects are listed (Supabase Auth).
+
 ## Working rules
 
 - One plan checklist item per branch and pull request. Tick its box in `docs/implementation-plan.md` in the same pull request.

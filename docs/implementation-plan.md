@@ -6,7 +6,7 @@
 
 Platform work comes first: a deployed, signed-in walking skeleton with CI/CD and a database. Frontend coding starts in Phase 3, once that foundation and the importer exist. Everything runs on free plans for personal, non-commercial use.
 
-This plan says what to build and in what order; it doesn't repeat the specs. Data, import rules and models live in `docs/implementation-basis.md`. Screens and their states live in `docs/design-handoff.md` and `docs/design/boards/`.
+This plan says what to build and in what order; it doesn't repeat the specs. Data, import rules and models live in `docs/agent-knowledge-base.md`, the spec of record, and Seattle's reference data in `docs/implementation-basis.md`. Screens and their states live in `docs/design-handoff.md` and `docs/design/boards/`.
 
 Tasks are checkboxes to tick off as you go. Service limits were checked on 3 October 2026 and are linked where they're used.
 
@@ -48,12 +48,12 @@ The browser loads the app from Vercel and reads and writes Supabase directly, gu
 
 ## Free-tier budget
 
-Every service stays free because none has a payment method on file, so each stops at its limit instead of billing. Expected use is a small fraction of each allowance: a full snapshot of raw exports is about 20 KB.
+Every service stays free because none has a payment method on file, so each stops at its limit instead of billing. Expected use is a small fraction of each allowance: a full snapshot of raw exports is about 17 KB of team views (18 KB with the hitter capture), plus about 170 KB of league files.
 
 | Service | Limits that matter | Expected use | When a limit is hit |
 | --- | --- | --- | --- |
 | [Vercel Hobby](https://vercel.com/docs/limits/fair-use-guidelines) | 100 GB data transfer, 1M function invocations and 4 hours of Active CPU a month; [100 deployments a day, one build at a time](https://vercel.com/docs/limits) | A few deployments a day; advisor calls in the dozens | No on-demand billing on Hobby; usage over the allotment can pause the project |
-| [Supabase Free](https://supabase.com/pricing) | 500 MB database, 1 GB file storage, 5 GB egress, 2 active projects; pauses after 1 week without activity; no automatic backups | About 0.5 MB of raw files a season at weekly snapshots | A paused project is resumed from the dashboard; the app shows a reconnect message |
+| [Supabase Free](https://supabase.com/pricing) | 500 MB database, 1 GB file storage, 5 GB egress, 2 active projects; pauses after 1 week without activity; no automatic backups | About 5 MB of raw files a season at weekly snapshots | A paused project is resumed from the dashboard; the app shows a reconnect message |
 | [GitHub Actions](https://docs.github.com/en/billing/concepts/product-billing/github-actions) | Public repo: standard runners free. Private repo: 2,000 minutes and 500 MB of artifacts a month | A few minutes per pull request | With no payment method on file, runs are blocked until the quota resets |
 | [Gemini API free tier](https://ai.google.dev/gemini-api/docs/rate-limits) | Per-project rate limits, shown in AI Studio; the daily quota resets at midnight Pacific | One call per advisor question | Calls fail with a rate-limit error; the advisor says so and every other screen keeps working |
 
@@ -71,7 +71,9 @@ ootp-consultation/
 ├── supabase/
 │   ├── migrations/           SQL, applied by CI only
 │   └── tests/                pgTAP policy tests
-├── fixtures/seattle-g42/     canonical exports + legacy variants
+├── fixtures/
+│   ├── seattle-g42/          team views, hitter capture, league files
+│   └── legacy/               older superstats versions
 ├── e2e/                      Playwright specs
 ├── docs/adr/                 one record per decision
 └── .github/
@@ -213,20 +215,20 @@ Hobby functions can run for [300 seconds](https://vercel.com/docs/functions/limi
 
 ## Core logic package
 
-`packages/core` holds every calculation as pure TypeScript, built in the Basis's order. Only the importer and canonical tables must exist before frontend work starts; each model arrives with the screen that shows it.
+`packages/core` holds every calculation as pure TypeScript, built in the order of Knowledge Base › Delivery plan. Only the importer and canonical tables must exist before frontend work starts; each model arrives with the screen that shows it.
 
-| Order | Module | Spec in the Basis | First screen that needs it | Phase |
+| Order | Module | Spec in the Knowledge Base | First screen that needs it | Phase |
 | --- | --- | --- | --- | --- |
-| 1 | Importer: header detection, synonym table, unit and enum normalization, identity checks, routing | Import rules | Create a Team, Clubhouse | 2 |
-| 2 | Canonical tables and league config, stored on 20–80 | Ratings model | Every screen | 2 |
-| 3 | Metrics and luck gaps | Metrics | Talent radar, Bullpen & tactics | 4 |
-| 4 | Talent estimator v0 | Talent estimator | Talent radar, Lineup card | 4 |
-| 5 | Defensive model and eligibility matrix | Defensive model | Lineup card | 4 |
-| 6 | Strategy rules engine | Strategy rules | Bullpen & tactics | 4 |
-| 7 | Lineup optimizer, in a Web Worker | Lineup optimization | Lineup card | 4 |
-| 8 | Development planner | Development | Dev lab | 4 |
-| 9 | Consultation output and the manager's card | Purpose and pipeline | Every screen, advisor | 4–5 |
-| 10 | Backtest | Build order | Trends | 6 |
+| 1 | Importer: header detection, synonym table, unit and enum normalization, identity checks, routing | Import contract (§ 5) | Create a Team, Clubhouse | 2 |
+| 2 | Canonical tables and league config, stored on 20–80 | Ratings model › Scale conversion (§ 7) | Every screen | 2 |
+| 3 | Metrics and luck gaps | Metrics and league context (§ 6) | Talent radar, Bullpen & tactics | 4 |
+| 4 | Talent estimator v0 | Ratings model › Talent estimator (§ 7) | Talent radar, Lineup card | 4 |
+| 5 | Defensive model and eligibility matrix | Defensive model (§ 9) | Lineup card | 4 |
+| 6 | Strategy rules engine | Strategy rules (§ 10) | Bullpen & tactics | 4 |
+| 7 | Lineup optimizer, in a Web Worker | Lineup optimization (§ 11) | Lineup card | 4 |
+| 8 | Development planner | Development planner (§ 12) | Dev lab | 4 |
+| 9 | Consultation output and the manager's card | Product vision and scope (§ 2) | Every screen, advisor | 4–5 |
+| 10 | Backtest | Delivery plan (§ 15) | Trends | 6 |
 
 These acceptance criteria differ from the canvas or from the Basis as written:
 
@@ -237,8 +239,9 @@ These acceptance criteria differ from the canvas or from the Basis as written:
 - Pitcher age comes from `cus_pitch_pot`.
 - At a non-listed position, position cards show component ceilings, not the listed position's DEF.
 
-- [ ] Add the six canonical uploads to `fixtures/seattle-g42/`: `custom_bat_pot`, `cus_pitch_pot`, the hitter capture and the newer `batting_superstats_1`, `pitching_superstats_1` and `pitching_superstats_2`.
-- [ ] Keep the older superstats copies in `fixtures/legacy/`, to test header-version handling.
+- [x] Add the six canonical uploads to `fixtures/seattle-g42/`: `custom_bat_pot`, `cus_pitch_pot`, the hitter capture and the newer `batting_superstats_1`, `pitching_superstats_1` and `pitching_superstats_2`.
+- [x] Add the four league sortable superstats exports to `fixtures/seattle-g42/` (Knowledge Base › Data sources › League sortable stats).
+- [x] Keep the older superstats copies in `fixtures/legacy/`, to test header-version handling.
 - [ ] Stamp every import with `importer_version`, so re-reading raw files is deterministic.
 
 ## Frontend foundation
@@ -265,7 +268,7 @@ The canvas's Dugout alignment, batting order and luck reads are placeholders, so
 
 ## Testing and quality
 
-The Seattle game-42 exports are the golden fixtures: every parser rule, identity check and model output is tested against them. Each row of the Basis's "Columns that need special handling" table becomes at least one test.
+The Seattle game-42 exports are the golden fixtures: every parser rule, identity check and model output is tested against them. Each row of the "Columns that need special handling" tables in the Knowledge Base and the Basis becomes at least one test.
 
 | Layer | Tool | What it proves | Runs |
 | --- | --- | --- | --- |
@@ -279,7 +282,7 @@ The Seattle game-42 exports are the golden fixtures: every parser rule, identity
 End-to-end tests can't click through GitHub sign-in. Staging gets one email-and-password test user, with its credentials stored as GitHub secrets; production stays GitHub-only.
 
 - [ ] Write the test for each special-handling row before the parser code for it.
-- [ ] Run the identity checks as property tests over every fixture.
+- [ ] Run the identity checks as property tests over every fixture, skipping pitcher rows with G = 0, which carry no data.
 - [ ] Create the staging test user and store its credentials as secrets.
 - [ ] Set the coverage floor on `packages/core` at 80% and raise it as modules settle. The 80% floor is set in `vitest.config.ts`.
 
@@ -337,7 +340,7 @@ The biggest risk is a quiet failure on a free tier, so each mitigation either ke
 | A free tier changes its terms | A service stops being free | Portable stack: static build, plain Postgres SQL, raw files as the source of truth. GitHub Pages, another Postgres host or browser storage can each take over one piece. |
 | Gemini's free-tier limits or terms change | No advisor | The advisor is optional; every screen works without it, and the provider interface allows a swap |
 | Vercel and the migration job race on merge | A brief mismatch between app and schema | Backward-compatible migrations only |
-| The canonical uploads stay missing | The importer is tested on the wrong file versions | Add the six files to the fixtures before Phase 2 |
+| The canonical uploads stay missing | The importer is tested on the wrong file versions | Resolved: all six are in `fixtures/seattle-g42/` |
 | Docker isn't available for local development | No local database | Develop against staging; the Docker stack runs in CI |
 
 - [ ] Public or private repo? This decides branch protection, environment secrets and Actions minutes.
@@ -345,7 +348,7 @@ The biggest risk is a quiet failure on a free tier, so each mitigation either ke
 - [ ] Do you need the app on more than one device? If not, browser storage could replace Supabase.
 - [ ] Gemini for the advisor, or another model?
 
-League questions (DH, scout view, per-position ratings) stay tracked in the Basis.
+League questions (DH, scout view) stay tracked in the Knowledge Base. Per-position ratings aren't available.
 
 ## Sources
 

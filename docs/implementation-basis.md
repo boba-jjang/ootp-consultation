@@ -26,30 +26,30 @@ Imports feed the metrics and the talent estimator; the estimator's player model 
 
 ## Data sources
 
-The canonical data set is 11 screen-view exports: six views for 12 hitters and five for 13 pitchers, all from one snapshot roughly 42 games into the season. The latest pitching-ratings re-export listed the hitters instead of the staff, so the staff's ratings still come from the first pitching export, without work ethic, IQ or development risk.
+The canonical data set is 11 screen-view exports: six views for 12 hitters and five for 13 pitchers, all from one snapshot roughly 42 games into the season. The staff's ratings come from the pitching-ratings re-export, which includes work ethic, IQ and development risk. The same view run on the lineup listed the hitters; that capture is a supplemental source, used only for DEF Pot.
 
 | View | Side | Rows × cols | Contents | Version |
 | --- | --- | --- | --- | --- |
-| default | Hitters | 12 × 17 | Age, nationality, height, weight, handedness, salary, contract years, service time, scouting accuracy; OVR, POT, Inf and Mor export blank | Project |
+| default | Hitters | 12 × 17 | Age, nationality, height, weight, handedness, salary, contract years, service time, scouting accuracy; POT, Inf and Mor export blank and OVR exports "-" | Project |
 | batting\_stats\_1 | Hitters | 12 × 30 | Batting line, slash line, ISO, OPS, OPS+, BABIP, WAR, SB, CS | Project |
 | batting\_stats\_2 | Hitters | 12 × 25 | BB%, K%, sacrifices, extra-base hits, total bases, runs created, wOBA, WPA, pitches per PA, UBR | Project |
 | batting\_superstats\_1 | Hitters | 12 × 33 | Batted-ball mix and direction, exit velocity, launch angle, barrels, hard-hit, expected stats overall and on contact | Upload, replaces project copy |
 | batting\_superstats\_2 | Hitters | 12 × 23 | Plate-discipline rates, pitch mix faced, run values by pitch group | Project |
 | custom\_bat\_pot | Hitters | 12 × 33 | Batting potentials, bunting, batted-ball tendencies, every fielding component, baserunning, DEF, work ethic, IQ, development risk | Upload, third version |
 | pitching\_stats\_1 | Pitchers | 13 × 31 | Pitching line, rate stats, ERA+, FIP, WAR | Project |
-| pitching\_stats\_2 | Pitchers | 13 × 32 | Saves and holds detail, batters faced, relief usage, inherited runners, leverage, quality starts, run support, GO%, SIERA, SB and CS against, WPA | Project |
+| pitching\_stats\_2 | Pitchers | 13 × 32 | Save percentage, blown saves, shutdowns and meltdowns, batters faced, relief usage, inherited runners, leverage, quality starts, run support, GO%, SIERA, SB and CS against, WPA | Project |
 | pitching\_superstats\_1 | Pitchers | 13 × 25 | Batted-ball mix allowed, contact quality allowed, expected stats, xERA | Upload, replaces project copy |
 | pitching\_superstats\_2 | Pitchers | 13 × 23 | Pitch, swing, whiff and chase counts, discipline rates, run values | Upload, replaces project copy |
-| cus\_pitch\_pot | Pitchers | 13 × 17 | Age, pitching potentials, velocity now and potential, stamina, arm slot, pitcher type, GB/FB tendency, hold, P defense potential | Upload, first version; still the staff's only ratings |
-| cus\_pitch\_pot, hitter capture | Hitters | 12 × 20 | The pitching view run on the lineup: hitters' pitching ratings (all 1), plus work ethic, IQ, risk and DEF Pot. Only DEF Pot adds anything | Upload, supplemental |
+| cus\_pitch\_pot | Pitchers | 13 × 20 | Age, work ethic, IQ, pitching potentials, velocity now and potential, stamina, arm slot, pitcher type, GB/FB tendency, hold, P defense potential, development risk | Upload, staff re-export with work ethic, IQ and risk |
+| cus\_pitch\_pot, hitter capture | Hitters | 12 × 20 | The pitching view run on the lineup: hitters' pitching ratings (1, except PBABIP P at 2 or 3), plus work ethic, IQ, risk and DEF Pot. Only DEF Pot adds anything | Upload, supplemental |
 
 ### Join model
 
-- Name is the only column in all 11 views, so it is the join key. Jersey number appears in five views (default and both stats views per side) and serves as a cross-check.
-- Hitters and pitchers are disjoint sets with no two-way players, so each side joins on its own.
+- Name and POS are the only columns in all 11 views; Name is the join key. Jersey number appears in five views (default and both stats views per side) and serves as a cross-check.
+- Seattle's hitters and pitchers are disjoint sets with no two-way players, so each side joins on its own. League files can list a name on both sides (three in the sample); each side keeps its own record.
 - Every view of a side has the same names and positions. Duplicated batting columns (G, PA, BB, K, GIDP, ISO) agree, and the re-exported superstats matched the project copies in every shared cell.
 - Hitter age comes from default; pitcher age comes from cus\_pitch\_pot. Pitchers have no bio or contract view.
-- For league-wide imports later, key on team plus name, because names can repeat across teams.
+- For league-wide imports, key on team plus name, because names can repeat across teams. The league pitching files have no team column, so they key on name and flag duplicates.
 
 ## Import rules
 
@@ -92,12 +92,12 @@ Screen-view CSVs mirror the UI, so the importer validates headers per view, norm
 | OSW, CH, CH% | superstats\_2 (counts pitchers only) | OSW = chase swings; CH = chase whiffs = OSW × (1 − OC%); CH% = CH / pitches outside the zone | CH% is not O-Swing% |
 | Z%, ZS%, OS%, SW%, OC%, ZC%, CL% | Both superstats\_2 views | Zone rate, zone swing, chase swing, swing, chase contact, zone contact; CL% presumably called-strike rate | Z% is not Z-Swing% |
 | FF%, BR%, OFF% | batting\_superstats\_2 | Pitch mix faced: fastballs, breaking, offspeed; sums to 100 | None |
-| BIP | Both superstats\_1 views | Balls in play including home runs; for pitchers it equals BF − K − BB − HBP | Actual BACON = H / BIP, comparable to xBACON |
+| BIP | Both superstats\_1 views | Balls in play including home runs; for pitchers it matches BF − K − BB − HBP within 1 (Lee: 140 by the formula, 139 exported) | Use the exported BIP: actual BACON = H / BIP, comparable to xBACON; the formula is a check, not an identity |
 | xBACON, xSLGCON, xwOBACON | Both superstats\_1 views | Expected stats on contact only | None |
 | EV, mEV, LA | superstats\_1 (LA hitters only) | Average and max exit velocity in mph; average launch angle in degrees | None |
 | BAR, BAR%, HHi, HHi% | superstats\_1 (counts hitters only) | Barrels and hard-hit balls (95+ mph per the research) | None |
 | Avg% and Med% | batting and pitching superstats\_1 | The same middle contact bucket under two labels | Map to one canonical name |
-| CON P | Both ratings views | Contact for hitters, Control for pitchers | Resolve by side |
+| CON P | Both ratings views | Contact in custom\_bat\_pot, Control in cus\_pitch\_pot (the hitter capture included) | Resolve by view |
 | DEF | custom\_bat\_pot | Current position rating at the listed POS | Link to POS |
 | DEF Pot | cus\_pitch\_pot | Position-rating potential at the listed position; P for pitchers | Store as the ceiling for DEF |
 | C ABI, C FRM, C ARM | custom\_bat\_pot | Catcher ability, framing, arm; every non-catcher shows 1 | A 1 on a non-catcher means "can't catch" |
@@ -122,28 +122,28 @@ Screen-view CSVs mirror the UI, so the importer validates headers per view, norm
 | SctAcc | V.High for every player | Ordinal scouting accuracy |
 | NAT | JPN, KOR, CHN, TPE, MEX | Country codes |
 | WE, INT | Low, Normal, High | Ordinal 0–2; more levels may exist |
-| Risk | Very Low and Low here; OOTP's scale runs Very Low, Low, Medium, High, Very High, Extreme | Ordinal 0–5 |
+| Risk | Very Low, Low and Medium here; OOTP's scale runs Very Low, Low, Medium, High, Very High, Extreme | Ordinal 0–5 |
 
 ### Validation on import
 
 - Each file's headers match the manifest for its view; label variants map through a synonym table.
-- Each file lists its own side's roster. A pitching view that lists hitters is rejected, as happened with the development-risk re-export.
+- Each file lists its own side's roster. The one exception is the pitching ratings view run on hitters (cus\_pitch\_pot listing hitters): it routes as a supplemental source that keeps only DEF Pot and is logged as supplemental, not rejected. Any other view that lists the wrong side is rejected.
 - Every view of a side has the same names and positions; a mismatch fails loudly.
 - Duplicated columns agree across views: G, PA, BB, K, GIDP and ISO for hitters; G, GS and IP for pitchers; handedness everywhere.
-- Identities hold: RV = RV-FB + RV-BR + RV-OFF (±0.15), WH% = WH / SW, CTC% = 100 − WH%, CH = OSW × (1 − OC%), FF% + BR% + OFF% = 100.
+- Identities hold within rounding: RV = RV-FB + RV-BR + RV-OFF (±0.15), WH% = WH / SW, CTC% = 100 − WH%, CH = OSW × (1 − OC%), FF% + BR% + OFF% = 100. A pitcher row with G = 0 shows 0 in every superstats\_2 stat (CTC% 0, WH / SW = 0/0), so the checks skip it.
 - Ratings fall inside the league's declared scale (1–10 here).
 - Row order is ignored, because it follows whatever column the UI was sorted by.
 
 ## Metrics
 
-Use OOTP's exported metrics where they exist and compute only what's missing. wRC+, wRAA and xFIP need league context that a single-team export doesn't carry.
+Use OOTP's exported metrics where they exist and compute only what's missing. wRC+ and wRAA need league totals, which aren't available. xFIP's league HR/FB comes from the league pitching file.
 
 | Metric | Status | Notes |
 | --- | --- | --- |
 | wOBA | Exported (batting\_stats\_2) | Within .007 of the research's FanGraphs-constant calculation; OOTP uses its own league weights, so trust the export |
 | OPS+ | Exported (batting\_stats\_1) | League and park adjusted; the research mislabeled it as wRC+ |
 | wRC+ | Missing | Needs league wOBA, league runs per PA and park factors |
-| wRAA | Computable once league wOBA is known | Formula below |
+| wRAA | Missing | Needs league wOBA; formula below |
 | xBA, xSLG, xwOBA | Exported (superstats\_1) | Expected stats including strikeouts and walks |
 | xBACON, xSLGCON, xwOBACON | Exported (superstats\_1) | Contact-only versions; isolate batted-ball quality from plate discipline |
 | RC, RC/27, WAR, WPA, UBR | Exported | Use as reported |
@@ -156,7 +156,7 @@ Use OOTP's exported metrics where they exist and compute only what's missing. wR
 
 ### Formulas
 
-Constants below are the research's FanGraphs values. An OOTP league has its own run environment, so derive league constants from league totals once that export exists.
+Constants below are the research's FanGraphs values. An OOTP league has its own run environment. The exported FIP implies the league's FIP constant (3.25 for every Seattle pitcher), and the league pitching file gives league HR/FB (11.8%: 1,341 home runs on 11,383 fly balls, from BIP × FB% × HR/FB). The wOBA and run constants need league totals, which aren't available.
 
 ```latex
 \text{wOBA} = \frac{0.698\,uBB + 0.729\,HBP + 0.890\,1B + 1.261\,2B + 1.596\,3B + 2.049\,HR}{AB + BB - IBB + SF + HBP}
@@ -235,7 +235,7 @@ The composites check out in the data. Contact leans on avoid K's (Obata: BABIP 8
 
 ### Talent estimator
 
-1. Prior: treat potential as the ceiling. Development risk sets where the estimate starts below it and how wide its band is (see Development risk below). Where risk isn't exported, as for the staff today, age is the fallback: players 28 and older sit at their potential.
+1. Prior: treat potential as the ceiling. Development risk sets where the estimate starts below it and how wide its band is (see Development risk below). Where risk isn't exported, age is the fallback: players 28 and older sit at their potential.
 2. Evidence: map each component to the stats that track it (table below), weighted by sample size against its stabilization point.
 3. Estimate: blend prior and evidence per component, then rebuild Contact and Movement from the components.
 4. Output: an estimate with a confidence band, flagged when evidence and prior differ by more than one 1–10 step.
@@ -265,7 +265,7 @@ Development risk is the scout's read on how reliably a player will reach his pot
 | Low | Half a step below potential | ±1 step | Moderately |
 | Medium | One step below | ±1½ steps | Substantially |
 | High, Very High, Extreme | Two or more steps below | ±2 steps or more | Stats lead |
-| Not exported (the staff today) | At potential from age 28, below it before | ±1 step | Moderately |
+| Not exported | At potential from age 28, below it before | ±1 step | Moderately |
 
 These are starting settings to calibrate, in 1–10 steps. A Very Low risk narrows the band around the talent estimate; it doesn't make the stats less noisy. In practice, a Very Low-risk player's stat swings read as luck and regress harder toward what his ratings imply.
 
@@ -302,7 +302,7 @@ Weights below come from the research, which took them from community reverse-eng
 
 ### Eligibility matrix
 
-The optimizer needs a player × position matrix. The listed position uses DEF, with DEF Pot as its ceiling; every other position uses a component-based ceiling, discounted for inexperience until per-position ratings are exported. Anyone can DH.
+The optimizer needs a player × position matrix. The listed position uses DEF, with DEF Pot as its ceiling; every other position uses a component-based ceiling, discounted for inexperience, since per-position ratings aren't available. Anyone can DH.
 
 | Position | Listed | Other options by components | Note |
 | --- | --- | --- | --- |
@@ -342,7 +342,7 @@ The gates are research claims without supporting data, so each one is a setting 
 | Hold runners | Catcher arm, pitcher hold | 8–10 behind a weak arm (about 35); costs some stuff and control | Arm 3 or lower; 4 borderline | Lean higher with Tsumoto (arm 4), especially for low-hold pitchers such as Hsia (2) |
 | Infield shift | Middle-infield range; opposing hitters' pull tendency | 10 only with 65+ middle-infield range | Range 8+ | Mangjeol (8) qualifies; the second basemen are 7 (borderline), so moderate |
 | Guard lines | SS and 2B range | High only with 70+ at both | Range 9+ at both | Nobody qualifies; keep low |
-| Pinch hitting and platoons | Handedness splits | Player-level rules by pitcher hand | Not stated | No split data exported yet |
+| Pinch hitting and platoons | Handedness splits | Player-level rules by pitcher hand | Not stated | No split data available |
 
 ## Lineup optimization
 
@@ -408,7 +408,7 @@ Development advice combines potentials, age and OOTP's two levers: the developme
 - The offseason Development Lab has 1–30 slots per league setting, with programs such as Improve Infield Defense, Improve Control, Increase Velocity, Learn New Pitch and Generate Batspeed.
 - Programs run Easy to Very Hard and end Poor, No Improvement, Successful or Outstanding; progress shows as Red, Orange, Green or Blue.
 - The league's Program Improvement Magnitude (Smaller, Default, Larger) sets how far a success moves a rating.
-- Odds depend on age, work ethic and coaching quality. Hitters' work ethic and IQ are now exported; the staff's and coaching quality are not.
+- Odds depend on age and work ethic. The league runs with the coaching staff disabled, so coaching quality plays no part. Work ethic and IQ are exported for hitters and pitchers.
 
 ### Research priorities
 
@@ -425,13 +425,13 @@ Development advice combines potentials, age and OOTP's two levers: the developme
 
 ### Seattle starting points
 
-Illustrative only: current ratings are hidden, and the staff's work ethic, IQ and risk aren't exported yet.
+Illustrative only: current ratings are hidden.
 
 | Player | Age | Work ethic / IQ / risk | Why | Lever |
 | --- | --- | --- | --- | --- |
-| Inouye | 24 | Not exported yet | Only pitcher whose velocity potential (96–98) exceeds his current velocity (95–97) | Increase Velocity |
-| Kaneshiro | 26 | Not exported yet | Stuff 8 held back by control 4 | Improve Control |
-| Gong | 25 | Not exported yet | Stuff 7 held back by control 4 | Improve Control |
+| Inouye | 24 | Normal / Low / Medium | Only pitcher whose velocity potential (96–98) exceeds his current velocity (95–97) | Increase Velocity |
+| Kaneshiro | 26 | Normal / Normal / Low | Stuff 8 held back by control 4 | Improve Control |
+| Gong | 25 | High / Normal / Low | Stuff 7 held back by control 4 | Improve Control |
 | Li | 27 | High / Normal / Very Low | IF range 7, one step short of the 8 that supports a heavy shift; the best work ethic of the three second basemen | Improve Infield Defense, first in line |
 | Choi, Geng | 30, 28 | Normal / Normal / Very Low; Normal / High / Very Low | Same IF range 7 | Improve Infield Defense if slots allow |
 | Yamanaka | 29 | High / Normal / Low | DEF 3 in left with a ceiling of 5 | Defense focus and left-field reps if he stays there; otherwise DH |
@@ -443,7 +443,7 @@ Checking the three research docs against the CSVs found five misread columns and
 
 | Research claim | What the data shows | Consequence for the app |
 | --- | --- | --- |
-| Hitter "wRC+" values (179, 146 … 23), both docs | They are OOTP's OPS+; no export contains wRC+ | Compute wRC+ only with league context |
+| Hitter "wRC+" values (179, 146 … 23), both docs | They are OOTP's OPS+; no export contains wRC+ | Compute wRC+ only with league totals, which aren't available |
 | Hitter RV-FB and RV-BR values (OOTP 27 doc) | Shifted one column: Kawasaki is +2.7 fastball, +1.5 breaking, +4.8 offspeed | Map run values by header, never by position |
 | Pitcher "Barrel%" (OOTP 27 doc) | Those numbers are HR/FB. Real barrel rates allowed: Katayama 5.5% (not 15.8%), Hsia 12.1% (not 0.0%) | Use BAR% from pitching\_superstats\_1 |
 | Mangjeol's "51.6% Z-Swing%" | 51.6 is his zone rate; his Z-Swing is 55.7% | Keep Z% and ZS% distinct |
@@ -561,7 +561,7 @@ Work ethic, IQ and development risk come from the third batting-ratings export; 
 
 ### Pitchers: ratings
 
-Stuff, Movement, HR avoidance, BABIP allowed and Control are potentials; the rest are current. The staff's work ethic, IQ and development risk aren't exported yet.
+Stuff, Movement, HR avoidance, BABIP allowed and Control are potentials; the rest are current.
 
 | Player | Stuff | Movement | HR avoid | BABIP allowed | Control | Velocity now (mph) | Velocity potential (mph) | Stamina | GB/FB | Type | Slot | Hold | P defense |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -601,13 +601,13 @@ Working reads to test the app against, combining ratings, contact quality and sa
 | Niu | Best strikeout starter | Stuff 9, 10.0 K/9; SIERA 3.02 and FIP 3.93 lead the rotation; the rotation's most barrels allowed (14.9%) |
 | Ito | ERA likely to rise | xERA 4.56 and SIERA 4.19 vs a 3.59 ERA; HR avoidance 3 with a fly-ball lean; stuff 9 says strikeouts could climb from 7.0 K/9; stamina 10 |
 | Lee | Better than his ERA | SIERA 3.30 and xERA 3.51 vs a 5.20 ERA; .366 BABIP; even 6s with control 7 |
-| Katayama | Unlucky, but average | Softest contact among starters (5.5% barrels; BACON .394 vs .309); every pitching rating is 5 |
+| Katayama | Unlucky, but average | Fewest barrels and hard-hit balls among the listed starters (5.5% barrels, 22.0% hard-hit; BACON .394 vs .309); every pitching rating is 5 |
 | Inouye | Strikeouts real, some damage real | Stuff 10, 11.5 K/9; contact luck is bad (BACON .437 vs .334), but HR avoidance 4 with an extreme fly-ball tendency explains part of his 1.8 HR/9 |
 | Hsia | Control real, strikeouts will fall | Control 9 and zero walks; stuff 6 can't sustain 14.4 K/9; stamina 1 and hold 2 |
 | Loh | Good, not a 1.00-ERA pitcher | FIP 2.81 and xERA 2.70; extreme groundballer; hold 8 |
 | Kaneshiro | Walks are real | Control 4 and 4.5 BB/9; stuff 8 and a 57.5% ground-ball rate if control improves |
 
-Ka, Gong, Chun and Murakami have under 22 innings each, too few for a read.
+Ka, Gong, Chun and Murakami have no read yet.
 
 ## Gaps and build order
 
@@ -618,21 +618,21 @@ The current data supports a v1. The gaps below limit confidence rather than bloc
 | Gap | What it limits | Fix |
 | --- | --- | --- |
 | Current batting and pitching ratings are hidden | Every projection | Talent estimator anchored on development risk, calibrated on refreshed exports |
-| No ratings at positions other than the listed one | CF, DH and position moves | Per-position ratings if the view allows; otherwise component ceilings |
-| No league context (league totals, park factors) | wRC+, wRAA, xFIP, league constants, stabilization points | A league-totals export |
-| No handedness splits | Platoons and pinch-hitting | Split stats, if a view offers them |
-| No opponent data | Shift decisions (opposing pull tendencies) and steal decisions (opposing catcher arms) | Opponent roster exports, later |
-| No pitcher bio or contract view | Contract and payroll advice | A pitcher version of the default view |
-| No staff work ethic, IQ or development risk; no injury proneness or coaching data | Development odds and the staff's talent estimates | Re-export the pitching ratings view with the staff listed; injury proneness if the view allows |
+| No ratings at positions other than the listed one | CF, DH and position moves | Component ceilings; per-position ratings aren't available |
+| No league totals or park factors | wRC+, wRAA, the wOBA and run constants, stabilization points | Not available |
+| No handedness splits | Platoons and pinch-hitting | Not available |
+| No opponent data | Shift decisions (opposing pull tendencies) and steal decisions (opposing catcher arms) | Not available |
+| No pitcher bio or contract view | Contract and payroll advice | Not available |
+| No injury proneness | Development odds | Not available |
 | About 42 games of data | Confidence on every read | Stabilization weighting and regular refreshes |
-| xBACON runs .02–.03 above actual results on both sides | Contact-luck reads | Measure against the league offset once league data exists |
+| xBACON runs .02–.03 above actual results on both sides | Contact-luck reads | Judge contact luck against the team's own offset; the league files carry no hits, so there is no league offset |
 
 ### Open questions
 
 - [ ] Does the league use the DH?
-- [ ] Will exports be refreshed during the season, so the estimator can be calibrated and trends tracked?
-- [ ] Where should the consultation appear: a chat-style advisor, a written report, or a dashboard?
-- [ ] Does the view editor offer per-position ratings and handedness splits?
+- [ ] Will exports be refreshed during the season, so the estimator can be calibrated and trends tracked? Each upload becomes a dated snapshot (design handoff); the cadence is still open.
+- [x] Where should the consultation appear: a chat-style advisor, a written report, or a dashboard? Answered: dashboard screens with an advisor drawer, plus the manager's card (design handoff).
+- [x] Does the view editor offer per-position ratings and handedness splits? Answered: treat neither as available, since the owner hasn't provided them.
 - [ ] Which scout's view do the exports use, the head scout or OSA? Development risk can differ between them.
 - [ ] Does the league merge stats into scouting reports? If so, the estimator weights stats less.
 
@@ -640,7 +640,7 @@ The current data supports a v1. The gaps below limit confidence rather than bloc
 
 1. Importer: header manifest checks, unit and label normalization, enums, identity checks.
 2. Canonical tables and configuration: one player table per side, the league's rating scale, every threshold stored on 20–80.
-3. Metrics: exported metrics plus luck gaps against the offset; computed metrics once league context exists.
+3. Metrics: exported metrics plus luck gaps against each metric pair's team offset; wRC+ and wRAA are left out, since league totals aren't available; xFIP takes league HR/FB from the league pitching file.
 4. Talent estimator v0: potential prior set by development risk, age as fallback, sample-weighted evidence, confidence bands.
 5. Defensive model and the eligibility matrix.
 6. Strategy rules engine: configurable gates, the situational matrix, per-player overrides.

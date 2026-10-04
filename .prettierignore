@@ -1,5 +1,6 @@
 # Generated
 pnpm-lock.yaml
+apps/web/src/database.types.ts
 dist/
 coverage/
 

@@ -1,0 +1,13 @@
+POS,Name,B,T,WE,INT,CON P,HT P,K P,GAP P,POW P,EYE P,BUN,BFH,BBT,GBT,FBT,C ABI,C FRM,C ARM,IF RNG,IF ERR,IF ARM,TDP,OF RNG,OF ERR,OF ARM,SPE,STE,SR,RUN,DEF,Risk
+SS,Bitgaram Mangjeol,R,R,High,High,3,4,1,7,1,5,2,1,Line Drive,Normal,Normal,1,1,1,8,10,7,10,4,6,7,2,6,10,6,8,Very Low
+RF,Etsuji Obata,L,L,Normal,Normal,5,8,4,6,8,8,3,5,Groundball,Normal,Spray,1,1,1,3,3,5,2,8,7,7,9,7,10,10,8,Low
+2B,Han-lee Choi,R,R,Normal,Normal,5,5,4,6,4,6,6,5,Line Drive,Normal,Spray,1,1,1,7,6,5,7,5,5,3,3,5,6,3,7,Very Low
+2B,Zhong-shan Geng,L,R,Normal,High,4,4,5,5,5,4,3,3,Normal,Pull,Normal,1,1,1,7,5,5,6,7,10,7,7,10,10,10,7,Very Low
+C,Yoshitsugu Ishida,S,R,Normal,Low,5,5,4,4,5,6,3,1,Normal,Pull,Spray,7,7,7,3,3,6,4,3,1,7,1,2,2,1,7,Low
+3B,Manichiro Kawasaki,R,R,Normal,Low,4,4,4,5,7,6,2,1,Flyball,Pull,Normal,1,1,1,5,8,9,5,3,5,5,3,3,5,5,7,Very Low
+C,Yasuhiro Tsumoto,R,R,High,Normal,4,4,4,3,6,8,6,2,Flyball,Pull,Pull,8,9,4,1,3,2,1,1,3,2,1,4,5,4,7,Very Low
+2B,Ling-lai Li,L,R,High,Normal,4,3,5,3,3,9,6,3,Normal,Spray,Normal,1,1,1,7,6,6,6,7,5,7,3,3,7,9,6,Very Low
+LF,Jin-soo Shinn,R,R,Normal,High,5,5,5,4,8,4,2,3,Flyball,Normal,Pull,1,1,1,4,4,6,4,3,6,6,1,1,6,1,6,Very Low
+RF,Daniel Wang,R,L,Normal,Normal,6,7,5,7,4,5,5,1,Line Drive,Pull,Normal,1,1,1,2,2,4,1,6,7,6,7,8,9,5,6,Low
+LF,Hideji Yamanaka,R,L,High,Normal,7,6,6,7,6,9,4,1,Normal,Pull,Spray,1,1,1,1,2,4,1,4,5,8,2,2,9,1,3,Low
+1B,Cheng-qian Eng,L,L,High,High,5,4,5,4,8,6,1,1,Flyball,Normal,Normal,1,1,1,1,3,3,1,1,1,2,3,2,2,5,2,Very Low

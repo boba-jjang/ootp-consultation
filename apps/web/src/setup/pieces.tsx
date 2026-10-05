@@ -7,7 +7,7 @@ import {
   type CoverageLevel,
   type ExportSummary,
   type Layer,
-  type NamedExport,
+  type RoutedExport,
   type ViewId,
 } from '@ootp/core';
 import { useRef, useState, type DragEvent, type ReactNode } from 'react';
@@ -37,10 +37,17 @@ export function DropZone({
   size,
   onFiles,
   busy,
+  id,
+  title,
+  text,
 }: {
   size: 'large' | 'small';
   onFiles: (files: Promise<import('@ootp/core').Upload[]>) => void;
   busy: boolean;
+  id?: string;
+  /** The setup's words unless a screen has its own. */
+  title?: string;
+  text?: string;
 }) {
   const [over, setOver] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -52,6 +59,7 @@ export function DropZone({
   };
   return (
     <div
+      id={id}
       className={classes(styles.dropZone, size === 'small' && styles.dropZoneSmall)}
       data-over={over}
       onDragOver={(event) => {
@@ -65,12 +73,12 @@ export function DropZone({
     >
       <UploadIcon className={styles.dropIcon} />
       <p className={styles.dropTitle}>
-        {size === 'large' ? 'Drop your OOTP exports here' : 'Drop more files here'}
+        {title ?? (size === 'large' ? 'Drop your OOTP exports here' : 'Drop more files here')}
       </p>
-      {size === 'large' ? (
+      {size === 'large' || text ? (
         <p className={styles.dropText}>
-          Any mix of views, one file or a whole folder. Each file is recognized by its columns, so
-          names don't matter.
+          {text ??
+            "Any mix of views, one file or a whole folder. Each file is recognized by its columns, so names don't matter."}
         </p>
       ) : null}
       <div className={styles.dropActions}>
@@ -200,10 +208,10 @@ export function FoundInFiles({ summary }: { summary: ExportSummary }) {
 }
 
 /** The views recognized, per side, with the league files, the capture and the rejects. */
-export function ViewsRead({ named, coverage }: { named: NamedExport[]; coverage: Coverage }) {
-  const used = named.filter((upload) => upload.result.routing !== 'rejected').length;
-  const capture = named.some((upload) => upload.result.routing === 'supplemental');
-  const rejected = named.filter((upload) => upload.result.routing === 'rejected');
+export function ViewsRead({ named, coverage }: { named: RoutedExport[]; coverage: Coverage }) {
+  const used = named.filter((upload) => upload.routing !== 'rejected').length;
+  const capture = named.some((upload) => upload.routing === 'supplemental');
+  const rejected = named.filter((upload) => upload.routing === 'rejected');
   const side = (which: 'hitters' | 'pitchers') =>
     coverage.views.onFile.filter((view) => VIEW_MANIFESTS[view].side === which);
   return (
@@ -258,7 +266,7 @@ export function ViewsRead({ named, coverage }: { named: NamedExport[]; coverage:
               <li key={upload.name} className={styles.view}>
                 <span className={styles.viewName}>{upload.name}</span>
                 <span className={styles.muted}>
-                  {upload.result.events.find((event) => event.level === 'error')?.message ??
+                  {upload.events.find((event) => event.level === 'error')?.message ??
                     'The file could not be used.'}
                 </span>
               </li>

@@ -9,6 +9,7 @@ import { listOf } from '../src/ui/text.ts';
 const withViews = (...views: ViewId[]) =>
   measureCoverage(
     views.map((view): RoutedExport => ({
+      name: `${view}.csv`,
       view,
       version: 1,
       scope: 'team',

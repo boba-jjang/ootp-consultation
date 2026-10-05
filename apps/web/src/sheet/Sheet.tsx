@@ -2,6 +2,13 @@ import { useState, type ReactNode } from 'react';
 
 import { measureCoverage } from '@ootp/core';
 
+import {
+  ColumnNotes,
+  CoverageMatrix,
+  ImportLog,
+  SnapshotTimeline,
+  UploadNext,
+} from '../clubhouse/pieces.tsx';
 import { BestFirstUpload, DropZone, FoundInFiles } from '../setup/pieces.tsx';
 import { Gate } from '../shell/Gate.tsx';
 import { Tabs } from '../shell/Tabs.tsx';
@@ -26,6 +33,7 @@ import {
   Timeline,
   Trend,
 } from '../ui/primitives.tsx';
+import { SHEET_COVERAGE, SHEET_LOG } from './mock.ts';
 import styles from './Sheet.module.css';
 
 const SWATCHES: [string, string][] = [
@@ -163,6 +171,25 @@ export function Sheet() {
         <FoundInFiles summary={SHEET_SUMMARY} />
       </Section>
 
+      <Section title="Clubhouse" note="The Clubhouse pieces on a pretend nine-view snapshot">
+        <div className={styles.columns}>
+          <SnapshotTimeline
+            games={162}
+            snapshots={[{ id: 'g42', teamId: 'sheet', label: 'Game 42', gameNumber: 42 }]}
+            counts={new Map([['g42', 9]])}
+          />
+          <UploadNext coverage={SHEET_COVERAGE} onUpload={() => undefined} />
+        </div>
+        <div className={styles.columns}>
+          <CoverageMatrix side={SHEET_COVERAGE.hitters} />
+          <CoverageMatrix side={SHEET_COVERAGE.pitchers} />
+        </div>
+        <div className={styles.columns}>
+          <ImportLog files={SHEET_LOG} label="Game 42" />
+          <ColumnNotes views={SHEET_COVERAGE.views.onFile} files={SHEET_LOG} />
+        </div>
+      </Section>
+
       <Section title="Buttons" note="One gold action per screen; every control is at least 44 px">
         <div className={styles.row}>
           <Button variant="primary">Create team</Button>
@@ -225,8 +252,10 @@ export function Sheet() {
         note="A dashed gold outline means empty, upload to fill"
       >
         <div className={styles.row}>
-          <MatrixCell label="Bio" on />
-          <MatrixCell label="Ratings" on={false} />
+          <MatrixCell label="Bio" state="on" />
+          <MatrixCell label="Stats" state="partial" />
+          <MatrixCell label="Ratings" state="empty" />
+          <MatrixCell label="Bio" state="unavailable" />
         </div>
       </Section>
 

@@ -279,7 +279,7 @@ Build order, one pull request each:
 - [x] Data coverage in `packages/core`, with tests on the fixtures: the Seattle snapshot is High with 12 hitters at 5 of 5 data sets and 13 pitchers at 4 of 5 (no pitcher bio view).
 - [x] App shell: top bar (team menu, snapshot selector, coverage badge, DH, advisor status), module tabs with locked states, and the lock framework.
 - [x] Team menu and Create a Team: add exports (drop or choose files, folders included), files read, team and league prefilled from the files, review, create.
-- [ ] The Clubhouse: upload, snapshot timeline, what to upload next, coverage matrices, import log, how columns were read, Run analysis.
+- [x] The Clubhouse: upload, snapshot timeline, what to upload next, coverage matrices, import log, how columns were read, Run analysis.
 - [ ] Team settings, Export team and restore from a zip.
 - [ ] End-to-end and accessibility tests in `e2e.yml`: Create a Team from the fixtures yields a Game 42 snapshot with High coverage; locked states render; no serious axe violations; 44 px targets. Needs the staging test user below.
 - [ ] Ask the design chat for Talent radar (with league percentiles), the situational strategy view, trends and where league files are uploaded.

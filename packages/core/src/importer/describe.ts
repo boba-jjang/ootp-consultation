@@ -1,12 +1,6 @@
 import { measureCoverage } from './coverage.ts';
 import type { ExportRow, RoutedExport } from './route.ts';
 
-/** One upload with its routing: the name is what the importer records for provenance. */
-export interface NamedExport {
-  name: string;
-  result: RoutedExport;
-}
-
 /**
  * What a set of exports says about the team, for the Create a Team flow to prefill and
  * show (docs/design-handoff.md › Team setup, and the "files read" board).
@@ -71,14 +65,13 @@ function mostCommon(values: readonly string[]): string | null {
   return best;
 }
 
-export function describeExports(uploads: readonly NamedExport[]): ExportSummary {
-  const files = uploads.map((upload) => upload.result);
+export function describeExports(files: readonly RoutedExport[]): ExportSummary {
   const team = files.filter((file) => file.scope === 'team' && file.routing === 'primary');
   const rows = team.flatMap((file) => file.rows);
   const coverage = measureCoverage(files);
   const filePrefix = mostCommon(
-    uploads
-      .map((upload) => upload.name.split('/').at(-1) ?? upload.name)
+    files
+      .map((file) => file.name.split('/').at(-1) ?? file.name)
       .filter((name) => name.includes(TEAM_FILE))
       .map((name) => name.slice(0, name.indexOf(TEAM_FILE))),
   );
@@ -97,13 +90,13 @@ export function describeExports(uploads: readonly NamedExport[]): ExportSummary 
     gameNumber: games.length > 0 ? Math.max(...games) : null,
     scoutingAccuracy: defaultView ? onlyValue(defaultView.rows, 'SctAcc') : null,
     viewsRecognized: coverage.views.onFile.length,
-    rejected: uploads.flatMap((upload) =>
-      upload.result.routing === 'rejected'
+    rejected: files.flatMap((file) =>
+      file.routing === 'rejected'
         ? [
             {
-              name: upload.name,
+              name: file.name,
               reason:
-                upload.result.events.find((event) => event.level === 'error')?.message ??
+                file.events.find((event) => event.level === 'error')?.message ??
                 'The file could not be used.',
             },
           ]

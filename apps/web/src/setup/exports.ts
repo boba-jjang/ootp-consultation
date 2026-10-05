@@ -4,7 +4,7 @@ import {
   routeExport,
   type Coverage,
   type ExportSummary,
-  type NamedExport,
+  type RoutedExport,
   type TeamSettings,
   type Upload,
 } from '@ootp/core';
@@ -12,7 +12,7 @@ import {
 /** The exports added so far, routed, with what they say. */
 export interface ReadExports {
   uploads: Upload[];
-  named: NamedExport[];
+  named: RoutedExport[];
   summary: ExportSummary;
   coverage: Coverage;
 }
@@ -28,15 +28,12 @@ export function readExports(uploads: readonly Upload[]): ReadExports {
     seen.add(key);
     return true;
   });
-  const named = unique.map((upload) => ({
-    name: upload.name,
-    result: routeExport(upload.name, upload.text),
-  }));
+  const named = unique.map((upload) => routeExport(upload.name, upload.text));
   return {
     uploads: unique,
     named,
     summary: describeExports(named),
-    coverage: measureCoverage(named.map((upload) => upload.result)),
+    coverage: measureCoverage(named),
   };
 }
 

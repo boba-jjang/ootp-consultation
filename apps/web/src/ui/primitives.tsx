@@ -142,12 +142,22 @@ export function CoverageLayers({
 }
 
 /** One cell of the coverage matrix: on file, or empty until its view is uploaded. */
-export function MatrixCell({ label, on }: { label: string; on: boolean }) {
+/** One cell of a coverage matrix: on file, partly (one of two views), empty, or no view carries it. */
+export type MatrixState = 'on' | 'partial' | 'empty' | 'unavailable';
+
+const MATRIX_WORDS: Record<MatrixState, string> = {
+  on: 'on file',
+  partial: 'partly on file',
+  empty: 'empty',
+  unavailable: 'no view carries it',
+};
+
+export function MatrixCell({ label, state }: { label: string; state: MatrixState }) {
   return (
     <span className={styles.matrixCell}>
-      <span className={styles.matrixSwatch} data-on={on} aria-hidden="true" />
+      <span className={styles.matrixSwatch} data-state={state} aria-hidden="true" />
       <span className="sr-only">
-        {label} {on ? 'on file' : 'missing'}
+        {label}, {MATRIX_WORDS[state]}
       </span>
     </span>
   );

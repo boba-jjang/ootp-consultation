@@ -22,6 +22,8 @@ export interface ImportEvent {
 export type ExportRow = Record<string, CellValue>;
 
 export interface RoutedExport {
+  /** The file name the export came in with, kept to show where data came from. */
+  name: string;
   view: ViewId | null;
   version: number | null;
   scope: Scope | null;
@@ -76,6 +78,7 @@ export function routeExport(
 ): RoutedExport {
   const events: ImportEvent[] = [];
   const result: RoutedExport = {
+    name: fileName,
     view: null,
     version: null,
     scope: null,

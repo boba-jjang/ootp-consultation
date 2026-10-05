@@ -42,6 +42,11 @@ export function TeamsScreen() {
             {signOutError}
           </p>
         ) : null}
+        {latest.isError ? (
+          <p className={styles.error} role="alert">
+            {latest.error.message}
+          </p>
+        ) : null}
         {teams.isPending ? (
           <p role="status" className={styles.muted}>
             Loading teams…
@@ -59,7 +64,13 @@ export function TeamsScreen() {
                     <LeagueTag>{team.league}</LeagueTag>
                   </Link>
                   <span className={styles.muted}>
-                    {snapshot ? `Latest: ${snapshot.label}` : 'No snapshot yet'}
+                    {latest.isPending
+                      ? 'Loading snapshots…'
+                      : latest.isError
+                        ? 'Snapshots unavailable'
+                        : snapshot
+                          ? `Latest: ${snapshot.label}`
+                          : 'No snapshot yet'}
                   </span>
                   <Link to={`/t/${team.id}/settings`} className={styles.teamSettings}>
                     Team settings

@@ -31,7 +31,13 @@ import {
   Steps,
 } from '../ui/primitives.tsx';
 import { listOf } from '../ui/text.ts';
-import { prefill, readExports, type ReadExports } from './exports.ts';
+import {
+  NOTHING_PREFILLED,
+  prefill,
+  readExports,
+  type Prefilled,
+  type ReadExports,
+} from './exports.ts';
 import { BestFirstUpload, CoverageSoFar, DropZone, FoundInFiles, ViewsRead } from './pieces.tsx';
 import styles from './Setup.module.css';
 
@@ -95,6 +101,7 @@ export function CreateTeam() {
   const [exports, setExports] = useState<ReadExports>(() => readExports([]));
   const [form, setForm] = useState<TeamForm>(() => toForm(DEFAULT_TEAM_SETTINGS));
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [prefilled, setPrefilled] = useState<Prefilled>(NOTHING_PREFILLED);
   const stepElement = useRef<HTMLDivElement>(null);
   const firstRender = useRef(true);
 
@@ -206,7 +213,9 @@ export function CreateTeam() {
                   setReadError(null);
                 }}
                 onContinue={() => {
-                  setForm((current) => prefill(current, exports.summary));
+                  const filled = prefill(form, exports.summary, prefilled);
+                  setForm(filled.settings);
+                  setPrefilled(filled.prefilled);
                   go(1);
                 }}
               />

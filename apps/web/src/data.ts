@@ -99,13 +99,25 @@ export function useCreateTeamWithExports() {
       if (uploads.length === 0) {
         return { team, snapshot: null, message: null };
       }
-      const result = await importUpload(needClient(store, 'Saving the exports'), team.id, uploads, {
-        scale: settings.rating_scale,
-        hash: sha256,
-      });
-      return result.ok
-        ? { team, snapshot: result.snapshot, message: null }
-        : { team, snapshot: null, message: result.message };
+      // The team exists from here on: a failure to save the exports is reported, not thrown,
+      // so a retry can't create the team twice.
+      try {
+        const result = await importUpload(
+          needClient(store, 'Saving the exports'),
+          team.id,
+          uploads,
+          { scale: settings.rating_scale, hash: sha256 },
+        );
+        return result.ok
+          ? { team, snapshot: result.snapshot, message: null }
+          : { team, snapshot: null, message: result.message };
+      } catch (error: unknown) {
+        return {
+          team,
+          snapshot: null,
+          message: error instanceof Error ? error.message : String(error),
+        };
+      }
     },
     onSettled: () => {
       void queries.invalidateQueries({ queryKey: queryKeys.teams });

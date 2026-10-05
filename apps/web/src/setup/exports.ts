@@ -40,15 +40,30 @@ export function readExports(uploads: readonly Upload[]): ReadExports {
   };
 }
 
-/** Fills the team and league from the files where the form hasn't been typed in. */
-export function prefill<T extends Pick<TeamSettings, 'name' | 'league'>>(
+/** What the files filled in last time, so a field they filled can be filled again. */
+export type Prefilled = Pick<TeamSettings, 'name' | 'league'>;
+
+export const NOTHING_PREFILLED: Prefilled = { name: '', league: '' };
+
+/**
+ * Fills the team and league from the files. A field keeps what was typed in it; one that is
+ * empty, or still holds what the files filled in before, follows the files, even to empty.
+ */
+export function prefill<T extends Prefilled>(
   settings: T,
   summary: ExportSummary,
-): T {
+  before: Prefilled = NOTHING_PREFILLED,
+): { settings: T; prefilled: Prefilled } {
+  const prefilled = { name: summary.teamName ?? '', league: summary.leagueColumn ?? '' };
+  const follow = (field: keyof Prefilled) =>
+    settings[field] === '' || settings[field] === before[field];
   return {
-    ...settings,
-    name: settings.name === '' ? (summary.teamName ?? '') : settings.name,
-    league: settings.league === '' ? (summary.leagueColumn ?? '') : settings.league,
+    settings: {
+      ...settings,
+      name: follow('name') ? prefilled.name : settings.name,
+      league: follow('league') ? prefilled.league : settings.league,
+    },
+    prefilled,
   };
 }
 

@@ -30,29 +30,34 @@ describe('prefill', () => {
   };
 
   it('fills the team and league from the files', () => {
-    expect(prefill(DEFAULT_TEAM_SETTINGS, summary)).toMatchObject({
-      name: 'Seattle Arrows',
-      league: 'RSL',
-      rating_scale: '1-10',
-    });
+    const { settings, prefilled } = prefill(DEFAULT_TEAM_SETTINGS, summary);
+    expect(settings).toMatchObject({ name: 'Seattle Arrows', league: 'RSL', rating_scale: '1-10' });
+    expect(prefilled).toEqual({ name: 'Seattle Arrows', league: 'RSL' });
   });
 
   it('keeps what was typed', () => {
-    expect(
-      prefill({ ...DEFAULT_TEAM_SETTINGS, name: 'Arrows', league: 'X' }, summary),
-    ).toMatchObject({
-      name: 'Arrows',
-      league: 'X',
-    });
+    const typed = { ...DEFAULT_TEAM_SETTINGS, name: 'Arrows', league: 'X' };
+    expect(prefill(typed, summary).settings).toMatchObject({ name: 'Arrows', league: 'X' });
+  });
+
+  it('follows new files in a field it filled before, even to empty', () => {
+    const first = prefill(DEFAULT_TEAM_SETTINGS, summary);
+    const other = { ...summary, teamName: 'Portland Pines', leagueColumn: null };
+    const second = prefill(first.settings, other, first.prefilled);
+    expect(second.settings).toMatchObject({ name: 'Portland Pines', league: '' });
+    expect(second.prefilled).toEqual({ name: 'Portland Pines', league: '' });
+  });
+
+  it('leaves a typed field alone when the files change', () => {
+    const first = prefill(DEFAULT_TEAM_SETTINGS, summary);
+    const typed = { ...first.settings, name: 'My Arrows' };
+    const other = { ...summary, teamName: 'Portland Pines' };
+    expect(prefill(typed, other, first.prefilled).settings.name).toBe('My Arrows');
   });
 
   it('leaves a field empty when the files say nothing', () => {
-    expect(
-      prefill(DEFAULT_TEAM_SETTINGS, { ...summary, teamName: null, leagueColumn: null }),
-    ).toMatchObject({
-      name: '',
-      league: '',
-    });
+    const none = { ...summary, teamName: null, leagueColumn: null };
+    expect(prefill(DEFAULT_TEAM_SETTINGS, none).settings).toMatchObject({ name: '', league: '' });
   });
 });
 

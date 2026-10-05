@@ -3,13 +3,25 @@ import { measureCoverage, type Coverage } from './coverage.ts';
 import { scaleBounds, toTwentyEighty, type RatingScale } from '../ratings/scale.ts';
 import { importLeague } from './league.ts';
 import { VIEW_MANIFESTS, type Side, type ViewId } from './manifest.ts';
-import type { ExportRow, RoutedExport } from './route.ts';
+import type { ExportRow, ImportEvent, Routing, RoutedExport, Scope } from './route.ts';
 import {
   DEFAULT_IDENTITY_TOLERANCES,
   validateSnapshot,
   type IdentityTolerances,
   type SnapshotEvent,
 } from './validate.ts';
+
+/** One file of a snapshot and how the import treated it: a line of the import log. */
+export interface ImportedFile {
+  name: string;
+  view: ViewId | null;
+  side: Side | null;
+  scope: Scope | null;
+  routing: Routing;
+  /** Players the file listed; none for a rejected file. */
+  players: number;
+  events: ImportEvent[];
+}
 
 /** One snapshot of a team: its players, the league's, and what the import found. */
 export interface Snapshot {
@@ -23,6 +35,8 @@ export interface Snapshot {
   league: { hitters: ExportRow[]; pitchers: ExportRow[] };
   /** The badge, the matrices and what to upload next. */
   coverage: Coverage;
+  /** The import log: every file, used or not, in upload order. */
+  files: ImportedFile[];
   events: SnapshotEvent[];
 }
 
@@ -75,6 +89,15 @@ export function assembleSnapshot(
     pitchers,
     league: { hitters: league.hitters, pitchers: league.pitchers },
     coverage: measureCoverage(files),
+    files: files.map((file) => ({
+      name: file.name,
+      view: file.view,
+      side: file.side,
+      scope: file.scope,
+      routing: file.routing,
+      players: file.rows.length,
+      events: file.events,
+    })),
     events,
   };
 }

@@ -37,6 +37,8 @@ export const queryClient = new QueryClient({
 export const queryKeys = {
   teams: ['teams'] as const,
   latestSnapshots: ['snapshots', 'latest'] as const,
+  viewCounts: (snapshotIds: readonly string[]) =>
+    ['snapshots', 'view-counts', snapshotIds.join(',')] as const,
   snapshots: (teamId: string) => ['teams', teamId, 'snapshots'] as const,
   snapshot: (snapshotId: string, scale: RatingScale) =>
     ['snapshots', snapshotId, scale, IMPORTER_VERSION] as const,
@@ -119,9 +121,66 @@ export function useCreateTeamWithExports() {
         };
       }
     },
-    onSettled: () => {
-      void queries.invalidateQueries({ queryKey: queryKeys.teams });
-      void queries.invalidateQueries({ queryKey: ['snapshots'] });
+    // Awaited, so a screen that navigates on success finds the lists refetched.
+    onSettled: () =>
+      Promise.all([
+        queries.invalidateQueries({ queryKey: queryKeys.teams }),
+        queries.invalidateQueries({ queryKey: ['snapshots'] }),
+      ]),
+  });
+}
+
+/** Adds exports to a team: a dated upload goes to its game's snapshot, an undated one here. */
+export function useAddExports() {
+  const { store } = useSessionState();
+  const queries = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      teamId,
+      snapshotId,
+      uploads,
+      scale,
+    }: {
+      teamId: string;
+      snapshotId: string;
+      uploads: Upload[];
+      scale: RatingScale;
+    }) =>
+      importUpload(needClient(store, 'Saving the exports'), teamId, uploads, {
+        scale,
+        hash: sha256,
+        into: snapshotId,
+      }),
+    // Awaited, so the Clubhouse navigates to a new snapshot only once the shell can find it.
+    onSettled: (_result, _error, { teamId }) =>
+      Promise.all([
+        queries.invalidateQueries({ queryKey: queryKeys.snapshots(teamId) }),
+        queries.invalidateQueries({ queryKey: ['snapshots'] }),
+      ]),
+  });
+}
+
+/** Team views on file per snapshot, for the timeline's labels. */
+export function useViewCounts(snapshotIds: readonly string[]) {
+  const { client } = useSessionState();
+  return useQuery({
+    queryKey: queryKeys.viewCounts(snapshotIds),
+    enabled: client !== null && snapshotIds.length > 0,
+    queryFn: async (): Promise<Map<string, number>> => {
+      const { data, error } = await needClient(client, 'Counting the views')
+        .from('view_files')
+        .select('snapshot_id, scope, routing')
+        .in('snapshot_id', snapshotIds);
+      if (error) {
+        throw new Error(`Couldn't count the views: ${error.message}`);
+      }
+      const counts = new Map<string, number>();
+      for (const row of data) {
+        if (row.scope === 'team' && row.routing === 'primary') {
+          counts.set(row.snapshot_id, (counts.get(row.snapshot_id) ?? 0) + 1);
+        }
+      }
+      return counts;
     },
   });
 }

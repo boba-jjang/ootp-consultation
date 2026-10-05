@@ -2,13 +2,13 @@ import { readdirSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { describeExports, routeExport, type NamedExport } from '../index.ts';
+import { describeExports, routeExport, type RoutedExport } from '../index.ts';
 import { FIXTURES, readFixtureText } from '../../test/fixtures.ts';
 
-const uploads = (): NamedExport[] =>
+const uploads = (): RoutedExport[] =>
   readdirSync(new URL('seattle-g42/', FIXTURES), { encoding: 'utf8' })
     .filter((file) => file.endsWith('.csv'))
-    .map((name) => ({ name, result: routeExport(name, readFixtureText(`seattle-g42/${name}`)) }));
+    .map((name) => routeExport(name, readFixtureText(`seattle-g42/${name}`)));
 
 describe('describeExports on the Seattle game-42 files', () => {
   const summary = describeExports(uploads());
@@ -51,13 +51,13 @@ describe('describeExports with less, or worse, data', () => {
   });
 
   it('takes the file name from a path, and names a rejected file with its reason', () => {
-    const team = uploads().find((upload) => upload.result.view === 'default');
+    const team = uploads().find((upload) => upload.view === 'default');
     if (!team) {
       throw new Error('the fixtures have no default view');
     }
     const summary = describeExports([
       { ...team, name: `exports/${team.name}` },
-      { name: 'notes.csv', result: routeExport('notes.csv', 'a,b\n1,2\n') },
+      routeExport('notes.csv', 'a,b\n1,2\n'),
     ]);
     expect(summary.filePrefix).toBe('seattle_arrows');
     expect(summary.rejected).toHaveLength(1);
@@ -66,13 +66,10 @@ describe('describeExports with less, or worse, data', () => {
   });
 
   it('leaves a column null when the files disagree on it', () => {
-    const files = uploads().filter((upload) => upload.result.view === 'batting_superstats_1');
+    const files = uploads().filter((upload) => upload.view === 'batting_superstats_1');
     const changed = files.map((upload) => ({
       ...upload,
-      result: {
-        ...upload.result,
-        rows: upload.result.rows.map((row, index) => (index === 0 ? { ...row, LG: 'XYZ' } : row)),
-      },
+      rows: upload.rows.map((row, index) => (index === 0 ? { ...row, LG: 'XYZ' } : row)),
     }));
     expect(describeExports(changed).leagueColumn).toBeNull();
     expect(describeExports(files).leagueColumn).toBe('RSL');

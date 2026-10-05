@@ -9,7 +9,7 @@ describe('readExports', () => {
     const notes = { name: 'notes.csv', text: 'a,b\n1,2\n' };
     const read = readExports([notes, notes, { name: 'other.csv', text: 'c,d\n3,4\n' }]);
     expect(read.uploads).toHaveLength(2);
-    expect(read.named.map((upload) => upload.result.routing)).toEqual(['rejected', 'rejected']);
+    expect(read.named.map((upload) => upload.routing)).toEqual(['rejected', 'rejected']);
     expect(read.summary.rejected).toHaveLength(2);
     expect(read.coverage.level).toBe('low');
   });

@@ -53,8 +53,14 @@ export {
   type RatingScale,
 } from './ratings/scale.ts';
 export { RATING_COLUMNS } from './ratings/columns.ts';
-export { assembleSnapshot, type Snapshot, type SnapshotSettings } from './importer/snapshot.ts';
-export { describeExports, type ExportSummary, type NamedExport } from './importer/describe.ts';
+export {
+  assembleSnapshot,
+  type ImportedFile,
+  type Snapshot,
+  type SnapshotSettings,
+} from './importer/snapshot.ts';
+export { describeExports, type ExportSummary } from './importer/describe.ts';
+export { COLUMN_NOTES, columnNotesFor, type ColumnNote } from './importer/columns.ts';
 export {
   DATA_SETS,
   DATA_SET_INFO,

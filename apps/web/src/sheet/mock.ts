@@ -1,0 +1,85 @@
+import {
+  VIEW_MANIFESTS,
+  measureCoverage,
+  type ImportedFile,
+  type RoutedExport,
+  type ViewId,
+} from '@ootp/core';
+
+/** The sheet's pretend snapshot: nine views, three players a side, one reject, one league file. */
+const HITTERS = [
+  { Name: 'Yoshitsugu Ishida', POS: 'C' },
+  { Name: 'Jeong Lee', POS: 'SS' },
+  { Name: 'Cheng-qian Eng', POS: '1B' },
+];
+const PITCHERS = [
+  { Name: 'Hajime Ito', POS: 'SP' },
+  { Name: 'Yoichibei Inouye', POS: 'SP' },
+  { Name: 'Kiyohiro Kaneshiro', POS: 'RP' },
+];
+
+const NINE_VIEWS: ViewId[] = [
+  'default',
+  'batting_stats_1',
+  'batting_stats_2',
+  'batting_superstats_1',
+  'batting_superstats_2',
+  'pitching_stats_1',
+  'pitching_stats_2',
+  'pitching_superstats_1',
+  'pitching_superstats_2',
+];
+
+const teamFile = (view: ViewId): RoutedExport => ({
+  name: `seattle_arrows_lineups_-_overview_${view}.csv`,
+  view,
+  version: 1,
+  scope: 'team',
+  side: VIEW_MANIFESTS[view].side,
+  routing: 'primary',
+  rows: VIEW_MANIFESTS[view].side === 'hitters' ? HITTERS : PITCHERS,
+  events:
+    view === 'batting_superstats_1'
+      ? [
+          {
+            level: 'warning',
+            code: 'older-version',
+            message: 'An older export of this view, without the contact-only expected stats.',
+          },
+        ]
+      : [],
+  importerVersion: 'sheet',
+});
+
+export const SHEET_FILES: RoutedExport[] = [
+  ...NINE_VIEWS.map(teamFile),
+  {
+    ...teamFile('batting_superstats_1'),
+    name: 'rsl_statistics_player_statistics_-_sortable_stats_batting_superstats_1.csv',
+    scope: 'league',
+    rows: Array.from({ length: 214 }, (_, index) => ({ Name: `Hitter ${index}`, POS: 'LF' })),
+  },
+  {
+    name: 'notes.csv',
+    view: null,
+    version: null,
+    scope: null,
+    side: null,
+    routing: 'rejected',
+    rows: [],
+    events: [{ level: 'error', code: 'unknown-view', message: 'No view has these columns.' }],
+    importerVersion: 'sheet',
+  },
+];
+
+export const SHEET_COVERAGE = measureCoverage(SHEET_FILES);
+
+export const SHEET_LOG: ImportedFile[] = SHEET_FILES.map((file) => ({
+  name: file.name,
+  view: file.view,
+  side: file.side,
+  scope: file.scope,
+  routing: file.routing,
+  players: file.rows.length,
+  events: file.events,
+}));

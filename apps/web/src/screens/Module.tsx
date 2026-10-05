@@ -1,5 +1,6 @@
 import { useParams } from 'react-router';
 
+import { Clubhouse } from '../clubhouse/Clubhouse.tsx';
 import { Gate } from '../shell/Gate.tsx';
 import { useShell } from '../shell/context.ts';
 import { moduleById, modulePath } from '../shell/modules.ts';
@@ -14,6 +15,9 @@ export function ModuleScreen() {
   const module = moduleById(tab);
   if (!module) {
     return <NotFound />;
+  }
+  if (module.id === 'clubhouse') {
+    return <Clubhouse />;
   }
   return (
     <main id="main" className={styles.main}>

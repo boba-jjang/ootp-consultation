@@ -28,6 +28,20 @@ describe('assembleSnapshot on the Seattle game-42 files (the Phase 2 gate)', () 
     expect(snapshot.league.pitchers).toHaveLength(415);
   });
 
+  it('logs every file, with its players', () => {
+    expect(snapshot.files).toHaveLength(16);
+    const stats = snapshot.files.find((file) => file.view === 'batting_stats_1');
+    expect(stats).toMatchObject({
+      name: 'seattle_arrows_lineups_-_overview_batting_stats_1.csv',
+      side: 'hitters',
+      scope: 'team',
+      routing: 'primary',
+      players: 12,
+    });
+    const capture = snapshot.files.find((file) => file.routing === 'supplemental');
+    expect(capture?.name).toContain('hitter_capture');
+  });
+
   it('measures High coverage', () => {
     expect(snapshot.coverage.level).toBe('high');
     expect(snapshot.coverage.views.onFile).toHaveLength(11);

@@ -121,6 +121,8 @@ Local development points at the cloud staging project, not a local Supabase stac
 | `SUPABASE_ACCESS_TOKEN` | GitHub Actions secret | Secret | Lets CI run the Supabase CLI |
 | `SUPABASE_DB_PASSWORD_STAGING`, `SUPABASE_DB_PASSWORD_PROD` | GitHub Actions secrets | Secret | Migration pushes |
 | `SUPABASE_REF_STAGING`, `SUPABASE_REF_PROD` | GitHub Actions variables | Not secret | Which project CI targets |
+| `SUPABASE_PUBLISHABLE_KEY_STAGING` | GitHub Actions variable | Public by design | The e2e workflow's dev server, with the staging URL built from `SUPABASE_REF_STAGING` |
+| `E2E_EMAIL`, `E2E_PASSWORD` | GitHub Actions secrets | Secret | The staging test user the signed-in e2e tests use |
 
 Two rules keep secrets out of the browser: a `VITE_` prefix means public, and no secret ever gets one. The app never needs Supabase's secret or service-role key, so none is stored anywhere.
 
@@ -281,7 +283,7 @@ Build order, one pull request each:
 - [x] Team menu and Create a Team: add exports (drop or choose files, folders included), files read, team and league prefilled from the files, review, create.
 - [x] The Clubhouse: upload, snapshot timeline, what to upload next, coverage matrices, import log, how columns were read, Run analysis.
 - [x] Team settings, Export team and restore from a zip.
-- [ ] End-to-end and accessibility tests in `e2e.yml`: Create a Team from the fixtures yields a Game 42 snapshot with High coverage; locked states render; no serious axe violations; 44 px targets. Needs the staging test user below.
+- [x] End-to-end and accessibility tests in `e2e.yml`: Create a Team from the fixtures yields a Game 42 snapshot with High coverage; locked states render; no serious axe violations; 44 px targets. Needs the staging test user below. The workflow runs the public screens on every pull request now; the signed-in test skips until the test user and the variables below exist.
 - [ ] Ask the design chat for Talent radar (with league percentiles), the situational strategy view, trends and where league files are uploaded.
 
 ## Testing and quality

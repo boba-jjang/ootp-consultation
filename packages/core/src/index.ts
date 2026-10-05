@@ -4,6 +4,7 @@ export {
   RATING_SCALES,
   parseTeamRow,
   parseTeamSettings,
+  settingsOf,
   type ParseResult,
   type TeamRow,
   type TeamSettings,

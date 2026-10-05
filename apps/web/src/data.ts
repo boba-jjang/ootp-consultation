@@ -2,11 +2,14 @@ import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/re
 
 import {
   IMPORTER_VERSION,
+  exportTeam,
   importUpload,
   loadSnapshot,
   parseTeamRow,
+  restoreTeam,
   type RatingScale,
   type StoredSnapshot,
+  type TeamExport,
   type TeamRow,
   type TeamSettings,
   type Upload,
@@ -182,6 +185,51 @@ export function useViewCounts(snapshotIds: readonly string[]) {
       }
       return counts;
     },
+  });
+}
+
+/** Saves a team's settings. */
+export function useUpdateTeam() {
+  const { client } = useSessionState();
+  const queries = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, settings }: { id: string; settings: TeamSettings }) => {
+      const { data, error } = await needClient(client, 'Saving the settings')
+        .from('teams')
+        .update(settings)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) {
+        throw new Error(`Couldn't save the settings: ${error.message}`);
+      }
+      return parseTeamRow(data);
+    },
+    onSettled: () => queries.invalidateQueries({ queryKey: queryKeys.teams }),
+  });
+}
+
+/** Export team: the zip of every raw file plus the settings. */
+export function useExportTeam() {
+  const { store } = useSessionState();
+  return useMutation({
+    mutationFn: ({ teamId, settings }: { teamId: string; settings: TeamSettings }) =>
+      exportTeam(needClient(store, 'Exporting the team'), teamId, settings),
+  });
+}
+
+/** Restores an Export team zip into a team, through the importer. */
+export function useRestoreTeam() {
+  const { store } = useSessionState();
+  const queries = useQueryClient();
+  return useMutation({
+    mutationFn: ({ teamId, exported }: { teamId: string; exported: TeamExport }) =>
+      restoreTeam(needClient(store, 'Restoring the team'), teamId, exported, { hash: sha256 }),
+    onSettled: (_result, _error, { teamId }) =>
+      Promise.all([
+        queries.invalidateQueries({ queryKey: queryKeys.snapshots(teamId) }),
+        queries.invalidateQueries({ queryKey: ['snapshots'] }),
+      ]),
   });
 }
 

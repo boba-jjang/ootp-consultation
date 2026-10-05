@@ -1,0 +1,57 @@
+/* Team settings: the setup's form, then the backup and the restore. */
+
+.panel {
+  gap: var(--space-4);
+}
+
+.text {
+  max-width: 62ch;
+  font-size: var(--text-14);
+  color: var(--color-text-secondary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.status {
+  font-size: var(--text-14);
+  color: var(--color-text-body);
+}
+
+.error {
+  font-size: var(--text-14);
+  color: var(--color-negative-text);
+}
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: var(--panel-radius);
+}
+
+.previewTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-17);
+  font-weight: var(--weight-bold);
+}
+
+.fileName {
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.saved {
+  font-size: var(--text-14);
+  color: var(--color-text-body);
+}

@@ -9,6 +9,7 @@ import {
   SnapshotTimeline,
   UploadNext,
 } from '../clubhouse/pieces.tsx';
+import { ExportPanel, RestorePanel } from '../settings/pieces.tsx';
 import { BestFirstUpload, DropZone, FoundInFiles } from '../setup/pieces.tsx';
 import { Gate } from '../shell/Gate.tsx';
 import { Tabs } from '../shell/Tabs.tsx';
@@ -187,6 +188,32 @@ export function Sheet() {
         <div className={styles.columns}>
           <ImportLog files={SHEET_LOG} label="Game 42" />
           <ColumnNotes views={SHEET_COVERAGE.views.onFile} files={SHEET_LOG} />
+        </div>
+      </Section>
+
+      <Section title="Team settings" note="The backup and the restore, on mock data">
+        <div className={styles.columns}>
+          <ExportPanel
+            busy={false}
+            status="Your download started: seattle-arrows-export-2026-10-05.zip."
+            error={null}
+            onExport={() => undefined}
+          />
+          <RestorePanel
+            preview={{
+              fileName: 'seattle-arrows-export-2026-10-05.zip',
+              team: { name: 'Seattle Arrows', league: 'RSL' },
+              snapshots: 1,
+              files: 16,
+            }}
+            readError={null}
+            busy={false}
+            status={null}
+            error={null}
+            onChoose={() => undefined}
+            onRestore={() => undefined}
+            onClear={() => undefined}
+          />
         </div>
       </Section>
 

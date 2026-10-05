@@ -1,5 +1,11 @@
-import { parseTeamSettings, readTeamExport, type TeamExport, type TeamRow } from '@ootp/core';
-import { useState, type SubmitEvent } from 'react';
+import {
+  parseTeamSettings,
+  readTeamExport,
+  settingsOf,
+  type TeamExport,
+  type TeamRow,
+} from '@ootp/core';
+import { useRef, useState, type SubmitEvent } from 'react';
 import { Link, useParams } from 'react-router';
 
 import { useExportTeam, useRestoreTeam, useTeams, useUpdateTeam } from '../data.ts';
@@ -41,6 +47,8 @@ function TeamSettings({ team }: { team: TeamRow }) {
   const [zip, setZip] = useState<{ preview: RestorePreview; value: TeamExport } | null>(null);
   const [readError, setReadError] = useState<string | null>(null);
   const [restoreStatus, setRestoreStatus] = useState<string | null>(null);
+  // Only the last chosen zip counts: a slow read of an earlier one must not land after it.
+  const reading = useRef(0);
 
   const save = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -66,7 +74,7 @@ function TeamSettings({ team }: { team: TeamRow }) {
   const exportZip = () => {
     setExportStatus(null);
     exporter.mutate(
-      { teamId: team.id, settings: team },
+      { teamId: team.id, settings: settingsOf(team) },
       {
         onSuccess: (bytes) => {
           const name = exportFileName(team.name, new Date());
@@ -80,23 +88,35 @@ function TeamSettings({ team }: { team: TeamRow }) {
   const chooseZip = (file: File) => {
     setRestoreStatus(null);
     setReadError(null);
-    void file.arrayBuffer().then((buffer) => {
-      const result = readTeamExport(new Uint8Array(buffer));
-      if (!result.ok) {
-        setZip(null);
-        setReadError(result.message);
-        return;
-      }
-      const counts = exportPreview(result.value);
-      setZip({
-        value: result.value,
-        preview: {
-          fileName: file.name,
-          team: { name: result.value.team.name, league: result.value.team.league },
-          ...counts,
-        },
+    const attempt = (reading.current += 1);
+    file
+      .arrayBuffer()
+      .then((buffer) => {
+        if (attempt !== reading.current) {
+          return;
+        }
+        const result = readTeamExport(new Uint8Array(buffer));
+        if (!result.ok) {
+          setZip(null);
+          setReadError(result.message);
+          return;
+        }
+        const counts = exportPreview(result.value);
+        setZip({
+          value: result.value,
+          preview: {
+            fileName: file.name,
+            team: { name: result.value.team.name, league: result.value.team.league },
+            ...counts,
+          },
+        });
+      })
+      .catch((failure: unknown) => {
+        if (attempt === reading.current) {
+          setZip(null);
+          setReadError(failure instanceof Error ? failure.message : String(failure));
+        }
       });
-    });
   };
 
   const restoreZip = () => {
@@ -173,5 +193,8 @@ function download(bytes: Uint8Array, name: string) {
   anchor.href = url;
   anchor.download = name;
   anchor.click();
-  URL.revokeObjectURL(url);
+  // Safari reads the URL after the click returns; revoking it at once can empty the download.
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 60_000);
 }

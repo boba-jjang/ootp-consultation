@@ -1,13 +1,16 @@
 import type { TeamExport, UploadResult } from '@ootp/core';
 
-/** "seattle-arrows-export-2026-10-05.zip" */
+const pad = (part: number) => String(part).padStart(2, '0');
+
+/** "seattle-arrows-export-2026-10-05.zip", dated where the user is. */
 export function exportFileName(teamName: string, date: Date): string {
   const slug =
     teamName
       .toLowerCase()
       .replaceAll(/[^a-z0-9]+/g, '-')
       .replaceAll(/^-+|-+$/g, '') || 'team';
-  return `${slug}-export-${date.toISOString().slice(0, 10)}.zip`;
+  const day = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  return `${slug}-export-${day}.zip`;
 }
 
 /** What a zip holds, before it's restored. */

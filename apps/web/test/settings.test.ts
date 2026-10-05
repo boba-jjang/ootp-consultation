@@ -11,12 +11,10 @@ import {
 
 describe('exportFileName', () => {
   it('slugs the team name and dates the file', () => {
-    expect(exportFileName('Seattle Arrows', new Date('2026-10-05T03:00:00Z'))).toBe(
+    expect(exportFileName('Seattle Arrows', new Date(2026, 9, 5, 22, 30))).toBe(
       'seattle-arrows-export-2026-10-05.zip',
     );
-    expect(exportFileName('  ', new Date('2026-10-05T03:00:00Z'))).toBe(
-      'team-export-2026-10-05.zip',
-    );
+    expect(exportFileName('  ', new Date(2026, 9, 5))).toBe('team-export-2026-10-05.zip');
   });
 });
 

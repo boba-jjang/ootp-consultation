@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Link, Outlet, useMatch, useParams } from 'react-router';
+import { Outlet, useMatch, useParams } from 'react-router';
 
 import type { StoredSnapshot, TeamRow } from '@ootp/core';
 
 import { useSnapshot, useSnapshots, useTeams } from '../data.ts';
-import messageStyles from '../screens/Message.module.css';
+import { MissingScreen, StatusScreen } from '../screens/Message.tsx';
 import { useAuthActions, useSessionState } from '../session.ts';
 import { ShellContext } from './context.ts';
 import { lockedModules, moduleById, type ModuleId } from './modules.ts';
@@ -27,14 +27,16 @@ export function Shell() {
     throw snapshots.error;
   }
   if (teams.isPending || snapshots.isPending) {
-    return <Status>Loading the team…</Status>;
+    return <StatusScreen>Loading the team…</StatusScreen>;
   }
   const team = teams.data.find((candidate) => candidate.id === teamId);
   if (!team) {
-    return <Missing title="Team not found" to="/teams" link="Go to your teams" />;
+    return <MissingScreen title="Team not found" to="/teams" link="Go to your teams" />;
   }
   if (!snapshots.data.some((snapshot) => snapshot.id === snapshotId)) {
-    return <Missing title="Snapshot not found" to={`/t/${team.id}`} link="Go to the latest" />;
+    return (
+      <MissingScreen title="Snapshot not found" to={`/t/${team.id}`} link="Go to the latest" />
+    );
   }
   return (
     <SnapshotShell
@@ -100,32 +102,8 @@ function SnapshotShell({
           <Outlet />
         </ShellContext>
       ) : (
-        <Status>Reading the snapshot…</Status>
+        <StatusScreen>Reading the snapshot…</StatusScreen>
       )}
     </>
-  );
-}
-
-function Status({ children }: { children: string }) {
-  return (
-    <main id="main" className={messageStyles.main}>
-      <p role="status" className={messageStyles.text}>
-        {children}
-      </p>
-    </main>
-  );
-}
-
-function Missing({ title, to, link }: { title: string; to: string; link: string }) {
-  return (
-    <main id="main" className={messageStyles.main}>
-      <h1 className={messageStyles.title}>{title}</h1>
-      <p className={messageStyles.text}>
-        Nothing of yours is at this address. It may have been deleted, or the link may be wrong.
-      </p>
-      <p className={messageStyles.actions}>
-        <Link to={to}>{link}</Link>
-      </p>
-    </main>
   );
 }

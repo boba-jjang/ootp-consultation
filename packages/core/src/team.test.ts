@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_TEAM_SETTINGS, parseTeamRow, parseTeamSettings } from './index.ts';
+import { DEFAULT_TEAM_SETTINGS, parseTeamRow, parseTeamSettings, settingsOf } from './index.ts';
 
 describe('DEFAULT_TEAM_SETTINGS', () => {
   it('uses the design handoff defaults and is itself valid', () => {
@@ -72,5 +72,23 @@ describe('parseTeamRow', () => {
     const withoutId: Partial<typeof row> = { ...row };
     delete withoutId.id;
     expect(() => parseTeamRow(withoutId)).toThrow();
+  });
+});
+
+describe('settingsOf', () => {
+  it('keeps the settings and drops the row', () => {
+    const row = {
+      ...DEFAULT_TEAM_SETTINGS,
+      name: 'Seattle Arrows',
+      league: 'RSL',
+      id: '11111111-1111-4111-8111-111111111111',
+      owner_id: '22222222-2222-4222-8222-222222222222',
+      created_at: '2026-10-04T00:00:00Z',
+    };
+    expect(settingsOf(row)).toEqual({
+      ...DEFAULT_TEAM_SETTINGS,
+      name: 'Seattle Arrows',
+      league: 'RSL',
+    });
   });
 });

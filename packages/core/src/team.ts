@@ -62,6 +62,11 @@ const teamRowSchema = teamSettingsSchema.extend({
 /** A row of the `teams` table. */
 export type TeamRow = z.infer<typeof teamRowSchema>;
 
+/** The settings of a row, and nothing else: no id, owner or date leaves with an export. */
+export function settingsOf(row: TeamRow): TeamSettings {
+  return teamSettingsSchema.parse(row);
+}
+
 /** Reads a `teams` row from the database, throwing if it doesn't match the schema. */
 export function parseTeamRow(input: unknown): TeamRow {
   return teamRowSchema.parse(input);

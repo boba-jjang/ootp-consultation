@@ -70,6 +70,10 @@
   height: 16px;
 }
 
+.step:hover {
+  color: var(--color-text);
+}
+
 .step:disabled {
   opacity: 0.4;
 }

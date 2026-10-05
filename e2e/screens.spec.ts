@@ -29,6 +29,12 @@ test.describe('the component sheet', () => {
     await page.keyboard.press('Escape');
     await expect(menu).toBeHidden();
     await expect(trigger).toBeFocused();
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('End');
+    await page.keyboard.press('ArrowUp');
+    await expect(page.getByRole('menuitem', { name: 'Team settings' })).toBeFocused();
+    await page.keyboard.press(' ');
+    await expect(page).not.toHaveURL(/\/sheet$/);
   });
 });
 

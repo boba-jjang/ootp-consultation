@@ -27,8 +27,8 @@ const useMenu = () => {
 
 /**
  * A button that opens a menu of links and actions, with the keyboard behaviour of the ARIA
- * menu pattern: arrows move, Home and End jump, Escape closes and returns the focus, and a
- * pointer down outside closes.
+ * menu pattern: arrows move, Home and End jump, Space activates a link like a button, Escape
+ * closes and returns the focus, and a pointer down outside closes.
  */
 export function Menu({
   label,
@@ -91,6 +91,13 @@ export function Menu({
         break;
       case 'Tab':
         close();
+        break;
+      case ' ':
+        // Anchors only act on Enter; a menu item acts on Space too.
+        if (document.activeElement instanceof HTMLAnchorElement) {
+          event.preventDefault();
+          document.activeElement.click();
+        }
         break;
       default:
     }

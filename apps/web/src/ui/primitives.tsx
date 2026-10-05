@@ -1,6 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react';
 
-import { classes } from './classes.ts';
+import { buttonClass, classes, type ButtonVariant } from './classes.ts';
 import { CheckIcon, LockIcon } from './icons.tsx';
 import styles from './primitives.module.css';
 
@@ -10,7 +10,7 @@ import styles from './primitives.module.css';
  */
 
 /** Primary is the one gold action on a screen; outline and accent are quieter; ghost and link are inline. */
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'accent' | 'ghost' | 'link';
+export type { ButtonVariant };
 
 export function Button({
   variant = 'outline',
@@ -18,9 +18,7 @@ export function Button({
   type = 'button',
   ...props
 }: ComponentProps<'button'> & { variant?: ButtonVariant }) {
-  return (
-    <button type={type} className={classes(styles.button, styles[variant], className)} {...props} />
-  );
+  return <button type={type} className={buttonClass(variant, className)} {...props} />;
 }
 
 /** A link that looks like a button; the router's Link replaces the anchor where it applies. */
@@ -29,7 +27,7 @@ export function LinkButton({
   className,
   ...props
 }: ComponentProps<'a'> & { variant?: ButtonVariant }) {
-  return <a className={classes(styles.button, styles[variant], className)} {...props} />;
+  return <a className={buttonClass(variant, className)} {...props} />;
 }
 
 /** A view or file name, in the mono face. */

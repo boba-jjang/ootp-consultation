@@ -2,14 +2,19 @@ import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/re
 
 import {
   IMPORTER_VERSION,
+  importUpload,
   loadSnapshot,
   parseTeamRow,
   type RatingScale,
+  type StoredSnapshot,
   type TeamRow,
   type TeamSettings,
+  type Upload,
 } from '@ootp/core';
 
 import { useSessionState } from './session.ts';
+import { sha256 } from './store.ts';
+import type { Client } from './supabase.ts';
 
 /**
  * Data loading: TanStack Query over the Supabase store. Derived data is computed by
@@ -31,6 +36,7 @@ export const queryClient = new QueryClient({
 
 export const queryKeys = {
   teams: ['teams'] as const,
+  latestSnapshots: ['snapshots', 'latest'] as const,
   snapshots: (teamId: string) => ['teams', teamId, 'snapshots'] as const,
   snapshot: (snapshotId: string, scale: RatingScale) =>
     ['snapshots', snapshotId, scale, IMPORTER_VERSION] as const,
@@ -61,22 +67,78 @@ export function useTeams() {
   });
 }
 
-export function useCreateTeam() {
-  const { client } = useSessionState();
+async function insertTeam(client: Client, settings: TeamSettings): Promise<TeamRow> {
+  const { data, error } = await client.from('teams').insert(settings).select().single();
+  if (error) {
+    throw new Error(`Couldn't save the team: ${error.message}`);
+  }
+  return parseTeamRow(data);
+}
+
+export interface CreatedTeam {
+  team: TeamRow;
+  /** The first snapshot, when the exports could be dated. */
+  snapshot: StoredSnapshot | null;
+  /** Why the exports weren't saved, when the team was but they weren't. */
+  message: string | null;
+}
+
+/** Create a Team: the team row, then its exports as its first snapshot. */
+export function useCreateTeamWithExports() {
+  const { client, store } = useSessionState();
   const queries = useQueryClient();
   return useMutation({
-    mutationFn: async (settings: TeamSettings): Promise<TeamRow> => {
-      const { data, error } = await needClient(client, 'Saving a team')
-        .from('teams')
-        .insert(settings)
-        .select()
-        .single();
-      if (error) {
-        throw new Error(`Couldn't save the team: ${error.message}`);
+    mutationFn: async ({
+      settings,
+      uploads,
+    }: {
+      settings: TeamSettings;
+      uploads: Upload[];
+    }): Promise<CreatedTeam> => {
+      const team = await insertTeam(needClient(client, 'Creating a team'), settings);
+      if (uploads.length === 0) {
+        return { team, snapshot: null, message: null };
       }
-      return parseTeamRow(data);
+      const result = await importUpload(needClient(store, 'Saving the exports'), team.id, uploads, {
+        scale: settings.rating_scale,
+        hash: sha256,
+      });
+      return result.ok
+        ? { team, snapshot: result.snapshot, message: null }
+        : { team, snapshot: null, message: result.message };
     },
-    onSuccess: () => queries.invalidateQueries({ queryKey: queryKeys.teams }),
+    onSettled: () => {
+      void queries.invalidateQueries({ queryKey: queryKeys.teams });
+      void queries.invalidateQueries({ queryKey: ['snapshots'] });
+    },
+  });
+}
+
+/** Each team's latest snapshot, in one read, for the Team menu. */
+export function useLatestSnapshots() {
+  const { client } = useSessionState();
+  return useQuery({
+    queryKey: queryKeys.latestSnapshots,
+    enabled: client !== null,
+    queryFn: async (): Promise<Map<string, StoredSnapshot>> => {
+      const { data, error } = await needClient(client, 'Loading snapshots')
+        .from('snapshots')
+        .select('id, team_id, label, game_number')
+        .order('game_number', { ascending: true });
+      if (error) {
+        throw new Error(`Couldn't load the snapshots: ${error.message}`);
+      }
+      const latest = new Map<string, StoredSnapshot>();
+      for (const row of data) {
+        latest.set(row.team_id, {
+          id: row.id,
+          teamId: row.team_id,
+          label: row.label,
+          gameNumber: row.game_number,
+        });
+      }
+      return latest;
+    },
   });
 }
 

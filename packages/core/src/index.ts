@@ -54,6 +54,7 @@ export {
 } from './ratings/scale.ts';
 export { RATING_COLUMNS } from './ratings/columns.ts';
 export { assembleSnapshot, type Snapshot, type SnapshotSettings } from './importer/snapshot.ts';
+export { describeExports, type ExportSummary, type NamedExport } from './importer/describe.ts';
 export {
   DATA_SETS,
   DATA_SET_INFO,

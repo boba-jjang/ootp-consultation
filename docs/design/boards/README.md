@@ -19,3 +19,5 @@ Reference markup exported from the Front Office Command Center canvas on 3 Octob
 | Create a team | Setup 1: files read | `SetupFilesRead.dc.html` |
 | Create a team | Setup 2: team and league | `SetupLeague.dc.html` |
 | Create a team | Setup 3: review | `SetupReview.dc.html` |
+
+The boards the Phase 4 screens still need are asked for in `../design-ask-phase-4.md`.

@@ -282,7 +282,7 @@ Build order, one pull request each:
 - [x] The Clubhouse: upload, snapshot timeline, what to upload next, coverage matrices, import log, how columns were read, Run analysis.
 - [x] Team settings, Export team and restore from a zip.
 - [ ] End-to-end and accessibility tests in `e2e.yml`: Create a Team from the fixtures yields a Game 42 snapshot with High coverage; locked states render; no serious axe violations; 44 px targets. Needs the staging test user below.
-- [ ] Ask the design chat for Talent radar (with league percentiles), the situational strategy view, trends and where league files are uploaded.
+- [ ] Ask the design chat for Talent radar (with league percentiles), the situational strategy view, trends and where league files are uploaded. The brief is `docs/design/design-ask-phase-4.md`; sending it is the owner's step.
 
 ## Testing and quality
 

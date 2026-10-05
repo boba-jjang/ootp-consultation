@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import { expect, test } from '@playwright/test';
 
-import { deleteTeamsNamed, signIn, withSession, type Session } from './auth.ts';
+import { deleteStaleTeams, deleteTeamNamed, signIn, withSession, type Session } from './auth.ts';
 import { expectAccessible, expectTargets } from './checks.ts';
 import { supabaseEnv, testUser } from './env.ts';
 
@@ -19,16 +19,18 @@ const required = () => {
 };
 const FIXTURES = fileURLToPath(new URL('../fixtures/seattle-g42/', import.meta.url));
 const PREFIX = 'E2E Seattle Arrows';
-const TEAM_NAME = `${PREFIX} ${process.env.GITHUB_RUN_ID ?? 'local'}`;
+/** One team per run and project: the desktop and phone projects run at the same time. */
+const teamName = () =>
+  `${PREFIX} ${process.env.GITHUB_RUN_ID ?? 'local'} ${test.info().project.name}`;
 
 /**
  * The plan's end-to-end check: Create a Team from the fixtures yields a Game 42 snapshot with
  * High coverage, and the locked states render. It needs the staging test user, so it skips
- * where that isn't set.
+ * where that isn't set. Each project makes its own team and deletes only that one.
  */
 test.describe('Create a Team from the fixtures', () => {
   test.skip(
-    !env || !user,
+    !settings,
     'needs VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY, E2E_EMAIL and E2E_PASSWORD',
   );
   test.describe.configure({ mode: 'serial' });
@@ -36,14 +38,15 @@ test.describe('Create a Team from the fixtures', () => {
   let session: Session | undefined;
 
   test.beforeAll(async () => {
-    const { env, user } = required();
-    session = await signIn(env, user);
-    await deleteTeamsNamed(env, session, PREFIX);
+    const { env: staging, user: tester } = required();
+    session = await signIn(staging, tester);
+    await deleteTeamNamed(staging, session, teamName());
+    await deleteStaleTeams(staging, session, PREFIX);
   });
 
   test.afterAll(async () => {
     if (session) {
-      await deleteTeamsNamed(required().env, session, PREFIX);
+      await deleteTeamNamed(required().env, session, teamName());
     }
   });
 
@@ -71,7 +74,7 @@ test.describe('Create a Team from the fixtures', () => {
     const name = page.getByLabel('Team name');
     await expect(name).toHaveValue('Seattle Arrows');
     await expect(page.getByLabel('League')).toHaveValue('RSL');
-    await name.fill(TEAM_NAME);
+    await name.fill(teamName());
     await expectAccessible(page);
     await page.getByRole('button', { name: 'Continue' }).click();
 

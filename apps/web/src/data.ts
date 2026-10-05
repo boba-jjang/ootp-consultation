@@ -121,10 +121,12 @@ export function useCreateTeamWithExports() {
         };
       }
     },
-    onSettled: () => {
-      void queries.invalidateQueries({ queryKey: queryKeys.teams });
-      void queries.invalidateQueries({ queryKey: ['snapshots'] });
-    },
+    // Awaited, so a screen that navigates on success finds the lists refetched.
+    onSettled: () =>
+      Promise.all([
+        queries.invalidateQueries({ queryKey: queryKeys.teams }),
+        queries.invalidateQueries({ queryKey: ['snapshots'] }),
+      ]),
   });
 }
 
@@ -149,10 +151,12 @@ export function useAddExports() {
         hash: sha256,
         into: snapshotId,
       }),
-    onSettled: (_result, _error, { teamId }) => {
-      void queries.invalidateQueries({ queryKey: queryKeys.snapshots(teamId) });
-      void queries.invalidateQueries({ queryKey: ['snapshots'] });
-    },
+    // Awaited, so the Clubhouse navigates to a new snapshot only once the shell can find it.
+    onSettled: (_result, _error, { teamId }) =>
+      Promise.all([
+        queries.invalidateQueries({ queryKey: queryKeys.snapshots(teamId) }),
+        queries.invalidateQueries({ queryKey: ['snapshots'] }),
+      ]),
   });
 }
 

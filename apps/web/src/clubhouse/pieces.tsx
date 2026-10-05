@@ -215,10 +215,11 @@ export function ImportLog({ files, label }: { files: readonly ImportedFile[]; la
     <Panel title="Import log" meta={`${label} snapshot`} className={styles.log}>
       {files.length === 0 ? <p className={styles.muted}>No file yet.</p> : null}
       <ul className={styles.logList}>
-        {files.map((file) => {
+        {files.map((file, index) => {
           const warnings = file.events.filter((event) => event.level === 'warning');
+          // Two rejected copies of one name can sit in the log: the position tells them apart.
           return (
-            <li key={`${file.name}:${file.view ?? ''}:${file.routing}`} className={styles.logRow}>
+            <li key={`${index}:${file.name}`} className={styles.logRow}>
               <span className={styles.logIcon} data-routing={file.routing} aria-hidden="true">
                 {file.routing === 'rejected' ? <InfoIcon /> : <CheckIcon />}
               </span>

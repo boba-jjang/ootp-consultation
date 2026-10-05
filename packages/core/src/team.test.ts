@@ -1,4 +1,4 @@
-import { settingsOf, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_TEAM_SETTINGS, parseTeamRow, parseTeamSettings, settingsOf } from './index.ts';
 

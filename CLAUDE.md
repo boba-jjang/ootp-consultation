@@ -49,6 +49,7 @@ Keep these current. Run them from the repo root on Node 24. The Node major is se
 
 CI (`.github/workflows/ci.yml`, job `ci`) runs install, lint, format check, typecheck, test and build, in that order.
 `.github/workflows/db.yml` (job `db`) applies every migration to a fresh database and runs the pgTAP tests when `supabase/` changes. On `main` it pushes migrations to staging, then production (jobs `db-deploy-staging` and `db-deploy-production`), once their GitHub variables and secrets exist.
+`.github/workflows/e2e.yml` (job `e2e`) runs `pnpm e2e` against the staging project on every pull request. The Create a Team test signs in as the staging test user (`E2E_EMAIL`, `E2E_PASSWORD`) and skips when those secrets or `SUPABASE_PUBLISHABLE_KEY_STAGING` are missing; a failed run uploads `playwright-report`.
 `.github/workflows/keepalive.yml` reads from each Supabase database every Monday, because the Free plan pauses a project after a week without activity. Run it by hand after a long break.
 
 ## Deployments

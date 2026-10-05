@@ -1,5 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
+import { loadLocalEnv } from './e2e/env.ts';
+
+// The tests read the same settings as the dev server; CI sets them in the environment.
+loadLocalEnv();
+
 /**
  * End-to-end and accessibility tests (docs/implementation-plan.md › Testing and quality). They
  * drive the dev server on port 5173, which talks to staging, like local development does.
@@ -9,7 +14,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? 'github' : 'list',
+  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router';
 
 import { useAuthActions, useSessionState } from '../session.ts';
-import { DiamondMark } from '../ui/icons.tsx';
+import { AppHeader } from '../ui/AppHeader.tsx';
 import { Button } from '../ui/primitives.tsx';
 import styles from './SignIn.module.css';
 
@@ -33,12 +33,7 @@ export function SignIn() {
 
   return (
     <>
-      <header className={styles.header}>
-        <span className={styles.brand} translate="no">
-          <DiamondMark className={styles.mark} />
-          Front Office Command Center
-        </span>
-      </header>
+      <AppHeader />
       <main id="main" className={styles.main}>
         <section className={styles.panel} aria-labelledby="sign-in-title">
           <h1 id="sign-in-title" className={styles.title}>

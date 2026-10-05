@@ -128,6 +128,59 @@ svg {
   transform: none;
 }
 
+/* The setup steps slide the way they're travelled (React ViewTransition classes). */
+@keyframes slide-in-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+@keyframes slide-out-to-left {
+  to {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+
+@keyframes slide-in-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+
+@keyframes slide-out-to-right {
+  to {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+::view-transition-new(.setup-enter-forward) {
+  animation: slide-in-from-right 220ms ease-out;
+}
+
+::view-transition-old(.setup-exit-forward) {
+  animation: slide-out-to-left 160ms ease-in;
+}
+
+::view-transition-new(.setup-enter-back) {
+  animation: slide-in-from-left 220ms ease-out;
+}
+
+::view-transition-old(.setup-exit-back) {
+  animation: slide-out-to-right 160ms ease-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

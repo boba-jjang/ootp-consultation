@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 
 import { measureCoverage } from '@ootp/core';
 
+import { BestFirstUpload, DropZone, FoundInFiles } from '../setup/pieces.tsx';
 import { Gate } from '../shell/Gate.tsx';
 import { Tabs } from '../shell/Tabs.tsx';
 import { TopBar } from '../shell/TopBar.tsx';
@@ -50,6 +51,18 @@ const SHEET_SNAPSHOTS = [
   { id: 'g42', label: 'Game 42' },
 ];
 const NOTHING_ON_FILE = measureCoverage([]);
+const SHEET_SUMMARY = {
+  teamName: 'Seattle Arrows',
+  filePrefix: 'seattle_arrows',
+  teamColumn: 'Seattle',
+  leagueColumn: 'RSL',
+  hitters: 12,
+  pitchers: 13,
+  gameNumber: 42,
+  scoutingAccuracy: 'V.High',
+  viewsRecognized: 9,
+  rejected: [],
+};
 
 /**
  * The component sheet: every primitive next to its token names, to check against the canvas.
@@ -137,6 +150,17 @@ export function Sheet() {
             never shown
           </Gate>
         </div>
+      </Section>
+
+      <Section
+        title="Create a team"
+        note="The setup pieces on mock data; dropping here reads nothing"
+      >
+        <div className={styles.columns}>
+          <DropZone size="large" busy={false} onFiles={() => undefined} />
+          <BestFirstUpload />
+        </div>
+        <FoundInFiles summary={SHEET_SUMMARY} />
       </Section>
 
       <Section title="Buttons" note="One gold action per screen; every control is at least 44 px">

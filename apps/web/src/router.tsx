@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate, Outlet } from 'react-router';
 import { RequireSession } from './auth.tsx';
 import { ComingSoon } from './screens/ComingSoon.tsx';
 import { Home } from './screens/Home.tsx';
+import { CreateTeam } from './setup/CreateTeam.tsx';
 import { ModuleScreen } from './screens/Module.tsx';
 import { NotFound } from './screens/NotFound.tsx';
 import { Root } from './screens/Root.tsx';
@@ -35,10 +36,7 @@ export const router = createBrowserRouter([
         errorElement: <RouteError />,
         children: [
           { path: 'teams', element: <TeamsScreen />, errorElement: <RouteError /> },
-          {
-            path: 'teams/new',
-            element: <ComingSoon screen="Create a team" item="Team menu and Create a Team" />,
-          },
+          { path: 'teams/new', element: <CreateTeam />, errorElement: <RouteError /> },
           {
             path: 't/:team/settings',
             element: (

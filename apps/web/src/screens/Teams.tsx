@@ -102,9 +102,9 @@ export function TeamsScreen() {
           <ul className={styles.list}>
             {teams.data.map((team) => (
               <li key={team.id}>
-                <Link to={`/t/${team.id}/settings`}>{team.name}</Link> ({team.league}):{' '}
-                {team.rating_scale} scale, {LEAGUE_SHOWS_LABELS[team.league_shows].toLowerCase()},
-                DH {team.dh_enabled ? 'on' : 'off'}, {team.games_per_season} games,{' '}
+                <Link to={`/t/${team.id}`}>{team.name}</Link> ({team.league}): {team.rating_scale}{' '}
+                scale, {LEAGUE_SHOWS_LABELS[team.league_shows].toLowerCase()}, DH{' '}
+                {team.dh_enabled ? 'on' : 'off'}, {team.games_per_season} games,{' '}
                 {team.dev_lab_slots} Dev Lab slots.
               </li>
             ))}

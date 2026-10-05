@@ -1,0 +1,180 @@
+/* The app shell: the canvas's top bar and module tabs, on the tokens. */
+
+.topBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-6);
+  min-height: var(--header-height);
+  padding: var(--space-1) var(--gutter);
+  border-bottom: var(--border-hairline);
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-0-5);
+}
+
+.mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control);
+  min-height: var(--control-lg);
+  color: var(--color-accent);
+}
+
+.mark svg {
+  width: 22px;
+  height: 22px;
+}
+
+.teamName {
+  font-size: var(--text-17);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-brand);
+}
+
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-5);
+  font-size: var(--text-13);
+  color: var(--color-text-secondary);
+}
+
+.snapshot {
+  display: flex;
+  align-items: center;
+}
+
+.snapshotLabel {
+  padding-right: var(--space-1);
+}
+
+.step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control);
+  min-height: var(--control);
+  padding: 0;
+  color: var(--color-text-secondary);
+}
+
+.step svg {
+  width: 16px;
+  height: 16px;
+}
+
+.step:hover {
+  color: var(--color-text);
+}
+
+.step:disabled {
+  opacity: 0.4;
+}
+
+.select {
+  min-height: var(--control);
+  padding: 0 var(--space-2-5);
+  border: var(--input-border);
+  border-radius: var(--input-radius);
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+}
+
+.coverageLink {
+  text-decoration: none;
+}
+
+.fact {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  min-height: var(--control);
+}
+
+.fact strong {
+  font-weight: var(--weight-regular);
+  color: var(--color-text);
+}
+
+.advisorDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-text-tertiary);
+}
+
+.advisorDot[data-online='true'] {
+  background: var(--color-positive);
+}
+
+.tabs {
+  padding: 0 clamp(2px, 2vw, 18px);
+  border-bottom: var(--border-hairline);
+}
+
+.tabList {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  min-height: var(--control-lg);
+  padding: 0 var(--space-3-5);
+  border-bottom: 2px solid transparent;
+  font-size: var(--text-14);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.tab:hover {
+  color: var(--color-text);
+}
+
+.tabActive {
+  border-bottom-color: var(--tab-active);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+}
+
+.tabLocked {
+  color: var(--tab-locked-fg);
+}
+
+.tabLock {
+  width: 12px;
+  height: 12px;
+}
+
+.alert {
+  padding: var(--space-2) var(--gutter);
+  font-size: var(--text-14);
+  color: var(--color-negative-text);
+}
+
+.main {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6) var(--gutter) var(--space-12);
+}
+
+.heading {
+  font-size: var(--text-22);
+  line-height: var(--leading-heading);
+  font-weight: var(--weight-semibold);
+  text-wrap: balance;
+}

@@ -1,5 +1,11 @@
 import { useState, type ReactNode } from 'react';
 
+import { measureCoverage } from '@ootp/core';
+
+import { Gate } from '../shell/Gate.tsx';
+import { Tabs } from '../shell/Tabs.tsx';
+import { TopBar } from '../shell/TopBar.tsx';
+
 import { ArrowMark, DiamondMark, PlusIcon, SlidersIcon, UploadIcon } from '../ui/icons.tsx';
 import {
   Badge,
@@ -37,6 +43,13 @@ const SWATCHES: [string, string][] = [
 ];
 
 const TYPE_SIZES = [10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 22, 32, 36, 44];
+
+const SHEET_TEAM = { id: 'sheet', name: 'Seattle Arrows', league: 'RSL' };
+const SHEET_SNAPSHOTS = [
+  { id: 'g1', label: 'Game 1' },
+  { id: 'g42', label: 'Game 42' },
+];
+const NOTHING_ON_FILE = measureCoverage([]);
 
 /**
  * The component sheet: every primitive next to its token names, to check against the canvas.
@@ -84,6 +97,46 @@ export function Sheet() {
             </li>
           ))}
         </ul>
+      </Section>
+
+      <Section
+        title="App shell"
+        note="The top bar, the module tabs and the lock framework, on mock data"
+      >
+        <div className={styles.shell}>
+          <TopBar
+            team={SHEET_TEAM}
+            teams={[SHEET_TEAM, { id: 'sheet-2', name: 'Portland Pines', league: 'RSL' }]}
+            dh
+            snapshots={SHEET_SNAPSHOTS}
+            current="g42"
+            tab="clubhouse"
+            coverage="high"
+            advisor="offline"
+            onSignOut={() => undefined}
+          />
+          <Tabs
+            teamId="sheet"
+            snapshotId="g42"
+            locks={{ 'talent-radar': true, 'lineup-card': true, bullpen: true, 'dev-lab': true }}
+          />
+        </div>
+        <div className={styles.row}>
+          <Gate
+            module={{ label: 'Dev lab', needs: ['custom_bat_pot', 'cus_pitch_pot'], arrives: null }}
+            coverage={NOTHING_ON_FILE}
+            clubhouse="/sheet"
+          >
+            never shown
+          </Gate>
+          <Gate
+            module={{ label: 'Talent radar', needs: [], arrives: 'Phase 4' }}
+            coverage={NOTHING_ON_FILE}
+            clubhouse="/sheet"
+          >
+            never shown
+          </Gate>
+        </div>
       </Section>
 
       <Section title="Buttons" note="One gold action per screen; every control is at least 44 px">

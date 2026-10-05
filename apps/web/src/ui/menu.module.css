@@ -1,0 +1,85 @@
+.menu {
+  position: relative;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control);
+  padding: 0 var(--space-2-5);
+  border: 0;
+  border-radius: var(--button-radius);
+  background: transparent;
+  color: var(--color-text);
+}
+
+.trigger:hover,
+.trigger[aria-expanded='true'] {
+  background: var(--menu-active-bg);
+}
+
+.chevron {
+  width: 14px;
+  height: 14px;
+  color: var(--color-text-secondary);
+}
+
+.list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  min-width: 260px;
+  margin-top: var(--space-1);
+  padding: var(--space-1-5);
+  background: var(--menu-bg);
+  border: var(--menu-border);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--menu-shadow);
+}
+
+.groupLabel {
+  padding: var(--space-1-5) var(--space-2-5) var(--space-1);
+  font-size: var(--text-11);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--control);
+  padding: 0 var(--space-2-5);
+  border: 0;
+  border-radius: var(--button-radius);
+  background: transparent;
+  color: var(--color-text);
+  text-align: left;
+  text-decoration: none;
+}
+
+.item:hover,
+.item:focus-visible {
+  background: var(--menu-active-bg);
+  color: var(--color-text);
+}
+
+.item[aria-current='true'] {
+  color: var(--color-accent);
+}
+
+.item svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-secondary);
+}
+
+.separator {
+  margin: var(--space-1-5) 0;
+  border: 0;
+  border-top: var(--border-subtle);
+}

@@ -1,5 +1,5 @@
 {
-  "generation": "5698703a671f5c5d1bd0f1f8a8dbb9fff1a3ee27202f0ed5ad9b0aaee430f5d9",
+  "generation": "328889245b3e5b2124f142cb3419883adad5e9705677041ae0f410908f7553d6",
   "inputs": {
     ".cao/roles/cao-callback-protocol.md": "cbca20b760abe6c33ad67501db8b30600d7440feae4aee395c86e114b8590421",
     ".cao/roles/ootp_code_owner.md": "85e96584e71946581bf1f7a0a0c1497a103fce49d6a28242e38f1b7c74e60544",
@@ -9,8 +9,8 @@
     ".workspace/agent-contract.json": "7438261b1c30b490d62d590901de10c190c1cf8d2eb43748541af25db83dde52",
     ".workspace/native-agents.json": "17a5d75db703acb60eeadbe84d4ecd785d8b359cd1ce072be07f40ca0043b81b",
     ".workspace/role-bindings.json": "9c7145bb6dfe5db8fb802ca187b93c6ec789fa39230ccf06aa37c4661022031d",
-    "CLAUDE.md": "1fb128c9594a95e25355a6d39619bc0e9bd8f46888dec997fb33c6fd13a6c0bf",
-    "docs/tasks/authoring-guide.md": "055a659278581b8f9fd32ea4d5ff637af7b3a1bca7d4cee10de4d2c0d8ae6d73"
+    "CLAUDE.md": "f156e83d724499fa32efd6953f3b8aeb59a6c5e428974e4ebe24443bfd7d7282",
+    "docs/tasks/authoring-guide.md": "f50c1adf8cfaef3d50c63b0bda21d1c1a7c03668c4ab65a6b4efff343cf0f2d9"
   },
   "outputs": {
     ".cao/agent_store/_base.md": "0d79859c1c75b49032acfb153fc39eacf59b51724fdd13d8ca6751481c8a025e",

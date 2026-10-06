@@ -36,6 +36,8 @@ describe('restoreSummary and describeRestore', () => {
   const snapshot = { id: 's', teamId: 't', label: 'Game 42', gameNumber: 42 };
   const file = (outcome: 'added' | 'replaced' | 'unchanged') => ({
     name: `${outcome}.csv`,
+    view: 'batting_stats_1' as const,
+    scope: 'team' as const,
     routing: 'primary' as const,
     outcome,
     events: [],

@@ -321,3 +321,29 @@
   font-size: var(--text-14);
   color: var(--color-text-secondary);
 }
+
+/* A pending file in Create a Team: what it was read as, and its Remove. */
+.fileRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.fileRow > .view {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.fileName {
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  color: var(--color-text-tertiary);
+  overflow-wrap: anywhere;
+}
+
+.replaced {
+  font-size: var(--text-12);
+  color: var(--color-accent);
+  overflow-wrap: anywhere;
+}

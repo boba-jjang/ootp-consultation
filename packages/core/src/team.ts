@@ -16,16 +16,15 @@ const teamSettingsSchema = z.object({
   league_shows: z.enum(LEAGUE_SHOWS, 'Choose what the league shows.'),
   dh_enabled: z.boolean(),
   games_per_season: z.int('Use a whole number of games.').positive('Use at least 1 game.'),
-  dev_lab_slots: z
-    .int('Use a whole number of slots.')
-    .min(1, 'Use 1 to 30 slots.')
-    .max(30, 'Use 1 to 30 slots.'),
 });
 
 /** The Team setup fields from the design handoff, named as in the `teams` table. */
 export type TeamSettings = z.infer<typeof teamSettingsSchema>;
 
-/** Setup defaults from the design handoff: a 1-10 scale, potentials only, DH on, 162 games, 4 slots. */
+/**
+ * Setup defaults from the design handoff: a 1-10 scale, potentials only, DH on, 162 games.
+ * Since v3.1 the app writes potentials only; LEAGUE_SHOWS keeps the other value readable.
+ */
 export const DEFAULT_TEAM_SETTINGS: TeamSettings = {
   name: '',
   league: '',
@@ -33,7 +32,6 @@ export const DEFAULT_TEAM_SETTINGS: TeamSettings = {
   league_shows: 'potentials_only',
   dh_enabled: true,
   games_per_season: 162,
-  dev_lab_slots: 4,
 };
 
 export type ParseResult<T> =

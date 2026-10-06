@@ -187,18 +187,13 @@ export interface Coverage {
 const ALL_VIEWS = Object.keys(VIEW_MANIFESTS) as ViewId[];
 const SIDES: readonly Side[] = ['hitters', 'pitchers'];
 
-/** The views of each layer, both sides, in manifest order. */
-const LAYER_VIEWS: Record<Layer, ViewId[]> = {
-  stats: [],
-  superstats: [],
-  ratings: [],
-};
-for (const view of ALL_VIEWS) {
-  const layer = DATA_SET_INFO[VIEW_DESCRIPTIONS[view].dataSet].layer;
-  if (layer !== null) {
-    LAYER_VIEWS[layer].push(view);
-  }
-}
+/** The views of each layer, both sides, in manifest order. The bio view counts toward none. */
+export const LAYER_VIEWS: Readonly<Record<Layer, readonly ViewId[]>> = Object.fromEntries(
+  LAYERS.map((layer) => [
+    layer,
+    ALL_VIEWS.filter((view) => DATA_SET_INFO[VIEW_DESCRIPTIONS[view].dataSet].layer === layer),
+  ]),
+) as Record<Layer, ViewId[]>;
 
 const text = (row: ExportRow, column: string) => {
   const value = row[column];

@@ -23,3 +23,11 @@ export async function expectTargets(page: Page): Promise<void> {
   );
   expect(small).toEqual([]);
 }
+
+/** Nothing makes the page scroll sideways; wide tables scroll inside their own frames. */
+export async function expectNoSideScroll(page: Page): Promise<void> {
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBe(0);
+}

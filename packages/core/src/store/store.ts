@@ -66,6 +66,9 @@ export interface UploadOptions {
 
 export interface UploadedFile {
   name: string;
+  /** The view the importer read, with its scope; null for a rejected file. */
+  view: ViewId | null;
+  scope: Scope | null;
   routing: Routing;
   /** Added as new, replaced an earlier copy of the same view, or already stored. */
   outcome: 'added' | 'replaced' | 'unchanged';
@@ -128,7 +131,13 @@ export async function importUpload(
   const files: UploadedFile[] = [];
   for (const { upload, result } of routed) {
     const sha256 = await options.hash(upload.text);
-    const summary = { name: upload.name, routing: result.routing, events: result.events };
+    const summary = {
+      name: upload.name,
+      view: result.view,
+      scope: result.scope,
+      routing: result.routing,
+      events: result.events,
+    };
     if (stored.some((file) => file.sha256 === sha256)) {
       files.push({ ...summary, outcome: 'unchanged' });
       continue;
@@ -175,8 +184,16 @@ export async function loadSnapshot(
   scale: RatingScale,
 ): Promise<Snapshot> {
   const files = await store.listFiles(snapshotId);
-  return assembleSnapshot(
+  const snapshot = assembleSnapshot(
     files.map((file) => routeExport(file.originalFilename, file.content)),
     { scale },
   );
+  // Each log row keeps its stored file's id, so a screen can replace or remove that file.
+  return {
+    ...snapshot,
+    files: snapshot.files.map((file, index) => {
+      const id = files[index]?.id;
+      return id === undefined ? file : { ...file, id };
+    }),
+  };
 }

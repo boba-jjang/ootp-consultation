@@ -11,7 +11,6 @@ describe('DEFAULT_TEAM_SETTINGS', () => {
       league_shows: 'potentials_only',
       dh_enabled: true,
       games_per_season: 162,
-      dev_lab_slots: 4,
     });
     const filledIn = { ...DEFAULT_TEAM_SETTINGS, name: 'Seattle Arrows', league: 'ABL' };
     expect(parseTeamSettings(filledIn)).toEqual({ ok: true, value: filledIn });
@@ -33,8 +32,6 @@ describe('parseTeamSettings', () => {
     ['an unknown league display', { league_shows: 'everything' }, 'league_shows'],
     ['zero games per season', { games_per_season: 0 }, 'games_per_season'],
     ['fractional games per season', { games_per_season: 161.5 }, 'games_per_season'],
-    ['no Dev Lab slots', { dev_lab_slots: 0 }, 'dev_lab_slots'],
-    ['more than 30 Dev Lab slots', { dev_lab_slots: 31 }, 'dev_lab_slots'],
   ])('rejects %s and names the field', (_case, change, field) => {
     const result = parseTeamSettings({ ...valid, ...change });
     expect(result.ok).toBe(false);
@@ -43,9 +40,12 @@ describe('parseTeamSettings', () => {
     }
   });
 
-  it('accepts the Dev Lab slot range ends, 1 and 30', () => {
-    expect(parseTeamSettings({ ...valid, dev_lab_slots: 1 }).ok).toBe(true);
-    expect(parseTeamSettings({ ...valid, dev_lab_slots: 30 }).ok).toBe(true);
+  it('still reads a team stored as current and potential', () => {
+    expect(parseTeamSettings({ ...valid, league_shows: 'current_and_potential' }).ok).toBe(true);
+  });
+
+  it('drops Dev Lab slots, which teams no longer have', () => {
+    expect(parseTeamSettings({ ...valid, dev_lab_slots: 4 })).toEqual({ ok: true, value: valid });
   });
 
   it('drops fields it does not know, such as owner_id', () => {
@@ -66,6 +66,10 @@ describe('parseTeamRow', () => {
 
   it('reads a teams row as stored', () => {
     expect(parseTeamRow(row)).toEqual(row);
+  });
+
+  it('reads a row that still has the retired dev_lab_slots column, without it', () => {
+    expect(parseTeamRow({ ...row, dev_lab_slots: 4 })).toEqual(row);
   });
 
   it('rejects a row missing its id', () => {

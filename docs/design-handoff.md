@@ -79,3 +79,9 @@ Notes added after review in the planning chat (3 October 2026):
 - Import log: the pitching view run on hitters is not rejected. It is routed as a supplemental source for hitters' DEF Pot, which no batting view carries. See `CLAUDE.md`.
 - Luck reads: the .02–.03 offset is Seattle's own BACON vs xBACON gap, and the league files carry no hits to give a league offset. It does not carry over to wOBA vs xwOBA or ERA vs xERA, which run the other way in this data; each pair gets its own baseline.
 - Hosting is now decided in `docs/implementation-plan.md` (Vercel, Supabase, Gemini free tier), pending the open questions listed there.
+
+Notes added after the owner's Phase 3 review (5 October 2026, v3.1):
+
+- Team setup no longer asks for Dev Lab slots or what the league shows. The app reads potentials only for batting and pitching, for now; the choice can come back without a database change. Setup asks for the team name, league, rating scale, DH and games per season.
+- A team's exports can be added, replaced or removed after setup: from the team menu's "Add or update exports" (it opens the Clubhouse's Add data), on the page of a team with no snapshot yet, and file by file in the Clubhouse's import log, where Remove asks first. Every upload ends in a list of what happened to each file.
+- Best first upload no longer lists `default` under Stats. It is the hitters' bio view and counts toward no coverage layer; it is still read, and still suggested last.

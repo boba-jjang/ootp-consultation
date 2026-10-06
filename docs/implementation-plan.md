@@ -287,6 +287,11 @@ Build order, one pull request each:
 - [x] End-to-end and accessibility tests in `e2e.yml`: Create a Team from the fixtures yields a Game 42 snapshot with High coverage; locked states render; no serious axe violations; 44 px targets. The signed-in test runs as the staging test user below.
 - [ ] Ask the design chat for Talent radar (with league percentiles), the situational strategy view, trends and where league files are uploaded. The brief is `docs/design/design-ask-phase-4.md`; sending it is the owner's step.
 
+Phase 3.1 (v3.1), from the owner's Phase 3 review on 5 October 2026:
+
+- [x] Update exports after setup: add or update exports from any team screen, including a team with no snapshot yet; remove or replace a single file in Create a Team and in the Clubhouse, with each file's outcome listed; team settings without Dev Lab slots or the ratings-shown choice (potentials only, for now); Best first upload without the bio view.
+- [ ] Retire `teams.dev_lab_slots`, which the app stopped using in v3.1: make the column nullable in one release, stop writing it in the next, then drop it. Needs the owner's go, since it changes production's schema.
+
 ## Testing and quality
 
 The Seattle game-42 exports are the golden fixtures: every parser rule, identity check and model output is tested against them. Each row of the Knowledge Base's "Columns that need special handling" table becomes at least one test; that table is the checklist.

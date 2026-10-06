@@ -7,6 +7,7 @@ import {
   ChevronRightIcon,
   PlusIcon,
   SlidersIcon,
+  UploadIcon,
 } from '../ui/icons.tsx';
 import { Menu, MenuAction, MenuGroup, MenuLink, MenuSeparator } from '../ui/menu.tsx';
 import { Button, CoverageBadge, LeagueTag } from '../ui/primitives.tsx';
@@ -86,6 +87,9 @@ export function TopBar({
             ))}
           </MenuGroup>
           <MenuSeparator />
+          <MenuLink to={modulePath(team.id, current, 'clubhouse')} state={{ addData: true }}>
+            <UploadIcon /> Add or update exports
+          </MenuLink>
           <MenuLink to="/teams/new">
             <PlusIcon /> Create a team
           </MenuLink>

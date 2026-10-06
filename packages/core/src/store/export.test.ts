@@ -14,7 +14,7 @@ import {
   type TeamSettings,
   type Upload,
 } from '../index.ts';
-import { FIXTURES, readFixtureText } from '../../test/fixtures.ts';
+import { FIXTURES, readFixtureText, withoutFileIds } from '../../test/fixtures.ts';
 import { memoryStore, sha256 } from '../../test/memory-store.ts';
 
 const TEAM: TeamSettings = { ...DEFAULT_TEAM_SETTINGS, name: 'Seattle Arrows', league: 'RSL' };
@@ -77,9 +77,9 @@ describe('exportTeam and restoreTeam', () => {
       expect(await contents(target.store, restored?.id ?? '')).toEqual(
         await contents(source.store, snapshot.id),
       );
-      expect(await loadSnapshot(target.store, restored?.id ?? '', TEAM.rating_scale)).toEqual(
-        await loadSnapshot(source.store, snapshot.id, TEAM.rating_scale),
-      );
+      expect(
+        withoutFileIds(await loadSnapshot(target.store, restored?.id ?? '', TEAM.rating_scale)),
+      ).toEqual(withoutFileIds(await loadSnapshot(source.store, snapshot.id, TEAM.rating_scale)));
     }
   });
 
@@ -113,6 +113,19 @@ describe('exportTeam and restoreTeam', () => {
   });
 });
 
+describe('readTeamExport of an older zip', () => {
+  it('reads team settings that still carry Dev Lab slots, without them', () => {
+    const team = { ...TEAM, dev_lab_slots: 4 };
+    const zip = zipSync({
+      'team.json': strToU8(
+        JSON.stringify({ format: 1, importerVersion: IMPORTER_VERSION, team, snapshots: [] }),
+      ),
+    });
+    const read = readTeamExport(zip);
+    expect(read.ok ? read.value.team : null).toEqual(TEAM);
+  });
+});
+
 describe('readTeamExport refusals', () => {
   const manifest = (overrides: Record<string, unknown>) =>
     strToU8(
@@ -131,7 +144,7 @@ describe('readTeamExport refusals', () => {
     ['an unknown format version', zipSync({ 'team.json': manifest({ format: 2 }) }), /format/],
     [
       'invalid team settings',
-      zipSync({ 'team.json': manifest({ team: { ...TEAM, dev_lab_slots: 99 } }) }),
+      zipSync({ 'team.json': manifest({ team: { ...TEAM, games_per_season: 0 } }) }),
       /team settings/,
     ],
     [

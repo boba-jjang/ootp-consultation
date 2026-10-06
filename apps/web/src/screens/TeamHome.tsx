@@ -15,6 +15,9 @@ export function TeamHome() {
   const { team: teamId = '' } = useParams();
   const teams = useTeams();
   const snapshots = useSnapshots(teamId);
+  // While the first upload runs, the snapshot it creates arrives in the list before the upload
+  // returns. The upload opens it, with its results, so this screen waits instead of redirecting.
+  const [uploading, setUploading] = useState(false);
   if (teams.isError) {
     throw teams.error;
   }
@@ -29,21 +32,28 @@ export function TeamHome() {
     return <MissingScreen title="Team not found" to="/teams" link="Go to your teams" />;
   }
   const latest = snapshots.data.at(-1);
-  if (latest) {
+  if (latest && !uploading) {
     return <Navigate to={modulePath(team.id, latest.id, 'clubhouse')} replace />;
   }
-  return <FirstUpload team={team} />;
+  return <FirstUpload team={team} busy={uploading} onBusy={setUploading} />;
 }
 
 /** A team created without files: its first exports make its first snapshot. */
-function FirstUpload({ team }: { team: TeamRow }) {
+function FirstUpload({
+  team,
+  busy,
+  onBusy,
+}: {
+  team: TeamRow;
+  busy: boolean;
+  onBusy: (busy: boolean) => void;
+}) {
   const navigate = useNavigate();
   const add = useAddExports();
-  const [reading, setReading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const onFiles = (files: Promise<Upload[]>) => {
-    setReading(true);
+    onBusy(true);
     setError(null);
     files
       .then(async (uploads) => {
@@ -61,13 +71,17 @@ function FirstUpload({ team }: { team: TeamRow }) {
           return;
         }
         const state: ClubhouseState = { results: { result, from: null } };
-        void navigate(modulePath(team.id, result.snapshot.id, 'clubhouse'), { state });
+        // In place of this page: /t/:team would only redirect to the new snapshot now.
+        void navigate(modulePath(team.id, result.snapshot.id, 'clubhouse'), {
+          replace: true,
+          state,
+        });
       })
       .catch((failure: unknown) => {
         setError(failure instanceof Error ? failure.message : String(failure));
       })
       .finally(() => {
-        setReading(false);
+        onBusy(false);
       });
   };
 
@@ -86,7 +100,7 @@ function FirstUpload({ team }: { team: TeamRow }) {
         </div>
         <DropZone
           size="large"
-          busy={reading}
+          busy={busy}
           onFiles={onFiles}
           title="Drop this team's OOTP exports here"
         />

@@ -1,4 +1,6 @@
 .sheet {
+  /* Stretched, not shrink-to-fit: centred in a flex column, it would grow to its content. */
+  width: 100%;
   max-width: var(--width-setup);
   margin: 0 auto;
   padding: var(--space-10) var(--gutter) var(--space-12);

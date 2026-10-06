@@ -10,7 +10,8 @@ import { Link, useParams } from 'react-router';
 
 import { useExportTeam, useRestoreTeam, useTeams, useUpdateTeam } from '../data.ts';
 import { MissingScreen, StatusScreen } from '../screens/Message.tsx';
-import { focusFirstError, fromForm, toForm, type FieldErrors } from '../setup/form.ts';
+import { fromForm, toForm, type FieldErrors } from '../setup/form.ts';
+import { focusFirstError } from '../setup/focus.ts';
 import setupStyles from '../setup/Setup.module.css';
 import { TeamSettingsForm } from '../setup/TeamSettingsForm.tsx';
 import { AppHeader } from '../ui/AppHeader.tsx';

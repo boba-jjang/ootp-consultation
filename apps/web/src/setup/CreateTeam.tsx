@@ -22,21 +22,16 @@ import { Button, CoverageBadge, LeagueTag, Panel, Steps } from '../ui/primitives
 import { listOf } from '../ui/text.ts';
 import {
   NOTHING_PREFILLED,
+  NO_EXPORTS,
+  addExports,
   prefill,
-  readExports,
+  removeExport,
   type Prefilled,
   type ReadExports,
 } from './exports.ts';
-import {
-  SCALE_LABELS,
-  SHOWS_LABELS,
-  focusFirstError,
-  fromForm,
-  toForm,
-  type FieldErrors,
-  type TeamForm,
-} from './form.ts';
-import { BestFirstUpload, CoverageSoFar, DropZone, FoundInFiles, ViewsRead } from './pieces.tsx';
+import { SCALE_LABELS, fromForm, toForm, type FieldErrors, type TeamForm } from './form.ts';
+import { focusFirstError } from './focus.ts';
+import { BestFirstUpload, CoverageSoFar, DropZone, FilesRead, FoundInFiles } from './pieces.tsx';
 import { TeamSettingsForm } from './TeamSettingsForm.tsx';
 import styles from './Setup.module.css';
 
@@ -54,7 +49,7 @@ export function CreateTeam() {
   const [step, setStep] = useState<Step>(0);
   const [reading, setReading] = useState(false);
   const [readError, setReadError] = useState<string | null>(null);
-  const [exports, setExports] = useState<ReadExports>(() => readExports([]));
+  const [exports, setExports] = useState<ReadExports>(NO_EXPORTS);
   const [form, setForm] = useState<TeamForm>(() => toForm(DEFAULT_TEAM_SETTINGS));
   const [errors, setErrors] = useState<FieldErrors>({});
   const [prefilled, setPrefilled] = useState<Prefilled>(NOTHING_PREFILLED);
@@ -85,7 +80,7 @@ export function CreateTeam() {
         if (uploads.length === 0) {
           setReadError('No CSV file was among those. OOTP exports are .csv files.');
         }
-        setExports((current) => readExports([...current.uploads, ...uploads]));
+        setExports((current) => addExports(current, uploads));
       })
       .catch((error: unknown) => {
         setReadError(error instanceof Error ? error.message : String(error));
@@ -158,8 +153,11 @@ export function CreateTeam() {
                 reading={reading}
                 readError={readError}
                 onFiles={addFiles}
+                onRemove={(key) => {
+                  setExports((current) => removeExport(current, key));
+                }}
                 onReset={() => {
-                  setExports(readExports([]));
+                  setExports(NO_EXPORTS);
                   setReadError(null);
                 }}
                 onContinue={() => {
@@ -204,6 +202,7 @@ function StepExports({
   reading,
   readError,
   onFiles,
+  onRemove,
   onReset,
   onContinue,
 }: {
@@ -211,6 +210,7 @@ function StepExports({
   reading: boolean;
   readError: string | null;
   onFiles: (files: Promise<Upload[]>) => void;
+  onRemove: (key: string) => void;
   onReset: () => void;
   onContinue: () => void;
 }) {
@@ -229,7 +229,7 @@ function StepExports({
         </h1>
         <p className={styles.lead}>
           {has
-            ? `${exports.named.length} ${exports.named.length === 1 ? 'file' : 'files'} read. Here's what they say about your team.`
+            ? `${exports.files.length} ${exports.files.length === 1 ? 'file' : 'files'} read. Here's what they say about your team.`
             : "Start with your OOTP exports. The team, league and roster are read from them, so there's less to type."}
         </p>
       </div>
@@ -237,7 +237,7 @@ function StepExports({
         <>
           <FoundInFiles summary={exports.summary} />
           <div className={styles.columns}>
-            <ViewsRead named={exports.named} coverage={exports.coverage} />
+            <FilesRead files={exports.files} coverage={exports.coverage} onRemove={onRemove} />
             <CoverageSoFar coverage={exports.coverage} />
           </div>
           <DropZone size="small" busy={reading} onFiles={onFiles} />
@@ -373,8 +373,6 @@ function StepReview({
           }}
         >
           {SCALE_LABELS[form.rating_scale]} scale, converted to 20–80
-          <br />
-          Batting and pitching: {SHOWS_LABELS[form.league_shows].toLowerCase()}
         </SummaryItem>
         <SummaryItem
           title="League rules"
@@ -385,7 +383,7 @@ function StepReview({
         >
           DH {form.dh_enabled ? 'on' : 'off'}
           <br />
-          {form.games_per_season} games, {form.dev_lab_slots} Dev Lab slots
+          {form.games_per_season} games
         </SummaryItem>
         <SummaryItem
           title="First snapshot"
@@ -398,7 +396,7 @@ function StepReview({
           <br />
           {has
             ? `${coverage.views.onFile.length} views, ${players} players`
-            : 'Add exports anytime from the Clubhouse'}
+            : 'Add exports once the team exists'}
         </SummaryItem>
       </dl>
       <Panel title="On day one" meta={<CoverageBadge level={coverage.level} prefix="" />}>

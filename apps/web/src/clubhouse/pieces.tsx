@@ -10,13 +10,17 @@ import {
   type Layer,
   type SideCoverage,
   type StoredSnapshot,
+  type Upload,
+  type UploadedFile,
   type ViewId,
 } from '@ootp/core';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
+import { FileButton } from '../setup/pieces.tsx';
 import { CheckIcon, InfoIcon } from '../ui/icons.tsx';
 import { Button, Chip, MatrixCell, Panel, Timeline } from '../ui/primitives.tsx';
 import styles from './Clubhouse.module.css';
+import { outcomeOf } from './results.ts';
 
 /**
  * The Clubhouse's pieces that read nothing themselves, so the sheet can show them: the
@@ -68,10 +72,12 @@ export function SnapshotTimeline({
 /** The layers, the badge's sentence, and a card per view that would raise it. */
 export function UploadNext({
   coverage,
-  onUpload,
+  busy,
+  onFiles,
 }: {
   coverage: Coverage;
-  onUpload: (view: ViewId) => void;
+  busy: boolean;
+  onFiles: (files: Promise<Upload[]>) => void;
 }) {
   return (
     <Panel title="What to upload next" className={styles.next}>
@@ -96,15 +102,16 @@ export function UploadNext({
             <p className={styles.muted}>
               {description.carries}.{description.unlocks ? ` Unlocks: ${description.unlocks}.` : ''}
             </p>
-            <Button
+            <FileButton
               variant="outline"
               className={styles.cardAction}
-              onClick={() => {
-                onUpload(view);
-              }}
+              label={`Upload this view: ${view}`}
+              multiple={false}
+              busy={busy}
+              onFiles={onFiles}
             >
               Upload this view
-            </Button>
+            </FileButton>
           </article>
         );
       })}
@@ -210,42 +217,168 @@ const routeOf = (file: ImportedFile) => {
 };
 
 /** Every file of the snapshot, where it went and how many players it matched. */
-export function ImportLog({ files, label }: { files: readonly ImportedFile[]; label: string }) {
+/** What a stored file's row can do, when the screen can change the snapshot. */
+export interface LogActions {
+  busy: boolean;
+  /** A message on one row, such as why a replacement was refused. */
+  notice: { id: string; message: string } | null;
+  onReplace: (file: ImportedFile, files: Promise<Upload[]>) => void;
+  onRemove: (file: ImportedFile) => void;
+}
+
+/** Every file of the snapshot, where it went and how many players it matched. */
+export function ImportLog({
+  files,
+  label,
+  actions,
+}: {
+  files: readonly ImportedFile[];
+  label: string;
+  actions?: LogActions;
+}) {
   return (
     <Panel title="Import log" meta={`${label} snapshot`} className={styles.log}>
       {files.length === 0 ? <p className={styles.muted}>No file yet.</p> : null}
       <ul className={styles.logList}>
-        {files.map((file, index) => {
-          const warnings = file.events.filter((event) => event.level === 'warning');
+        {files.map((file, index) => (
           // Two rejected copies of one name can sit in the log: the position tells them apart.
-          return (
-            <li key={`${index}:${file.name}`} className={styles.logRow}>
-              <span className={styles.logIcon} data-routing={file.routing} aria-hidden="true">
-                {file.routing === 'rejected' ? <InfoIcon /> : <CheckIcon />}
-              </span>
-              <span className={styles.logText}>
-                <span>{routeOf(file)}</span>
-                <span className={styles.logFile}>{file.name}</span>
-                {warnings.map((event) => (
-                  <span key={event.code} className={styles.logWarning}>
-                    {event.message}
-                  </span>
-                ))}
-              </span>
-              <span className={styles.logCount}>
-                {file.routing === 'rejected'
-                  ? '—'
-                  : `${file.players} ${file.scope === 'league' ? 'rows' : 'players'}`}
-              </span>
-            </li>
-          );
-        })}
+          <LogRow key={file.id ?? `${String(index)}:${file.name}`} file={file} actions={actions} />
+        ))}
       </ul>
       <p className={styles.muted}>
         Cleaned on the way in: innings read in thirds (52.2 IP is 52⅔ innings), percent signs,
         fractional rates and salaries like $600 000.
       </p>
     </Panel>
+  );
+}
+
+/** One file of the log. Replace swaps it for another export of its view; Remove asks first. */
+function LogRow({ file, actions }: { file: ImportedFile; actions: LogActions | undefined }) {
+  const [confirming, setConfirming] = useState(false);
+  const cancel = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    // The Remove button is gone once the question shows, so the focus moves to the safe answer.
+    if (confirming) {
+      cancel.current?.focus();
+    }
+  }, [confirming]);
+  const warnings = file.events.filter((event) => event.level === 'warning');
+  const notice = actions?.notice && actions.notice.id === file.id ? actions.notice.message : null;
+  return (
+    <li className={styles.logRow}>
+      <span className={styles.logIcon} data-routing={file.routing} aria-hidden="true">
+        {file.routing === 'rejected' ? <InfoIcon /> : <CheckIcon />}
+      </span>
+      <div className={styles.logText}>
+        <span>{routeOf(file)}</span>
+        <span className={styles.logFile}>{file.name}</span>
+        {warnings.map((event) => (
+          <span key={event.code} className={styles.logWarning}>
+            {event.message}
+          </span>
+        ))}
+        {actions && file.id !== undefined ? (
+          <div className={styles.logActions}>
+            {confirming ? (
+              <>
+                <span className={styles.confirmText}>Remove this file from the snapshot?</span>
+                <Button
+                  variant="outline"
+                  aria-label={`Yes, remove ${file.name}`}
+                  disabled={actions.busy}
+                  onClick={() => {
+                    setConfirming(false);
+                    actions.onRemove(file);
+                  }}
+                >
+                  Yes, remove
+                </Button>
+                <Button
+                  ref={cancel}
+                  variant="ghost"
+                  onClick={() => {
+                    setConfirming(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </>
+            ) : (
+              <>
+                {file.routing === 'rejected' ? null : (
+                  <FileButton
+                    variant="ghost"
+                    label={`Replace ${file.name}`}
+                    multiple={false}
+                    busy={actions.busy}
+                    onFiles={(files) => {
+                      actions.onReplace(file, files);
+                    }}
+                  >
+                    Replace
+                  </FileButton>
+                )}
+                <Button
+                  variant="ghost"
+                  aria-label={`Remove ${file.name}`}
+                  disabled={actions.busy}
+                  onClick={() => {
+                    setConfirming(true);
+                  }}
+                >
+                  Remove
+                </Button>
+              </>
+            )}
+          </div>
+        ) : null}
+        {notice ? (
+          <p className={styles.rowNotice} role="alert">
+            {notice}
+          </p>
+        ) : null}
+      </div>
+      <span className={styles.logCount}>
+        {file.routing === 'rejected'
+          ? '—'
+          : `${String(file.players)} ${file.scope === 'league' ? 'rows' : 'players'}`}
+      </span>
+    </li>
+  );
+}
+
+/** What an upload did, file by file. */
+export function UploadResults({
+  heading,
+  files,
+  onDismiss,
+}: {
+  heading: string;
+  files: readonly UploadedFile[];
+  onDismiss: () => void;
+}) {
+  return (
+    <div className={styles.results}>
+      <p className={styles.resultsHeading} role="status">
+        {heading}
+      </p>
+      <ul className={styles.resultList}>
+        {files.map((file, index) => (
+          <li
+            key={`${String(index)}:${file.name}`}
+            className={styles.result}
+            data-outcome={file.routing === 'rejected' ? 'rejected' : file.outcome}
+          >
+            <span className={styles.logFile}>{file.name}</span>
+            <span>{outcomeOf(file)}</span>
+          </li>
+        ))}
+      </ul>
+      <Button variant="ghost" className={styles.dismiss} onClick={onDismiss}>
+        Dismiss
+      </Button>
+    </div>
   );
 }
 

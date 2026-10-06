@@ -2,7 +2,7 @@ import { readdirSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { assembleSnapshot, routeExport, type RoutedExport } from '../index.ts';
+import { assembleSnapshot, gameNumberOf, routeExport, type RoutedExport } from '../index.ts';
 import { FIXTURES, readFixtureText } from '../../test/fixtures.ts';
 
 const routed = (): RoutedExport[] =>
@@ -98,5 +98,17 @@ describe('assembleSnapshot with less data or another scale', () => {
   it("checks ratings against the league's declared scale", () => {
     const snapshot = assembleSnapshot(routed(), { scale: '20-80' });
     expect(snapshot.events.map((event) => event.code)).toContain('rating-out-of-scale');
+  });
+});
+
+describe('gameNumberOf', () => {
+  it('dates files by the most games any hitter has played', () => {
+    expect(gameNumberOf(routed())).toBe(42);
+    expect(gameNumberOf(routed().filter((file) => file.view === 'batting_stats_2'))).toBe(42);
+  });
+
+  it('has no game number without a hitter stats view', () => {
+    expect(gameNumberOf(routed().filter((file) => file.side === 'pitchers'))).toBeNull();
+    expect(gameNumberOf([])).toBeNull();
   });
 });

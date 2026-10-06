@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DATA_SETS,
   DATA_SET_INFO,
+  LAYER_VIEWS,
   LEAGUE_VIEWS,
   VIEW_DESCRIPTIONS,
   VIEW_MANIFESTS,
@@ -61,6 +62,17 @@ describe('the data sets and the view descriptions', () => {
     }
     expect([...described].sort()).toEqual([...ALL_VIEWS].sort());
     expect(DATA_SET_INFO.bio.views.pitchers).toEqual([]);
+  });
+});
+
+describe('LAYER_VIEWS', () => {
+  it('lists each layer’s views, and leaves the bio view out of all three', () => {
+    expect(LAYER_VIEWS).toEqual({
+      stats: [...STATS],
+      superstats: [...SUPERSTATS],
+      ratings: [...RATINGS],
+    });
+    expect(Object.values(LAYER_VIEWS).flat()).not.toContain('default');
   });
 });
 

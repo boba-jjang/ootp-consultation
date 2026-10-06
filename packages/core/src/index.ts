@@ -56,6 +56,7 @@ export {
 export { RATING_COLUMNS } from './ratings/columns.ts';
 export {
   assembleSnapshot,
+  gameNumberOf,
   type ImportedFile,
   type Snapshot,
   type SnapshotSettings,
@@ -66,6 +67,7 @@ export {
   DATA_SETS,
   DATA_SET_INFO,
   LAYERS,
+  LAYER_VIEWS,
   VIEW_DESCRIPTIONS,
   measureCoverage,
   type Coverage,
@@ -98,3 +100,11 @@ export {
   type TeamExport,
   type TeamExportResult,
 } from './store/export.ts';
+export {
+  collectUploads,
+  describeFile,
+  replacementKey,
+  replacementProblem,
+  type CollectedUploads,
+  type PendingUpload,
+} from './store/updates.ts';

@@ -328,3 +328,63 @@
   padding-top: var(--space-4);
   border-top: var(--border-subtle);
 }
+
+/* A stored file's Replace and Remove, and the question Remove asks first. */
+.logActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.confirmText {
+  font-size: var(--text-13);
+  color: var(--color-text-body);
+}
+
+.rowNotice {
+  margin-top: var(--space-1);
+  font-size: var(--text-13);
+  color: var(--color-negative-text);
+}
+
+/* What an upload did, file by file. */
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: var(--panel-radius);
+}
+
+.resultsHeading {
+  font-size: var(--text-14);
+  font-weight: var(--weight-semibold);
+}
+
+.resultList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+  list-style: none;
+  padding: 0;
+  font-size: var(--text-13);
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.result[data-outcome='rejected'] > span:last-child {
+  color: var(--color-negative-text);
+}
+
+.dismiss {
+  align-self: flex-start;
+}

@@ -1,0 +1,67 @@
+{
+  "base": ".cao/roles/project.md",
+  "guides": [
+    "CLAUDE.md",
+    "docs/tasks/authoring-guide.md",
+    ".cao/roles/cao-callback-protocol.md"
+  ],
+  "native_agents": ".workspace/native-agents.json",
+  "profiles": {
+    "ootp_code_owner": {
+      "description": "Read-only coordinator: reads the task, delegates the implementation and the independent QA, verifies every callback and reports readiness to the owner.",
+      "hub_operations": [
+        "github.heads",
+        "github.pull_requests",
+        "github.pull_request",
+        "cao.observe",
+        "artifact.sha256",
+        "human.reply",
+        "cao.callback_check",
+        "cao.review_check",
+        "cao.ack"
+      ],
+      "launch_root": ".",
+      "specialization": ".cao/roles/ootp_code_owner.md"
+    },
+    "ootp_developer": {
+      "description": "Implements one task on its task branch, tests first, and delivers scoped commits and a draft pull request through the hub's GitHub task operations.",
+      "hub_operations": [
+        "github.heads",
+        "github.pull_requests",
+        "github.pull_request",
+        "github.task_prepare",
+        "github.task_commit",
+        "github.task_push",
+        "github.task_pr"
+      ],
+      "launch_root": ".",
+      "specialization": ".cao/roles/ootp_developer.md"
+    },
+    "ootp_qa": {
+      "description": "Independently verifies one delivery at its exact commits with the repository's own checks and reports a verdict with evidence.",
+      "hub_operations": [
+        "github.heads",
+        "github.pull_requests",
+        "github.pull_request",
+        "cao.report_store"
+      ],
+      "launch_root": ".",
+      "specialization": ".cao/roles/ootp_qa.md"
+    }
+  },
+  "project_id": "ootp-consultation",
+  "responsibilities": {
+    "coordinator": [
+      "ootp_code_owner"
+    ],
+    "implementation": [
+      "ootp_developer"
+    ],
+    "qa": [
+      "ootp_qa"
+    ]
+  },
+  "schema_version": 1,
+  "shared_revision": "1.2.2",
+  "shared_sha256": "279c7fe5f77ce9013b577f75dbe3821468ea1dfdbd4ab76f0e426f8c11201e83"
+}

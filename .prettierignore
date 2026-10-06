@@ -10,3 +10,8 @@ fixtures/
 # Docs are edited as prose, and the boards are reference markup exported from the canvas
 *.md
 docs/design/boards/
+
+# Hub-managed configuration and generated profiles are byte-exact (wsx agents check)
+.workspace/
+.cao/agent_store/
+.claude/settings.json

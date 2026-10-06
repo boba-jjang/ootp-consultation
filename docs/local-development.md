@@ -105,6 +105,8 @@ Project refs: staging is `kcmjeivksnptmvemusma` and production is `piswvhjbbzeog
 
 `CLAUDE.md` loads automatically, and `/next-task` and `/gate-check` work as they do in the cloud. The session-start hook in `.claude/settings.json` only installs dependencies in cloud sessions and does nothing on your machine.
 
+Tasks drafted by the task-authoring server run unattended through CAO on the owner's machine; `.cao/README.md` describes that setup. The hub's observation hooks in `.claude/settings.json` record session events for CAO's watcher and do nothing useful outside a CAO pane.
+
 ## Troubleshooting
 
 | Symptom | Fix |

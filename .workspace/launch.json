@@ -1,0 +1,53 @@
+{
+  "baseline": {
+    "max_bytes": 104857600,
+    "max_files": 500
+  },
+  "capture": {
+    "helper": ".cao/bin/cao-session-capture",
+    "hint": null,
+    "metadata_null_fields": [],
+    "metadata_repository_shas": {
+      "projectSha": "project"
+    }
+  },
+  "control": null,
+  "default_role": "ootp_code_owner",
+  "delivery_policy": null,
+  "evidence_dir": "build/cao-sessions",
+  "keep_awake": {
+    "max_hours": 12
+  },
+  "message_lines": [
+    "OOTP Consultation task. Read and carry out the task at {task_ref}; it is the source of truth for this run.",
+    "Read {base_profile_ref}, then your role profile, before acting.",
+    "Git delivery is what the task's Delivery section and its stated Git authority allow: one task branch, scoped commits, a push and one draft pull request, all through the hub's github_task operations. The owner merges; a launch never authorizes a merge."
+  ],
+  "native_handoff_roots": [],
+  "preflight": {
+    "operations": [],
+    "skip_env": null
+  },
+  "schema_version": 1,
+  "tmux_env": [
+    "DISABLE_AUTOUPDATER"
+  ],
+  "tmux_env_defaults": {
+    "DISABLE_AUTOUPDATER": "1"
+  },
+  "watch": {
+    "human_input": {
+      "chat": true,
+      "wait_seconds": 1800
+    },
+    "mode": "watchdog",
+    "notifications": {
+      "agent": "cao",
+      "channel": "agent-notify"
+    },
+    "server_timezone": "America/New_York",
+    "timers": {
+      "unknown_grace_seconds": 900
+    }
+  }
+}

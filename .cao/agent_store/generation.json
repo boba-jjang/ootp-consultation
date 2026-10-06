@@ -1,0 +1,281 @@
+{
+  "generation": "c59050e4b33fbc30fe4671fa885a32146a94ebc3196bf4cea0e3cace966d6939",
+  "inputs": {
+    ".cao/roles/cao-callback-protocol.md": "cbca20b760abe6c33ad67501db8b30600d7440feae4aee395c86e114b8590421",
+    ".cao/roles/ootp_code_owner.md": "db407c9689fb2aa64c4912947835c9ea1c80d8bc1711d9e8522ae93fb3ddf5cf",
+    ".cao/roles/ootp_developer.md": "23d0861c491f8c5416963c980b481285e69a83ca721bd12f0f1d732f8fa2bdec",
+    ".cao/roles/ootp_qa.md": "59139a59e0141c1c0dc781d6bff2cdeba946bfda86ec0d8ac93980f452ae67e1",
+    ".cao/roles/project.md": "26b5cd276862df5027a6a1db5f4bface781debaf4954072c9f7de38d57a861ff",
+    ".workspace/agent-contract.json": "7438261b1c30b490d62d590901de10c190c1cf8d2eb43748541af25db83dde52",
+    ".workspace/native-agents.json": "17a5d75db703acb60eeadbe84d4ecd785d8b359cd1ce072be07f40ca0043b81b",
+    ".workspace/role-bindings.json": "31cc693d322b9dbc21e1f3a4ad40b8b19ffc25b9c4df53d768e8a52c9d002051",
+    "CLAUDE.md": "1fb128c9594a95e25355a6d39619bc0e9bd8f46888dec997fb33c6fd13a6c0bf",
+    "docs/tasks/authoring-guide.md": "055a659278581b8f9fd32ea4d5ff637af7b3a1bca7d4cee10de4d2c0d8ae6d73"
+  },
+  "outputs": {
+    ".cao/agent_store/_base.md": "0d79859c1c75b49032acfb153fc39eacf59b51724fdd13d8ca6751481c8a025e",
+    ".cao/agent_store/ootp_code_owner.md": "b482c289a6677cc04322d9daa2042127b384409055b245e7a9d3fd66bc61ab3d",
+    ".cao/agent_store/ootp_code_owner_claude.md": "bb86fcc1e7d34a6b11b70cf8a3288b0b85d7d6e854c8ff4ec6cde0722daac2ed",
+    ".cao/agent_store/ootp_developer.md": "cd12bbdc64112a444688871486f3cb9fb7feb8d232e2a1a75ecb20cb1439271f",
+    ".cao/agent_store/ootp_developer_claude.md": "0f0baf3c4afe846b46a449f1fda704f38849c556f83fe562c07926c09b4f3e8a",
+    ".cao/agent_store/ootp_qa.md": "a42687c6a6e11130c450ca23c59fb2ecb7243145f008b09cd52e18d9e55aec4d",
+    ".cao/agent_store/ootp_qa_claude.md": "7040bb298d3b8f57e7f906eb269647b2bed524b3e5da1a1fce7da8ac9cf23cb6",
+    ".claude/agents/ootp-code-owner.md": "34eed56b69e55d0dd2da4997211e778075b9f5439fad84088bc4dc1e69ba7348",
+    ".claude/agents/ootp-developer.md": "5b8d2cec7c2d05fef85e8a8df46847b02db9ea06223d0e36647a4f4185dd8f6b",
+    ".claude/agents/ootp-qa.md": "ba9aceb4090db6f394ee5df3dc2bdb6cba6a21ca4083b09a2fea18cfe6330ee2"
+  },
+  "profiles": {
+    "ootp_code_owner": {
+      "launch_root": ".",
+      "metadata": {
+        "allowedTools": [
+          "fs_read",
+          "fs_list",
+          "execute_bash",
+          "@cao-mcp-server"
+        ],
+        "codexConfig": {
+          "approval_policy": "never",
+          "mcp_servers.cao-mcp-server.tools.assign.approval_mode": "approve",
+          "mcp_servers.cao-mcp-server.tools.handoff.approval_mode": "approve",
+          "mcp_servers.cao-mcp-server.tools.load_skill.approval_mode": "approve",
+          "mcp_servers.cao-mcp-server.tools.send_message.approval_mode": "approve",
+          "sandbox_mode": "read-only"
+        },
+        "codexProfile": "cao-readonly",
+        "description": "Read-only coordinator: reads the task, delegates the implementation and the independent QA, verifies every callback and reports readiness to the owner.",
+        "mcpServers": {
+          "cao-mcp-server": {
+            "args": [
+              "mcp-server"
+            ],
+            "command": "cao",
+            "type": "stdio"
+          },
+          "workspace-execution": {
+            "args": [
+              "--workspace",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
+              "--role",
+              "ootp_code_owner"
+            ],
+            "command": "wsx-mcp",
+            "type": "stdio"
+          }
+        },
+        "name": "ootp_code_owner",
+        "provider": "codex",
+        "role": "supervisor"
+      }
+    },
+    "ootp_code_owner_claude": {
+      "launch_root": ".",
+      "metadata": {
+        "allowedTools": [
+          "fs_read",
+          "fs_list",
+          "@cao-mcp-server"
+        ],
+        "claudeConfig": {
+          "wsx_role_tools": "cao-only-v1"
+        },
+        "description": "Read-only coordinator: reads the task, delegates the implementation and the independent QA, verifies every callback and reports readiness to the owner.",
+        "mcpServers": {
+          "cao-mcp-server": {
+            "args": [
+              "mcp-server"
+            ],
+            "command": "cao",
+            "type": "stdio"
+          },
+          "workspace-execution": {
+            "args": [
+              "--workspace",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
+              "--role",
+              "ootp_code_owner"
+            ],
+            "command": "wsx-mcp",
+            "type": "stdio"
+          }
+        },
+        "name": "ootp_code_owner_claude",
+        "provider": "claude_code",
+        "role": "supervisor"
+      }
+    },
+    "ootp_developer": {
+      "launch_root": ".",
+      "metadata": {
+        "allowedTools": [
+          "@builtin",
+          "fs_*",
+          "execute_bash",
+          "@cao-mcp-server"
+        ],
+        "codexConfig": {
+          "approval_policy": "never",
+          "mcp_servers.cao-mcp-server.tools.load_skill.approval_mode": "approve",
+          "mcp_servers.cao-mcp-server.tools.send_message.approval_mode": "approve",
+          "sandbox_mode": "workspace-write"
+        },
+        "codexProfile": "cao-workspace-write",
+        "description": "Implements one task on its task branch, tests first, and delivers scoped commits and a draft pull request through the hub's GitHub task operations.",
+        "mcpServers": {
+          "cao-mcp-server": {
+            "args": [
+              "mcp-server"
+            ],
+            "command": "cao",
+            "type": "stdio"
+          },
+          "workspace-execution": {
+            "args": [
+              "--workspace",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
+              "--role",
+              "ootp_developer"
+            ],
+            "command": "wsx-mcp",
+            "type": "stdio"
+          }
+        },
+        "name": "ootp_developer",
+        "provider": "codex",
+        "role": "developer"
+      }
+    },
+    "ootp_developer_claude": {
+      "launch_root": ".",
+      "metadata": {
+        "allowedTools": [
+          "@builtin",
+          "fs_*",
+          "execute_bash",
+          "@cao-mcp-server"
+        ],
+        "claudeConfig": {
+          "wsx_role_tools": "cao-only-v1"
+        },
+        "description": "Implements one task on its task branch, tests first, and delivers scoped commits and a draft pull request through the hub's GitHub task operations.",
+        "mcpServers": {
+          "cao-mcp-server": {
+            "args": [
+              "mcp-server"
+            ],
+            "command": "cao",
+            "type": "stdio"
+          },
+          "workspace-execution": {
+            "args": [
+              "--workspace",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
+              "--role",
+              "ootp_developer"
+            ],
+            "command": "wsx-mcp",
+            "type": "stdio"
+          }
+        },
+        "name": "ootp_developer_claude",
+        "provider": "claude_code",
+        "role": "developer"
+      }
+    },
+    "ootp_qa": {
+      "launch_root": ".",
+      "metadata": {
+        "allowedTools": [
+          "@builtin",
+          "fs_read",
+          "fs_list",
+          "execute_bash",
+          "@cao-mcp-server"
+        ],
+        "codexConfig": {
+          "approval_policy": "never",
+          "mcp_servers.cao-mcp-server.tools.load_skill.approval_mode": "approve",
+          "mcp_servers.cao-mcp-server.tools.send_message.approval_mode": "approve",
+          "sandbox_mode": "workspace-write"
+        },
+        "codexProfile": "cao-workspace-write",
+        "description": "Independently verifies one delivery at its exact commits with the repository's own checks and reports a verdict with evidence.",
+        "mcpServers": {
+          "cao-mcp-server": {
+            "args": [
+              "mcp-server"
+            ],
+            "command": "cao",
+            "type": "stdio"
+          },
+          "workspace-execution": {
+            "args": [
+              "--workspace",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
+              "--role",
+              "ootp_qa"
+            ],
+            "command": "wsx-mcp",
+            "type": "stdio"
+          }
+        },
+        "name": "ootp_qa",
+        "provider": "codex",
+        "role": "reviewer"
+      }
+    },
+    "ootp_qa_claude": {
+      "launch_root": ".",
+      "metadata": {
+        "allowedTools": [
+          "@builtin",
+          "fs_read",
+          "fs_list",
+          "execute_bash",
+          "@cao-mcp-server"
+        ],
+        "claudeConfig": {
+          "wsx_role_tools": "cao-only-v1"
+        },
+        "description": "Independently verifies one delivery at its exact commits with the repository's own checks and reports a verdict with evidence.",
+        "mcpServers": {
+          "cao-mcp-server": {
+            "args": [
+              "mcp-server"
+            ],
+            "command": "cao",
+            "type": "stdio"
+          },
+          "workspace-execution": {
+            "args": [
+              "--workspace",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
+              "--role",
+              "ootp_qa"
+            ],
+            "command": "wsx-mcp",
+            "type": "stdio"
+          }
+        },
+        "name": "ootp_qa_claude",
+        "provider": "claude_code",
+        "role": "reviewer"
+      }
+    }
+  },
+  "project_id": "ootp-consultation",
+  "responsibilities": {
+    "coordinator": [
+      "ootp_code_owner"
+    ],
+    "implementation": [
+      "ootp_developer"
+    ],
+    "qa": [
+      "ootp_qa"
+    ]
+  },
+  "schema_version": 1,
+  "shared_revision": "1.2.2",
+  "shared_sha256": "279c7fe5f77ce9013b577f75dbe3821468ea1dfdbd4ab76f0e426f8c11201e83"
+}

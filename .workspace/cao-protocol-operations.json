@@ -1,0 +1,167 @@
+{
+  "operations": [
+    {
+      "argv": [
+        "wsx",
+        "cao",
+        "callback-check",
+        "--json"
+      ],
+      "description": "Verify one callback line: schema, artifact hashes and commits (Plan 03 C4).",
+      "effects": [
+        "read-repository"
+      ],
+      "evidence_limits": [
+        "Prints or verifies a line only; nothing is sent, routed or accepted.",
+        "Transport identity and single-writer ownership stay unverified."
+      ],
+      "executor": "local",
+      "id": "cao.callback_check",
+      "parameters": [
+        {
+          "arg_map": {
+            "style": "positional"
+          },
+          "max_length": 1500,
+          "name": "line",
+          "type": "string"
+        }
+      ],
+      "repository": "project",
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 30,
+      "version": 1
+    },
+    {
+      "argv": [
+        "wsx",
+        "cao",
+        "callback-check",
+        "--json"
+      ],
+      "description": "Verify a reviewer FINAL against the latest implementer FINAL (Plan 03 C4).",
+      "effects": [
+        "read-repository"
+      ],
+      "evidence_limits": [
+        "Prints or verifies a line only; nothing is sent, routed or accepted.",
+        "The caller establishes that the implementer line is the latest delivery."
+      ],
+      "executor": "local",
+      "id": "cao.review_check",
+      "parameters": [
+        {
+          "arg_map": {
+            "style": "positional"
+          },
+          "max_length": 1500,
+          "name": "line",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--implementer",
+            "style": "flag"
+          },
+          "max_length": 1500,
+          "name": "implementer",
+          "type": "string"
+        }
+      ],
+      "repository": "project",
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 30,
+      "version": 1
+    },
+    {
+      "argv": [
+        "wsx",
+        "cao",
+        "ack"
+      ],
+      "description": "Print the coordinator's CAO-ACK line for one recognized callback or WATCHDOG (Plan 03 C4, C9).",
+      "effects": [
+        "read-repository"
+      ],
+      "env_allowlist": [
+        "CAO_TERMINAL_ID"
+      ],
+      "evidence_limits": [
+        "Prints or verifies a line only; nothing is sent, routed or accepted.",
+        "An ACK recognizes receipt only; it settles nothing."
+      ],
+      "executor": "local",
+      "id": "cao.ack",
+      "parameters": [
+        {
+          "arg_map": {
+            "flag": "--event-id",
+            "style": "flag"
+          },
+          "max_length": 64,
+          "name": "event_id",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--assignment-id",
+            "style": "flag"
+          },
+          "max_length": 64,
+          "name": "assignment_id",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--task",
+            "style": "flag"
+          },
+          "max_length": 128,
+          "name": "task",
+          "type": "string"
+        }
+      ],
+      "repository": "project",
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 30,
+      "version": 1
+    },
+    {
+      "control": {
+        "action": "cao-report-store",
+        "input_roots": [
+          "build/cao-reports"
+        ],
+        "policy": null,
+        "report_store": {
+          "max_bytes": 60000,
+          "output_root": "build/cao-reports",
+          "roles": [
+            "ootp_qa"
+          ]
+        }
+      },
+      "effects": [
+        "mutate-repository"
+      ],
+      "executor": "control",
+      "id": "cao.report_store",
+      "parameters": [
+        {
+          "max_length": 64000,
+          "name": "document_json",
+          "type": "string"
+        }
+      ],
+      "report": {},
+      "repository": "project",
+      "result_adapter": "structured-report",
+      "timeout_seconds": 30,
+      "version": 1
+    }
+  ],
+  "schema_version": 1
+}

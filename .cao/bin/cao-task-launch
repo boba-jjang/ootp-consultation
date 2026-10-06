@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#
+# Launch one OOTP Consultation task through CAO:
+#
+#   .cao/bin/cao-task-launch claude /absolute/path/to/task.md [--dry-run]
+#
+# The shared launcher is `wsx cao-launch`. What this project sets lives in
+# .workspace/launch.json; each role's launch root, which is its write boundary,
+# comes from .workspace/role-bindings.json. Relative task paths resolve from the
+# caller's directory. --dry-run runs, writes, admits and starts nothing.
+set -euo pipefail
+exec wsx --workspace "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)" cao-launch "$@"

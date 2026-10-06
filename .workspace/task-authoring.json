@@ -4,7 +4,7 @@
   "default_route": "plan-task",
   "routes": {
     "plan-task": {
-      "description": "One implementation-plan item as one branch and pull request, built in a Claude Code session. Authoring only: no CAO launcher, coordinator or roles.",
+      "description": "One implementation-plan item as one task branch and pull request, built through CAO: ootp_code_owner coordinates, ootp_developer implements, ootp_qa reviews independently.",
       "format": "markdown-template-v1",
       "hub_prompt": "ootp-task-author-v1",
       "template": "docs/tasks/task-template.md",
@@ -22,12 +22,16 @@
         "screen": "docs/tasks/inserts/screen.md"
       },
       "prompt_packs": [],
-      "entry_point": null,
-      "coordinator": null,
+      "entry_point": ".cao/bin/cao-task-launch",
+      "coordinator": "ootp_code_owner",
       "purpose": null,
       "required_inserts": [],
-      "allowed_owners": [],
-      "required_reviewers": [],
+      "allowed_owners": [
+        "ootp_developer"
+      ],
+      "required_reviewers": [
+        "ootp_qa"
+      ],
       "section_mapping": {
         "scope": "Scope",
         "requirements": "Requirements",
@@ -49,12 +53,22 @@
   },
   "prompt_packs": {
     "screens": {
-      "sources": ["docs/design-handoff.md", "docs/design/boards/README.md"],
-      "applies_to": ["plan-task"]
+      "sources": [
+        "docs/design-handoff.md",
+        "docs/design/boards/README.md"
+      ],
+      "applies_to": [
+        "plan-task"
+      ]
     },
     "local-setup": {
-      "sources": ["docs/local-development.md", "README.md"],
-      "applies_to": ["plan-task"]
+      "sources": [
+        "docs/local-development.md",
+        "README.md"
+      ],
+      "applies_to": [
+        "plan-task"
+      ]
     }
   },
   "host_skills": {

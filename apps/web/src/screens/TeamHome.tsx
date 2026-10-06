@@ -55,10 +55,14 @@ function FirstUpload({
   const onFiles = (files: Promise<Upload[]>) => {
     onBusy(true);
     setError(null);
+    const fail = (message: string) => {
+      setError(message);
+      onBusy(false);
+    };
     files
       .then(async (uploads) => {
         if (uploads.length === 0) {
-          setError('No CSV file was among those. OOTP exports are .csv files.');
+          fail('No CSV file was among those. OOTP exports are .csv files.');
           return;
         }
         const result = await add.mutateAsync({
@@ -67,21 +71,19 @@ function FirstUpload({
           scale: team.rating_scale,
         });
         if (!result.ok) {
-          setError(result.message);
+          fail(result.message);
           return;
         }
         const state: ClubhouseState = { results: { result, from: null } };
-        // In place of this page: /t/:team would only redirect to the new snapshot now.
+        // In place of this page, which stays busy until it's gone: clearing busy here would
+        // let its own redirect to the new snapshot run first, without the results.
         void navigate(modulePath(team.id, result.snapshot.id, 'clubhouse'), {
           replace: true,
           state,
         });
       })
       .catch((failure: unknown) => {
-        setError(failure instanceof Error ? failure.message : String(failure));
-      })
-      .finally(() => {
-        onBusy(false);
+        fail(failure instanceof Error ? failure.message : String(failure));
       });
   };
 

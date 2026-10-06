@@ -283,7 +283,7 @@ Build order, one pull request each:
 - [x] Team menu and Create a Team: add exports (drop or choose files, folders included), files read, team and league prefilled from the files, review, create.
 - [x] The Clubhouse: upload, snapshot timeline, what to upload next, coverage matrices, import log, how columns were read, Run analysis.
 - [x] Team settings, Export team and restore from a zip.
-- [x] End-to-end and accessibility tests in `e2e.yml`: Create a Team from the fixtures yields a Game 42 snapshot with High coverage; locked states render; no serious axe violations; 44 px targets. Needs the staging test user below. The workflow runs the public screens on every pull request now; the signed-in test skips until the test user and the variables below exist.
+- [x] End-to-end and accessibility tests in `e2e.yml`: Create a Team from the fixtures yields a Game 42 snapshot with High coverage; locked states render; no serious axe violations; 44 px targets. The signed-in test runs as the staging test user below.
 - [ ] Ask the design chat for Talent radar (with league percentiles), the situational strategy view, trends and where league files are uploaded. The brief is `docs/design/design-ask-phase-4.md`; sending it is the owner's step.
 
 ## Testing and quality
@@ -303,7 +303,7 @@ End-to-end tests can't click through GitHub sign-in. Staging gets one email-and-
 
 - [x] Write the test for each special-handling row before the parser code for it.
 - [x] Run the identity checks as property tests over every fixture, skipping pitcher rows with G = 0, which carry no data.
-- [ ] Create the staging test user and store its credentials as secrets.
+- [x] Create the staging test user and store its credentials as secrets.
 - [ ] Set the coverage floor on `packages/core` at 80% and raise it as modules settle. The 80% floor is set in `vitest.config.ts`.
 
 ## Operations

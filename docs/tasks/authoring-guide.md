@@ -81,7 +81,7 @@ Contract notes:
 - `task_kind` is `change` for implementation and `inspection` for a gate check or audit with no writes.
 - `scope.writes` lists exact paths. A change task always writes `docs/implementation-plan.md`, to tick its box.
 - `dependency` names plan items and pull requests by title. `scenario_impact` says what changes for the app's user, such as a screen or saved data, or that nothing does yet.
-- Each check names its exact command, for example `pnpm test:core innings`, with the evidence and pass condition. The developer runs every check in the task worktree before its `FINAL`; QA reruns them at the delivered commit. The last check is CI on the pull request.
+- Each check names its exact command, for example `pnpm exec vitest run --project @ootp/core innings`, with the evidence and pass condition. The developer runs every check in the task worktree before its `FINAL`; QA reruns them at the delivered commit. The last check is CI on the pull request.
 - `owner` is `ootp_developer` and `review.reviewers` is `["ootp_qa"]`; the server refuses any other owner or an empty reviewer list. `review.scope` says what QA verifies beyond rerunning the checks, for example that each new setting has its default, description and source.
 - Commands in the worker's own worktree need no capability. Declare one only for something outside it:
 
@@ -98,7 +98,7 @@ Request settings: `execution_provider` is `claude`; the route is `plan-task`. Un
 These come from `CLAUDE.md` › Commands. CI's `ci` job runs the first five in this order.
 
 - `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test`, `pnpm build`
-- A narrower run: `pnpm test:core <filter>` or `pnpm test:apps <filter>`; `pnpm test` takes no arguments.
+- A narrower run: `pnpm exec vitest run --project @ootp/core <filter>` for core, or `pnpm test:apps <filter>`; `pnpm test` takes no arguments. Don't filter `pnpm test:core`: its coverage floor covers all of core, so a filtered run always fails it. Leave coverage to a check that runs the whole of `pnpm test:core`.
 - Database tests run as `supabase test db`, which needs Docker, so CI's `db` job runs them whenever `supabase/` changes.
 - End-to-end and axe tests run as `pnpm e2e`, against the dev server and the staging project; `e2e.yml` runs them on every pull request.
 

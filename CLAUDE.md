@@ -14,7 +14,9 @@ OOTP CSV Consultation is a personal, free-tier web app. It turns one team's Out 
 
 ## Current phase
 
-Phase 3, frontend foundation. Exit gate: Setup and the Clubhouse match the canvas on real data; end-to-end and accessibility tests pass.
+Phase 4, models and screens. Exit gate: Every screen shows model output with evidence and confidence; no placeholders left.
+
+Phase 3 (frontend foundation) passed its gate on 6 October 2026 and is tagged `v0.3`. The tokens, app shell, routing, lock framework, Team menu, Create a Team, Clubhouse and team settings live in `apps/web`, and the end-to-end and accessibility tests run in CI. Phase 3.1, from the owner's review, added updating a team's exports after setup and is tagged `v0.3.1`.
 
 Phase 2 (data foundation) passed its gate on 4 October 2026 and is tagged `v0.2`. The importer, snapshot assembly, league tables, team store and Export team live in `packages/core`; `apps/web/src/store.ts` is the Supabase store.
 
@@ -41,7 +43,7 @@ Keep these current. Run them from the repo root on Node 24. The Node major is se
 - Lint: `pnpm lint` (ESLint, type-aware; warnings fail)
 - Format: `pnpm format` to fix, `pnpm format:check` to check (Prettier)
 - Typecheck: `pnpm typecheck` (`tsc --build` over every project referenced from the root `tsconfig.json`; add each new tsconfig there)
-- Test: `pnpm test`, which runs `test:core` (core's own tests, with the coverage floor on `packages/core`), then `test:apps` (every other project). `pnpm test` takes no extra arguments, so pass a filter or `-u` to `test:core`, `test:apps` or `test:watch` instead.
+- Test: `pnpm test`, which runs `test:core` (core's own tests, with the coverage floor on `packages/core`), then `test:apps` (every other project). `pnpm test` takes no extra arguments, so pass a filter or `-u` to `test:apps` or `test:watch` instead. For part of core's tests, run `pnpm exec vitest run --project @ootp/core <filter>`: a filtered `test:core` always fails, because its coverage floor covers all of core.
 - Build: `pnpm build`
 - End-to-end and accessibility: `pnpm e2e` (Playwright with axe, in `e2e/`; it starts the dev server itself, so `apps/web/.env.local` must exist). Once per machine: `pnpm exec playwright install chromium`.
 - Database tests: `supabase db start`, then `supabase test db` (pgTAP in `supabase/tests/`). These need Docker and the Supabase CLI, so they're optional locally; CI runs them.

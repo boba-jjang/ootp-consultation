@@ -678,6 +678,115 @@
       "result_adapter": "exit-code",
       "timeout_seconds": 180,
       "version": 1
+    },
+    {
+      "argv": [
+        "wsx-github-write",
+        "merge",
+        "--repository",
+        "boba-jjang/ootp-consultation",
+        "--account",
+        "boba-jjang",
+        "--remote-url",
+        "git@github.com-boba:boba-jjang/ootp-consultation.git"
+      ],
+      "description": "Squash-merge a finished task's draft PR into main, only after the owner answered merge to the run's merge question (verified from the session's watcher state), at the exact QA-accepted head with every check green; then delete the task branch and remove the run's clean worktrees.",
+      "effects": [
+        "write-github",
+        "write-git-refs",
+        "write-task-worktree"
+      ],
+      "evidence_limits": [
+        "Refuses without the owner's recorded merge answer to that exact question, or when the head, mergeability or any check differs. Cleanup skips anything changed or dirty and reports it."
+      ],
+      "executor": "local",
+      "id": "github.merge",
+      "parameters": [
+        {
+          "arg_map": {
+            "flag": "--branch",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "branch",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--expected-head",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "expected_head",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--base",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "base",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--number",
+            "style": "flag_equals"
+          },
+          "minimum": 1,
+          "name": "number",
+          "type": "integer"
+        },
+        {
+          "arg_map": {
+            "flag": "--session",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "session",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--question-id",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "question_id",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--question",
+            "style": "flag_equals"
+          },
+          "max_length": 240,
+          "name": "question",
+          "type": "string"
+        }
+      ],
+      "repository": "project",
+      "requires": [
+        {
+          "name": "wsx-github-write",
+          "probe": "executable"
+        },
+        {
+          "name": "git",
+          "probe": "executable"
+        },
+        {
+          "name": "gh",
+          "probe": "executable"
+        }
+      ],
+      "resources": [
+        "project-checkout"
+      ],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 300,
+      "version": 1
     }
   ],
   "schema_version": 1

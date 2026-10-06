@@ -99,6 +99,7 @@ ootp-consultation/
 - [x] Commit `.env.example`; gitignore `.env*.local`. It lives in `apps/web/`, where Vite reads env files.
 - [ ] Write `docs/adr/0001-platform.md` once the decisions table is confirmed.
 - [ ] Use Conventional Commits and squash merges, so `main` reads as one change per pull request.
+- [x] Run tasks through CAO: the workspace manifests in `.workspace/`, the roles in `.cao/roles/`, the generated profiles in `.cao/agent_store/` and the launcher `.cao/bin/cao-task-launch`; `.cao/README.md` has the setup.
 
 ## Environments and configuration
 

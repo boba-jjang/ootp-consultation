@@ -1,0 +1,135 @@
+{
+  "operations": [
+    {
+      "argv": [
+        "wsx",
+        "cao",
+        "observe",
+        "--live"
+      ],
+      "description": "Read authorized session hook-derived observation; not callback acceptance.",
+      "effects": [
+        "read-cao-session-observation"
+      ],
+      "evidence_limits": [
+        "Observation is not delivery or review acceptance.",
+        "Unknown or degraded coverage is not a successful run."
+      ],
+      "executor": "local",
+      "id": "cao.observe",
+      "parameters": [
+        {
+          "arg_map": {
+            "flag": "--session",
+            "style": "flag"
+          },
+          "max_length": 64,
+          "name": "session",
+          "type": "string"
+        }
+      ],
+      "repository": "project",
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 30,
+      "version": 1
+    },
+    {
+      "argv": [
+        "shasum",
+        "-a",
+        "256",
+        "--"
+      ],
+      "description": "Measure one file's SHA-256 (protocol C4); evidence of content, not of delivery.",
+      "effects": [
+        "read-file"
+      ],
+      "evidence_limits": [
+        "A hash proves content identity only; routing and acceptance still follow C4/C5.",
+        "The path is not scope-checked; hashing is as wide as the pane's read access."
+      ],
+      "executor": "local",
+      "id": "artifact.sha256",
+      "parameters": [
+        {
+          "arg_map": {
+            "style": "positional"
+          },
+          "max_length": 512,
+          "name": "path",
+          "type": "string"
+        }
+      ],
+      "repository": "project",
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 30,
+      "version": 1
+    },
+    {
+      "argv": [
+        "wsx",
+        "cao",
+        "human-reply"
+      ],
+      "description": "Queue your reply in a human chat (protocol C12); the watcher posts it into the Slack thread.",
+      "effects": [
+        "queue-human-chat-reply"
+      ],
+      "evidence_limits": [
+        "Queued is not posted: the watcher posts the reply on its next poll.",
+        "Nothing said in a chat is a decision; only the human's pick of an option is."
+      ],
+      "executor": "local",
+      "id": "human.reply",
+      "parameters": [
+        {
+          "arg_map": {
+            "flag": "--session",
+            "style": "flag"
+          },
+          "max_length": 64,
+          "name": "session",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--question-id",
+            "style": "flag_equals"
+          },
+          "max_length": 64,
+          "name": "question_id",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--text",
+            "style": "flag_equals"
+          },
+          "default": "",
+          "max_length": 2000,
+          "name": "text",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "style": "switch",
+            "when_true": [
+              "--end"
+            ]
+          },
+          "default": false,
+          "name": "end",
+          "type": "boolean"
+        }
+      ],
+      "repository": "project",
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 30,
+      "version": 1
+    }
+  ],
+  "schema_version": 1
+}

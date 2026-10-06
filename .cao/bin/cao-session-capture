@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+# Streams a CAO worker's pane to disk while it runs.
+#
+# `cao launch` only posts to the cao-server daemon; the worker pane is created
+# by that daemon, not as a child of the launcher, so no worker stdout ever
+# flows through cao-task-launch and a shell-pipe tee is impossible.
+#
+# `tmux pipe-pane` is the obvious alternative and does not work here: Codex is
+# a full-screen TUI, so the raw pty byte stream is redraw traffic in which the
+# worker's own text is not recoverable, and the pipe was observed detaching
+# mid-run. `tmux capture-pane` renders the same pane as clean, greppable text.
+#
+# So this polls capture-pane and rewrites the transcript in place. Each capture
+# is the full scrollback, so the file is replaced rather than appended, and the
+# last completed write survives if the session is killed -- which is the case
+# that motivated the feature.
+#
+# Variables are task-prefixed per AGENTS.md; bare `path` and `status` are
+# reserved in zsh.
+
+set -euo pipefail
+
+if [[ $# -lt 3 ]]; then
+  echo "Usage: cao-session-capture <session-name> <transcript-path> <meta-path>" >&2
+  exit 1
+fi
+
+cao_session="$1"
+cao_transcript="$2"
+cao_meta="$3"
+cao_interval="${CAO_CAPTURE_INTERVAL:-5}"
+cao_wait_deadline="${CAO_CAPTURE_WAIT:-60}"
+
+mkdir -p "$(dirname "${cao_transcript}")"
+
+# Wait for the daemon to create the session. Bounded, so a failed launch does
+# not leave this running forever.
+cao_waited=0
+while ! tmux has-session -t "${cao_session}" 2>/dev/null; do
+  if (( cao_waited >= cao_wait_deadline )); then
+    echo "cao-session-capture: session ${cao_session} never appeared within ${cao_wait_deadline}s" >&2
+    exit 1
+  fi
+  sleep 1
+  cao_waited=$((cao_waited + 1))
+done
+
+write_capture() {
+  local cao_tmp="${cao_transcript}.partial"
+  if tmux capture-pane -p -S - -t "${cao_session}" >"${cao_tmp}" 2>/dev/null; then
+    mv -f "${cao_tmp}" "${cao_transcript}"
+    return 0
+  fi
+  rm -f "${cao_tmp}"
+  return 1
+}
+
+finalize_meta() {
+  local cao_ended
+  cao_ended="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+  if [[ -f "${cao_meta}" ]]; then
+    CAO_META_PATH="${cao_meta}" CAO_ENDED_AT="${cao_ended}" node -e '
+      const fs = require("node:fs");
+      const metaPath = process.env.CAO_META_PATH;
+      let meta = {};
+      try {
+        meta = JSON.parse(fs.readFileSync(metaPath, "utf8"));
+      } catch {
+        meta = {};
+      }
+      meta.endedAt = process.env.CAO_ENDED_AT;
+      fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2) + "\n");
+    ' 2>/dev/null || true
+  fi
+}
+
+trap finalize_meta EXIT
+
+while tmux has-session -t "${cao_session}" 2>/dev/null; do
+  write_capture || true
+  sleep "${cao_interval}"
+done
+
+# The session is gone. The last in-loop capture is the surviving record; the
+# pane cannot be read after the session ends.
+exit 0

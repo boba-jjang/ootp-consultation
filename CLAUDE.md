@@ -52,6 +52,10 @@ CI (`.github/workflows/ci.yml`, job `ci`) runs install, lint, format check, type
 `.github/workflows/e2e.yml` (job `e2e`) runs `pnpm e2e` against the staging project on every pull request. The Create a Team test signs in as the staging test user (`E2E_EMAIL`, `E2E_PASSWORD`) and skips when those secrets or `SUPABASE_PUBLISHABLE_KEY_STAGING` are missing; a failed run uploads `playwright-report`.
 `.github/workflows/keepalive.yml` reads from each Supabase database every Monday, because the Free plan pauses a project after a week without activity. Run it by hand after a long break.
 
+## Running tasks through CAO
+
+Tasks drafted by the task-authoring server (`docs/tasks/authoring-guide.md`) run unattended through CAO: `.cao/bin/cao-task-launch claude /absolute/path/to/task.md`. The coordinator `ootp_code_owner` delegates the task to `ootp_developer`, which builds it on `task/<slug>` and opens a draft pull request, then routes an independent `ootp_qa` review. Role sources are in `.cao/roles/`; `.cao/README.md` has the setup, the launch and the re-render steps. A single Claude Code session can carry out the same task file directly. Either way, the worker sees only the task and this repository, and the owner merges.
+
 ## Deployments
 
 - Vercel project `ootp-consultation` (Hobby): Root Directory `apps/web`, Vite preset, files outside the Root Directory included in the build, Node from `apps/web/package.json`.

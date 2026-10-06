@@ -4,7 +4,7 @@
 
 ## 1. Context
 
-[The plan item, quoted, with its phase and plan section. What it unblocks. The spec sections it implements, by document and heading. Suggested role: architect, implementation developer, QA validator or code reviewer.]
+[The plan item, quoted, with its phase and plan section. What it unblocks. The spec sections it implements, by document and heading.]
 
 ## 2. Scope
 
@@ -30,15 +30,15 @@
 
 ## 7. Preparation
 
-[Generated: capabilities outside the checkout and owner-only steps. The session stops on a blocking gap.]
+[Generated: capabilities outside the worktree and owner-only steps. The coordinator stops before delegating on a blocking gap.]
 
 ## 8. Validation
 
-[Generated: each check with its command, evidence and pass condition.]
+[Generated: each check with its command, evidence and pass condition. The developer runs them in the task worktree; QA reruns them at the delivered commit.]
 
 ## 9. Review
 
-[Generated: who reviews and which checks they rerun.]
+[Generated: the independent reviewer and which checks it reruns.]
 
 ## 10. Acceptance
 
@@ -46,4 +46,4 @@
 
 ## 11. Delivery
 
-[The branch, the commit and pull-request title, the plan box to tick, the pull-request summary and what is left for the owner. The owner merges.]
+[The task branch (`task/<slug>`), the commit and pull-request title, the plan box to tick, the pull-request summary and what is left for the owner. The owner merges.]

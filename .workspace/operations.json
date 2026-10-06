@@ -1,0 +1,684 @@
+{
+  "operations": [
+    {
+      "argv": [
+        "pnpm",
+        "lint"
+      ],
+      "description": "Run ESLint through the committed pnpm script; warnings fail, as in CI.",
+      "effects": [
+        "execute-repository-code",
+        "read-repository"
+      ],
+      "evidence_limits": [
+        "lint findings only; proves nothing about runtime behaviour"
+      ],
+      "executor": "local",
+      "id": "code.lint",
+      "repository": "project",
+      "requires": [
+        {
+          "probe": "repository-present",
+          "repository": "project"
+        },
+        {
+          "name": "pnpm",
+          "probe": "executable"
+        },
+        {
+          "hint": "run pnpm install --frozen-lockfile in the project before using this operation",
+          "path": "node_modules",
+          "probe": "repository-path",
+          "repository": "project"
+        }
+      ],
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 600,
+      "version": 1
+    },
+    {
+      "argv": [
+        "pnpm",
+        "format:check"
+      ],
+      "description": "Check formatting with Prettier through the committed pnpm script.",
+      "effects": [
+        "execute-repository-code",
+        "read-repository"
+      ],
+      "evidence_limits": [
+        "formatting only; proves nothing about behaviour"
+      ],
+      "executor": "local",
+      "id": "format.check",
+      "repository": "project",
+      "requires": [
+        {
+          "probe": "repository-present",
+          "repository": "project"
+        },
+        {
+          "name": "pnpm",
+          "probe": "executable"
+        },
+        {
+          "hint": "run pnpm install --frozen-lockfile in the project before using this operation",
+          "path": "node_modules",
+          "probe": "repository-path",
+          "repository": "project"
+        }
+      ],
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 300,
+      "version": 1
+    },
+    {
+      "argv": [
+        "pnpm",
+        "typecheck"
+      ],
+      "description": "TypeScript build-mode type check over every referenced project, with no emit of app code.",
+      "effects": [
+        "execute-repository-code",
+        "read-repository"
+      ],
+      "evidence_limits": [
+        "type checking only; executes no tests and starts no server"
+      ],
+      "executor": "local",
+      "id": "types.check",
+      "repository": "project",
+      "requires": [
+        {
+          "probe": "repository-present",
+          "repository": "project"
+        },
+        {
+          "name": "pnpm",
+          "probe": "executable"
+        },
+        {
+          "hint": "run pnpm install --frozen-lockfile in the project before using this operation",
+          "path": "node_modules",
+          "probe": "repository-path",
+          "repository": "project"
+        }
+      ],
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 900,
+      "version": 1
+    },
+    {
+      "argv": [
+        "pnpm",
+        "test"
+      ],
+      "description": "Run the Vitest suites through the committed pnpm script: packages/core with its coverage floor, then every other project.",
+      "effects": [
+        "execute-repository-code",
+        "read-repository",
+        "write-coverage-report"
+      ],
+      "evidence_limits": [
+        "outcome derives from the pnpm script's exit status; the coverage floor applies to packages/core only",
+        "the Git-ignored coverage/ directory is rewritten; the exit code cannot tell an executed suite from an empty one, so read the output"
+      ],
+      "executor": "local",
+      "id": "tests.run",
+      "repository": "project",
+      "requires": [
+        {
+          "probe": "repository-present",
+          "repository": "project"
+        },
+        {
+          "name": "pnpm",
+          "probe": "executable"
+        },
+        {
+          "hint": "run pnpm install --frozen-lockfile in the project before using this operation",
+          "path": "node_modules",
+          "probe": "repository-path",
+          "repository": "project"
+        }
+      ],
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 900,
+      "version": 1
+    },
+    {
+      "argv": [
+        "pnpm",
+        "build"
+      ],
+      "description": "Production build of every workspace package through the committed pnpm script.",
+      "effects": [
+        "execute-repository-code",
+        "read-repository",
+        "write-build-output"
+      ],
+      "evidence_limits": [
+        "writes Git-ignored dist/ output; a successful build is not a test result"
+      ],
+      "executor": "local",
+      "id": "build.run",
+      "repository": "project",
+      "requires": [
+        {
+          "probe": "repository-present",
+          "repository": "project"
+        },
+        {
+          "name": "pnpm",
+          "probe": "executable"
+        },
+        {
+          "hint": "run pnpm install --frozen-lockfile in the project before using this operation",
+          "path": "node_modules",
+          "probe": "repository-path",
+          "repository": "project"
+        }
+      ],
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 900,
+      "version": 1
+    },
+    {
+      "argv": [
+        "pnpm",
+        "e2e"
+      ],
+      "description": "Run the Playwright and axe tests against the dev server on port 5173, which talks to the staging Supabase project.",
+      "effects": [
+        "execute-repository-code",
+        "read-repository",
+        "start-dev-server",
+        "read-staging-project",
+        "write-test-results"
+      ],
+      "evidence_limits": [
+        "needs apps/web/.env.local and a Chromium installed by Playwright; the signed-in test skips without E2E_EMAIL and E2E_PASSWORD",
+        "reuses a dev server already on port 5173 outside CI; a stale server tests stale code"
+      ],
+      "executor": "local",
+      "id": "tests.e2e",
+      "repository": "project",
+      "requires": [
+        {
+          "probe": "repository-present",
+          "repository": "project"
+        },
+        {
+          "name": "pnpm",
+          "probe": "executable"
+        },
+        {
+          "hint": "run pnpm install --frozen-lockfile in the project before using this operation",
+          "path": "node_modules",
+          "probe": "repository-path",
+          "repository": "project"
+        },
+        {
+          "hint": "copy apps/web/.env.example to apps/web/.env.local and fill in the staging values",
+          "path": "apps/web/.env.local",
+          "probe": "repository-path",
+          "repository": "project"
+        }
+      ],
+      "resources": [
+        "dev-server-port"
+      ],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 1800,
+      "version": 1
+    },
+    {
+      "argv": [
+        "wsx-github-read",
+        "heads",
+        "--repository",
+        "boba-jjang/ootp-consultation",
+        "--account",
+        "boba-jjang"
+      ],
+      "description": "Read live GitHub heads for boba-jjang/ootp-consultation through the host hub. No fetch, ref changes, merges or PR writes. Read stdout via run_logs after success.",
+      "effects": [
+        "read-github",
+        "write-run-evidence"
+      ],
+      "evidence_limits": [
+        "Remote evidence is dated and can change after collection. PR pagination is not atomic. No semantic merge/deletion verdict or authorization."
+      ],
+      "executor": "local",
+      "id": "github.heads",
+      "parameters": [],
+      "repository": "project",
+      "requires": [
+        {
+          "name": "wsx-github-read",
+          "probe": "executable"
+        },
+        {
+          "name": "gh",
+          "probe": "executable"
+        }
+      ],
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 180,
+      "version": 2
+    },
+    {
+      "argv": [
+        "wsx-github-read",
+        "pulls",
+        "--repository",
+        "boba-jjang/ootp-consultation",
+        "--account",
+        "boba-jjang"
+      ],
+      "description": "Read live GitHub pulls for boba-jjang/ootp-consultation through the host hub. No fetch, ref changes, merges or PR writes. Read stdout via run_logs after success.",
+      "effects": [
+        "read-github",
+        "write-run-evidence"
+      ],
+      "evidence_limits": [
+        "Remote evidence is dated and can change after collection. PR pagination is not atomic. No semantic merge/deletion verdict or authorization."
+      ],
+      "executor": "local",
+      "id": "github.pull_requests",
+      "parameters": [
+        {
+          "arg_map": {
+            "flag": "--state",
+            "style": "flag"
+          },
+          "default": "open",
+          "enum": [
+            "open",
+            "closed",
+            "all"
+          ],
+          "name": "state",
+          "type": "string"
+        }
+      ],
+      "repository": "project",
+      "requires": [
+        {
+          "name": "wsx-github-read",
+          "probe": "executable"
+        },
+        {
+          "name": "gh",
+          "probe": "executable"
+        }
+      ],
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 180,
+      "version": 2
+    },
+    {
+      "argv": [
+        "wsx-github-read",
+        "pull",
+        "--repository",
+        "boba-jjang/ootp-consultation",
+        "--account",
+        "boba-jjang"
+      ],
+      "description": "Read live GitHub pull for boba-jjang/ootp-consultation through the host hub. No fetch, ref changes, merges or PR writes. Read stdout via run_logs after success.",
+      "effects": [
+        "read-github",
+        "write-run-evidence"
+      ],
+      "evidence_limits": [
+        "Remote evidence is dated and can change after collection. PR pagination is not atomic. No semantic merge/deletion verdict or authorization."
+      ],
+      "executor": "local",
+      "id": "github.pull_request",
+      "parameters": [
+        {
+          "arg_map": {
+            "flag": "--number",
+            "style": "flag"
+          },
+          "maximum": 10000000,
+          "minimum": 1,
+          "name": "number",
+          "type": "integer"
+        }
+      ],
+      "repository": "project",
+      "requires": [
+        {
+          "name": "wsx-github-read",
+          "probe": "executable"
+        },
+        {
+          "name": "gh",
+          "probe": "executable"
+        }
+      ],
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 180,
+      "version": 2
+    },
+    {
+      "argv": [
+        "wsx-github-write",
+        "prepare",
+        "--repository",
+        "boba-jjang/ootp-consultation",
+        "--account",
+        "boba-jjang",
+        "--remote-url",
+        "git@github.com-boba:boba-jjang/ootp-consultation.git"
+      ],
+      "description": "Create or resume an isolated task/<slug> worktree at an exact starting commit.",
+      "effects": [
+        "write-task-worktree",
+        "write-git-refs"
+      ],
+      "evidence_limits": [
+        "Requires implementation task authority. No merge, force-push, deletion, default-branch write or QA acceptance. Reconcile uncertain writes before retrying."
+      ],
+      "executor": "local",
+      "id": "github.task_prepare",
+      "parameters": [
+        {
+          "arg_map": {
+            "flag": "--branch",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "branch",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--start-head",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "start_head",
+          "type": "string"
+        }
+      ],
+      "repository": "project",
+      "requires": [
+        {
+          "name": "wsx-github-write",
+          "probe": "executable"
+        },
+        {
+          "name": "git",
+          "probe": "executable"
+        },
+        {
+          "name": "gh",
+          "probe": "executable"
+        }
+      ],
+      "resources": [
+        "project-checkout"
+      ],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 180,
+      "version": 1
+    },
+    {
+      "argv": [
+        "wsx-github-write",
+        "commit",
+        "--repository",
+        "boba-jjang/ootp-consultation",
+        "--account",
+        "boba-jjang",
+        "--remote-url",
+        "git@github.com-boba:boba-jjang/ootp-consultation.git"
+      ],
+      "description": "Commit only the explicitly listed task files; preserve unrelated changes.",
+      "effects": [
+        "write-task-worktree",
+        "write-git-refs"
+      ],
+      "evidence_limits": [
+        "Requires implementation task authority. No merge, force-push, deletion, default-branch write or QA acceptance. Reconcile uncertain writes before retrying."
+      ],
+      "executor": "local",
+      "id": "github.task_commit",
+      "parameters": [
+        {
+          "arg_map": {
+            "flag": "--branch",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "branch",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--expected-head",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "expected_head",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--files",
+            "style": "flag_equals"
+          },
+          "max_length": 65000,
+          "name": "files",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--message",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "message",
+          "type": "string"
+        }
+      ],
+      "repository": "project",
+      "requires": [
+        {
+          "name": "wsx-github-write",
+          "probe": "executable"
+        },
+        {
+          "name": "git",
+          "probe": "executable"
+        },
+        {
+          "name": "gh",
+          "probe": "executable"
+        }
+      ],
+      "resources": [
+        "project-checkout"
+      ],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 180,
+      "version": 1
+    },
+    {
+      "argv": [
+        "wsx-github-write",
+        "push",
+        "--repository",
+        "boba-jjang/ootp-consultation",
+        "--account",
+        "boba-jjang",
+        "--remote-url",
+        "git@github.com-boba:boba-jjang/ootp-consultation.git"
+      ],
+      "description": "Create or fast-forward the task branch using an expected remote SHA; no force or main pushes.",
+      "effects": [
+        "write-task-worktree",
+        "write-git-refs",
+        "write-github"
+      ],
+      "evidence_limits": [
+        "Requires implementation task authority. No merge, force-push, deletion, default-branch write or QA acceptance. Reconcile uncertain writes before retrying."
+      ],
+      "executor": "local",
+      "id": "github.task_push",
+      "parameters": [
+        {
+          "arg_map": {
+            "flag": "--branch",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "branch",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--expected-head",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "expected_head",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--expected-remote",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "expected_remote",
+          "type": "string"
+        }
+      ],
+      "repository": "project",
+      "requires": [
+        {
+          "name": "wsx-github-write",
+          "probe": "executable"
+        },
+        {
+          "name": "git",
+          "probe": "executable"
+        },
+        {
+          "name": "gh",
+          "probe": "executable"
+        }
+      ],
+      "resources": [
+        "project-checkout"
+      ],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 180,
+      "version": 1
+    },
+    {
+      "argv": [
+        "wsx-github-write",
+        "pr",
+        "--repository",
+        "boba-jjang/ootp-consultation",
+        "--account",
+        "boba-jjang",
+        "--remote-url",
+        "git@github.com-boba:boba-jjang/ootp-consultation.git"
+      ],
+      "description": "Create a draft PR or update its title/body for the exact published task head and base.",
+      "effects": [
+        "write-task-worktree",
+        "write-git-refs",
+        "write-github"
+      ],
+      "evidence_limits": [
+        "Requires implementation task authority. No merge, force-push, deletion, default-branch write or QA acceptance. Reconcile uncertain writes before retrying."
+      ],
+      "executor": "local",
+      "id": "github.task_pr",
+      "parameters": [
+        {
+          "arg_map": {
+            "flag": "--branch",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "branch",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--expected-head",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "expected_head",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--base",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "base",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--title",
+            "style": "flag_equals"
+          },
+          "max_length": 10000,
+          "name": "title",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--body",
+            "style": "flag_equals"
+          },
+          "max_length": 65000,
+          "name": "body",
+          "type": "string"
+        }
+      ],
+      "repository": "project",
+      "requires": [
+        {
+          "name": "wsx-github-write",
+          "probe": "executable"
+        },
+        {
+          "name": "git",
+          "probe": "executable"
+        },
+        {
+          "name": "gh",
+          "probe": "executable"
+        }
+      ],
+      "resources": [
+        "project-checkout"
+      ],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 180,
+      "version": 1
+    }
+  ],
+  "schema_version": 1
+}

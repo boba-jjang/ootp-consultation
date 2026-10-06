@@ -1,0 +1,43 @@
+{
+  "guards": [],
+  "providers": [
+    "claude"
+  ],
+  "roles": {
+    "ootp_code_owner": {
+      "claude_hooks": [],
+      "claude_tools": [
+        "Read",
+        "Grep",
+        "Glob"
+      ],
+      "name": "ootp-code-owner"
+    },
+    "ootp_developer": {
+      "claude_hooks": [],
+      "claude_tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "TodoWrite",
+        "Edit",
+        "Write",
+        "Skill"
+      ],
+      "name": "ootp-developer"
+    },
+    "ootp_qa": {
+      "claude_hooks": [],
+      "claude_tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash",
+        "TodoWrite"
+      ],
+      "name": "ootp-qa"
+    }
+  },
+  "schema_version": 1
+}

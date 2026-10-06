@@ -1,0 +1,78 @@
+{
+  "execution_policies": {
+    "read_only": {
+      "approval_policy": "never",
+      "codexProfile": "cao-readonly",
+      "sandbox_mode": "read-only"
+    },
+    "workspace_write": {
+      "approval_policy": "never",
+      "codexProfile": "cao-workspace-write",
+      "sandbox_mode": "workspace-write"
+    }
+  },
+  "policy_id": "cao-source-profile-conformance",
+  "policy_version": "1.0.0",
+  "profiles": {
+    "ootp_code_owner.md": {
+      "allowedTools": [
+        "fs_read",
+        "fs_list",
+        "execute_bash",
+        "@cao-mcp-server"
+      ],
+      "approve_cao_tools": [
+        "load_skill",
+        "send_message",
+        "handoff",
+        "assign"
+      ],
+      "approve_hub_sequence_steps": false,
+      "execution_policy": "read_only",
+      "name": "ootp_code_owner",
+      "provider": "codex",
+      "role": "supervisor"
+    },
+    "ootp_developer.md": {
+      "allowedTools": [
+        "@builtin",
+        "fs_*",
+        "execute_bash",
+        "@cao-mcp-server"
+      ],
+      "approve_cao_tools": [
+        "load_skill",
+        "send_message"
+      ],
+      "execution_policy": "workspace_write",
+      "name": "ootp_developer",
+      "provider": "codex",
+      "role": "developer"
+    },
+    "ootp_qa.md": {
+      "allowedTools": [
+        "@builtin",
+        "fs_read",
+        "fs_list",
+        "execute_bash",
+        "@cao-mcp-server"
+      ],
+      "approve_cao_tools": [
+        "load_skill",
+        "send_message"
+      ],
+      "execution_policy": "workspace_write",
+      "name": "ootp_qa",
+      "provider": "codex",
+      "role": "reviewer"
+    }
+  },
+  "provider_variants": [
+    "claude_code"
+  ],
+  "schema_version": 1,
+  "supporting_documents": {
+    "README.md": "readme",
+    "_base.md": "base"
+  }
+}

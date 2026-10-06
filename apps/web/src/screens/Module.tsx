@@ -17,7 +17,8 @@ export function ModuleScreen() {
     return <NotFound />;
   }
   if (module.id === 'clubhouse') {
-    return <Clubhouse />;
+    // A new snapshot starts the screen afresh, with whatever results brought it there.
+    return <Clubhouse key={snapshotId} />;
   }
   return (
     <main id="main" className={styles.main}>

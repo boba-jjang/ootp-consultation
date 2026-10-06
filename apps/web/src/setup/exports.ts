@@ -1,7 +1,7 @@
 import {
+  collectUploads,
   describeExports,
   measureCoverage,
-  routeExport,
   type Coverage,
   type ExportSummary,
   type RoutedExport,
@@ -9,32 +9,70 @@ import {
   type Upload,
 } from '@ootp/core';
 
-/** The exports added so far, routed, with what they say. */
+/** A file Create team would store, routed in the browser. */
+export interface PendingFile {
+  /** Stable while the file stays in the set: for list keys and Remove. */
+  key: string;
+  upload: Upload;
+  routed: RoutedExport;
+  /** The earlier file of the same view this one replaced, by name. */
+  replaced: string | null;
+}
+
+/** The exports chosen so far, with what they say. */
 export interface ReadExports {
+  files: PendingFile[];
   uploads: Upload[];
   named: RoutedExport[];
   summary: ExportSummary;
   coverage: Coverage;
+  /** The next key to hand out. */
+  next: number;
 }
 
-/** Routes the uploads in the browser; a file added twice counts once. */
-export function readExports(uploads: readonly Upload[]): ReadExports {
-  const seen = new Set<string>();
-  const unique = uploads.filter((upload) => {
-    const key = `${upload.name}\n${upload.text}`;
-    if (seen.has(key)) {
-      return false;
-    }
-    seen.add(key);
-    return true;
-  });
-  const named = unique.map((upload) => routeExport(upload.name, upload.text));
+function summarize(files: PendingFile[], next: number): ReadExports {
+  const named = files.map((file) => file.routed);
   return {
-    uploads: unique,
+    files,
+    uploads: files.map((file) => file.upload),
     named,
     summary: describeExports(named),
     coverage: measureCoverage(named),
+    next,
   };
+}
+
+export const NO_EXPORTS: ReadExports = summarize([], 0);
+
+/**
+ * Adds files to the set as the importer would store them (collectUploads): a file added twice
+ * counts once, and a later export of a view replaces the earlier one, which leaves the set.
+ */
+export function addExports(current: ReadExports, added: readonly Upload[]): ReadExports {
+  const keys = new Map(current.files.map((file) => [file.upload, file.key]));
+  const notes = new Map(current.files.map((file) => [file.upload, file.replaced]));
+  let next = current.next;
+  const { kept, replaced } = collectUploads([...current.uploads, ...added]);
+  for (const entry of replaced) {
+    notes.set(entry.by, entry.upload.name);
+  }
+  const files = kept.map(({ upload, routed }) => {
+    let key = keys.get(upload);
+    if (key === undefined) {
+      key = `file-${String(next)}`;
+      next += 1;
+    }
+    return { key, upload, routed, replaced: notes.get(upload) ?? null };
+  });
+  return summarize(files, next);
+}
+
+/** Takes one file out of the set; nothing has been saved yet. */
+export function removeExport(current: ReadExports, key: string): ReadExports {
+  return summarize(
+    current.files.filter((file) => file.key !== key),
+    current.next,
+  );
 }
 
 /** What the files filled in last time, so a field they filled can be filled again. */

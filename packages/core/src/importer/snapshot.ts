@@ -13,6 +13,8 @@ import {
 
 /** One file of a snapshot and how the import treated it: a line of the import log. */
 export interface ImportedFile {
+  /** The stored file's id, when the snapshot was read from the store. */
+  id?: string;
   name: string;
   view: ViewId | null;
   side: Side | null;
@@ -70,8 +72,7 @@ export function assembleSnapshot(
     joinSide(files, side).map((row) => toStoredRatings(row, settings.scale));
   const hitters = stored('hitters');
   const pitchers = stored('pitchers');
-  const games = hitters.flatMap((row) => (typeof row.G === 'number' ? [row.G] : []));
-  const gameNumber = games.length > 0 ? Math.max(...games) : null;
+  const gameNumber = mostGames(hitters);
   if (gameNumber === null) {
     events.push({
       level: 'warning',
@@ -100,6 +101,16 @@ export function assembleSnapshot(
     })),
     events,
   };
+}
+
+/** The most games any hitter has played: the game number that dates a snapshot. */
+export function gameNumberOf(files: readonly RoutedExport[]): number | null {
+  return mostGames(joinSide(files, 'hitters'));
+}
+
+function mostGames(hitters: readonly ExportRow[]): number | null {
+  const games = hitters.flatMap((row) => (typeof row.G === 'number' ? [row.G] : []));
+  return games.length > 0 ? Math.max(...games) : null;
 }
 
 /** One row per player of a side, joined by name in manifest order; the first value wins. */

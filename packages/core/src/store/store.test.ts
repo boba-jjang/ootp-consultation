@@ -9,7 +9,7 @@ import {
   routeExport,
   type Upload,
 } from '../index.ts';
-import { FIXTURES, readFixtureText } from '../../test/fixtures.ts';
+import { FIXTURES, editCell, readFixtureText, withoutFileIds } from '../../test/fixtures.ts';
 import { memoryStore, sha256 } from '../../test/memory-store.ts';
 
 const TEAM = 'team-1';
@@ -20,24 +20,6 @@ const uploads = (): Upload[] =>
   readdirSync(new URL('seattle-g42/', FIXTURES), { encoding: 'utf8' })
     .filter((file) => file.endsWith('.csv'))
     .map((name) => ({ name, text: readFixtureText(`seattle-g42/${name}`) }));
-
-/** Rewrites one player's cell in a CSV export. */
-function editCell(text: string, name: string, column: string, value: string): string {
-  const lines = text.split('\r\n');
-  const header = (lines[0] ?? '').split(',');
-  const nameAt = header.indexOf('Name');
-  const at = header.indexOf(column);
-  return lines
-    .map((line, i) => {
-      const cells = line.split(',');
-      if (i === 0 || cells[nameAt] !== name) {
-        return line;
-      }
-      cells[at] = value;
-      return cells.join(',');
-    })
-    .join('\r\n');
-}
 
 const withEdit = (all: Upload[], file: string, name: string, column: string, value: string) =>
   all.map((upload) =>
@@ -142,7 +124,19 @@ describe('loadSnapshot', () => {
       uploads().map((upload) => routeExport(upload.name, upload.text)),
       { scale: '1-10' },
     );
-    expect(loaded).toEqual(direct);
+    expect(withoutFileIds(loaded)).toEqual(direct);
     expect(loaded.label).toBe('Game 42');
+  });
+
+  it('keeps each stored file id on its import-log row', async () => {
+    const { store } = memoryStore();
+    const result = await importUpload(store, TEAM, uploads(), options);
+    if (!result.ok) {
+      throw new Error(result.message);
+    }
+    const stored = await store.listFiles(result.snapshot.id);
+    const snapshot = await loadSnapshot(store, result.snapshot.id, '1-10');
+    expect(snapshot.files.map((file) => file.id)).toEqual(stored.map((file) => file.id));
+    expect(snapshot.files.every((file) => typeof file.id === 'string')).toBe(true);
   });
 });

@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
 
+import type { Snapshot } from '../src/index.ts';
+
 /** The repository's fixtures/ directory. */
 export const FIXTURES = new URL('../../../fixtures/', import.meta.url);
 
@@ -40,4 +42,34 @@ export function rawCell(path: string, name: string, column: string): string {
     throw new Error(`${path} has no ${column} for ${name}`);
   }
   return row[column];
+}
+
+/** Rewrites one player's cell in a CSV export, keeping its CRLF line endings. */
+export function editCell(text: string, name: string, column: string, value: string): string {
+  const lines = text.split('\r\n');
+  const header = (lines[0] ?? '').split(',');
+  const nameAt = header.indexOf('Name');
+  const at = header.indexOf(column);
+  return lines
+    .map((line, i) => {
+      const cells = line.split(',');
+      if (i === 0 || cells[nameAt] !== name) {
+        return line;
+      }
+      cells[at] = value;
+      return cells.join(',');
+    })
+    .join('\r\n');
+}
+
+/** A snapshot without its stored file ids, which differ from store to store. */
+export function withoutFileIds(snapshot: Snapshot): Snapshot {
+  return {
+    ...snapshot,
+    files: snapshot.files.map((file) => {
+      const copy = { ...file };
+      delete copy.id;
+      return copy;
+    }),
+  };
 }

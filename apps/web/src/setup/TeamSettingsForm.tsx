@@ -1,8 +1,8 @@
-import { LEAGUE_SHOWS, RATING_SCALES } from '@ootp/core';
+import { RATING_SCALES } from '@ootp/core';
 import type { ReactNode, SubmitEvent } from 'react';
 
 import { Choices, Field, Panel } from '../ui/primitives.tsx';
-import { SCALE_LABELS, SHOWS_LABELS, type FieldErrors, type TeamForm } from './form.ts';
+import { SCALE_LABELS, type FieldErrors, type TeamForm } from './form.ts';
 import styles from './Setup.module.css';
 
 /**
@@ -70,16 +70,6 @@ export function TeamSettingsForm({
           }}
           help="Ratings are stored on 20–80; this says how your exports show them."
         />
-        <Choices
-          legend="Batting and pitching ratings your league shows"
-          name="league_shows"
-          options={LEAGUE_SHOWS.map((shows) => ({ value: shows, label: SHOWS_LABELS[shows] }))}
-          value={form.league_shows}
-          onChange={(value) => {
-            update('league_shows', value);
-          }}
-          help="Fielding and running ratings have no potentials in OOTP, so they're always read as current."
-        />
       </Panel>
       <Panel title="League rules" className={styles.formPanel}>
         <Choices
@@ -108,22 +98,6 @@ export function TeamSettingsForm({
           error={errors.games_per_season}
           onChange={(event) => {
             update('games_per_season', event.target.value);
-          }}
-        />
-        <Field
-          id="team-slots"
-          name="dev_lab_slots"
-          type="number"
-          inputMode="numeric"
-          min={1}
-          max={30}
-          autoComplete="off"
-          label="Dev Lab slots"
-          help="Set by your league, from 1 to 30"
-          value={form.dev_lab_slots}
-          error={errors.dev_lab_slots}
-          onChange={(event) => {
-            update('dev_lab_slots', event.target.value);
           }}
         />
       </Panel>

@@ -1,6 +1,6 @@
 import {
-  DATA_SET_INFO,
   LAYERS,
+  LAYER_VIEWS,
   VIEW_DESCRIPTIONS,
   VIEW_MANIFESTS,
   type Coverage,
@@ -8,6 +8,7 @@ import {
   type ExportSummary,
   type Layer,
   type RoutedExport,
+  type Upload,
   type ViewId,
 } from '@ootp/core';
 import { useRef, useState, type DragEvent, type ReactNode } from 'react';
@@ -22,8 +23,9 @@ import {
   CoverageLayers,
   LeagueTag,
   Panel,
+  type ButtonVariant,
 } from '../ui/primitives.tsx';
-import { scoutingAccuracyLabel } from './exports.ts';
+import { scoutingAccuracyLabel, type PendingFile } from './exports.ts';
 import { readDrop, readFiles } from './files.ts';
 import styles from './Setup.module.css';
 
@@ -31,6 +33,54 @@ import styles from './Setup.module.css';
  * The pieces of the Create a Team flow that read nothing themselves, so the sheet can show
  * them: the drop zone, the best-first-upload card, what the files say and the views read.
  */
+
+/** A button that opens the file picker for CSV exports. */
+export function FileButton({
+  children,
+  label,
+  variant,
+  multiple,
+  busy,
+  className,
+  onFiles,
+}: {
+  children: ReactNode;
+  /** The accessible name, when the visible text alone is ambiguous; it starts with that text. */
+  label?: string;
+  variant: ButtonVariant;
+  multiple: boolean;
+  busy: boolean;
+  className?: string;
+  onFiles: (files: Promise<Upload[]>) => void;
+}) {
+  const input = useRef<HTMLInputElement>(null);
+  return (
+    <>
+      <Button
+        variant={variant}
+        className={className}
+        disabled={busy}
+        aria-label={label}
+        onClick={() => input.current?.click()}
+      >
+        {children}
+      </Button>
+      <input
+        ref={input}
+        type="file"
+        multiple={multiple}
+        accept=".csv,text/csv"
+        className="sr-only"
+        tabIndex={-1}
+        aria-hidden="true"
+        onChange={(event) => {
+          onFiles(readFiles(event.target.files ?? []));
+          event.target.value = '';
+        }}
+      />
+    </>
+  );
+}
 
 /** Drop or choose files, folders included. */
 export function DropZone({
@@ -42,7 +92,7 @@ export function DropZone({
   text,
 }: {
   size: 'large' | 'small';
-  onFiles: (files: Promise<import('@ootp/core').Upload[]>) => void;
+  onFiles: (files: Promise<Upload[]>) => void;
   busy: boolean;
   id?: string;
   /** The setup's words unless a screen has its own. */
@@ -50,7 +100,6 @@ export function DropZone({
   text?: string;
 }) {
   const [over, setOver] = useState(false);
-  const fileInput = useRef<HTMLInputElement>(null);
   const folderInput = useRef<HTMLInputElement>(null);
   const onDrop = (event: DragEvent) => {
     event.preventDefault();
@@ -82,30 +131,18 @@ export function DropZone({
         </p>
       ) : null}
       <div className={styles.dropActions}>
-        <Button
+        <FileButton
           variant={size === 'large' ? 'primary' : 'outline'}
-          disabled={busy}
-          onClick={() => fileInput.current?.click()}
+          multiple
+          busy={busy}
+          onFiles={onFiles}
         >
           {busy ? 'Reading…' : size === 'large' ? 'Choose files' : 'Add more files'}
-        </Button>
+        </FileButton>
         <Button variant="ghost" disabled={busy} onClick={() => folderInput.current?.click()}>
           Choose a folder
         </Button>
       </div>
-      <input
-        ref={fileInput}
-        type="file"
-        multiple
-        accept=".csv,text/csv"
-        className="sr-only"
-        tabIndex={-1}
-        aria-hidden="true"
-        onChange={(event) => {
-          onFiles(readFiles(event.target.files ?? []));
-          event.target.value = '';
-        }}
-      />
       <input
         ref={folderInput}
         type="file"
@@ -137,12 +174,6 @@ const LAYER_COPY: Record<Layer, { title: string; level: CoverageLevel; text: str
   },
 };
 
-const layerViews = (layer: Layer): ViewId[] =>
-  (Object.keys(VIEW_MANIFESTS) as ViewId[]).filter((view) => {
-    const set = DATA_SET_INFO[VIEW_DESCRIPTIONS[view].dataSet];
-    return set.layer === layer || (layer === 'stats' && set.layer === null);
-  });
-
 /** The three layers, as the setup board lists them: any export works, each layer adds. */
 export function BestFirstUpload() {
   return (
@@ -158,7 +189,7 @@ export function BestFirstUpload() {
           </div>
           <p className={styles.muted}>{LAYER_COPY[layer].text}</p>
           <div className={styles.chips}>
-            {layerViews(layer).map((view) => (
+            {LAYER_VIEWS[layer].map((view) => (
               <Chip key={view}>{view}</Chip>
             ))}
           </div>
@@ -207,73 +238,120 @@ export function FoundInFiles({ summary }: { summary: ExportSummary }) {
   );
 }
 
-/** The views recognized, per side, with the league files, the capture and the rejects. */
-export function ViewsRead({ named, coverage }: { named: RoutedExport[]; coverage: Coverage }) {
-  const used = named.filter((upload) => upload.routing !== 'rejected').length;
-  const capture = named.some((upload) => upload.routing === 'supplemental');
-  const rejected = named.filter((upload) => upload.routing === 'rejected');
-  const side = (which: 'hitters' | 'pitchers') =>
-    coverage.views.onFile.filter((view) => VIEW_MANIFESTS[view].side === which);
+const MANIFEST_ORDER = Object.keys(VIEW_MANIFESTS) as ViewId[];
+const byManifest = (a: PendingFile, b: PendingFile) =>
+  MANIFEST_ORDER.indexOf(a.routed.view ?? 'default') -
+  MANIFEST_ORDER.indexOf(b.routed.view ?? 'default');
+
+/** A pending file's line: what it was read as, and what that brings. */
+function fileLine(file: RoutedExport): { title: string; detail: string } {
+  if (file.routing === 'rejected' || file.view === null) {
+    return {
+      title: file.name,
+      detail:
+        file.events.find((event) => event.level === 'error')?.message ??
+        'The app can’t read this file.',
+    };
+  }
+  if (file.routing === 'supplemental') {
+    return {
+      title: `${file.view} on the hitters`,
+      detail: 'Only DEF Pot is used, as the hitters’ ceiling',
+    };
+  }
+  if (file.scope === 'league') {
+    return { title: `League ${file.view}`, detail: 'League-wide, for percentiles later' };
+  }
+  return { title: file.view, detail: VIEW_DESCRIPTIONS[file.view].carries };
+}
+
+/**
+ * The files read, per side, with the league files, the capture and the rejects apart. Each
+ * can be removed before anything is saved; a file that replaced an earlier export of its
+ * view says so.
+ */
+export function FilesRead({
+  files,
+  coverage,
+  onRemove,
+}: {
+  files: readonly PendingFile[];
+  coverage: Coverage;
+  onRemove: (key: string) => void;
+}) {
+  const used = files.filter((file) => file.routed.routing !== 'rejected').length;
+  const team = (side: 'hitters' | 'pitchers') =>
+    files
+      .filter(
+        (file) =>
+          file.routed.scope === 'team' &&
+          file.routed.routing === 'primary' &&
+          file.routed.side === side,
+      )
+      .sort(byManifest);
+  const groups: { title: string; empty?: string; rows: PendingFile[] }[] = [
+    { title: 'Hitters', empty: 'No hitter view yet.', rows: team('hitters') },
+    { title: 'Pitchers', empty: 'No pitcher view yet.', rows: team('pitchers') },
+    {
+      title: 'Also read',
+      rows: files
+        .filter(
+          (file) =>
+            file.routed.routing === 'supplemental' ||
+            (file.routed.scope === 'league' && file.routed.routing !== 'rejected'),
+        )
+        .sort(byManifest),
+    },
+    { title: 'Not used', rows: files.filter((file) => file.routed.routing === 'rejected') },
+  ];
+  const views = coverage.views.onFile.length;
   return (
     <Panel
-      title={`${coverage.views.onFile.length} ${coverage.views.onFile.length === 1 ? 'view' : 'views'} recognized`}
-      meta={`${used} of ${named.length} files`}
+      title={`${views} ${views === 1 ? 'view' : 'views'} recognized`}
+      meta={`${used} of ${files.length} files`}
       className={styles.views}
     >
-      {(['hitters', 'pitchers'] as const).map((which) => (
-        <div key={which} className={styles.viewGroup}>
-          <h3 className={styles.viewGroupTitle}>{which === 'hitters' ? 'Hitters' : 'Pitchers'}</h3>
-          {side(which).length === 0 ? (
-            <p className={styles.muted}>
-              No {which === 'hitters' ? 'hitter' : 'pitcher'} view yet.
-            </p>
-          ) : (
-            <ul className={styles.viewList}>
-              {side(which).map((view) => (
-                <li key={view} className={styles.view}>
-                  <span className={styles.viewName}>{view}</span>
-                  <span className={styles.muted}>{VIEW_DESCRIPTIONS[view].carries}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      ))}
-      {coverage.league.onFile.length > 0 || capture ? (
-        <div className={styles.viewGroup}>
-          <h3 className={styles.viewGroupTitle}>Also read</h3>
-          <ul className={styles.viewList}>
-            {coverage.league.onFile.map((view) => (
-              <li key={view} className={styles.view}>
-                <span className={styles.viewName}>League {view}</span>
-                <span className={styles.muted}>League-wide, for percentiles later</span>
-              </li>
-            ))}
-            {capture ? (
-              <li className={styles.view}>
-                <span className={styles.viewName}>cus_pitch_pot on the hitters</span>
-                <span className={styles.muted}>Only DEF Pot is used, as the hitters' ceiling</span>
-              </li>
-            ) : null}
-          </ul>
-        </div>
-      ) : null}
-      {rejected.length > 0 ? (
-        <div className={styles.viewGroup}>
-          <h3 className={styles.viewGroupTitle}>Not used</h3>
-          <ul className={styles.viewList}>
-            {rejected.map((upload) => (
-              <li key={upload.name} className={styles.view}>
-                <span className={styles.viewName}>{upload.name}</span>
-                <span className={styles.muted}>
-                  {upload.events.find((event) => event.level === 'error')?.message ??
-                    'The file could not be used.'}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+      {groups.map((group) =>
+        group.rows.length === 0 && group.empty === undefined ? null : (
+          <div key={group.title} className={styles.viewGroup}>
+            <h3 className={styles.viewGroupTitle}>{group.title}</h3>
+            {group.rows.length === 0 ? (
+              <p className={styles.muted}>{group.empty}</p>
+            ) : (
+              <ul className={styles.viewList}>
+                {group.rows.map((file) => {
+                  const line = fileLine(file.routed);
+                  return (
+                    <li key={file.key} className={styles.fileRow}>
+                      <span className={styles.view}>
+                        <span className={styles.viewName}>{line.title}</span>
+                        <span className={styles.muted}>{line.detail}</span>
+                        {line.title === file.routed.name ? null : (
+                          <span className={styles.fileName}>{file.routed.name}</span>
+                        )}
+                        {file.replaced ? (
+                          <span className={styles.replaced}>
+                            Replaced an earlier copy: {file.replaced}
+                          </span>
+                        ) : null}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        aria-label={`Remove ${file.routed.name}`}
+                        onClick={() => {
+                          onRemove(file.key);
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        ),
+      )}
     </Panel>
   );
 }

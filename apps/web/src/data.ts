@@ -72,8 +72,19 @@ export function useTeams() {
   });
 }
 
+/**
+ * teams.dev_lab_slots is still NOT NULL without a default, though the app stopped asking for
+ * Dev Lab slots in v3.1. Until the plan's Phase 3.1 retirement item drops the column, new teams
+ * get 4, the old setup default. A database filler, not a setting.
+ */
+const RETIRED_DEV_LAB_SLOTS = 4;
+
 async function insertTeam(client: Client, settings: TeamSettings): Promise<TeamRow> {
-  const { data, error } = await client.from('teams').insert(settings).select().single();
+  const { data, error } = await client
+    .from('teams')
+    .insert({ ...settings, dev_lab_slots: RETIRED_DEV_LAB_SLOTS })
+    .select()
+    .single();
   if (error) {
     throw new Error(`Couldn't save the team: ${error.message}`);
   }
@@ -133,7 +144,10 @@ export function useCreateTeamWithExports() {
   });
 }
 
-/** Adds exports to a team: a dated upload goes to its game's snapshot, an undated one here. */
+/**
+ * Adds exports to a team: a dated upload goes to its game's snapshot, an undated one into
+ * snapshotId. A team with no snapshot yet passes none, so only a dated upload can start one.
+ */
 export function useAddExports() {
   const { store } = useSessionState();
   const queries = useQueryClient();
@@ -145,7 +159,7 @@ export function useAddExports() {
       scale,
     }: {
       teamId: string;
-      snapshotId: string;
+      snapshotId?: string;
       uploads: Upload[];
       scale: RatingScale;
     }) =>
@@ -160,6 +174,16 @@ export function useAddExports() {
         queries.invalidateQueries({ queryKey: queryKeys.snapshots(teamId) }),
         queries.invalidateQueries({ queryKey: ['snapshots'] }),
       ]),
+  });
+}
+
+/** Removes one stored file from its snapshot; its import events go with it. */
+export function useRemoveFile() {
+  const { store } = useSessionState();
+  const queries = useQueryClient();
+  return useMutation({
+    mutationFn: (fileId: string) => needClient(store, 'Removing the file').removeFiles([fileId]),
+    onSettled: () => queries.invalidateQueries({ queryKey: ['snapshots'] }),
   });
 }
 

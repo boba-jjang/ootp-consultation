@@ -3,8 +3,11 @@ import {
   measureCoverage,
   type ImportedFile,
   type RoutedExport,
+  type UploadedFile,
   type ViewId,
 } from '@ootp/core';
+
+import type { PendingFile } from '../setup/exports.ts';
 
 /** The sheet's pretend snapshot: nine views, three players a side, one reject, one league file. */
 const HITTERS = [
@@ -74,7 +77,8 @@ export const SHEET_FILES: RoutedExport[] = [
 
 export const SHEET_COVERAGE = measureCoverage(SHEET_FILES);
 
-export const SHEET_LOG: ImportedFile[] = SHEET_FILES.map((file) => ({
+export const SHEET_LOG: ImportedFile[] = SHEET_FILES.map((file, index) => ({
+  id: `sheet-file-${String(index)}`,
   name: file.name,
   view: file.view,
   side: file.side,
@@ -83,3 +87,47 @@ export const SHEET_LOG: ImportedFile[] = SHEET_FILES.map((file) => ({
   players: file.rows.length,
   events: file.events,
 }));
+
+/** The same files as Create a Team holds them, batting_stats_1 having replaced an earlier copy. */
+export const SHEET_PENDING: PendingFile[] = SHEET_FILES.map((file, index) => ({
+  key: `sheet-pending-${String(index)}`,
+  upload: { name: file.name, text: '' },
+  routed: file,
+  replaced: file.view === 'batting_stats_1' && file.scope === 'team' ? file.name : null,
+}));
+
+/** One upload's results, with each outcome a file can have. */
+export const SHEET_RESULTS: UploadedFile[] = [
+  {
+    name: 'seattle_arrows_lineups_-_overview_cus_pitch_pot.csv',
+    view: 'cus_pitch_pot',
+    scope: 'team',
+    routing: 'primary',
+    outcome: 'added',
+    events: [],
+  },
+  {
+    name: 'seattle_arrows_lineups_-_overview_batting_stats_1.csv',
+    view: 'batting_stats_1',
+    scope: 'team',
+    routing: 'primary',
+    outcome: 'replaced',
+    events: [],
+  },
+  {
+    name: 'seattle_arrows_lineups_-_overview_default.csv',
+    view: 'default',
+    scope: 'team',
+    routing: 'primary',
+    outcome: 'unchanged',
+    events: [],
+  },
+  {
+    name: 'notes.csv',
+    view: null,
+    scope: null,
+    routing: 'rejected',
+    outcome: 'added',
+    events: [{ level: 'error', code: 'unknown-view', message: 'No view has these columns.' }],
+  },
+];

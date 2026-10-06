@@ -8,9 +8,10 @@ import {
   ImportLog,
   SnapshotTimeline,
   UploadNext,
+  UploadResults,
 } from '../clubhouse/pieces.tsx';
 import { ExportPanel, RestorePanel } from '../settings/pieces.tsx';
-import { BestFirstUpload, DropZone, FoundInFiles } from '../setup/pieces.tsx';
+import { BestFirstUpload, DropZone, FilesRead, FoundInFiles } from '../setup/pieces.tsx';
 import { Gate } from '../shell/Gate.tsx';
 import { Tabs } from '../shell/Tabs.tsx';
 import { TopBar } from '../shell/TopBar.tsx';
@@ -34,7 +35,7 @@ import {
   Timeline,
   Trend,
 } from '../ui/primitives.tsx';
-import { SHEET_COVERAGE, SHEET_LOG } from './mock.ts';
+import { SHEET_COVERAGE, SHEET_LOG, SHEET_PENDING, SHEET_RESULTS } from './mock.ts';
 import styles from './Sheet.module.css';
 
 const SWATCHES: [string, string][] = [
@@ -170,6 +171,7 @@ export function Sheet() {
           <BestFirstUpload />
         </div>
         <FoundInFiles summary={SHEET_SUMMARY} />
+        <FilesRead files={SHEET_PENDING} coverage={SHEET_COVERAGE} onRemove={() => undefined} />
       </Section>
 
       <Section title="Clubhouse" note="The Clubhouse pieces on a pretend nine-view snapshot">
@@ -179,14 +181,27 @@ export function Sheet() {
             snapshots={[{ id: 'g42', teamId: 'sheet', label: 'Game 42', gameNumber: 42 }]}
             counts={new Map([['g42', 9]])}
           />
-          <UploadNext coverage={SHEET_COVERAGE} onUpload={() => undefined} />
+          <UploadNext coverage={SHEET_COVERAGE} busy={false} onFiles={() => undefined} />
         </div>
+        <UploadResults heading="4 files read." files={SHEET_RESULTS} onDismiss={() => undefined} />
         <div className={styles.columns}>
           <CoverageMatrix side={SHEET_COVERAGE.hitters} />
           <CoverageMatrix side={SHEET_COVERAGE.pitchers} />
         </div>
         <div className={styles.columns}>
-          <ImportLog files={SHEET_LOG} label="Game 42" />
+          <ImportLog
+            files={SHEET_LOG}
+            label="Game 42"
+            actions={{
+              busy: false,
+              notice: {
+                id: SHEET_LOG.find((file) => file.view === 'pitching_superstats_2')?.id ?? '',
+                message: 'This file is batting_stats_1, not pitching_superstats_2.',
+              },
+              onReplace: () => undefined,
+              onRemove: () => undefined,
+            }}
+          />
           <ColumnNotes views={SHEET_COVERAGE.views.onFile} files={SHEET_LOG} />
         </div>
       </Section>

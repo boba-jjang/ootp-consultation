@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { expectAccessible, expectTargets } from './checks.ts';
+import { expectAccessible, expectNoSideScroll, expectTargets } from './checks.ts';
 import { supabaseEnv } from './env.ts';
 
 test.describe('the component sheet', () => {
@@ -11,6 +11,7 @@ test.describe('the component sheet', () => {
     await expect(page.getByRole('navigation', { name: 'Setup steps' })).toBeVisible();
     await expectAccessible(page);
     await expectTargets(page);
+    await expectNoSideScroll(page);
   });
 
   test('shows the app shell, with a team menu the keyboard can work', async ({ page }) => {
@@ -36,6 +37,42 @@ test.describe('the component sheet', () => {
     await expect(page.getByRole('menuitem', { name: 'Team settings' })).toBeFocused();
     await page.keyboard.press(' ');
     await expect(page).not.toHaveURL(/\/sheet$/);
+  });
+});
+
+test.describe('updating exports, on the sheet', () => {
+  test('Best first upload lists the stats views without the bio view', async ({ page }) => {
+    await page.goto('/sheet');
+    // The sheet nests each panel in a section of its own; the innermost is the panel.
+    const best = page
+      .locator('section', {
+        has: page.getByRole('heading', { name: 'Best first upload', exact: true }),
+      })
+      .last();
+    await expect(best.getByText('batting_stats_1', { exact: true })).toBeVisible();
+    await expect(best.getByText('default', { exact: true })).toHaveCount(0);
+  });
+
+  test('a stored file asks before it is removed, and the pieces pass the checks', async ({
+    page,
+  }) => {
+    await page.goto('/sheet');
+    const log = page
+      .locator('section', {
+        has: page.getByRole('heading', { name: 'Import log', exact: true }),
+      })
+      .last();
+    const file = 'seattle_arrows_lineups_-_overview_default.csv';
+    await log.getByRole('button', { name: `Remove ${file}`, exact: true }).click();
+    await expect(log.getByText('Remove this file from the snapshot?')).toBeVisible();
+    await expect(log.getByRole('button', { name: 'Cancel' })).toBeFocused();
+    await expect(log.getByRole('alert')).toHaveText(
+      'This file is batting_stats_1, not pitching_superstats_2.',
+    );
+    await expectAccessible(page);
+    await expectTargets(page);
+    await log.getByRole('button', { name: 'Cancel' }).click();
+    await expect(log.getByRole('button', { name: `Remove ${file}`, exact: true })).toBeVisible();
   });
 });
 

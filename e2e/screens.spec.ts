@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { expectAccessible, expectTargets } from './checks.ts';
+import { supabaseEnv } from './env.ts';
 
 test.describe('the component sheet', () => {
   test('shows every primitive and passes the accessibility checks', async ({ page }) => {
@@ -57,6 +58,7 @@ test.describe('sign-in', () => {
   test('remembers where sign-in started, survives Back from GitHub, forgets on return', async ({
     page,
   }) => {
+    test.skip(!supabaseEnv(), 'needs VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY');
     // GitHub itself is out of reach here: the authorize request gets a stub page instead.
     await page.route('**/auth/v1/authorize**', (route) =>
       route.fulfill({ status: 200, contentType: 'text/html', body: '<title>GitHub stub</title>' }),
@@ -64,7 +66,8 @@ test.describe('sign-in', () => {
     await page.goto('/t/abc/settings?tab=x');
     await expect(page).toHaveURL(/\/sign-in$/);
     const button = page.getByRole('button', { name: 'Sign in with GitHub' });
-    test.skip(!(await button.isVisible()), 'needs Supabase settings in .env.local');
+    // The sign-in screen renders just after the URL changes, so wait for the button.
+    await expect(button).toBeVisible();
     await button.click();
     await expect(page).toHaveTitle('GitHub stub');
     await page.goBack();

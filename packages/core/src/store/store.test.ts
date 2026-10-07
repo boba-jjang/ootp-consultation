@@ -9,7 +9,13 @@ import {
   routeExport,
   type Upload,
 } from '../index.ts';
-import { FIXTURES, editCell, readFixtureText, withoutFileIds } from '../../test/fixtures.ts';
+import {
+  FIXTURES,
+  editCell,
+  fixtureFiles,
+  readFixtureText,
+  withoutFileIds,
+} from '../../test/fixtures.ts';
 import { memoryStore, sha256 } from '../../test/memory-store.ts';
 
 const TEAM = 'team-1';
@@ -111,6 +117,77 @@ describe('importUpload', () => {
     expect([...events.values()].flat()).toContainEqual(
       expect.objectContaining({ level: 'error', code: 'unrecognized' }),
     );
+  });
+});
+
+/** Fixture files as a browser would upload them. */
+const uploadsOf = (paths: readonly string[]): Upload[] =>
+  paths.map((path) => ({ name: path.split('/').at(-1) ?? path, text: readFixtureText(path) }));
+
+describe('importUpload never removes a stored file', () => {
+  it('stores all 13 game-53 exports as a Game 53 snapshot, each with its side', async () => {
+    const { store, files } = memoryStore();
+    const result = await importUpload(
+      store,
+      TEAM,
+      uploadsOf(fixtureFiles('seattle-g53/')),
+      options,
+    );
+    expect(result).toMatchObject({ ok: true, created: true, snapshot: { label: 'Game 53' } });
+    if (!result.ok) {
+      return;
+    }
+    expect(files.size).toBe(13);
+    expect(result.files.map((file) => file.outcome)).toEqual(Array(13).fill('added'));
+    const sides = Object.fromEntries(result.files.map((file) => [file.name, file.side]));
+    expect(sides).toMatchObject({
+      'seattle_arrows_lineups_-_overview_default.csv': null,
+      'seattle_arrows_lineups_-_overview_batting_stats_1_cust.csv': 'hitters',
+      'starter_pitching_stats_1.csv': 'pitchers',
+    });
+    expect([...files.values()].map((file) => file.side)).toEqual(
+      result.files.map((file) => file.side),
+    );
+    expect([...files.values()].every((file) => file.importerVersion === '0.2.0')).toBe(true);
+  });
+
+  it('adds the overlap files beside them, leaving the tables as they were', async () => {
+    const { store, files } = memoryStore();
+    const first = await importUpload(store, TEAM, uploadsOf(fixtureFiles('seattle-g53/')), options);
+    const into = first.ok ? first.snapshot.id : '';
+    const before = await loadSnapshot(store, into, '1-10');
+    const overlap = uploadsOf(fixtureFiles('seattle-g53/overlap/'));
+    const result = await importUpload(store, TEAM, overlap, { ...options, into });
+    expect(result.ok && result.files.map((file) => file.outcome)).toEqual(Array(6).fill('added'));
+    expect(files.size).toBe(19);
+    const after = await loadSnapshot(store, into, '1-10');
+    expect(after.hitters).toEqual(before.hitters);
+    expect(after.pitchers).toEqual(before.pitchers);
+    expect(after.league).toEqual(before.league);
+    expect(after.events).toEqual(before.events);
+  });
+
+  it('keeps an earlier export of a view beside a re-export, the later values winning', async () => {
+    const { store, files } = memoryStore();
+    await importUpload(store, TEAM, uploads(), options);
+    const into = (await store.listSnapshots(TEAM))[0]?.id;
+    const edited = withEdit(uploads(), 'default', 'Yoshitsugu Ishida', 'SLR', '$700 000').filter(
+      (upload) => upload.name.endsWith('overview_default.csv'),
+    );
+    const added = await importUpload(store, TEAM, edited, { ...options, into });
+    expect(added.ok && added.files.map((file) => file.outcome)).toEqual(['added']);
+    expect(files.size).toBe(17);
+    const loaded = await loadSnapshot(store, into ?? '', '1-10');
+    expect(loaded.hitters.find((row) => row.Name === 'Yoshitsugu Ishida')?.SLR).toBe(700_000);
+    expect(loaded.events.filter((event) => event.code === 'value-replaced')).toEqual([
+      expect.objectContaining({
+        details: expect.objectContaining({
+          column: 'SLR',
+          earlier: 600_000,
+          later: 700_000,
+        }) as unknown,
+      }),
+    ]);
   });
 });
 

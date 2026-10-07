@@ -2,15 +2,20 @@ import { readdirSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { IMPORTER_VERSION, parseCsv, routeExport, type ViewId } from '../index.ts';
+import { IMPORTER_VERSION, parseCsv, routeExport, type Side, type ViewId } from '../index.ts';
 import { FIXTURES, leagueView, readFixtureText, teamView } from '../../test/fixtures.ts';
 
 const fileName = (path: string) => path.split('/').at(-1) ?? path;
 const route = (path: string, name = fileName(path)) => routeExport(name, readFixtureText(path));
 
-type Expected = [ViewId, 'team' | 'league', 'hitters' | 'pitchers', 'primary' | 'supplemental'];
+type Expected = [ViewId | null, 'team' | 'league', Side | null, 'primary' | 'supplemental'];
 
-// Every fixture and how it must route: view, scope, the side its rows list, routing.
+const G53 = 'seattle-g53/';
+const G53_TEAM = `${G53}seattle_arrows_lineups_-_overview_`;
+const G53_LEAGUE = `${G53}rsl_statistics_player_statistics_-_sortable_stats_`;
+
+// Every fixture and how it must route: the known view its header matches exactly (null for a
+// custom view), scope, the side its rows list (null when they list both), routing.
 const EXPECTED: Record<string, Expected> = {
   [teamView('default')]: ['default', 'team', 'hitters', 'primary'],
   [teamView('batting_stats_1')]: ['batting_stats_1', 'team', 'hitters', 'primary'],
@@ -46,7 +51,71 @@ const EXPECTED: Record<string, Expected> = {
     'pitchers',
     'primary',
   ],
+  // Game 53 (task Context: Game 53, file by file).
+  [`${G53_TEAM}default.csv`]: ['default', 'team', null, 'primary'],
+  [`${G53_TEAM}custom_bat_pot.csv`]: ['custom_bat_pot', 'team', 'hitters', 'primary'],
+  [`${G53_TEAM}cus_pitch_pot.csv`]: ['cus_pitch_pot', 'team', 'pitchers', 'primary'],
+  [`${G53_TEAM}batting_stats_1_cust.csv`]: [null, 'team', 'hitters', 'primary'],
+  [`${G53_TEAM}batting_superstats_1.csv`]: [null, 'team', 'hitters', 'primary'],
+  [`${G53}seattle_arrows_pitching_pitching_stats_1.csv`]: [null, 'team', 'pitchers', 'primary'],
+  [`${G53}seattle_arrows_pitching_pitching_superstat_1.csv`]: [null, 'team', 'pitchers', 'primary'],
+  [`${G53_LEAGUE}batting_stats_1_cust.csv`]: [null, 'league', 'hitters', 'primary'],
+  [`${G53_LEAGUE}batting_superstats_1.csv`]: [null, 'league', 'hitters', 'primary'],
+  [`${G53}starter_pitching_stats_1.csv`]: [null, 'league', 'pitchers', 'primary'],
+  [`${G53}starter_pitching_superstat_1.csv`]: [null, 'league', 'pitchers', 'primary'],
+  [`${G53}reliever_pitching_stats_1.csv`]: [null, 'league', 'pitchers', 'primary'],
+  [`${G53}reliever_pitching_superstats_1.csv`]: [null, 'league', 'pitchers', 'primary'],
+  [`${G53}overlap/rsl_statistics_player_statistics_-_sortable_stats_pitching_stats_1.csv`]: [
+    null,
+    'league',
+    'pitchers',
+    'primary',
+  ],
+  [`${G53}overlap/rsl_statistics_player_statistics_-_sortable_stats_pitching_superstat_1.csv`]: [
+    null,
+    'league',
+    'pitchers',
+    'primary',
+  ],
+  [`${G53}overlap/seattle_arrows_starter_pitching_pitching_stats_1.csv`]: [
+    null,
+    'team',
+    'pitchers',
+    'primary',
+  ],
+  [`${G53}overlap/seattle_arrows_starter_pitching_pitching_superstat_1.csv`]: [
+    null,
+    'team',
+    'pitchers',
+    'primary',
+  ],
+  [`${G53}overlap/seattle_arrows_reliever_pitching_pitching_stats_1.csv`]: [
+    null,
+    'team',
+    'pitchers',
+    'primary',
+  ],
+  [`${G53}overlap/seattle_arrows_reliever_pitching_pitching_superstat_1.csv`]: [
+    null,
+    'team',
+    'pitchers',
+    'primary',
+  ],
 };
+
+// Game 53's files whose names carry neither OOTP prefix, so their rows give the scope.
+const SCOPE_FROM_ROWS = [
+  `${G53}seattle_arrows_pitching_pitching_stats_1.csv`,
+  `${G53}seattle_arrows_pitching_pitching_superstat_1.csv`,
+  `${G53}starter_pitching_stats_1.csv`,
+  `${G53}starter_pitching_superstat_1.csv`,
+  `${G53}reliever_pitching_stats_1.csv`,
+  `${G53}reliever_pitching_superstats_1.csv`,
+  `${G53}overlap/seattle_arrows_starter_pitching_pitching_stats_1.csv`,
+  `${G53}overlap/seattle_arrows_starter_pitching_pitching_superstat_1.csv`,
+  `${G53}overlap/seattle_arrows_reliever_pitching_pitching_stats_1.csv`,
+  `${G53}overlap/seattle_arrows_reliever_pitching_pitching_superstat_1.csv`,
+];
 
 const OLDER = [
   'legacy/seattle_arrows_lineups_-_overview_batting_superstats_1.csv',
@@ -67,14 +136,19 @@ function withColumn(text: string, column: string, value: (row: number) => string
   return [header, ...rows].join('\r\n');
 }
 
+/** Adds a column to a CSV text, with one value for every data row. */
+function addColumn(text: string, column: string, value: string): string {
+  return text
+    .split('\r\n')
+    .map((line, i) => (line === '' ? line : `${line},${i === 0 ? column : value}`))
+    .join('\r\n');
+}
+
 describe('routeExport on the fixtures', () => {
-  // seattle-g53/ uses custom views that the column-dictionary import will read; until then
-  // only the folders this file covers are checked.
-  it('has an expectation for every CSV in fixtures/, seattle-g53/ aside', () => {
+  it('has an expectation for every CSV in fixtures/', () => {
     const files = readdirSync(FIXTURES, { recursive: true, encoding: 'utf8' })
       .filter((file) => file.endsWith('.csv'))
-      .map((file) => file.replaceAll('\\', '/'))
-      .filter((file) => !file.startsWith('seattle-g53/'));
+      .map((file) => file.replaceAll('\\', '/'));
     expect(files.sort()).toEqual(Object.keys(EXPECTED).sort());
   });
 
@@ -99,6 +173,41 @@ describe('routeExport on the fixtures', () => {
         OLDER.includes(path) ? ['older-version'] : [],
       );
     }
+  });
+
+  it('logs exactly today’s events for Game 42 and the legacy files, and only the scope for Game 53', () => {
+    for (const path of Object.keys(EXPECTED)) {
+      const expected = OLDER.includes(path)
+        ? ['older-version']
+        : path.includes('hitter_capture')
+          ? ['supplemental-capture']
+          : SCOPE_FROM_ROWS.includes(path)
+            ? ['scope-from-rows']
+            : [];
+      expect(
+        route(path).events.map((event) => event.code),
+        path,
+      ).toEqual(expected);
+    }
+  });
+
+  it('reads Game 53’s rows on both sides from the bio view, with the bio columns', () => {
+    const bio = route(`${G53_TEAM}default.csv`);
+    expect(bio.rows).toHaveLength(25);
+    expect(bio.rows.find((row) => row.Name === 'Hajime Ito')).toMatchObject({
+      POS: 'SP',
+      NAT: 'JPN',
+      HT: 76,
+      WT: 200,
+      Age: 24,
+      B: 'R',
+      T: 'R',
+    });
+    expect(bio.rows.find((row) => row.Name === 'Dong-hee Moon')).toMatchObject({ POS: 'SS' });
+  });
+
+  it('stamps importer version 0.2.0, for the column dictionary', () => {
+    expect(IMPORTER_VERSION).toBe('0.2.0');
   });
 
   it('keeps only Name, POS and DEF Pot from the hitter capture, and says so', () => {
@@ -212,6 +321,170 @@ describe('routeExport rejections', () => {
     ['an unknown header', 'Date,Opponent,Score\r\n1,2,3', 'unrecognized'],
   ])('rejects %s', (_case, text, code) => {
     expect(rejected('export.csv', text)).toMatchObject({ code });
+  });
+});
+
+describe('routeExport through the column dictionary (hand-built files)', () => {
+  const rejectedWith = (name: string, text: string) => {
+    const result = routeExport(name, text);
+    expect(result.routing).toBe('rejected');
+    expect(result.rows).toEqual([]);
+    return result.events.find((event) => event.level === 'error');
+  };
+
+  it('logs an unknown column as not read, and reads the rest', () => {
+    const path = teamView('default');
+    const result = routeExport(fileName(path), addColumn(readFixtureText(path), 'Mood', 'Calm'));
+    expect(result).toMatchObject({
+      view: null,
+      scope: 'team',
+      side: 'hitters',
+      routing: 'primary',
+    });
+    expect(result.rows).toEqual(route(path).rows);
+    expect(result.events).toEqual([
+      expect.objectContaining({ level: 'info', code: 'not-read', details: { columns: ['Mood'] } }),
+    ]);
+  });
+
+  it('reads CON P only where potentials say which it is', () => {
+    const result = routeExport('export.csv', 'POS,Name,CON P,DEF\r\nSS,Ann,5,6');
+    expect(result.rows).toEqual([{ POS: 'SS', Name: 'Ann', DEF: 6 }]);
+    expect(result.events).toContainEqual(
+      expect.objectContaining({ code: 'not-read', details: { columns: ['CON P'] } }),
+    );
+  });
+
+  it('rejects a file without Name and POS', () => {
+    expect(rejectedWith('export.csv', 'Date,Opponent,Score\r\n1,2,3')).toMatchObject({
+      code: 'no-player-columns',
+    });
+    expect(rejectedWith('export.csv', 'Name,AVG\r\nAnn,.300')).toMatchObject({
+      code: 'no-player-columns',
+    });
+  });
+
+  it('rejects a file with no column it reads besides Name and POS', () => {
+    expect(rejectedWith('export.csv', 'POS,Name,Mood\r\nSS,Ann,Calm')).toMatchObject({
+      code: 'no-known-columns',
+    });
+    expect(rejectedWith('export.csv', 'POS,Name,Inf,OVR\r\nSS,Ann,,-')).toMatchObject({
+      code: 'no-known-columns',
+    });
+  });
+
+  it('rejects a file with markers from both sides', () => {
+    expect(rejectedWith('export.csv', 'POS,Name,PA,IP\r\nSS,Ann,10,3')).toMatchObject({
+      code: 'both-sides',
+      details: { hitters: ['PA'], pitchers: ['IP'] },
+    });
+  });
+
+  it('leaves a pitcher row out of a team batting file, and names it', () => {
+    const path = teamView('batting_stats_1');
+    const text = readFixtureText(path).replace('\r\nC,', '\r\nSP,');
+    const result = routeExport(fileName(path), text);
+    expect(result).toMatchObject({ scope: 'team', side: 'hitters', routing: 'primary' });
+    expect(result.rows).toHaveLength(11);
+    expect(result.rows.some((row) => row.POS === 'SP')).toBe(false);
+    const left = result.events.find((event) => event.code === 'other-side-rows');
+    expect(left).toMatchObject({ level: 'info', details: { names: ['Yoshitsugu Ishida'] } });
+  });
+
+  it('reads a team-named file whose TM spans the league as a league file, and says so', () => {
+    const text = readFixtureText(leagueView('batting_superstats_2'));
+    const result = routeExport(fileName(teamView('batting_superstats_2')), text);
+    expect(result).toMatchObject({ scope: 'league', side: 'hitters', routing: 'primary' });
+    expect(result.rows).toHaveLength(214);
+    expect(result.events).toEqual([
+      expect.objectContaining({
+        level: 'info',
+        code: 'scope-mismatch',
+        details: { named: 'team', teams: 30 },
+      }),
+    ]);
+  });
+
+  it('reads a league-named file with one team in TM as a team file', () => {
+    const text = readFixtureText(teamView('batting_superstats_2'));
+    const result = routeExport(fileName(leagueView('batting_superstats_2')), text);
+    expect(result).toMatchObject({ scope: 'team', routing: 'primary' });
+    expect(result.events).toEqual([
+      expect.objectContaining({ code: 'scope-mismatch', details: { named: 'league', teams: 1 } }),
+    ]);
+  });
+
+  it('reads a league export of the bio view, its side from the rows', () => {
+    const result = routeExport(
+      fileName(leagueView('default')),
+      readFixtureText(teamView('default')),
+    );
+    expect(result).toMatchObject({
+      view: 'default',
+      scope: 'league',
+      side: 'hitters',
+      routing: 'primary',
+    });
+    expect(result.rows).toHaveLength(12);
+  });
+
+  it('places a bio file’s rows on both sides by their POS, leaving its side open', () => {
+    const result = routeExport(
+      fileName(teamView('default')),
+      'POS,Name,Age\r\nSS,Ann,25\r\nSP,Bea,30',
+    );
+    expect(result).toMatchObject({ scope: 'team', side: null, routing: 'primary' });
+    expect(result.rows).toEqual([
+      { POS: 'SS', Name: 'Ann', Age: 25 },
+      { POS: 'SP', Name: 'Bea', Age: 30 },
+    ]);
+  });
+
+  it('takes a markerless team file’s side from rows that agree', () => {
+    const result = routeExport('export.csv', 'POS,Name,Age\r\nSP,Ann,25\r\nRP,Bea,30');
+    expect(result).toMatchObject({ scope: 'team', side: 'pitchers', routing: 'primary' });
+  });
+
+  it('leaves out a row whose POS names no side in a file on both sides', () => {
+    const result = routeExport('export.csv', 'POS,Name,Age\r\nSS,Ann,25\r\nSP,Bea,30\r\n,Cal,31');
+    expect(result.rows.map((row) => row.Name)).toEqual(['Ann', 'Bea']);
+    expect(result.events).toContainEqual(
+      expect.objectContaining({
+        level: 'info',
+        code: 'unplaced-rows',
+        details: { names: ['Cal'] },
+      }),
+    );
+  });
+
+  it('rejects a file whose side neither its columns nor its rows give', () => {
+    const tie = [
+      'POS,Name,G',
+      ...Array.from({ length: 40 }, (_, i) => `SS,Hitter ${String(i)},1`),
+      ...Array.from({ length: 40 }, (_, i) => `SP,Pitcher ${String(i)},1`),
+    ].join('\r\n');
+    expect(rejectedWith('export.csv', tie)).toMatchObject({ code: 'side-unknown' });
+    expect(rejectedWith('export.csv', 'POS,Name,G\r\n,Ann,1')).toMatchObject({
+      code: 'side-unknown',
+    });
+  });
+
+  it('puts every row of a league file on the file’s side, whatever its POS', () => {
+    const result = route(leagueView('batting_superstats_1'));
+    expect(result.rows.find((row) => row.Name === 'Yahya Kanoro')).toMatchObject({ POS: 'SP' });
+    expect(result.events).toEqual([expect.objectContaining({ code: 'older-version' })]);
+  });
+
+  it('leaves pitcher rows out of the hitter capture, which keeps the hitters’ DEF Pot', () => {
+    const path = teamView('cus_pitch_pot_hitter_capture');
+    const text = readFixtureText(path).replace('\r\nC,', '\r\nSP,');
+    const result = routeExport(fileName(path), text);
+    expect(result).toMatchObject({ side: 'hitters', routing: 'supplemental' });
+    expect(result.rows).toHaveLength(11);
+    expect(result.events.map((event) => event.code)).toEqual([
+      'other-side-rows',
+      'supplemental-capture',
+    ]);
   });
 });
 

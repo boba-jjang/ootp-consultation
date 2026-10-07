@@ -3,7 +3,7 @@ import { readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { describeExports, routeExport, type RoutedExport } from '../index.ts';
-import { FIXTURES, readFixtureText } from '../../test/fixtures.ts';
+import { FIXTURES, fixtureFiles, readFixtureText, routeFixture } from '../../test/fixtures.ts';
 
 const uploads = (): RoutedExport[] =>
   readdirSync(new URL('seattle-g42/', FIXTURES), { encoding: 'utf8' })
@@ -29,6 +29,24 @@ describe('describeExports on the Seattle game-42 files', () => {
       gameNumber: 42,
       scoutingAccuracy: 'V.High',
       viewsRecognized: 11,
+      rejected: [],
+    });
+  });
+});
+
+describe('describeExports on the Seattle game-53 files', () => {
+  it('counts the roster from the merged tables, the bio view listing both sides', () => {
+    expect(describeExports(fixtureFiles('seattle-g53/').map(routeFixture))).toEqual({
+      teamName: 'Seattle Arrows',
+      filePrefix: 'seattle_arrows',
+      teamColumn: 'Seattle',
+      leagueColumn: null,
+      hitters: 12,
+      pitchers: 13,
+      gameNumber: 53,
+      scoutingAccuracy: 'V.High',
+      // OOTP's own views among the files: the bio view and the two ratings views.
+      viewsRecognized: 3,
       rejected: [],
     });
   });

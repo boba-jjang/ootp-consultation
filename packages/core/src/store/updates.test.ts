@@ -10,7 +10,7 @@ import {
   routeExport,
   type Upload,
 } from '../index.ts';
-import { FIXTURES, editCell, readFixtureText } from '../../test/fixtures.ts';
+import { FIXTURES, editCell, readFixtureText, routeFixture } from '../../test/fixtures.ts';
 
 /** The 16 game-42 exports, as a browser would hand them over. */
 const uploads = (): Upload[] =>
@@ -153,5 +153,21 @@ describe('replacementProblem', () => {
       'the league’s batting_superstats_1',
     );
     expect(describeFile(routed(notes))).toBe('a file the app can’t read');
+  });
+
+  it('describes a custom view by its scope and side, and the bio view by its name', () => {
+    const g53 = (path: string) => describeFile(routeFixture(`seattle-g53/${path}`));
+    expect(g53('seattle_arrows_lineups_-_overview_batting_stats_1_cust.csv')).toBe(
+      'a custom hitters view',
+    );
+    expect(g53('seattle_arrows_pitching_pitching_superstat_1.csv')).toBe('a custom pitchers view');
+    expect(g53('starter_pitching_stats_1.csv')).toBe('the league’s custom pitchers view');
+    expect(g53('rsl_statistics_player_statistics_-_sortable_stats_batting_stats_1_cust.csv')).toBe(
+      'the league’s custom hitters view',
+    );
+    expect(g53('seattle_arrows_lineups_-_overview_default.csv')).toBe('default');
+    expect(describeFile({ view: null, scope: 'team', side: null, routing: 'primary' })).toBe(
+      'a custom view',
+    );
   });
 });

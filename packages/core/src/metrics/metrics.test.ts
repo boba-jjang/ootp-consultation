@@ -24,7 +24,15 @@ import {
   type PlayerMetrics,
   type SampleEntry,
 } from './metrics.ts';
-import { FIXTURES, rawCell, readFixture, readFixtureText, teamView } from '../../test/fixtures.ts';
+import {
+  FIXTURES,
+  fixtureFiles,
+  rawCell,
+  readFixture,
+  readFixtureText,
+  routeFixture,
+  teamView,
+} from '../../test/fixtures.ts';
 
 const routed = (): RoutedExport[] =>
   readdirSync(new URL('seattle-g42/', FIXTURES), { encoding: 'utf8' })
@@ -637,6 +645,52 @@ describe('columns that need special handling (Knowledge Base § 5)', () => {
       const row = seattle[player.side].find((candidate) => candidate.Name === player.name);
       expect(player.values.RV?.value).toBe(row?.RV);
     }
+  });
+});
+
+describe('teamMetrics on the Seattle game-53 files (task Context: the models)', () => {
+  const g53 = assembleSnapshot(fixtureFiles('seattle-g53/').map(routeFixture), { scale: '1-10' });
+  const result = teamMetrics(g53, DEFAULT_METRICS_SETTINGS);
+
+  it('lists the newly exported metrics as pass-throughs, and nothing as unavailable', () => {
+    expect(EXPORTED_METRICS.hitters).toEqual(
+      expect.arrayContaining(['wRC+', 'wRAA', 'wRC', 'BatR', 'BsR', 'wSB']),
+    );
+    expect(EXPORTED_METRICS.pitchers).toEqual(
+      expect.arrayContaining(['FIP-', 'rWAR', 'LOB%', 'K%-BB%']),
+    );
+    expect(UNAVAILABLE_METRICS).toEqual({});
+  });
+
+  it('covers all 12 hitters and 13 pitchers, dated Game 53', () => {
+    expect(result.snapshot).toBe('Game 53');
+    expect(result.hitters).toHaveLength(12);
+    expect(result.pitchers).toHaveLength(13);
+  });
+
+  it('passes Kawasaki’s wRC+ 128 and wRAA 9.0 through as exported', () => {
+    const kawasaki = playerOf(result.hitters, 'Manichiro Kawasaki');
+    expect(kawasaki.values['wRC+']).toEqual({ value: 128, source: 'exported' });
+    expect(kawasaki.values.wRAA).toEqual({ value: 9, source: 'exported' });
+    for (const metric of ['wRC', 'BatR', 'BsR', 'wSB']) {
+      expect(kawasaki.values[metric], metric).toMatchObject({ source: 'exported' });
+    }
+    const ito = playerOf(result.pitchers, 'Hajime Ito');
+    expect(ito.values['FIP-']).toEqual({ value: 110, source: 'exported' });
+    expect(ito.values['LOB%']?.value).toBeCloseTo(0.707, 10);
+    for (const metric of ['rWAR', 'K%-BB%']) {
+      expect(ito.values[metric], metric).toMatchObject({ source: 'exported' });
+    }
+  });
+
+  it('measures league HR/FB 0.118046 and the FIP constant 3.276540', () => {
+    expect(result.league.hrPerFlyBall).toBeCloseTo(0.118046, 5);
+    expect(result.league.fipConstant).toBeCloseTo(3.27654, 5);
+  });
+
+  it('measures the hitters’ offsets: BACON −0.019668 and wOBA +0.007699', () => {
+    expect(result.baselines.hitters['BACON-xBACON']?.offset).toBeCloseTo(-0.019668, 5);
+    expect(result.baselines.hitters['wOBA-xwOBA']?.offset).toBeCloseTo(0.007699, 5);
   });
 });
 

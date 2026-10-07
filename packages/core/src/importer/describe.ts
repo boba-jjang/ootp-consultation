@@ -1,5 +1,6 @@
 import { measureCoverage } from './coverage.ts';
 import type { ExportRow, RoutedExport } from './route.ts';
+import { gameNumberOf, mergeTables } from './snapshot.ts';
 
 /**
  * What a set of exports says about the team, for the Create a Team flow to prefill and
@@ -20,7 +21,7 @@ export interface ExportSummary {
   gameNumber: number | null;
   /** SctAcc from the default view, as the export spells it ("V.High"). */
   scoutingAccuracy: string | null;
-  /** Team views recognized, the supplemental capture and league files apart. */
+  /** OOTP's own team views recognized, the supplemental capture and league files apart. */
   viewsRecognized: number;
   /** Files that could not be used, with the importer's reason. */
   rejected: { name: string; reason: string }[];
@@ -75,19 +76,16 @@ export function describeExports(files: readonly RoutedExport[]): ExportSummary {
       .filter((name) => name.includes(TEAM_FILE))
       .map((name) => name.slice(0, name.indexOf(TEAM_FILE))),
   );
-  const games = team
-    .filter((file) => file.side === 'hitters')
-    .flatMap((file) => file.rows.map((row) => row.G))
-    .filter((value): value is number => typeof value === 'number');
+  const tables = mergeTables(files);
   const defaultView = team.find((file) => file.view === 'default');
   return {
     teamName: filePrefix === null ? null : titleCase(filePrefix),
     filePrefix,
     teamColumn: onlyValue(rows, 'TM'),
     leagueColumn: onlyValue(rows, 'LG'),
-    hitters: coverage.hitters.players.length,
-    pitchers: coverage.pitchers.players.length,
-    gameNumber: games.length > 0 ? Math.max(...games) : null,
+    hitters: tables.hitters.length,
+    pitchers: tables.pitchers.length,
+    gameNumber: gameNumberOf(files),
     scoutingAccuracy: defaultView ? onlyValue(defaultView.rows, 'SctAcc') : null,
     viewsRecognized: coverage.views.onFile.length,
     rejected: files.flatMap((file) =>

@@ -29,11 +29,14 @@ export const fixtureFiles = (folder: string): string[] =>
 export const routeFixture = (path: string): RoutedExport =>
   routeExport(path.split('/').at(-1) ?? path, readFixtureText(path));
 
+const text = (value: unknown) => (typeof value === 'string' ? value : '');
+
+/** A row's team and name, "Seattle|Han-lee Choi", or "|Hajime Ito" without TM. */
+export const playerKey = (row: ExportRow) => `${text(row.TM)}|${text(row.Name)}`;
+
 /** A table's rows in team-and-name order, to compare tables whatever order files came in. */
 export const byPlayer = (rows: readonly ExportRow[]): ExportRow[] =>
-  [...rows].sort((a, b) =>
-    `${String(a.TM)}|${String(a.Name)}`.localeCompare(`${String(b.TM)}|${String(b.Name)}`),
-  );
+  [...rows].sort((a, b) => playerKey(a).localeCompare(playerKey(b)));
 
 /**
  * Reads a fixture CSV into rows keyed by header. The exports quote nothing and no value

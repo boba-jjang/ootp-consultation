@@ -108,6 +108,13 @@ export const EXPORTED_METRICS: Readonly<Record<Side, readonly string[]>> = {
     'RV-FB',
     'RV-BR',
     'RV-OFF',
+    // From Game 53's custom batting views.
+    'wRC+',
+    'wRAA',
+    'wRC',
+    'BatR',
+    'BsR',
+    'wSB',
   ],
   pitchers: [
     'ERA',
@@ -126,14 +133,20 @@ export const EXPORTED_METRICS: Readonly<Record<Side, readonly string[]>> = {
     'RV-FB',
     'RV-BR',
     'RV-OFF',
+    // From Game 53's custom pitching stats view.
+    'FIP-',
+    'rWAR',
+    'LOB%',
+    'K%-BB%',
   ],
 };
 
-/** Metrics the app never computes, and why: Knowledge Base § 6 and § 14. */
-export const UNAVAILABLE_METRICS: Readonly<Record<'wRC+' | 'wRAA', string>> = {
-  'wRC+': 'Needs league wOBA, league runs per PA and park factors, which no export carries.',
-  wRAA: 'Needs league wOBA, which no export carries.',
-};
+/**
+ * Metrics the app can't read or compute, and why: Knowledge Base § 6 and § 14. None since
+ * Game 53, whose custom views export wRC+ and wRAA; the app reads them where present and
+ * never computes them.
+ */
+export const UNAVAILABLE_METRICS: Readonly<Record<string, string>> = {};
 
 export type LuckPairId = 'wOBA-xwOBA' | 'BACON-xBACON' | 'ERA-xERA' | 'ERA-FIP' | 'HR/FB-BAR%';
 

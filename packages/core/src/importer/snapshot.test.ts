@@ -19,6 +19,7 @@ import {
   editCell,
   fixtureFiles,
   leagueView,
+  playerKey,
   readFixture,
   readFixtureText,
   routeFixture,
@@ -115,8 +116,8 @@ describe('assembleSnapshot on the Seattle game-42 files (the Phase 2 gate)', () 
         columnsOf(league('pitching_superstats_1', 'pitching_superstats_2')),
       ),
     );
-    expect(snapshot.league.hitters.map((row) => `${String(row.TM)}|${String(row.Name)}`)).toEqual(
-      readFixture(leagueView('batting_superstats_1')).map((row) => `${row.TM}|${row.Name}`),
+    expect(snapshot.league.hitters.map(playerKey)).toEqual(
+      readFixture(leagueView('batting_superstats_1')).map(playerKey),
     );
   });
 
@@ -196,7 +197,7 @@ describe('assembleSnapshot on the Seattle game-53 files (task Context: the snaps
   it('gives every pitcher the bio view’s columns, Ito’s age agreeing between files', () => {
     for (const row of snapshot.pitchers) {
       for (const column of ['NAT', 'HT', 'WT', 'SLR', 'YL', 'Age']) {
-        expect(row, `${String(row.Name)} ${column}`).toHaveProperty(column);
+        expect(row, `${playerKey(row)} ${column}`).toHaveProperty(column);
       }
     }
     expect(player(snapshot.pitchers, 'Hajime Ito')).toMatchObject({
@@ -225,7 +226,7 @@ describe('assembleSnapshot on the Seattle game-53 files (task Context: the snaps
   it('fills the league tables: 199 hitters, each with a TM, and 426 of 458 pitchers', () => {
     expect(snapshot.league.hitters).toHaveLength(199);
     for (const row of snapshot.league.hitters) {
-      expect(typeof row.TM, String(row.Name)).toBe('string');
+      expect(typeof row.TM, playerKey(row)).toBe('string');
       expect(row).toHaveProperty('wRC+'); // the custom stats file, without TM
       expect(row).toHaveProperty('EV'); // the custom superstats file, with TM
     }

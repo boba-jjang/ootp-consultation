@@ -277,20 +277,6 @@ describe('routeExport rejections', () => {
     expect(rejected(fileName(path), text)).toMatchObject({ code: 'wrong-side' });
   });
 
-  it('rejects a team file whose rows span the league', () => {
-    const text = readFixtureText(leagueView('batting_superstats_2'));
-    expect(rejected(fileName(teamView('batting_superstats_2')), text)).toMatchObject({
-      code: 'scope-mismatch',
-    });
-  });
-
-  it('rejects a league export of a view the league files never use', () => {
-    const name = fileName(leagueView('default'));
-    expect(rejected(name, readFixtureText(teamView('default')))).toMatchObject({
-      code: 'unsupported-league-view',
-    });
-  });
-
   it('rejects an unreadable cell and names it', () => {
     const path = teamView('pitching_stats_1');
     const text = withColumn(readFixtureText(path), 'IP', (row) => (row === 1 ? '52.3' : '1.0'));
@@ -318,7 +304,7 @@ describe('routeExport rejections', () => {
 
   it.each([
     ['an empty file', '', 'empty'],
-    ['an unknown header', 'Date,Opponent,Score\r\n1,2,3', 'unrecognized'],
+    ['a header without Name and POS', 'Date,Opponent,Score\r\n1,2,3', 'no-player-columns'],
   ])('rejects %s', (_case, text, code) => {
     expect(rejected('export.csv', text)).toMatchObject({ code });
   });

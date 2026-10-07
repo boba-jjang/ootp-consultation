@@ -1,117 +1,182 @@
-import type { Side, ViewId } from './manifest.ts';
-import type { ExportRow, RoutedExport } from './route.ts';
+import { inColumnOrder } from './dictionary.ts';
+import type { Side } from './manifest.ts';
+import type { ExportRow, RoutedExport, Scope } from './route.ts';
 import type { SnapshotEvent } from './validate.ts';
+import type { CellValue } from './values.ts';
 
 /**
- * League tables from the league sortable files: Knowledge Base › Import contract › Joins and
+ * League tables from the league files: Knowledge Base › Import contract › Joins and
  * snapshots. Each side keeps its own table, so a name on both sides has a record on each.
+ * Every league file of a side fills its table: a filtered export (starters, relievers or
+ * qualified players only) is one part of it, and a row repeated in two files merges.
  */
 export interface LeagueTables {
-  /** One row per qualified hitter, joined across the league batting files. */
+  /** One row per hitter, merged across the league batting files on team plus name. */
   hitters: ExportRow[];
-  /** One row per pitcher with appearances, joined across the league pitching files. */
+  /** One row per pitcher with appearances, merged across the league pitching files by name. */
   pitchers: ExportRow[];
   events: SnapshotEvent[];
 }
 
-const LEAGUE_FILES: Record<Side, readonly ViewId[]> = {
-  hitters: ['batting_superstats_1', 'batting_superstats_2'],
-  pitchers: ['pitching_superstats_1', 'pitching_superstats_2'],
-};
-
 const nameOf = (row: ExportRow) => (typeof row.Name === 'string' ? row.Name : '');
 
-/**
- * Batting files join on team plus name. Pitching files have no team column, so they join on
- * name; a name listed twice can't be joined and is left out.
- */
-const keyOf = (side: Side, row: ExportRow) =>
-  side === 'hitters' ? `${typeof row.TM === 'string' ? row.TM : ''}|${nameOf(row)}` : nameOf(row);
+/** Whether two parsed cells agree. Parsing already made Right and R, or -0.0 and 0, equal. */
+export function sameValue(a: CellValue | undefined, b: CellValue | undefined): boolean {
+  return (
+    a === b ||
+    (typeof a === 'object' &&
+      a !== null &&
+      typeof b === 'object' &&
+      b !== null &&
+      JSON.stringify(a) === JSON.stringify(b))
+  );
+}
+
+/** A cell value as text, for messages. */
+export const show = (value: CellValue | undefined) =>
+  typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value);
+
+/** A table being merged: one row per key in first-seen order, and the file of each cell. */
+export interface MergingTable {
+  rows: Map<string, ExportRow>;
+  sources: Map<string, Map<string, string>>;
+}
+
+export const mergingTable = (): MergingTable => ({ rows: new Map(), sources: new Map() });
 
 /**
- * Joins the snapshot's league files into one table per side. Pitchers with G = 0 carry no
- * data and are dropped. A file that wasn't provided only leaves its columns out.
+ * Merges one file's row into a table cell by cell, files in the order given. Equal values
+ * merge silently; a later differing value replaces the earlier one, and the warning names
+ * the player, the column, both values and both files.
+ */
+export function mergeRow(
+  table: MergingTable,
+  key: string,
+  row: ExportRow,
+  file: RoutedExport,
+  scope: Scope,
+  events: SnapshotEvent[],
+): void {
+  const merged = table.rows.get(key) ?? {};
+  const sources = table.sources.get(key) ?? new Map<string, string>();
+  for (const [column, value] of Object.entries(row)) {
+    const earlier = merged[column];
+    if (Object.hasOwn(merged, column) && sameValue(earlier, value)) {
+      continue;
+    }
+    if (Object.hasOwn(merged, column)) {
+      const earlierFile = sources.get(column) ?? '';
+      events.push({
+        level: 'warning',
+        code: 'value-replaced',
+        message: `${nameOf(row)}: ${column} is ${show(value)} in ${file.name} and was ${show(earlier)} in ${earlierFile}; the later file's value is kept.`,
+        details: {
+          name: nameOf(row),
+          column,
+          earlier,
+          later: value,
+          earlierFile,
+          laterFile: file.name,
+        },
+        file: file.name,
+        view: file.view,
+        scope,
+      });
+    }
+    merged[column] = value;
+    sources.set(column, file.name);
+  }
+  table.rows.set(key, merged);
+  table.sources.set(key, sources);
+}
+
+/** A merged table's rows, each with its columns in the side's table order. */
+export const rowsOf = (table: MergingTable, side: Side): ExportRow[] =>
+  [...table.rows.values()].map((row) => inColumnOrder(row, side));
+
+/**
+ * Merges the snapshot's league files into one table per side, files in the order given.
+ * Batting rows key on team plus name; a batting row without TM takes the team of the one
+ * league batting row with that name and a TM, or is flagged and left out. Pitching rows key
+ * on name. A key listed twice within one file can't be joined and is left out. Pitchers with
+ * G = 0 carry no data and are dropped.
  */
 export function importLeague(files: readonly RoutedExport[]): LeagueTables {
   const events: SnapshotEvent[] = [];
   const tables: LeagueTables = { hitters: [], pitchers: [], events };
+  const league = files.filter((file) => file.scope === 'league' && file.routing !== 'rejected');
+
+  // The teams each name has among the league batting rows that carry TM.
+  const teams = new Map<string, Set<string>>();
+  for (const file of league.filter((candidate) => candidate.side === 'hitters')) {
+    for (const row of file.rows) {
+      if (typeof row.TM === 'string') {
+        teams.set(nameOf(row), (teams.get(nameOf(row)) ?? new Set<string>()).add(row.TM));
+      }
+    }
+  }
 
   for (const side of ['hitters', 'pitchers'] as const) {
-    const sources = LEAGUE_FILES[side].flatMap((view) => {
-      const routed = files.find(
-        (candidate) =>
-          candidate.scope === 'league' &&
-          candidate.view === view &&
-          candidate.routing === 'primary',
-      );
-      return routed ? [{ view, rows: routed.rows }] : [];
-    });
+    const sources = league
+      .filter((file) => file.side === side)
+      .map((file) => ({
+        file,
+        rows: file.rows.flatMap((row) => {
+          const name = nameOf(row);
+          if (side === 'pitchers') {
+            return [{ key: name, row }];
+          }
+          if (typeof row.TM === 'string') {
+            return [{ key: `${row.TM}|${name}`, row }];
+          }
+          const found = [...(teams.get(name) ?? [])].sort();
+          const [team] = found;
+          if (found.length !== 1 || team === undefined) {
+            events.push({
+              level: 'warning',
+              code: 'ambiguous-team',
+              message: `${name} has no TM in ${file.name}, and the league batting files list ${found.length === 0 ? 'no team' : `${String(found.length)} teams`} for that name, so the row is left out.`,
+              details: { name, teams: found },
+              file: file.name,
+              view: file.view,
+              scope: 'league',
+            });
+            return [];
+          }
+          return [{ key: `${team}|${name}`, row: { ...row, TM: team } }];
+        }),
+      }));
 
-    // Names listed twice in any file can't be joined.
+    // A key listed twice within one file can't be joined.
     const ambiguous = new Set<string>();
-    for (const { view, rows } of sources) {
-      const keys = rows.map((row) => keyOf(side, row));
-      for (const [i, key] of keys.entries()) {
+    for (const { file, rows } of sources) {
+      const keys = rows.map(({ key }) => key);
+      for (const [i, { key, row }] of rows.entries()) {
         if (keys.indexOf(key) !== i && !ambiguous.has(key)) {
           ambiguous.add(key);
-          const name = nameOf(rows[i] ?? {});
           events.push({
             level: 'warning',
             code: 'duplicate-name',
-            message: `${name} is listed more than once, so the league files can't be joined for that name.`,
-            details: { name },
-            view,
+            message: `${nameOf(row)} is listed more than once in ${file.name}, so the league files can't be joined for that name.`,
+            details: { name: nameOf(row) },
+            file: file.name,
+            view: file.view,
             scope: 'league',
           });
         }
       }
     }
 
-    const joined = new Map<string, ExportRow>();
-    for (const { view, rows } of sources) {
-      for (const row of rows) {
-        const key = keyOf(side, row);
-        if (ambiguous.has(key)) {
-          continue;
-        }
-        const merged = joined.get(key) ?? {};
-        for (const [column, value] of Object.entries(row)) {
-          if (column in merged && merged[column] !== value) {
-            events.push({
-              level: 'warning',
-              code: 'league-conflict',
-              message: `${nameOf(row)}: ${column} differs between the league files.`,
-              details: { name: nameOf(row), column, kept: merged[column], found: value },
-              view,
-              scope: 'league',
-            });
-            continue;
-          }
-          merged[column] = value;
-        }
-        joined.set(key, merged);
-      }
-    }
-
-    // A player missing from a file that was provided.
-    for (const { view, rows } of sources) {
-      const present = new Set(rows.map((row) => keyOf(side, row)));
-      for (const [key, row] of joined) {
-        if (!present.has(key)) {
-          events.push({
-            level: 'warning',
-            code: 'unmatched-league-row',
-            message: `${nameOf(row)} is missing from the league ${view} file.`,
-            details:
-              side === 'hitters' ? { name: nameOf(row), team: row.TM } : { name: nameOf(row) },
-            view,
-            scope: 'league',
-          });
+    const table = mergingTable();
+    for (const { file, rows } of sources) {
+      for (const { key, row } of rows) {
+        if (!ambiguous.has(key)) {
+          mergeRow(table, key, row, file, 'league', events);
         }
       }
     }
 
-    const rows = [...joined.values()];
+    const rows = rowsOf(table, side);
     if (side === 'pitchers') {
       const kept = rows.filter((row) => row.G !== 0);
       if (kept.length < rows.length) {
@@ -120,7 +185,7 @@ export function importLeague(files: readonly RoutedExport[]): LeagueTables {
           code: 'dropped-no-appearances',
           message: `${rows.length - kept.length} league pitchers with no appearances carry no data and were dropped.`,
           details: { count: rows.length - kept.length },
-          view: 'pitching_superstats_1',
+          view: null,
           scope: 'league',
         });
       }

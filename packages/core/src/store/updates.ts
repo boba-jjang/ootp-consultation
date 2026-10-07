@@ -1,12 +1,15 @@
 import { gameNumberOf } from '../importer/snapshot.ts';
+import type { Side } from '../importer/manifest.ts';
 import { routeExport, type RoutedExport } from '../importer/route.ts';
 import type { Upload } from './store.ts';
 
 /**
- * Updating a team's exports: Knowledge Base › Import contract › Joins and snapshots. A
- * re-export of the same view and date replaces the old one, a later date adds a snapshot,
- * and views from different dates are never merged into one snapshot. importUpload applies
- * these rules as files are stored; these helpers apply them to files still being chosen.
+ * Updating a team's exports: Knowledge Base › Import contract › Joins and snapshots. A later
+ * date adds a snapshot, and files from different dates are never merged into one snapshot.
+ * importUpload never removes a stored file: a re-export's values replace earlier ones cell
+ * by cell when the snapshot is assembled. These helpers serve the screens' file lists and
+ * explicit Replace, which still treat a later export of one of OOTP's views as replacing
+ * the earlier one.
  */
 
 /** A file a set of uploads keeps, routed. */
@@ -22,11 +25,11 @@ export interface CollectedUploads {
   replaced: { upload: Upload; by: Upload }[];
 }
 
-type Routed = Pick<RoutedExport, 'view' | 'scope' | 'routing'>;
+type Routed = Pick<RoutedExport, 'view' | 'scope' | 'routing'> & { side?: Side | null };
 
 /**
- * The importer's replacement key: the same view, scope and routing. A rejected file has
- * none, so it never replaces another file and is never replaced.
+ * The replacement key: the same view, scope and routing. A rejected file, or one without a
+ * known view, has none, so it never replaces another file and is never replaced.
  */
 export function replacementKey(file: Routed): string | null {
   return file.routing === 'rejected' || file.view === null
@@ -35,9 +38,9 @@ export function replacementKey(file: Routed): string | null {
 }
 
 /**
- * Routes a set of pending uploads as importUpload would store them: an identical file (the
- * same name and text) counts once, and a later file with the same replacement key replaces
- * the earlier one.
+ * Routes a set of pending uploads for the screens' file list: an identical file (the same
+ * name and text) counts once, and a later file with the same replacement key replaces the
+ * earlier one.
  */
 export function collectUploads(uploads: readonly Upload[]): CollectedUploads {
   const seen = new Set<string>();
@@ -68,15 +71,22 @@ export function collectUploads(uploads: readonly Upload[]): CollectedUploads {
   return { kept, replaced };
 }
 
-/** What a routed file is, in the words the reasons below use. */
+/**
+ * What a routed file is, in the words the reasons below use: a known view by its name, any
+ * other file as a custom view of its scope and side.
+ */
 export function describeFile(file: Routed): string {
-  if (file.view === null || file.routing === 'rejected') {
+  if (file.routing === 'rejected') {
     return 'a file the app can’t read';
   }
   if (file.routing === 'supplemental') {
-    return `${file.view} run on the hitters`;
+    return `${file.view ?? 'a custom pitchers view'} run on the hitters`;
   }
-  return file.scope === 'league' ? `the league’s ${file.view}` : file.view;
+  const view = file.view ?? `custom ${file.side ? `${file.side} ` : ''}view`;
+  if (file.scope === 'league') {
+    return `the league’s ${view}`;
+  }
+  return file.view ?? `a ${view}`;
 }
 
 /**

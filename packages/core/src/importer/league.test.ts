@@ -3,7 +3,13 @@ import { readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { importLeague, routeExport, type RoutedExport, type ViewId } from '../index.ts';
-import { FIXTURES, fixtureFiles, readFixtureText, routeFixture } from '../../test/fixtures.ts';
+import {
+  FIXTURES,
+  fixtureFiles,
+  playerKey,
+  readFixtureText,
+  routeFixture,
+} from '../../test/fixtures.ts';
 
 const snapshot = (): RoutedExport[] =>
   readdirSync(new URL('seattle-g42/', FIXTURES), { encoding: 'utf8' })
@@ -71,39 +77,6 @@ describe('importLeague on incomplete or conflicting files', () => {
     expect(league.hitters).toHaveLength(214);
     expect(league.hitters[0]).not.toHaveProperty('WH%');
     expect(league.events.filter((event) => event.level !== 'info')).toEqual([]);
-  });
-
-  it('keeps a hitter missing from one file, and warns', () => {
-    const files = snapshot();
-    const second = leagueFile(files, 'batting_superstats_2');
-    const removed = second.rows.shift();
-    const league = importLeague(files);
-    expect(league.hitters).toHaveLength(214);
-    expect(league.events).toContainEqual(
-      expect.objectContaining({
-        level: 'warning',
-        code: 'unmatched-league-row',
-        view: 'batting_superstats_2',
-        details: { name: removed?.Name, team: removed?.TM },
-      }),
-    );
-  });
-
-  it('warns when the two files disagree on a shared column', () => {
-    const files = snapshot();
-    const row = leagueFile(files, 'pitching_superstats_2').rows.find(
-      (candidate) => candidate.G !== 0,
-    );
-    if (row) {
-      row.GS = 99;
-    }
-    expect(importLeague(files).events).toContainEqual(
-      expect.objectContaining({
-        level: 'warning',
-        code: 'league-conflict',
-        details: expect.objectContaining({ name: row?.Name, column: 'GS' }) as unknown,
-      }),
-    );
   });
 
   it('leaves out a pitcher name listed twice, since the join is ambiguous, and warns', () => {
@@ -206,11 +179,7 @@ describe('importLeague joins and parts (hand-built)', () => {
 
   it('flags a TM-less row whose name is on two teams, or on none, and leaves it out', () => {
     const league = importLeague([withTeams(), withoutTeams()]);
-    expect(league.hitters.map((row) => `${String(row.TM)}|${String(row.Name)}`)).toEqual([
-      'Aces|Ann Lee',
-      'Bees|Ann Lee',
-      'Aces|Bo Kim',
-    ]);
+    expect(league.hitters.map(playerKey)).toEqual(['Aces|Ann Lee', 'Bees|Ann Lee', 'Aces|Bo Kim']);
     expect(league.hitters.some((row) => row.wOBA === 0.3 || row.wOBA === 0.32)).toBe(false);
     expect(league.events).toEqual([
       expect.objectContaining({

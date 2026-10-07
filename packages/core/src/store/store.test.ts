@@ -63,22 +63,6 @@ describe('importUpload', () => {
     expect(await store.listSnapshots(TEAM)).toHaveLength(1);
   });
 
-  it('replaces a view when a re-export of it arrives for the same game', async () => {
-    const { store, files } = memoryStore();
-    await importUpload(store, TEAM, uploads(), options);
-    const edited = withEdit(uploads(), 'default', 'Yoshitsugu Ishida', 'SLR', '$700 000').filter(
-      (upload) => upload.name.endsWith('overview_default.csv'),
-    );
-    const result = await importUpload(store, TEAM, edited, options);
-    expect(result).toMatchObject({ ok: false, reason: 'no-game-number' });
-    const into = (await store.listSnapshots(TEAM))[0]?.id;
-    const added = await importUpload(store, TEAM, edited, { ...options, into });
-    expect(added.ok && added.files.map((file) => file.outcome)).toEqual(['replaced']);
-    expect(files.size).toBe(16);
-    const loaded = await loadSnapshot(store, into ?? '', '1-10');
-    expect(loaded.hitters.find((row) => row.Name === 'Yoshitsugu Ishida')?.SLR).toBe(700_000);
-  });
-
   it('adds a snapshot for a later game and keeps the earlier one', async () => {
     const { store } = memoryStore();
     await importUpload(store, TEAM, uploads(), options);
@@ -115,7 +99,7 @@ describe('importUpload', () => {
     const rejected = result.ok ? result.files.find((file) => file.name === 'notes.csv') : undefined;
     expect(rejected).toMatchObject({ routing: 'rejected', outcome: 'added' });
     expect([...events.values()].flat()).toContainEqual(
-      expect.objectContaining({ level: 'error', code: 'unrecognized' }),
+      expect.objectContaining({ level: 'error', code: 'no-player-columns' }),
     );
   });
 });

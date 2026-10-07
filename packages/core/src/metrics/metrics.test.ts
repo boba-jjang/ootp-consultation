@@ -127,6 +127,12 @@ describe('the metric lists (Knowledge Base › Metrics and league context)', () 
         'RV-FB',
         'RV-BR',
         'RV-OFF',
+        'wRC+',
+        'wRAA',
+        'wRC',
+        'BatR',
+        'BsR',
+        'wSB',
       ],
       pitchers: [
         'ERA',
@@ -145,14 +151,16 @@ describe('the metric lists (Knowledge Base › Metrics and league context)', () 
         'RV-FB',
         'RV-BR',
         'RV-OFF',
+        'FIP-',
+        'rWAR',
+        'LOB%',
+        'K%-BB%',
       ],
     });
   });
 
-  it('lists wRC+ and wRAA as unavailable, with the reason', () => {
-    expect(Object.keys(UNAVAILABLE_METRICS)).toEqual(['wRC+', 'wRAA']);
-    expect(UNAVAILABLE_METRICS['wRC+']).toMatch(/league wOBA, league runs per PA and park factors/);
-    expect(UNAVAILABLE_METRICS.wRAA).toMatch(/league wOBA/);
+  it('lists nothing as unavailable, since Game 53’s views export wRC+ and wRAA', () => {
+    expect(UNAVAILABLE_METRICS).toEqual({});
   });
 
   it('pairs each results metric with its expected one, three of them with a team baseline', () => {
@@ -651,16 +659,6 @@ describe('columns that need special handling (Knowledge Base § 5)', () => {
 describe('teamMetrics on the Seattle game-53 files (task Context: the models)', () => {
   const g53 = assembleSnapshot(fixtureFiles('seattle-g53/').map(routeFixture), { scale: '1-10' });
   const result = teamMetrics(g53, DEFAULT_METRICS_SETTINGS);
-
-  it('lists the newly exported metrics as pass-throughs, and nothing as unavailable', () => {
-    expect(EXPORTED_METRICS.hitters).toEqual(
-      expect.arrayContaining(['wRC+', 'wRAA', 'wRC', 'BatR', 'BsR', 'wSB']),
-    );
-    expect(EXPORTED_METRICS.pitchers).toEqual(
-      expect.arrayContaining(['FIP-', 'rWAR', 'LOB%', 'K%-BB%']),
-    );
-    expect(UNAVAILABLE_METRICS).toEqual({});
-  });
 
   it('covers all 12 hitters and 13 pitchers, dated Game 53', () => {
     expect(result.snapshot).toBe('Game 53');

@@ -278,7 +278,7 @@ The league sortable files reuse these headers: at Game 42 the league batting\_su
 ### Invariants
 
 - Every row has Name and POS, and every column is in the column dictionary or listed in the import log as not read.
-- A player's value for a column is the same in every file that carries it, except POS between team and league files. When two files disagree, the later upload wins and the import log names both values.
+- A player's value for a column is the same in every file that carries it, except POS between team and league files. When two files disagree, the later upload wins and the import log names both values. A blank never replaces a value: it fills only an empty cell, so a re-export with a blank column keeps what earlier files gave.
 - Identities hold, within rounding, on every merged row with appearances (league pitching rows with G = 0 carry no data and drop first): RV = RV-FB + RV-BR + RV-OFF (±0.15), WH% = WH / SW, CTC% = 100 − WH%, CH = OSW × (1 − OC%), FF% + BR% + OFF% = 100. A pitcher's BIP is checked against BF − K − BB − HBP with a tolerance of 1.
 - Ratings fall inside the league's declared scale.
 - League rows for the team's players equal the team's rows from the same snapshot, POS aside.
@@ -291,11 +291,11 @@ The league sortable files reuse these headers: at Game 42 the league batting\_su
 - Parts combine: a filtered export (starters, relievers or qualified players only) adds its rows, and a row repeated in two files merges into one.
 - A name can appear on both sides when a position player pitches or a pitcher bats; each side keeps its own record.
 - Hitter age comes from the bio view; pitcher age from the bio view or cus\_pitch\_pot.
-- Every upload is stored as uploaded and stamped with team, snapshot date and importer version. Uploading never removes another file: an exact copy is skipped, and a later file's differing values replace earlier ones cell by cell, which the import log names. A later date adds a snapshot and keeps history; files from different dates are never merged into one snapshot.
+- Every upload is stored as uploaded and stamped with team, snapshot date and importer version. Uploading never removes another file: an exact copy is skipped, and a later file's differing values replace earlier ones cell by cell, which the import log names; a blank cell never replaces a value. A later date adds a snapshot and keeps history; files from different dates are never merged into one snapshot.
 
 ### Data coverage
 
-Coverage counts data, not views. Each data set has key columns: a player's set is on when his row has every key column, partial when it has some, and empty when it has none.
+Coverage counts data, not views. Each data set has key columns: a player's set is on when his merged row carries every key column, partial when it carries some, and empty when it carries none. A blank cell counts as carried, since the export had the column.
 
 | Data set | Hitters' key columns | Pitchers' key columns | Carried by |
 | --- | --- | --- | --- |

@@ -7,7 +7,7 @@ Canvas: https://claude.ai/artifact/Q1MymJ7UG3qEdLxVXEq2D5 (11 boards). The Imple
 - Where consultation appears: dashboard screens (Clubhouse, Talent radar, Lineup card, Bullpen & tactics, Dev lab), with an advisor drawer on the lineup screen. There's also a downloadable "manager's card" of settings to enter by hand in OOTP; no known way to import strategy files into OOTP (unverified). Advisor answers cite their numbers and say when data is missing (e.g., no platoon splits).
 - DH: the original wireframe shows "DH: Active", so the design assumes DH on. Confirmed: the league uses the DH.
 - Never a broken screen. Each module degrades and names the export that unlocks it.
-- The top-bar confidence badge measures data coverage: Low (stats views only), Moderate (+ superstats), High (+ both ratings views). It's separate from the estimator's per-recommendation confidence bands. Keep both, and name them so users can tell them apart.
+- The top-bar confidence badge measures data coverage, counted by data set (Knowledge Base › Data coverage): Low until the stats and both superstats sets are on for both sides, Moderate then, High with both sides' ratings too. It's separate from the estimator's per-recommendation confidence bands. Keep both, and name them so users can tell them apart.
 - Team setup asks for:
   - team name (from file names)
   - league (LG column)
@@ -84,4 +84,4 @@ Notes added after the owner's Phase 3 review (5 October 2026, v3.1):
 
 - Team setup no longer asks for Dev Lab slots or what the league shows. The app reads potentials only for batting and pitching, for now; the choice can come back without a database change. Setup asks for the team name, league, rating scale, DH and games per season.
 - A team's exports can be added, replaced or removed after setup: from the team menu's "Add or update exports" (it opens the Clubhouse's Add data), on the page of a team with no snapshot yet, and file by file in the Clubhouse's import log, where Remove asks first. Every upload ends in a list of what happened to each file.
-- Best first upload no longer lists `default` under Stats. It is the hitters' bio view and counts toward no coverage layer; it is still read, and still suggested last.
+- Best first upload no longer lists `default` under Stats. It is the bio view and counts toward no coverage layer; it is still read, and still suggested last.

@@ -73,6 +73,7 @@ ootp-consultation/
 │   └── tests/                pgTAP policy tests
 ├── fixtures/
 │   ├── seattle-g42/          team views, hitter capture, league files
+│   ├── seattle-g53/          the Game 53 custom views, team and league
 │   └── legacy/               older superstats versions
 ├── e2e/                      Playwright specs
 ├── docs/adr/                 one record per decision
@@ -248,6 +249,7 @@ These acceptance criteria differ from the canvas or from the Basis as written; t
 - [x] Add the six canonical uploads to `fixtures/seattle-g42/`: `custom_bat_pot`, `cus_pitch_pot`, the hitter capture and the newer `batting_superstats_1`, `pitching_superstats_1` and `pitching_superstats_2`.
 - [x] Add the four league sortable superstats exports to `fixtures/seattle-g42/` (Knowledge Base › Data sources › League sortable stats).
 - [x] Keep the older superstats copies in `fixtures/legacy/`, to test header-version handling.
+- [x] Add the Game 53 exports to `fixtures/seattle-g53/`: the owner's custom stats and superstats views for the team and the league (league pitching split into starters and relievers), the ratings views, a bio view listing both sides, and in `overlap/` the exports that repeat the snapshot's rows.
 - [x] Detect each export's view and header version from its header row, with every version in the header manifest (Knowledge Base › Import contract › Header manifest).
 - [x] Route each export: read the CSV and file name, and route it as primary, supplemental or rejected, with its scope, side and import events (Knowledge Base › Import contract).
 - [x] Validate a snapshot across its files: names and positions, repeated columns, identities, the rating scale and league rows (Knowledge Base › Import contract › Invariants).

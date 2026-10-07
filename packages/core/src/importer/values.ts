@@ -63,7 +63,7 @@ const PERCENT_STRINGS = new Set([
   'HHi%',
 ]);
 
-/** Percent units without the sign, such as 28.6: BB%, K%, IRS% and the superstats_2 rates. */
+/** Percent units without the sign, such as 28.6: BB%, K%, IRS%, the superstats_2 rates, SB%, LOB% and K%-BB%. */
 const PERCENT_UNITS = new Set([
   'BB%',
   'K%',
@@ -81,6 +81,10 @@ const PERCENT_UNITS = new Set([
   'FF%',
   'BR%',
   'OFF%',
+  // Game 53's custom views.
+  'SB%',
+  'LOB%',
+  'K%-BB%',
 ]);
 
 /** Columns kept as text. Their enumerations are normalized in a later step. */

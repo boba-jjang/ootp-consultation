@@ -34,6 +34,15 @@ const valueOf = (path: string, name: string, column: string) =>
 const everyCell = (path: string, column: string) =>
   readFixture(path).map((row: FixtureRow) => row[column] ?? '');
 
+// Game 53's custom views (fixtures/seattle-g53/), for the rules they bring.
+const G53_BATTING = 'seattle-g53/seattle_arrows_lineups_-_overview_batting_stats_1_cust.csv';
+const G53_BATTING_SUPERSTATS =
+  'seattle-g53/seattle_arrows_lineups_-_overview_batting_superstats_1.csv';
+const G53_PITCHING = 'seattle-g53/seattle_arrows_pitching_pitching_stats_1.csv';
+const G53_PITCHING_SUPERSTATS = 'seattle-g53/seattle_arrows_pitching_pitching_superstat_1.csv';
+const G53_LEAGUE_BATTING =
+  'seattle-g53/rsl_statistics_player_statistics_-_sortable_stats_batting_stats_1_cust.csv';
+
 // One test per row of Knowledge Base › Import contract › Columns that need special
 // handling, keyed by the row's first cell. That table is the test checklist.
 const ROW_TESTS: Record<string, () => void> = {
@@ -155,7 +164,7 @@ const ROW_TESTS: Record<string, () => void> = {
     expect(valueOf(teamView('pitching_superstats_1'), 'Hajime Ito', 'GB/FB')).toBe(1.2);
   },
 
-  'Signed stats (UBR, WPA, run values)': () => {
+  'Signed stats (UBR, WPA, run values, wRAA, wSB, BatR, BsR, rWAR)': () => {
     let negativeZeros = 0;
     for (const [path, columns] of [
       [teamView('batting_stats_2'), ['UBR', 'WPA']],
@@ -170,6 +179,20 @@ const ROW_TESTS: Record<string, () => void> = {
     }
     expect(negativeZeros).toBeGreaterThan(0);
     expect(valueOf(teamView('batting_stats_2'), 'Bitgaram Mangjeol', 'WPA')).toBe(-0.91);
+
+    // Game 53's custom views add wRAA, wSB, BatR, BsR and rWAR, signed the same way.
+    let customZeros = 0;
+    for (const column of ['wRAA', 'wSB']) {
+      for (const raw of everyCell(G53_LEAGUE_BATTING, column).filter((cell) => cell === '-0.0')) {
+        customZeros += 1;
+        expect(Object.is(parsed(column, raw), 0)).toBe(true);
+      }
+    }
+    expect(customZeros).toBeGreaterThan(0);
+    expect(valueOf(G53_BATTING, 'Zhong-shan Geng', 'wRAA')).toBe(-1.4);
+    expect(valueOf(G53_BATTING_SUPERSTATS, 'Manichiro Kawasaki', 'BatR')).toBe(7.8);
+    expect(valueOf(G53_BATTING_SUPERSTATS, 'Manichiro Kawasaki', 'BsR')).toBe(-2.5);
+    expect(valueOf(G53_PITCHING, 'Yoichibei Inouye', 'rWAR')).toBe(-0.8);
   },
 
   '"-" and zeros in league pitching files': () => {
@@ -318,6 +341,38 @@ const ROW_TESTS: Record<string, () => void> = {
     expect(valueOf(teamView('custom_bat_pot'), 'Yoshitsugu Ishida', 'Risk')).toBe(1);
     expect(valueOf(teamView('cus_pitch_pot'), 'Hajime Ito', 'Risk')).toBe(2);
     expect(parsed('Risk', 'Extreme')).toBe(5);
+  },
+
+  'SB%, LOB%, K%-BB%': () => {
+    expect(valueOf(G53_BATTING, 'Zhong-shan Geng', 'SB%')).toBeCloseTo(0.875, 10);
+    expect(valueOf(G53_PITCHING, 'Hajime Ito', 'LOB%')).toBeCloseTo(0.707, 10);
+    expect(valueOf(G53_PITCHING, 'Yoichibei Inouye', 'K%-BB%')).toBeCloseTo(0.172, 10);
+    expect(parsed('SB%', '100.0')).toBe(1);
+  },
+
+  'BS%': () => {
+    expect(valueOf(G53_PITCHING, 'Yoichibei Inouye', 'BS%')).toBe(0.5);
+    expect(valueOf(G53_PITCHING, 'Hajime Ito', 'BS%')).toBe(0);
+  },
+
+  ZX: () => {
+    // The view editor's Misses: pitches completely out of the zone, a count.
+    expect(valueOf(G53_BATTING_SUPERSTATS, 'Manichiro Kawasaki', 'ZX')).toBe(275);
+    expect(valueOf(G53_PITCHING_SUPERSTATS, 'Hajime Ito', 'ZX')).toBe(345);
+  },
+
+  'wRC, wRC+, FIP-, BRA/9, H/9': () => {
+    expect(valueOf(G53_BATTING, 'Manichiro Kawasaki', 'wRC')).toBe(36);
+    expect(valueOf(G53_BATTING, 'Manichiro Kawasaki', 'wRC+')).toBe(128);
+    expect(valueOf(G53_PITCHING, 'Hajime Ito', 'FIP-')).toBe(110);
+    expect(valueOf(G53_PITCHING, 'Hajime Ito', 'BRA/9')).toBe(12.9);
+    expect(valueOf(G53_PITCHING, 'Hajime Ito', 'H/9')).toBe(8.7);
+  },
+
+  'POS in league files': () => {
+    // A league row can show another position than the team's listing; each table keeps its own.
+    expect(valueOf(G53_BATTING, 'Zhong-shan Geng', 'POS')).toBe('2B');
+    expect(valueOf(G53_LEAGUE_BATTING, 'Zhong-shan Geng', 'POS')).toBe('CF');
   },
 };
 

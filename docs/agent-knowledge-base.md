@@ -2,7 +2,7 @@
 
 Oct 4, 2026 · @Jay
 
-> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 6 October 2026.
+> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 7 October 2026.
 
 ## Agent brief
 
@@ -98,7 +98,7 @@ Exports pass validation into the team store. The store feeds metrics, percentile
 
 | Module | Reads | Produces |
 | --- | --- | --- |
-| Import and validate | Uploaded CSVs, the header manifest, league settings | Normalized player tables per side, tagged with team, snapshot date and view |
+| Import and validate | Uploaded CSVs in any view and under any file name, the column dictionary, league settings | Four player tables per snapshot (team and league, hitters and pitchers), each cell filled from whichever file carries it |
 | Team store | Normalized tables, settings | Snapshot history per team and the latest merged record per player |
 | Metrics | Player tables, league tables | Exported metrics, computed metrics, luck gaps |
 | Percentiles | League tables, player tables | A percentile per metric within each peer pool |
@@ -118,15 +118,15 @@ Exports pass validation into the team store. The store feeds metrics, percentile
 
 ## Data sources
 
-v1 reads two kinds of OOTP export: team screen views and league-wide sortable stats. Both are snapshots of a game screen, so their headers and formatting follow the UI.
+v1 reads two kinds of OOTP export: team screen views and league-wide sortable stats. Both are snapshots of a game screen, so their headers and formatting follow the UI. The importer reads columns, not views: any view, OOTP's own or a custom one, works under any file name (section 5).
 
 ### Team screen views
 
-The user exports these from the team's Lineups overview screen, one view per CSV. Hitters and pitchers come as separate views; the two custom views are user-defined and can change columns.
+The user exports these from the team's screens (Lineups overview, Pitching), one view per CSV. OOTP ships the views below, and the owner also builds custom views, which carry any mix of their columns and can change. The table lists what each view carries; the importer needs none of them by name.
 
 | View | Side | Carries |
 | --- | --- | --- |
-| default | Hitters | Age, nationality, height, weight, handedness, salary, contract years, service time, scouting accuracy; POT, Inf and Mor export blank and OVR exports "-" where the league hides them |
+| default | Hitters, and pitchers when the export lists them | Age, nationality, height, weight, handedness, salary, contract years, service time, scouting accuracy; POT, Inf and Mor export blank and OVR exports "-" where the league hides them |
 | batting\_stats\_1 | Hitters | Batting line, slash line, ISO, OPS, OPS+, BABIP, WAR, SB, CS |
 | batting\_stats\_2 | Hitters | BB%, K%, sacrifices, extra-base hits, total bases, runs created, wOBA, WPA, pitches per PA, UBR |
 | batting\_superstats\_1 | Hitters | Batted-ball mix and direction, exit velocity, launch angle, barrels, hard-hit balls, expected stats overall and on contact |
@@ -137,36 +137,56 @@ The user exports these from the team's Lineups overview screen, one view per CSV
 | pitching\_superstats\_1 | Pitchers | Batted-ball mix allowed, contact quality allowed, expected stats, xERA |
 | pitching\_superstats\_2 | Pitchers | Pitch, swing, whiff and chase counts, discipline rates, run values |
 | cus\_pitch\_pot (custom) | Pitchers | Age, work ethic, IQ, pitching potentials, velocity now and potential, stamina, arm slot, pitcher type, GB/FB tendency, hold, DEF Pot, development risk |
+| Custom batting stats (Game 53, 47 columns) | Hitters | Both batting stats views in one, plus games started, singles, wRC, wRC+, wRAA, SB% and wSB |
+| Custom batting superstats (Game 53, 56 columns) | Hitters | Both batting superstats views in one, plus batting and baserunning run values (BatR, BsR), swing counts (SW, WH, OSW, CH) and pitches completely out of the zone (ZX) |
+| Custom pitching stats (Game 53, 61 columns, from the Pitching screen) | Pitchers | Both pitching stats views in one, plus save opportunities, blown-save rate, the opponents' line (AB, 1B, 2B, 3B, TB, OBP, SLG, OPS), BRA/9, H/9, K%, BB%, K%-BB%, sacrifices, wild pitches, inherited runners scored, LOB%, FIP- and rWAR. It leaves out the usage columns SD, MD, RA, GF, QS, QS%, CG, CG%, SHO, PPG, RSG, GO%, SB and CS |
+| Custom pitching superstats (Game 53, 46 columns) | Pitchers | Both pitching superstats views in one, plus infield and bunt hits, batted-ball direction, launch angle and ZX. It leaves out CH and the run values |
 
 Run on the hitters, cus\_pitch\_pot becomes a supplemental capture: only its DEF Pot column is used, as the hitters' DEF ceiling (section 9).
 
 ### League sortable stats
 
-The user exports these from the league's player statistics screen, one file per Superstats view.
+The user exports these from the league's player statistics screen, in any view, as for the team. A filtered export (starters, relievers or qualified players only) is one part of the league table, and the parts combine.
 
 | Files | Rows | Notes |
 | --- | --- | --- |
-| Batting superstats 1 and 2 | Qualified hitters only, by plate appearances: 214 in the sample, including one pitcher who batted | Carry team and league columns. The sample lacks the contact-only expected stats (xBACON, xSLGCON, xwOBACON) |
-| Pitching superstats 1 and 2 | Every listed pitcher: 446 in the sample, including 31 with no appearances and 4 position players | No team column, so rows match on name; the app applies its own sample floors (section 8) |
+| Batting superstats 1 and 2 (Game 42) | Qualified hitters only, by plate appearances: 214, including one pitcher who batted | Carry team and league columns. They lack the contact-only expected stats (xBACON, xSLGCON, xwOBACON) |
+| Pitching superstats 1 and 2 (Game 42) | Every listed pitcher: 446, including 31 with no appearances and 4 position players | No team column, so rows match on name; the app applies its own sample floors (section 8) |
+| Custom batting stats and superstats (Game 53) | Qualified hitters: 199 | Standard stats, wRC+ and wRAA, and every superstats column. The superstats file carries TM and the stats file doesn't, so stats rows take their team from the superstats rows |
+| Custom pitching stats and superstats (Game 53) | Every listed pitcher, in two parts by listed position: 246 starters and 212 relievers, 458 in all and 426 with appearances | A league row's POS can differ from the team's listing: one Seattle hitter is 2B on the team and CF in the league files |
 
 ### Sample data set
 
-- One team, the Seattle Arrows of the RSL, about 42 games into a season: 12 hitters, 13 pitchers, 11 team views. These files become the test fixtures.
-- The league files come from the same snapshot; the team's rows match the team views exactly.
+- One team, the Seattle Arrows of the RSL, at two points in one season. These files are the test fixtures.
+  - Game 42 (`fixtures/seattle-g42/`): 12 hitters, 13 pitchers, 11 team views in OOTP's own layouts, and four league files.
+  - Game 53 (`fixtures/seattle-g53/`): 12 hitters (two of them new) and the same 13 pitchers, in the owner's custom views, with league standard stats and a bio view that lists both sides.
+- The league files come from the same snapshot as the team's, and the team's rows match the team views, apart from one league position at Game 53.
 - The league rates players on a 1–10 scale and hides current batting and pitching ratings.
 
 ### Not yet used
 
 - OOTP database dumps: full league tables keyed by player ID, including ratings (later, per section 2).
-- Opponent rosters, handedness splits, per-position ratings, league totals, league standard stats, park factors, a pitcher bio and contract view, and injury proneness. None has been provided, so the app treats them as unavailable (section 14).
+- Opponent rosters, handedness splits, per-position ratings, league totals over every player (the league batting files list qualified hitters only), park factors and injury proneness. None has been provided, so the app treats them as unavailable (section 14). League standard stats and a pitcher bio view arrived with Game 53.
 
 ## Import contract
 
-The importer recognizes each file by its header, normalizes units and labels, validates it against the rest of the snapshot, and never relies on row order.
+The importer reads any CSV column by column through the column dictionary, fills one table per side and scope, normalizes units and labels, and validates the tables. It never relies on row order, view names or file names.
 
-### Header manifest
+### Column dictionary
 
-Headers below are the latest seen. Views carry a version, because OOTP views can gain columns: batting\_superstats\_1 v1 lacks xBACON, xSLGCON and xwOBACON, which v2 inserts before xBA. The pitching superstats changed the same way: pitching\_superstats\_1 v1 (19 columns) lacks mEV, BAR% and HHi%, which v2 inserts after EV, and xBACON, xSLGCON and xwOBACON, which it inserts before xBA; pitching\_superstats\_2 v1 (21 columns) lacks OSW, inserted after WH, and CTC%, inserted after ZC%. The v1 files are in fixtures/legacy/.
+- Every column the app reads has one entry: the header OOTP writes and any synonyms, a canonical name, the side it applies to (hitters, pitchers or both), its parse rule (Columns that need special handling) and its data set (Data coverage). Columns match by name, never by position or view.
+- A file needs Name and POS. Every other column is optional, in any mix; a file with no known column besides those two is rejected.
+- A column the dictionary doesn't know is listed in the import log as not read, and its cells stay in the stored file. Adding it later is one dictionary entry, after which stored files re-read with it.
+- Inf, Mor, OVR and POT are dropped: they export blank, or "-" for OVR, where the league hides them.
+- Names that mean two things resolve by the file's other columns:
+  - CON P is Contact P in a file with batting potentials (HT P, K P, GAP P, POW P, EYE P), and Control P in one with pitching potentials (STU P, MOV P, HRA P, PBABIP P).
+  - HLD is the hold-runners rating in a file with pitching potentials, and holds elsewhere.
+  - Avg% in hitters' files and Med% in pitchers' are the same middle contact bucket, one canonical Med%.
+  - Batting and pitching columns that share a name (K, BB, HR, H, R, AVG, OBP, SLG, BABIP, SB, CS, HP, WAR, WPA and the superstats columns) mean the hitter's own result in a hitters' file and the result allowed in a pitchers' file. Each side's table keeps its own.
+
+### Known views
+
+These are the headers OOTP's views export, kept to describe uploads and to suggest what to export next; a file needs none of them. The four custom views are the owner's, as of Game 53. Views carry a version, because OOTP views can gain columns: batting\_superstats\_1 v1 lacks xBACON, xSLGCON and xwOBACON, which v2 inserts before xBA. The pitching superstats changed the same way: pitching\_superstats\_1 v1 (19 columns) lacks mEV, BAR% and HHi%, which v2 inserts after EV, and xBACON, xSLGCON and xwOBACON, which it inserts before xBA; pitching\_superstats\_2 v1 (21 columns) lacks OSW, inserted after WH, and CTC%, inserted after ZC%. The v1 files are in fixtures/legacy/.
 
 | View | Columns in export order |
 | --- | --- |
@@ -181,8 +201,20 @@ Headers below are the latest seen. Views carry a version, because OOTP views can
 | pitching\_superstats\_1 | POS, Name, G, GS, BIP, GB/FB, LD%, GB%, FB%, IFFB, HR/FB, Soft%, Med%, Solid%, EV, mEV, BAR%, HHi%, xBACON, xSLGCON, xwOBACON, xBA, xSLG, xwOBA, xERA |
 | pitching\_superstats\_2 | POS, Name, G, GS, PI, SW, WH, OSW, CH, OS%, ZS%, SW%, OC%, ZC%, CTC%, Z%, WH%, CH%, CL%, RV-FB, RV-BR, RV-OFF, RV |
 | cus\_pitch\_pot | POS, Name, Age, T, WE, INT, STU P, MOV P, HRA P, PBABIP P, CON P, VELO, STM, VT, Slot, PT, G/F, HLD, DEF Pot, Risk |
+| Custom batting stats (Game 53) | POS, Name, B, T, G, GS, PA, AB, H, 1B, 2B, 3B, HR, RBI, R, BB, BB%, IBB, HP, SH, SF, K, K%, GIDP, EBH, TB, AVG, OBP, SLG, RC, RC/27, ISO, wOBA, OPS, OPS+, BABIP, WPA, wRC, wRC+, wRAA, WAR, PI/PA, SB, CS, SB%, wSB, UBR |
+| Custom batting superstats (Game 53) | POS, Name, TM, BatR, BsR, BIP, GB/FB, LD%, GB%, FB%, IFFB, HR/FB, IFH%, BUH%, Pull%, Cent%, Oppo%, Soft%, Avg%, Solid%, EV, mEV, LA, BAR, BAR%, HHi, HHi%, xBACON, xSLGCON, xwOBACON, xBA, xSLG, xwOBA, PI, SW, WH, OSW, CH, ZX, OS%, ZS%, SW%, OC%, ZC%, CTC%, WH%, CH%, Z%, CL%, RV, RV-FB, RV-OFF, RV-BR, FF%, BR%, OFF% |
+| Custom pitching stats (Game 53) | POS, #, Name, T, G, GS, W, L, WIN%, SVO, SV, SV%, BS, BS%, HLD, IP, BF, AB, HA, 1B, 2B, 3B, HR, TB, R, ER, BB, K, HP, ERA, AVG, OBP, SLG, OPS, BABIP, WHIP, BRA/9, HR/9, H/9, BB/9, K/9, K/BB, K%, BB%, K%-BB%, SH, SF, WP, DP, IR, IRS, IRS%, LOB%, pLi, ERA+, FIP, FIP-, WPA, WAR, rWAR, SIERA |
+| Custom pitching superstats (Game 53) | POS, Name, G, GS, BIP, GB/FB, LD%, GB%, FB%, IFFB, HR/FB, IFH%, BUH%, Pull%, Cent%, Oppo%, Soft%, Med%, Solid%, EV, mEV, LA, BAR%, HHi%, xBACON, xSLGCON, xwOBACON, xBA, xSLG, xwOBA, xERA, PI, SW, WH, OSW, ZX, OS%, ZS%, SW%, OC%, ZC%, CTC%, WH%, CH%, Z%, CL% |
 
-The league sortable files reuse the superstats headers: the league batting\_superstats\_1 is v1, and the other three match the team versions. Five pairs of files share a header line, so a header names the view but not always the scope or side: the file-name prefix and the rows tell a league file from a team view, and the POS values tell the hitter capture from the staff cus\_pitch\_pot.
+The league sortable files reuse these headers: at Game 42 the league batting\_superstats\_1 is v1 and the other three match the team versions, and at Game 53 the league files use the team's custom views.
+
+### Side and scope
+
+- A file's side comes from its columns. Columns only one side's views carry mark the side: PA, RBI, wOBA, OPS+, TM, Avg%, the batting potentials and the fielding components for hitters; IP, BF, ERA, xERA, Med%, the pitching potentials, STM and VELO for pitchers. The dictionary lists every marker. A file with markers from both sides is rejected.
+- A file with no marker, such as the bio view or a pitching swing-decisions file, takes its side from its rows' POS: in a team file each row by its own POS, and in a league file every row by the side most rows list.
+- In a team file with a side, a row from the other side is left out and logged, with one exception: the pitching ratings view run on hitters supplies those hitters' DEF Pot, their DEF ceiling (section 9).
+- In a league file, every row goes to the file's side, even when its POS is from the other side: league pitching files list position players who pitched, and league batting files can list a pitcher who batted.
+- Scope: a TM column with more than one team makes a league file, and one team a team file. Without TM, OOTP's league or team file prefix decides; failing both, a file with more than 60 rows is a league file (a setting).
 
 ### Columns that need special handling
 
@@ -200,19 +232,19 @@ The league sortable files reuse the superstats headers: the league batting\_supe
 | Inf, Mor, OVR, POT | Icon or hidden columns; blank, or "-" for OVR | Drop |
 | ERA+ | 999 is a display cap | Treat as capped; exclude from averages |
 | GB/FB | Ground balls per fly ball; 999.99 when there are no fly balls, a division by zero | Null when there are no fly balls |
-| Signed stats (UBR, WPA, run values) | Negative zero appears as "-0.0" | Normalize to 0 |
+| Signed stats (UBR, WPA, run values, wRAA, wSB, BatR, BsR, rWAR) | Negative zero appears as "-0.0" | Normalize to 0 |
 | "-" and zeros in league pitching files | Rows with no appearances (G = 0, BIP = 0) carry no data: superstats 1 shows "-" in some columns and 0 in the rest, superstats 2 shows 0 everywhere | Null; drop rows with G = 0 |
 | RV-FB, RV-BR, RV-OFF, RV | Run value by pitch group; RV is their sum | Positive is good for the player on both sides; results-based, not luck-free |
 | WH, WH%, CTC% | Whiffs; WH% = WH / swings; CTC% = 100 − WH% | None |
-| OSW, CH, CH% | OSW = chase swings; CH = chase whiffs = OSW × (1 − OC%); CH% = CH / pitches outside the zone | CH% is not O-Swing% |
-| Z%, ZS%, OS%, SW%, OC%, ZC%, CL% | Zone rate, zone swing, chase swing, swing, chase contact, zone contact; CL% presumably called-strike rate | Z% is not Z-Swing% |
+| OSW, CH, CH% | OSW = chase swings; CH = chase whiffs = OSW × (1 − OC%); CH% = CH / pitches outside the zone (the view editor's O-Swings, Chases and Chase%) | CH% is not O-Swing% |
+| Z%, ZS%, OS%, SW%, OC%, ZC%, CL% | Zone rate, zone swing, chase swing, swing, chase contact, zone contact; CL% is Close% in the view editor, and its values (about 17–19%) fit a called-strike rate | Z% is not Z-Swing% |
 | FF%, BR%, OFF% | Pitch mix faced: fastballs, breaking balls, offspeed; sums to 100 | None |
 | BIP | Balls in play including home runs; for pitchers about BF − K − BB − HBP (one sample pitcher is off by 1) | Use the exported BIP; actual BACON = H / BIP, comparable to xBACON |
 | xBACON, xSLGCON, xwOBACON | Expected stats on contact only | None |
 | EV, mEV, LA | Average and max exit velocity in mph; average launch angle in degrees (hitters only) | None |
 | BAR, BAR%, HHi, HHi% | Barrels and hard-hit balls (95+ mph) | None |
 | Avg% and Med% | The same middle contact bucket, hitter and pitcher labels | One canonical name |
-| CON P, HLD | Same header, different meaning: CON P is Contact in custom\_bat\_pot and Control in cus\_pitch\_pot, hitter capture included; HLD is holds (a count) in pitching\_stats\_1, the hold-runners rating in cus\_pitch\_pot | Both resolve by view |
+| CON P, HLD | Same header, different meaning: CON P is Contact in custom\_bat\_pot and Control in cus\_pitch\_pot, hitter capture included; HLD is holds (a count) in pitching\_stats\_1, the hold-runners rating in cus\_pitch\_pot | Both resolve by the file's other columns (Column dictionary) |
 | DEF | Current position rating at the listed position | Link to POS |
 | DEF Pot | Position-rating potential at the listed position; P for pitchers | Ceiling for DEF |
 | C ABI, C FRM, C ARM | Catcher ability, framing, arm; non-catchers show 1 | 1 on a non-catcher means "can't catch" |
@@ -221,6 +253,11 @@ The league sortable files reuse the superstats headers: the league batting\_supe
 | TM, LG | Team and league, in the batting superstats views; a league file's rows span every team | Use as the namespace; league batting rows join on team plus name |
 | WE, INT | Work ethic and intelligence (baseball IQ) | Ordinal |
 | Risk | Development risk, Very Low to Extreme | Ordinal |
+| SB%, LOB%, K%-BB% | Percent units without the sign (85.7) | Divide by 100 |
+| BS% | Already a fraction (.250), like SV% | Keep |
+| ZX | The view editor's Misses: pitches completely out of the zone | None |
+| wRC, wRC+, FIP-, BRA/9, H/9 | Weighted runs created and its league-adjusted index; FIP indexed to the league (100 is average, lower is better); baserunners and hits per nine innings | None |
+| POS in league files | A league row can show a different position from the team's listing (one Seattle hitter: 2B on the team, CF in the league files) | Each table keeps its own; team and league POS are never compared |
 
 ### Enumerations
 
@@ -230,7 +267,7 @@ The league sortable files reuse the superstats headers: the league batting\_supe
 | B, T | L, R, S; Left, Right, Switch | L, R, S |
 | BBT | Normal, Flyball, Line Drive, Groundball | Same |
 | GBT, FBT | Normal, Pull, Spray; older exports wrote Pull Hitter and Spray Hitter | Normal, Pull, Spray |
-| Slot | 3/4, OTT, Sidearm, SUB | Three-quarter, over the top, sidearm, submarine |
+| Slot | 3/4, OTT, Sidearm or SIDE, SUB | Three-quarter, over the top, sidearm, submarine |
 | PT | Power Pitcher, Groundballer, Normal | Same |
 | G/F | EX GB, GB, NEU, FB, EX FB | Ordinal −2 to +2 |
 | YL status | auto., arbitr., none | Auto-renew, arbitration, signed |
@@ -240,32 +277,49 @@ The league sortable files reuse the superstats headers: the league batting\_supe
 
 ### Invariants
 
-- Each file matches its view's manifest version; label variants map through a synonym table.
-- Each file lists its own side's roster; a league file can also list a few players from the other side, such as position players who pitched or a pitcher who batted. The one view that lists the other side's roster is the pitching ratings view run on hitters (cus\_pitch\_pot listing hitters): it routes as a supplemental source that keeps only its DEF Pot column. Any other view that lists the wrong side is rejected.
-- Every view of a side in one snapshot has the same names and positions.
-- Duplicated columns agree: G, PA, BB, K, GIDP and ISO for hitters; G, GS and IP for pitchers; handedness everywhere.
-- Identities hold, within rounding, on every row with appearances (league pitching rows with G = 0 carry no data and drop first): RV = RV-FB + RV-BR + RV-OFF (±0.15), WH% = WH / SW, CTC% = 100 − WH%, CH = OSW × (1 − OC%), FF% + BR% + OFF% = 100. A pitcher's BIP is checked against BF − K − BB − HBP with a tolerance of 1.
+- Every row has Name and POS, and every column is in the column dictionary or listed in the import log as not read.
+- A player's value for a column is the same in every file that carries it, except POS between team and league files. When two files disagree, the later upload wins and the import log names both values.
+- Identities hold, within rounding, on every merged row with appearances (league pitching rows with G = 0 carry no data and drop first): RV = RV-FB + RV-BR + RV-OFF (±0.15), WH% = WH / SW, CTC% = 100 − WH%, CH = OSW × (1 − OC%), FF% + BR% + OFF% = 100. A pitcher's BIP is checked against BF − K − BB − HBP with a tolerance of 1.
 - Ratings fall inside the league's declared scale.
-- League rows for the team's players equal the team views from the same snapshot.
+- League rows for the team's players equal the team's rows from the same snapshot, POS aside.
 
 ### Joins and snapshots
 
-- Team views join on Name within the team; jersey number, in five views, is a cross-check.
-- League batting files join on team plus name. League pitching files have no team column, so they join on name and flag duplicates.
+- A snapshot keeps four tables: team hitters, team pitchers, league hitters and league pitchers, with one row per player and one column per dictionary column. Every file of the snapshot fills them, and a player's row merges every file that lists him.
+- Team rows join on Name; jersey number is a cross-check.
+- League batting rows join on team plus name. A league batting file without TM takes each row's team from the snapshot's other league batting rows with that name; a name with no single team is flagged and left out. League pitching rows join on name, and a name listed twice in one file is flagged and left out.
+- Parts combine: a filtered export (starters, relievers or qualified players only) adds its rows, and a row repeated in two files merges into one.
 - A name can appear on both sides when a position player pitches or a pitcher bats; each side keeps its own record.
-- Hitter age comes from default; pitcher age comes from cus\_pitch\_pot.
-- Every upload is stamped with team, snapshot date, view and manifest version. A re-export of the same view and date replaces the old one; a later date adds a snapshot and keeps history. Views from different dates are never merged into one snapshot.
+- Hitter age comes from the bio view; pitcher age from the bio view or cus\_pitch\_pot.
+- Every upload is stored as uploaded and stamped with team, snapshot date and importer version. Uploading never removes another file: an exact copy is skipped, and a later file's differing values replace earlier ones cell by cell, which the import log names. A later date adds a snapshot and keeps history; files from different dates are never merged into one snapshot.
+
+### Data coverage
+
+Coverage counts data, not views. Each data set has key columns: a player's set is on when his row has every key column, partial when it has some, and empty when it has none.
+
+| Data set | Hitters' key columns | Pitchers' key columns | Carried by |
+| --- | --- | --- | --- |
+| Bio | NAT, HT, WT, SLR, YL | NAT, HT, WT, SLR, YL | default |
+| Stats | G, PA, AB, H, HR, BB, K, AVG, OBP, SLG, wOBA | G, IP, HA, HR, BB, K, ER, ERA, FIP, BF, SIERA | Batting or pitching stats 1 and 2, or a custom stats view |
+| Batted ball (contact) | BIP, LD%, GB%, FB%, EV, BAR%, xBA, xwOBA | BIP, LD%, GB%, FB%, EV, BAR%, xBA, xwOBA, xERA | Superstats 1, or a custom superstats view |
+| Swing decisions | PI, Z%, OS%, ZS%, SW%, CTC%, WH%, CH% | The same | Superstats 2, or a custom superstats view |
+| Ratings | Contact P, HT P, K P, GAP P, POW P, EYE P, DEF, Risk | STU P, MOV P, HRA P, PBABIP P, Control P, STM, Risk | custom\_bat\_pot, cus\_pitch\_pot |
+
+- The badge is Low until stats and both superstats sets are on for both sides, Moderate then, and High with ratings as well. Bio counts toward no level.
+- What to upload next names the missing sets and the views that carry them, as hints.
 
 ## Metrics and league context
 
-Use OOTP's exported metrics where they exist and compute only what's missing. wRC+ and wRAA need league totals that no current export carries; xFIP's league HR/FB comes from the league pitching file.
+Use OOTP's exported metrics where they exist and compute only what's missing. From Game 53 the custom batting stats view exports wRC+ and wRAA, so the app reads them where present and never computes them; xFIP's league HR/FB comes from the league pitching file.
 
 | Metric | Status | Notes |
 | --- | --- | --- |
 | wOBA | Exported | OOTP uses its own league weights; the sample landed within .007 of the FanGraphs-constant calculation, so trust the export |
 | OPS+ | Exported | League and park adjusted. Not wRC+, which the research mislabeled |
-| wRC+ | Missing | Needs league wOBA, league runs per PA and park factors |
-| wRAA | Missing | Needs league wOBA, which isn't available; formula below |
+| wRC+ | Exported from Game 53 | In the custom batting stats view; use as reported. Game 42's views don't carry it |
+| wRAA | Exported from Game 53 | In the custom batting stats view; use as reported. The formula below stays as a check |
+| wRC, BatR, BsR, wSB | Exported from Game 53 | Hitters' runs created and run values from the custom views; use as reported |
+| FIP-, rWAR, LOB%, K%-BB% | Exported from Game 53 | Pitchers' rates from the custom pitching stats view; use as reported |
 | xBA, xSLG, xwOBA | Exported | Expected stats including strikeouts and walks |
 | xBACON, xSLGCON, xwOBACON | Exported | Contact-only; isolate batted-ball quality from plate discipline |
 | RC, RC/27, WAR, WPA, UBR | Exported | Use as reported |
@@ -312,7 +366,7 @@ HR/FB against barrel rate compares a player's HR/FB with the rate his barrels pr
 - In the sample, contact results ran below xBACON on both sides (hitters .342 against .364 expected, pitchers .327 against .355), while team wOBA ran .008 above xwOBA and staff ERA 0.15 above xERA.
 - Team values are totals or weighted means: BACON from hits and BIP, xBACON weighted by BIP, wOBA and xwOBA by PA, ERA from earned runs and outs, and xERA by outs. ERA − FIP and HR/FB against barrels need no team baseline, because FIP carries the league's constant and xHR/FB the league's home runs per barrel.
 - A pitcher's regression signal comes from the talent estimator (FIP, SIERA and ratings), with xERA as one input, because pitchers' contact superstats don't track their contact ratings (section 7).
-- League pitching files carry xBACON but no hits, and no export with league hits is available, so there is no league-wide contact baseline.
+- Game 42's league files carry no hits, so there is no league-wide contact baseline there. Game 53's carry H and HA; using them is a later decision, and the team baseline stays the rule.
 
 ### Stabilization
 
@@ -333,8 +387,8 @@ About 42 games in, no sample player was near either BABIP point. That is why the
 
 ### League context
 
-- Available now: league-wide distributions of the superstats metrics the league files carry, for percentiles and league averages.
-- Missing: league totals (league wOBA, runs per PA), park factors, and league hits for contact-luck baselines.
+- Available now: league-wide distributions of the metrics the league files carry (superstats, and from Game 53 standard stats), for percentiles and league averages.
+- Missing: league totals over every player (league wOBA, runs per PA), since the league batting files list qualified hitters only, and park factors. League hits arrive with Game 53's files.
 
 ## Ratings model
 
@@ -458,8 +512,8 @@ P_i = 100 \times \frac{\#\{j : v_j \text{ worse than } v_i\} + \tfrac{1}{2}\,\#\
 
 ### Gaps for percentiles
 
-- The league batting file lacks contact-only expected stats, and no export with xBACON, xSLGCON and xwOBACON is available, so hitters get no league percentiles for them.
-- Percentiles for standard stats (K%, BB%, wOBA) need league exports of the standard stats views, which aren't available, so there are none.
+- Game 42's league batting file lacks the contact-only expected stats (xBACON, xSLGCON, xwOBACON), so hitters get no league percentiles for them there; Game 53's league files carry them.
+- Game 53's league files carry standard stats (K%, BB%, wOBA and the rest), but the directions table covers superstats only, so there are no standard-stat percentiles yet. Adding them is a later decision.
 
 ## Defensive model
 
@@ -632,7 +686,7 @@ The three research docs are useful hypotheses, not ground truth. Checked against
 
 | Research claim | What the data shows | Rule for the app |
 | --- | --- | --- |
-| Hitter "wRC+" values | They are OOTP's OPS+; no export contains wRC+ | Compute wRC+ only with league context |
+| Hitter "wRC+" values | They are OOTP's OPS+; Game 42's exports carry no wRC+, though Game 53's custom batting stats view does | Read wRC+ only where exported; never relabel OPS+ |
 | Hitter RV-FB and RV-BR values | Shifted one column to the left | Map run values by header, never by position |
 | Pitcher "Barrel%" | Those numbers are HR/FB | Read BAR% from the pitching superstats |
 | A hitter's "Z-Swing%" | The number is Z%, the zone rate | Keep Z% and ZS% distinct |
@@ -682,6 +736,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 | Spec of record | This doc. The Implementation Basis keeps the Seattle reference data and player reads; where its rules differ, this doc wins |
 | Consultation surface | Dashboard screens with an advisor drawer, plus a downloadable manager's card (design handoff) |
 | League scope | League sortable exports and percentiles are in v1: the league files import with the team views in Phase 2, and percentiles arrive with the Phase 4 models |
+| Import | Any CSV, in any view (OOTP's or custom) and under any file name: columns map through the column dictionary into one table per side and scope, and files merge cell by cell (7 October 2026) |
 
 ### Assumptions
 
@@ -706,7 +761,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 - [ ] Does the league merge stats into scouting reports? If so, the estimator weights stats less.
 - [x] Does the view editor offer per-position ratings and handedness splits? Answered: neither has been provided, so both are treated as unavailable (sections 9–11).
 - [x] Re-export the pitching ratings view with the staff listed, to get pitchers' work ethic, IQ and risk. Done: the staff cus\_pitch\_pot, the latest upload of that view, carries work ethic, IQ and risk for all 13 pitchers and is treated as part of the same snapshot.
-- [x] Can league standard stats and totals be exported, for wRC+, xFIP, luck baselines and standard-stat percentiles? Answered: they haven't been provided, so treat them as unavailable; wRC+, wRAA, a league-wide contact baseline and standard-stat percentiles are left out; xFIP takes league HR/FB from the league pitching file.
+- [x] Can league standard stats and totals be exported, for wRC+, xFIP, luck baselines and standard-stat percentiles? Answered: from Game 53 the owner exports them through custom league views (qualified hitters, every pitcher), with wRC+ and wRAA. League totals over every player and park factors stay unavailable, and xFIP takes league HR/FB from the league pitching file.
 
 ## Delivery plan
 
@@ -725,6 +780,7 @@ Phase gates close in order. Inside a phase, modules follow the Depends on column
 | Team store: teams, dated snapshots, latest merged record, history | 3, 5 | 2 | Snapshot validation | Re-importing a date replaces it; a later date adds history |
 | League file import with name-join rules and duplicate flags | 4, 5 | 2 | Value parsers | 214 hitter rows and 446 pitcher rows load; zero-appearance rows drop |
 | Scale conversion | 7 | 2 | Value parsers | Round-trip tests between 1–10 and 20–80 |
+| Column-dictionary import: four tables per snapshot, parts and re-exports merged cell by cell, coverage by data set | 4, 5 | 4 | Fixtures | Game 42 and Game 53 assemble from their files in any combination; the overlap files change nothing; coverage is High for both |
 | Metrics: pass-through, BACON, luck gaps against each pair's baseline | 6 | 4 | Team store | Fixture BACON and each pair's baseline match section 6 |
 | Percentiles: usage-based pools, floors, directions, mid-rank formula | 8 | 4 | League file import | Pools of 214, 151 and 260; 144 starters and 218 relievers after floors |
 | Talent estimator v0 | 7 | 4 | Metrics, scale conversion | Every fixture player gets an estimate and band; disagreements over one step are flagged |
@@ -747,33 +803,45 @@ Tasks that depend on an open question (section 14) carry it in their charter and
 | BABIP | Batting average on balls in play, home runs excluded |
 | BACON | Batting average on contact: hits ÷ balls in play, home runs included |
 | Barrel (BAR) | A batted ball with the exit velocity and launch angle that typically produce extra-base hits |
-| CH, CH% | Chase whiffs; chase whiffs per pitch outside the zone |
-| CL% | Presumably called-strike rate |
+| BatR, BsR | Batting and baserunning run values (the view editor's Batting RV and Baserunning RV) |
+| BRA/9, H/9 | Baserunners and hits allowed per nine innings |
+| CH, CH% | Chase whiffs; chase whiffs per pitch outside the zone (the view editor's Chases and Chase%) |
+| CL% | Close% in the view editor; its values (about 17–19%) fit a called-strike rate, which the percentile directions assume |
+| Column dictionary | The importer's list of known columns, each with its meaning, side, parse rule and data set |
 | EV, mEV, LA | Average exit velocity, maximum exit velocity, average launch angle |
 | FIP | Fielding-independent pitching, from strikeouts, walks, hit batters and home runs |
+| FIP- | FIP indexed to the league: 100 is average, lower is better |
 | Hard hit (HHi) | A batted ball at 95 mph or more |
 | IFFB | Infield fly balls as a share of fly balls |
 | ISO | Isolated power: SLG − AVG |
+| K%-BB% | Strikeout rate minus walk rate |
+| LOB% | Share of baserunners left on base |
 | Luck gap | Actual result minus expected result |
-| OC%, ZC%, CTC% | Contact rate on chases, in the zone, and overall |
+| OC%, ZC%, CTC% | Contact rate on chases, in the zone, and overall (O-Contact%, Z-Contact% and Contact%) |
 | OPS+ | League- and park-adjusted OPS; 100 is average |
-| OSW | Swings at pitches outside the zone |
+| OSW | Swings at pitches outside the zone (O-Swings) |
 | RC, RC/27 | Runs created, and per 27 outs |
 | RV | Run value by pitch group (FB fastball, BR breaking, OFF offspeed); positive is good for the player |
+| rWAR | Wins above replacement from runs allowed (RA9-WAR) |
+| SB%, wSB | Stolen-base success rate; stolen-base runs above average |
 | SIERA | Skill-interactive ERA, weighing strikeouts, walks and batted-ball type |
 | Stabilization point | The sample size at which a stat is about half signal, half noise |
+| SVO, BS% | Save opportunities; blown saves per opportunity |
 | UBR | Ultimate base running, in runs |
 | WAR | Wins above replacement |
 | WH% | Whiffs per swing |
 | wOBA | Weighted on-base average: each way of reaching base valued by its run worth |
+| WP, IRS | Wild pitches; inherited runners who scored |
 | WPA | Win probability added |
-| wRAA | Runs above average, derived from wOBA |
-| wRC+ | League- and park-adjusted runs created; 100 is average; not exported |
+| wRAA | Runs above average, derived from wOBA; exported from Game 53 |
+| wRC | Weighted runs created |
+| wRC+ | League- and park-adjusted runs created; 100 is average; exported from Game 53 |
 | xBA, xSLG, xwOBA | Expected average, slugging and wOBA from contact quality, strikeouts and walks included |
 | xBACON, xSLGCON, xwOBACON | Expected stats on contact only |
 | xERA | Expected ERA from contact quality allowed |
 | xFIP | FIP with home runs replaced by league HR/FB × fly balls |
-| Z%, ZS%, OS% | Zone rate; swing rate on pitches in the zone; swing rate on pitches outside it (chase rate) |
+| Z%, ZS%, OS% | Zone rate; swing rate on pitches in the zone; swing rate on pitches outside it, the chase rate (Zone%, Z-Swing% and O-Swing%) |
+| ZX | The view editor's Misses: pitches completely out of the zone |
 
 ### Ratings and game terms
 

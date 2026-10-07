@@ -210,9 +210,10 @@ The league sortable files reuse these headers: at Game 42 the league batting\_su
 
 ### Side and scope
 
-- A file's side comes from its columns. A file with hitter-only columns (PA, AB, wOBA, OPS+, the batting potentials, the fielding components) lists hitters; one with pitcher-only columns (IP, BF, ERA, xERA, the pitching potentials, STM, VELO) lists pitchers. A file with neither, such as the bio view, places each row by its POS. A file with both is rejected.
-- In a team file, each row goes to the table of its own POS, and columns that don't apply to that side are ignored. A ratings file run on the other side's players (the pitching ratings view run on hitters) supplies only DEF Pot, the hitters' DEF ceiling (section 9).
-- In a league file, every row goes to the file's side: league pitching files list position players who pitched, and league batting files can list a pitcher who batted.
+- A file's side comes from its columns. Columns only one side's views carry mark the side: PA, RBI, wOBA, OPS+, TM, Avg%, the batting potentials and the fielding components for hitters; IP, BF, ERA, xERA, Med%, the pitching potentials, STM and VELO for pitchers. The dictionary lists every marker. A file with markers from both sides is rejected.
+- A file with no marker, such as the bio view or a pitching swing-decisions file, takes its side from its rows' POS: in a team file each row by its own POS, and in a league file every row by the side most rows list.
+- In a team file with a side, a row from the other side is left out and logged, with one exception: the pitching ratings view run on hitters supplies those hitters' DEF Pot, their DEF ceiling (section 9).
+- In a league file, every row goes to the file's side, even when its POS is from the other side: league pitching files list position players who pitched, and league batting files can list a pitcher who batted.
 - Scope: a TM column with more than one team makes a league file, and one team a team file. Without TM, OOTP's league or team file prefix decides; failing both, a file with more than 60 rows is a league file (a setting).
 
 ### Columns that need special handling

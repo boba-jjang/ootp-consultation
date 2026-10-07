@@ -24,7 +24,15 @@ import {
   type PlayerMetrics,
   type SampleEntry,
 } from './metrics.ts';
-import { FIXTURES, rawCell, readFixture, readFixtureText, teamView } from '../../test/fixtures.ts';
+import {
+  FIXTURES,
+  fixtureFiles,
+  rawCell,
+  readFixture,
+  readFixtureText,
+  routeFixture,
+  teamView,
+} from '../../test/fixtures.ts';
 
 const routed = (): RoutedExport[] =>
   readdirSync(new URL('seattle-g42/', FIXTURES), { encoding: 'utf8' })
@@ -119,6 +127,12 @@ describe('the metric lists (Knowledge Base › Metrics and league context)', () 
         'RV-FB',
         'RV-BR',
         'RV-OFF',
+        'wRC+',
+        'wRAA',
+        'wRC',
+        'BatR',
+        'BsR',
+        'wSB',
       ],
       pitchers: [
         'ERA',
@@ -137,14 +151,16 @@ describe('the metric lists (Knowledge Base › Metrics and league context)', () 
         'RV-FB',
         'RV-BR',
         'RV-OFF',
+        'FIP-',
+        'rWAR',
+        'LOB%',
+        'K%-BB%',
       ],
     });
   });
 
-  it('lists wRC+ and wRAA as unavailable, with the reason', () => {
-    expect(Object.keys(UNAVAILABLE_METRICS)).toEqual(['wRC+', 'wRAA']);
-    expect(UNAVAILABLE_METRICS['wRC+']).toMatch(/league wOBA, league runs per PA and park factors/);
-    expect(UNAVAILABLE_METRICS.wRAA).toMatch(/league wOBA/);
+  it('lists nothing as unavailable, since Game 53’s views export wRC+ and wRAA', () => {
+    expect(UNAVAILABLE_METRICS).toEqual({});
   });
 
   it('pairs each results metric with its expected one, three of them with a team baseline', () => {
@@ -637,6 +653,42 @@ describe('columns that need special handling (Knowledge Base § 5)', () => {
       const row = seattle[player.side].find((candidate) => candidate.Name === player.name);
       expect(player.values.RV?.value).toBe(row?.RV);
     }
+  });
+});
+
+describe('teamMetrics on the Seattle game-53 files (task Context: the models)', () => {
+  const g53 = assembleSnapshot(fixtureFiles('seattle-g53/').map(routeFixture), { scale: '1-10' });
+  const result = teamMetrics(g53, DEFAULT_METRICS_SETTINGS);
+
+  it('covers all 12 hitters and 13 pitchers, dated Game 53', () => {
+    expect(result.snapshot).toBe('Game 53');
+    expect(result.hitters).toHaveLength(12);
+    expect(result.pitchers).toHaveLength(13);
+  });
+
+  it('passes Kawasaki’s wRC+ 128 and wRAA 9.0 through as exported', () => {
+    const kawasaki = playerOf(result.hitters, 'Manichiro Kawasaki');
+    expect(kawasaki.values['wRC+']).toEqual({ value: 128, source: 'exported' });
+    expect(kawasaki.values.wRAA).toEqual({ value: 9, source: 'exported' });
+    for (const metric of ['wRC', 'BatR', 'BsR', 'wSB']) {
+      expect(kawasaki.values[metric], metric).toMatchObject({ source: 'exported' });
+    }
+    const ito = playerOf(result.pitchers, 'Hajime Ito');
+    expect(ito.values['FIP-']).toEqual({ value: 110, source: 'exported' });
+    expect(ito.values['LOB%']?.value).toBeCloseTo(0.707, 10);
+    for (const metric of ['rWAR', 'K%-BB%']) {
+      expect(ito.values[metric], metric).toMatchObject({ source: 'exported' });
+    }
+  });
+
+  it('measures league HR/FB 0.118046 and the FIP constant 3.276540', () => {
+    expect(result.league.hrPerFlyBall).toBeCloseTo(0.118046, 5);
+    expect(result.league.fipConstant).toBeCloseTo(3.27654, 5);
+  });
+
+  it('measures the hitters’ offsets: BACON −0.019668 and wOBA +0.007699', () => {
+    expect(result.baselines.hitters['BACON-xBACON']?.offset).toBeCloseTo(-0.019668, 5);
+    expect(result.baselines.hitters['wOBA-xwOBA']?.offset).toBeCloseTo(0.007699, 5);
   });
 });
 

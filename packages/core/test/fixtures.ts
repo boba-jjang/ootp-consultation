@@ -1,6 +1,6 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 
-import type { Snapshot } from '../src/index.ts';
+import { routeExport, type ExportRow, type RoutedExport, type Snapshot } from '../src/index.ts';
 
 /** The repository's fixtures/ directory. */
 export const FIXTURES = new URL('../../../fixtures/', import.meta.url);
@@ -17,6 +17,26 @@ export type FixtureRow = Record<string, string>;
 
 /** A fixture file's text, byte for byte. */
 export const readFixtureText = (path: string) => readFileSync(new URL(path, FIXTURES), 'utf8');
+
+/** The CSV files directly in a fixture folder, such as 'seattle-g53/', sorted by name. */
+export const fixtureFiles = (folder: string): string[] =>
+  readdirSync(new URL(folder, FIXTURES), { encoding: 'utf8' })
+    .filter((file) => file.endsWith('.csv'))
+    .sort()
+    .map((file) => `${folder}${file}`);
+
+/** A fixture routed under its own file name, as an upload would be. */
+export const routeFixture = (path: string): RoutedExport =>
+  routeExport(path.split('/').at(-1) ?? path, readFixtureText(path));
+
+const text = (value: unknown) => (typeof value === 'string' ? value : '');
+
+/** A row's team and name, "Seattle|Han-lee Choi", or "|Hajime Ito" without TM. */
+export const playerKey = (row: ExportRow) => `${text(row.TM)}|${text(row.Name)}`;
+
+/** A table's rows in team-and-name order, to compare tables whatever order files came in. */
+export const byPlayer = (rows: readonly ExportRow[]): ExportRow[] =>
+  [...rows].sort((a, b) => playerKey(a).localeCompare(playerKey(b)));
 
 /**
  * Reads a fixture CSV into rows keyed by header. The exports quote nothing and no value

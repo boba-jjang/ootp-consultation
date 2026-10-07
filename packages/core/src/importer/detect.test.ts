@@ -6,10 +6,11 @@ import { VIEW_MANIFESTS, detectView, readHeader, type ViewId } from '../index.ts
 
 const FIXTURES = new URL('../../../../fixtures/', import.meta.url);
 
-// Every fixture file and the view and header version it must be detected as.
+// Every fixture file and the view and header version it must be detected as, or null for a
+// custom view, whose header matches no known view and is read column by column instead.
 // The hitter capture is a cus_pitch_pot export, so its header names that view;
 // the rows' POS values, checked later, tell it apart from the staff export.
-const EXPECTED: Record<string, [ViewId, number]> = {
+const EXPECTED: Record<string, [ViewId, number] | null> = {
   'seattle-g42/seattle_arrows_lineups_-_overview_default.csv': ['default', 1],
   'seattle-g42/seattle_arrows_lineups_-_overview_batting_stats_1.csv': ['batting_stats_1', 1],
   'seattle-g42/seattle_arrows_lineups_-_overview_batting_stats_2.csv': ['batting_stats_2', 1],
@@ -62,22 +63,52 @@ const EXPECTED: Record<string, [ViewId, number]> = {
     'pitching_superstats_2',
     1,
   ],
+  // Game 53: three of OOTP's own views, and the owner's custom views.
+  'seattle-g53/seattle_arrows_lineups_-_overview_default.csv': ['default', 1],
+  'seattle-g53/seattle_arrows_lineups_-_overview_custom_bat_pot.csv': ['custom_bat_pot', 1],
+  'seattle-g53/seattle_arrows_lineups_-_overview_cus_pitch_pot.csv': ['cus_pitch_pot', 1],
+  'seattle-g53/seattle_arrows_lineups_-_overview_batting_stats_1_cust.csv': null,
+  'seattle-g53/seattle_arrows_lineups_-_overview_batting_superstats_1.csv': null,
+  'seattle-g53/seattle_arrows_pitching_pitching_stats_1.csv': null,
+  'seattle-g53/seattle_arrows_pitching_pitching_superstat_1.csv': null,
+  'seattle-g53/rsl_statistics_player_statistics_-_sortable_stats_batting_stats_1_cust.csv': null,
+  'seattle-g53/rsl_statistics_player_statistics_-_sortable_stats_batting_superstats_1.csv': null,
+  'seattle-g53/starter_pitching_stats_1.csv': null,
+  'seattle-g53/starter_pitching_superstat_1.csv': null,
+  'seattle-g53/reliever_pitching_stats_1.csv': null,
+  'seattle-g53/reliever_pitching_superstats_1.csv': null,
+  'seattle-g53/overlap/rsl_statistics_player_statistics_-_sortable_stats_pitching_stats_1.csv':
+    null,
+  'seattle-g53/overlap/rsl_statistics_player_statistics_-_sortable_stats_pitching_superstat_1.csv':
+    null,
+  'seattle-g53/overlap/seattle_arrows_starter_pitching_pitching_stats_1.csv': null,
+  'seattle-g53/overlap/seattle_arrows_starter_pitching_pitching_superstat_1.csv': null,
+  'seattle-g53/overlap/seattle_arrows_reliever_pitching_pitching_stats_1.csv': null,
+  'seattle-g53/overlap/seattle_arrows_reliever_pitching_pitching_superstat_1.csv': null,
 };
+
+const KNOWN = Object.entries(EXPECTED).flatMap(([path, expected]) =>
+  expected === null ? [] : [[path, expected] as const],
+);
+const CUSTOM = Object.keys(EXPECTED).filter((path) => EXPECTED[path] === null);
 
 const fixtureHeader = (path: string) => readHeader(readFileSync(new URL(path, FIXTURES), 'utf8'));
 
 describe('detectView on the fixtures', () => {
-  // seattle-g53/ uses custom views that the column-dictionary import will read; until then
-  // only the folders this file covers are checked.
-  it('has an expectation for every CSV in fixtures/, seattle-g53/ aside', () => {
+  it('has an expectation for every CSV in fixtures/', () => {
     const files = readdirSync(FIXTURES, { recursive: true, encoding: 'utf8' })
       .filter((file) => file.endsWith('.csv'))
-      .map((file) => file.replaceAll('\\', '/'))
-      .filter((file) => !file.startsWith('seattle-g53/'));
+      .map((file) => file.replaceAll('\\', '/'));
     expect(files.sort()).toEqual(Object.keys(EXPECTED).sort());
   });
 
-  it.each(Object.entries(EXPECTED))('detects %s', (path, [view, version]) => {
+  it.each(CUSTOM)('finds no known view in the custom header of %s', (path) => {
+    const result = detectView(fixtureHeader(path));
+    expect(result.ok).toBe(false);
+    expect(result.ok ? '' : result.reason).toMatch(/^(unrecognized|mismatched)$/);
+  });
+
+  it.each(KNOWN)('detects %s', (path, [view, version]) => {
     const current = version === VIEW_MANIFESTS[view].versions.length;
     expect(detectView(fixtureHeader(path))).toEqual({
       ok: true,
@@ -89,7 +120,7 @@ describe('detectView on the fixtures', () => {
   });
 
   it('flags the three legacy copies and the league batting_superstats_1 as older versions', () => {
-    const older = Object.keys(EXPECTED).filter((path) => {
+    const older = KNOWN.map(([path]) => path).filter((path) => {
       const result = detectView(fixtureHeader(path));
       return result.ok && !result.current;
     });

@@ -66,11 +66,20 @@ export interface UploadOptions {
 
 export interface UploadedFile {
   name: string;
-  /** The view the importer read, with its scope; null for a rejected file. */
+  /** The known view the header matches, or null; with the scope and side the rows read as. */
   view: ViewId | null;
   scope: Scope | null;
+  /**
+   * Null for a rejected file, or a team file with rows on both sides. importUpload always
+   * sets it; it is optional so results built before it existed still type-check.
+   */
+  side?: Side | null;
   routing: Routing;
-  /** Added as new, replaced an earlier copy of the same view, or already stored. */
+  /**
+   * Added, or already stored byte for byte. Uploading never removes a stored file, so the
+   * importer no longer produces replaced; a re-export's values replace earlier ones cell by
+   * cell when the snapshot is assembled.
+   */
   outcome: 'added' | 'replaced' | 'unchanged';
   events: ImportEvent[];
 }
@@ -82,8 +91,9 @@ export type UploadResult =
 /**
  * Stores an upload. Its game number (the most games any hitter has played) dates it: the
  * team's snapshot for that game receives it, or a new one is created, so a later game adds
- * history. Within a snapshot, a file already stored is left alone, and a re-export of a view
- * replaces the earlier copy. Rejected files are kept so the import log can show why.
+ * history. Within a snapshot, a file already stored byte for byte is left alone and every
+ * other file is added: uploading never removes a stored file (Knowledge Base › Joins and
+ * snapshots). Rejected files are kept so the import log can show why.
  */
 export async function importUpload(
   store: SnapshotStore,
@@ -123,11 +133,11 @@ export async function importUpload(
       ok: false,
       reason: 'no-game-number',
       message:
-        'Add a hitter stats view (batting_stats_1 or batting_stats_2): its games played date the snapshot.',
+        "Add a file with the hitters' games played (G), such as batting_stats_1 or batting_stats_2: they date the snapshot.",
     };
   }
 
-  let stored = await store.listFiles(snapshot.id);
+  const stored = await store.listFiles(snapshot.id);
   const files: UploadedFile[] = [];
   for (const { upload, result } of routed) {
     const sha256 = await options.hash(upload.text);
@@ -135,24 +145,13 @@ export async function importUpload(
       name: upload.name,
       view: result.view,
       scope: result.scope,
+      side: result.side,
       routing: result.routing,
       events: result.events,
     };
     if (stored.some((file) => file.sha256 === sha256)) {
       files.push({ ...summary, outcome: 'unchanged' });
       continue;
-    }
-    const earlier =
-      result.routing === 'rejected'
-        ? []
-        : stored.filter(
-            (file) =>
-              file.detectedView === result.view &&
-              file.scope === result.scope &&
-              file.routing === result.routing,
-          );
-    if (earlier.length > 0) {
-      await store.removeFiles(earlier.map((file) => file.id));
     }
     const file = await store.addFile(
       snapshot.id,
@@ -168,8 +167,8 @@ export async function importUpload(
       },
       result.events,
     );
-    stored = [...stored.filter((candidate) => !earlier.includes(candidate)), file];
-    files.push({ ...summary, outcome: earlier.length > 0 ? 'replaced' : 'added' });
+    stored.push(file);
+    files.push({ ...summary, outcome: 'added' });
   }
   return { ok: true, snapshot, created, files };
 }

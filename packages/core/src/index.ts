@@ -15,7 +15,6 @@ export { VIEW_MANIFESTS, type Side, type ViewId, type ViewManifest } from './imp
 export {
   DROPPED_COLUMNS,
   ERA_PLUS_CAP,
-  canonicalColumn,
   parseCell,
   type CellResult,
   type CellValue,
@@ -24,10 +23,19 @@ export {
   type Hand,
   type VelocityRange,
 } from './importer/values.ts';
+export {
+  COLUMN_DICTIONARY,
+  canonicalColumn,
+  canonicalName,
+  readColumns,
+  type ColumnEntry,
+  type ColumnReading,
+} from './importer/dictionary.ts';
 export { parseCsv } from './importer/csv.ts';
 export {
   DEFAULT_ROUTING_SETTINGS,
   LEAGUE_VIEWS,
+  positionSide,
   routeExport,
   type ExportRow,
   type ImportEvent,
@@ -44,6 +52,7 @@ export {
   type IdentityFailure,
   type IdentityTolerances,
   type SnapshotEvent,
+  type SnapshotTables,
   type ValidationSettings,
 } from './importer/validate.ts';
 export { importLeague, type LeagueTables } from './importer/league.ts';
@@ -57,6 +66,7 @@ export { RATING_COLUMNS } from './ratings/columns.ts';
 export {
   assembleSnapshot,
   gameNumberOf,
+  mergeTables,
   type ImportedFile,
   type Snapshot,
   type SnapshotSettings,

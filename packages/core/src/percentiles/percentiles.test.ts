@@ -17,7 +17,7 @@ import {
   type RoutedExport,
   type Snapshot,
 } from '../index.ts';
-import { FIXTURES, readFixtureText } from '../../test/fixtures.ts';
+import { FIXTURES, fixtureFiles, readFixtureText, routeFixture } from '../../test/fixtures.ts';
 
 const routed = (): RoutedExport[] =>
   readdirSync(new URL('seattle-g42/', FIXTURES), { encoding: 'utf8' })
@@ -362,6 +362,40 @@ describe('teamPercentiles on the Seattle game-42 files', () => {
     expect(unfloored.relievers).toHaveLength(260);
     const murakami = resultFor(teamPercentiles(seattle, NO_FLOORS), 'Midori Murakami');
     expect(murakami.smallSample).toBe(false);
+  });
+});
+
+describe('percentile pools on the Seattle game-53 files (task Context: the models)', () => {
+  const g53 = assembleSnapshot(fixtureFiles('seattle-g53/').map(routeFixture), { scale: '1-10' });
+  const pools = percentilePools(g53, DEFAULT_PERCENTILE_SETTINGS);
+  const unfloored = percentilePools(g53, NO_FLOORS);
+  const results = teamPercentiles(g53, DEFAULT_PERCENTILE_SETTINGS);
+
+  it('pools 199 hitters, and 153 starters and 273 relievers by usage', () => {
+    expect(pools.hitters).toHaveLength(199);
+    expect(unfloored.starters).toHaveLength(153);
+    expect(unfloored.relievers).toHaveLength(273);
+  });
+
+  it('keeps 145 starters and 236 relievers at the floors', () => {
+    expect(pools.starters).toHaveLength(145);
+    expect(pools.relievers).toHaveLength(236);
+  });
+
+  it('finds Choi, Kawasaki and Geng among the pool’s hitters, and no other Seattle hitter', () => {
+    const members = results
+      .filter((result) => result.side === 'hitters' && !result.smallSample)
+      .map((result) => result.name);
+    expect(members).toEqual(['Han-lee Choi', 'Manichiro Kawasaki', 'Zhong-shan Geng']);
+    expect(results.filter((result) => result.side === 'hitters')).toHaveLength(12);
+  });
+
+  it('ranks Murakami, with 25 balls in play, below the relievers’ floor', () => {
+    const murakami = resultFor(results, 'Midori Murakami');
+    expect(murakami).toMatchObject({ pool: 'relievers', smallSample: true });
+    expect(g53.pitchers.find((row) => row.Name === 'Midori Murakami')?.BIP).toBe(25);
+    expect(namesOf(unfloored.relievers)).toContain('Midori Murakami');
+    expect(namesOf(pools.relievers)).not.toContain('Midori Murakami');
   });
 });
 

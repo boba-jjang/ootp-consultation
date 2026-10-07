@@ -1,9 +1,8 @@
-import type { ViewId } from './manifest.ts';
-
 /**
  * Cell parsing for the export columns: Knowledge Base › Import contract › Columns that need
- * special handling. Columns are matched by header. Every column not named here is a plain
- * number, and a blank or "-" cell is missing.
+ * special handling. Columns are matched by header; their names in the tables come from the
+ * column dictionary (dictionary.ts). Every column not named here is a plain number, and a
+ * blank or "-" cell is missing.
  */
 
 export type Hand = 'L' | 'R' | 'S';
@@ -123,22 +122,6 @@ const CONTRACT_STATUSES: Record<string, ContractStatus> = {
   'auto.': 'auto-renew',
   'arbitr.': 'arbitration',
 };
-
-/** A column's name where the same header means different things, or two headers one thing. */
-const CANONICAL: Partial<Record<ViewId, Record<string, string>>> = {
-  batting_superstats_1: { 'Avg%': 'Med%' },
-  custom_bat_pot: { 'CON P': 'Contact P' },
-  cus_pitch_pot: { 'CON P': 'Control P', HLD: 'Hold runners' },
-  pitching_stats_1: { HLD: 'Holds' },
-};
-
-/**
- * The name a column goes by after import. Avg% (hitters) and Med% (pitchers) are one
- * contact bucket; CON P and HLD mean different things in different views.
- */
-export function canonicalColumn(view: ViewId, column: string): string {
-  return CANONICAL[view]?.[column] ?? column;
-}
 
 const ok = (value: CellValue): CellResult => ({ ok: true, value });
 const fail = (column: string, raw: string): CellResult => ({

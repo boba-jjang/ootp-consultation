@@ -5,8 +5,8 @@ import { describe, expect, it } from 'vitest';
 import {
   DROPPED_COLUMNS,
   canonicalColumn,
-  detectView,
   parseCell,
+  readColumns,
   type CellValue,
 } from '../index.ts';
 import {
@@ -398,17 +398,18 @@ describe('Columns that need special handling', () => {
 });
 
 describe('parseCell on every fixture', () => {
-  // seattle-g53/ uses custom views that the column-dictionary import will read; until then
-  // its files are left out.
   const files = readdirSync(FIXTURES, { recursive: true, encoding: 'utf8' })
     .filter((file) => file.endsWith('.csv'))
-    .map((file) => file.replaceAll('\\', '/'))
-    .filter((file) => !file.startsWith('seattle-g53/'));
+    .map((file) => file.replaceAll('\\', '/'));
 
-  it.each(files)('parses every cell of %s', (path) => {
+  it('walks every folder of fixtures/, Game 53 and its overlap included', () => {
+    expect(files.filter((file) => file.startsWith('seattle-g53/'))).toHaveLength(19);
+    expect(files).toHaveLength(38);
+  });
+
+  it.each(files)('parses every cell of %s through the dictionary', (path) => {
     const rows = readFixture(path);
-    const detection = detectView(Object.keys(rows[0] ?? {}));
-    expect(detection.ok).toBe(true);
+    expect(readColumns(Object.keys(rows[0] ?? {})).notRead).toEqual([]);
     for (const row of rows) {
       for (const [column, raw] of Object.entries(row)) {
         const result = parseCell(column, raw);

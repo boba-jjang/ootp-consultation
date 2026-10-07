@@ -12,6 +12,7 @@ import {
   teamPercentiles,
   type ExportRow,
   type MetricDirection,
+  type PeerPool,
   type PlayerPercentiles,
   type RoutedExport,
   type Snapshot,
@@ -245,6 +246,23 @@ describe('teamPercentiles on the Seattle game-42 files', () => {
     expect(murakami).toMatchObject({ pool: 'relievers', smallSample: true });
     expect(namesOf(pools.relievers)).not.toContain('Midori Murakami');
     expect(murakami.metrics.xERA?.n).toBe(218);
+  });
+
+  it('pins six percentiles, recomputed from the raw league files with the formula', () => {
+    const PINS: [string, string, number, PeerPool, boolean, number][] = [
+      ['Manichiro Kawasaki', 'xwOBA', 91.35514, 'hitters', false, 214], // 100 × 195.5 / 214
+      ['Han-lee Choi', 'Soft%', 17.28972, 'hitters', false, 214], // 100 × 37 / 214, lower better
+      ['Bitgaram Mangjeol', 'EV', 0, 'hitters', false, 214], // the league's lowest
+      ['Su-shun Nie', 'xERA', 33.333333, 'starters', false, 144], // 100 × 48 / 144
+      ['Hajime Ito', 'xBACON', 55.555556, 'starters', false, 144], // 100 × 80 / 144
+      ['Midori Murakami', 'xERA', 100, 'relievers', true, 218], // below the floor, not a member
+    ];
+    for (const [name, metric, percentile, pool, smallSample, n] of PINS) {
+      const result = resultFor(results, name);
+      expect(result, name).toMatchObject({ pool, smallSample });
+      expect(result.metrics[metric]?.percentile, `${name} ${metric}`).toBeCloseTo(percentile, 4);
+      expect(result.metrics[metric]?.n, `${name} ${metric}`).toBe(n);
+    }
   });
 
   it('marks style metrics, and keeps every percentile between 0 and 100', () => {

@@ -252,7 +252,8 @@ describe('leagueContext on the Seattle game-42 files', () => {
     for (const row of rows) {
       const fip = Number(row.FIP);
       const raw = 13 * Number(row.HR) + 3 * (Number(row.BB) + Number(row.HP)) - 2 * Number(row.K);
-      const constant = fip - raw / innings(row.IP ?? '');
+      // To four decimals: Chun's 3.244865 is the low end.
+      const constant = Number((fip - raw / innings(row.IP ?? '')).toFixed(4));
       expect(constant, row.Name).toBeGreaterThanOrEqual(3.2449);
       expect(constant, row.Name).toBeLessThanOrEqual(3.2544);
     }
@@ -891,6 +892,21 @@ describe('teamMetrics on hand-built snapshots', () => {
     expect(bare.league.hrPerBarrel).toEqual({ hitters: null, pitchers: null });
     expect(playerOf(bare.pitchers, 'Ace').values).not.toHaveProperty('xFIP');
     expect(luckOf(playerOf(bare.hitters, 'Ann'), 'HR/FB-BAR%')).toBeUndefined();
+  });
+
+  it('skips league rows without every value, and rows without a name', () => {
+    const partial = teamMetrics(
+      built({
+        hitters: [{ PA: 10, wOBA: 0.3 }],
+        league: {
+          hitters: [...LEAGUE.hitters, { Name: 'Max', BIP: 50, 'FB%': 0.5, 'HR/FB': 0.2 }],
+          pitchers: [...LEAGUE.pitchers, { Name: 'Ned', BIP: 50, 'FB%': null, 'BAR%': 0.1 }],
+        },
+      }),
+      DEFAULT_METRICS_SETTINGS,
+    );
+    expect(partial.league).toEqual(result.league);
+    expect(partial.hitters).toEqual([]);
   });
 
   it('passes a negative run value through unchanged', () => {

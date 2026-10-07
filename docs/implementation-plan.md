@@ -255,6 +255,7 @@ These acceptance criteria differ from the canvas or from the Basis as written; t
 - [x] Convert ratings between the league's display scale and 20–80 (Knowledge Base › Ratings model › Scale conversion).
 - [x] Assemble a snapshot: one player table per side with ratings on 20–80, the league tables, validation events and the Game N label (Knowledge Base › Import contract › Joins and snapshots).
 - [x] Import the league sortable files: name joins, duplicate flags, rows with G = 0 dropped (Knowledge Base › Import contract › Joins and snapshots).
+- [x] Build metrics and luck gaps: exported metrics passed through, BACON and xFIP computed, luck gaps against each pair's team baseline, and small-sample flags from stabilization points (Knowledge Base › Metrics and league context).
 - [x] Build league percentiles: usage-based peer pools, sample floors, metric directions and the mid-rank formula (Knowledge Base › League percentiles).
 
 ## Frontend foundation

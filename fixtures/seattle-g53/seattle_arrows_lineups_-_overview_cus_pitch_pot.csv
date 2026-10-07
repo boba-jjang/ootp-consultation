@@ -1,0 +1,14 @@
+POS,Name,Age,T,WE,INT,STU P,MOV P,HRA P,PBABIP P,CON P,VELO,STM,VT,Slot,PT,G/F,HLD,DEF Pot,Risk
+SP,Hajime Ito,24,R,High,Normal,8,4,3,7,5,96-98 Mph,10,96-98 Mph,3/4,Power Pitcher,FB,6,10,Medium
+SP,Yasuhiro Katayama,28,L,Normal,Normal,5,5,5,5,5,93-95 Mph,7,93-95 Mph,3/4,Groundballer,GB,7,4,Low
+SP,Jeong Lee,30,R,High,Normal,6,6,6,6,7,94-96 Mph,6,94-96 Mph,3/4,Normal,NEU,8,4,Very Low
+SP,Su-shun Nie,35,L,Normal,High,2,7,8,7,8,91-93 Mph,9,91-93 Mph,OTT,Groundballer,EX GB,6,1,Very Low
+SP,Chua chay Niu,24,R,High,Normal,9,6,6,6,6,95-97 Mph,8,95-97 Mph,3/4,Power Pitcher,NEU,5,5,Medium
+RP,Hwi-gon Chun,27,R,Low,Low,6,5,4,6,6,94-96 Mph,6,94-96 Mph,3/4,Normal,FB,5,5,Low
+RP,Tse-peng Gong,25,R,High,Normal,7,4,3,6,4,94-96 Mph,6,94-96 Mph,3/4,Normal,FB,6,6,Low
+RP,Jimmy Hsia,41,R,Low,Low,6,7,7,8,9,92-94 Mph,1,92-94 Mph,3/4,Groundballer,GB,2,1,Very Low
+RP,Hyun-koo Ka,26,R,Low,Normal,3,6,6,6,4,92-94 Mph,9,92-94 Mph,3/4,Groundballer,GB,7,4,Very Low
+RP,Kiyohiro Kaneshiro,26,L,Normal,Normal,8,4,4,5,4,95-97 Mph,6,95-97 Mph,OTT,Power Pitcher,GB,8,4,Low
+RP,Xiong Loh,29,R,High,Normal,6,5,5,5,4,94-96 Mph,8,94-96 Mph,3/4,Groundballer,EX GB,8,6,Very Low
+RP,Midori Murakami,25,L,Normal,Low,8,6,6,5,6,91-93 Mph,3,91-93 Mph,SIDE,Normal,NEU,7,7,Low
+CL,Yoichibei Inouye,24,R,Normal,Low,10,4,4,6,5,95-97 Mph,3,96-98 Mph,SIDE,Power Pitcher,EX FB,9,1,Medium

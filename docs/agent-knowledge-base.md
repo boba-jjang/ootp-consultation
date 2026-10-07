@@ -2,7 +2,7 @@
 
 Oct 4, 2026 · @Jay
 
-> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 4 October 2026.
+> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 6 October 2026.
 
 ## Agent brief
 
@@ -278,7 +278,7 @@ Use OOTP's exported metrics where they exist and compute only what's missing. wR
 
 ### Formulas
 
-Constants are the research's FanGraphs values. An OOTP league has its own run environment. The exported FIP implies the league's FIP constant (3.25 for every team pitcher in the sample), and the league pitching file gives league HR/FB (11.8% in the sample: the sum of BIP × FB% × HR/FB over the sum of BIP × FB%). The wOBA and run constants need league totals, which aren't available.
+Constants are the research's FanGraphs values. An OOTP league has its own run environment. The exported FIP implies the league's FIP constant (3.25 for every team pitcher in the sample), and the league pitching file gives league HR/FB (11.8% in the sample: the sum of BIP × FB% × HR/FB over the sum of BIP × FB%). xFIP uses that measured constant, not 3.101: the outs-weighted mean, over the team's pitchers, of each one's exported FIP minus the formula's fraction (3.2496 in the sample). The wOBA and run constants need league totals, which aren't available.
 
 ```latex
 \text{wOBA} = \frac{0.698\,uBB + 0.729\,HBP + 0.890\,1B + 1.261\,2B + 1.596\,3B + 2.049\,HR}{AB + BB - IBB + SF + HBP}
@@ -293,17 +293,24 @@ Constants are the research's FanGraphs values. An OOTP league has its own run en
 ```
 
 ```latex
-\text{xFIP} = \frac{13\,(FB \times \text{lgHR/FB}) + 3\,(BB + HBP) - 2\,K}{IP} + 3.101
+\text{xFIP} = \frac{13\,(FB \times \text{lgHR/FB}) + 3\,(BB + HBP) - 2\,K}{IP} + c_{\text{FIP}}
 ```
 
 ```latex
 \text{BACON} = \frac{H}{BIP} \qquad IP_{true} = \frac{\text{outs}}{3}
 ```
 
+HR/FB against barrel rate compares a player's HR/FB with the rate his barrels predict. The league's home runs per barrel come from the same side's league file: 0.356 for hitters and 0.355 for pitchers in the sample. The luck gap is HR/FB − xHR/FB.
+
+```latex
+\text{xHR/FB} = \frac{\text{BAR\%} \times \text{lgHR/BAR}}{\text{FB\%}} \qquad \text{lgHR/BAR} = \frac{\sum BIP \times \text{FB\%} \times \text{HR/FB}}{\sum BIP \times \text{BAR\%}}
+```
+
 ### Luck baselines
 
 - Each luck pair gets its own baseline, measured from the import: BACON against xBACON, wOBA against xwOBA and ERA against xERA. One offset can't serve all three.
 - In the sample, contact results ran below xBACON on both sides (hitters .342 against .364 expected, pitchers .327 against .355), while team wOBA ran .008 above xwOBA and staff ERA 0.15 above xERA.
+- Team values are totals or weighted means: BACON from hits and BIP, xBACON weighted by BIP, wOBA and xwOBA by PA, ERA from earned runs and outs, and xERA by outs. ERA − FIP and HR/FB against barrels need no team baseline, because FIP carries the league's constant and xHR/FB the league's home runs per barrel.
 - A pitcher's regression signal comes from the talent estimator (FIP, SIERA and ratings), with xERA as one input, because pitchers' contact superstats don't track their contact ratings (section 7).
 - League pitching files carry xBACON but no hits, and no export with league hits is available, so there is no league-wide contact baseline.
 

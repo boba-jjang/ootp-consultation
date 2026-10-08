@@ -256,10 +256,6 @@
   border: 1px solid var(--matrix-cell-on);
 }
 
-.matrixSwatch[data-state='unavailable'] {
-  border: var(--border-hairline);
-}
-
 /* ---- Panels and cards -------------------------------------------------------------- */
 
 .panel {

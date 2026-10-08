@@ -206,8 +206,8 @@ describe('routeExport on the fixtures', () => {
     expect(bio.rows.find((row) => row.Name === 'Dong-hee Moon')).toMatchObject({ POS: 'SS' });
   });
 
-  it('stamps importer version 0.2.0, for the column dictionary', () => {
-    expect(IMPORTER_VERSION).toBe('0.2.0');
+  it('stamps importer version 0.3.0, for the blank rule and coverage by data set', () => {
+    expect(IMPORTER_VERSION).toBe('0.3.0');
   });
 
   it('keeps only Name, POS and DEF Pot from the hitter capture, and says so', () => {

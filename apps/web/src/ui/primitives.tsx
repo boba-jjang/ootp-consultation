@@ -141,15 +141,13 @@ export function CoverageLayers({
   );
 }
 
-/** One cell of the coverage matrix: on file, or empty until its view is uploaded. */
-/** One cell of a coverage matrix: on file, partly (one of two views), empty, or no view carries it. */
-export type MatrixState = 'on' | 'partial' | 'empty' | 'unavailable';
+/** One cell of a coverage matrix: on file, partly (some of its columns), or empty. */
+export type MatrixState = 'on' | 'partial' | 'empty';
 
 const MATRIX_WORDS: Record<MatrixState, string> = {
   on: 'on file',
   partial: 'partly on file',
   empty: 'empty',
-  unavailable: 'no view carries it',
 };
 
 export function MatrixCell({ label, state }: { label: string; state: MatrixState }) {

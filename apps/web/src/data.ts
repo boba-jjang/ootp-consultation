@@ -15,6 +15,7 @@ import {
   type Upload,
 } from '@ootp/core';
 
+import { usedFileCounts } from './clubhouse/copy.ts';
 import { useSessionState } from './session.ts';
 import { sha256 } from './store.ts';
 import type { Client } from './supabase.ts';
@@ -40,8 +41,8 @@ export const queryClient = new QueryClient({
 export const queryKeys = {
   teams: ['teams'] as const,
   latestSnapshots: ['snapshots', 'latest'] as const,
-  viewCounts: (snapshotIds: readonly string[]) =>
-    ['snapshots', 'view-counts', snapshotIds.join(',')] as const,
+  fileCounts: (snapshotIds: readonly string[]) =>
+    ['snapshots', 'file-counts', snapshotIds.join(',')] as const,
   snapshots: (teamId: string) => ['teams', teamId, 'snapshots'] as const,
   snapshot: (snapshotId: string, scale: RatingScale) =>
     ['snapshots', snapshotId, scale, IMPORTER_VERSION] as const,
@@ -187,27 +188,21 @@ export function useRemoveFile() {
   });
 }
 
-/** Team views on file per snapshot, for the timeline's labels. */
-export function useViewCounts(snapshotIds: readonly string[]) {
+/** The files each snapshot uses, from the stored files' metadata, for the timeline's labels. */
+export function useFileCounts(snapshotIds: readonly string[]) {
   const { client } = useSessionState();
   return useQuery({
-    queryKey: queryKeys.viewCounts(snapshotIds),
+    queryKey: queryKeys.fileCounts(snapshotIds),
     enabled: client !== null && snapshotIds.length > 0,
     queryFn: async (): Promise<Map<string, number>> => {
-      const { data, error } = await needClient(client, 'Counting the views')
+      const { data, error } = await needClient(client, 'Counting the files')
         .from('view_files')
-        .select('snapshot_id, scope, routing')
+        .select('snapshot_id, routing')
         .in('snapshot_id', snapshotIds);
       if (error) {
-        throw new Error(`Couldn't count the views: ${error.message}`);
+        throw new Error(`Couldn't count the files: ${error.message}`);
       }
-      const counts = new Map<string, number>();
-      for (const row of data) {
-        if (row.scope === 'team' && row.routing === 'primary') {
-          counts.set(row.snapshot_id, (counts.get(row.snapshot_id) ?? 0) + 1);
-        }
-      }
-      return counts;
+      return usedFileCounts(data);
     },
   });
 }

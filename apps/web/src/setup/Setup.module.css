@@ -341,9 +341,3 @@
   color: var(--color-text-tertiary);
   overflow-wrap: anywhere;
 }
-
-.replaced {
-  font-size: var(--text-12);
-  color: var(--color-accent);
-  overflow-wrap: anywhere;
-}

@@ -2,12 +2,13 @@ import { replacementProblem, routeExport, type ImportedFile, type Upload } from 
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
-import { useAddExports, useRemoveFile, useViewCounts } from '../data.ts';
+import { useAddExports, useFileCounts, useRemoveFile } from '../data.ts';
 import { DropZone } from '../setup/pieces.tsx';
 import { useShell } from '../shell/context.ts';
 import { modulePath } from '../shell/modules.ts';
 import { Button } from '../ui/primitives.tsx';
 import styles from './Clubhouse.module.css';
+import { ADD_DATA } from './copy.ts';
 import {
   ColumnNotes,
   CoverageMatrix,
@@ -44,7 +45,7 @@ export function Clubhouse() {
   const location = useLocation();
   const add = useAddExports();
   const remove = useRemoveFile();
-  const counts = useViewCounts(snapshots.map((candidate) => candidate.id));
+  const counts = useFileCounts(snapshots.map((candidate) => candidate.id));
   const [reading, setReading] = useState(false);
   const [results, setResults] = useState<ClubhouseState['results'] | null>(
     () => (location.state as ClubhouseState | null)?.results ?? null,
@@ -144,8 +145,6 @@ export function Clubhouse() {
   };
 
   const views = snapshot.coverage.views.onFile;
-  const counted = new Map(counts.data ?? EMPTY_COUNTS);
-  counted.set(snapshotId, views.length);
   const busy = reading || remove.isPending;
 
   return (
@@ -168,8 +167,8 @@ export function Clubhouse() {
             size="large"
             busy={busy}
             onFiles={upload}
-            title="Drop any OOTP export here"
-            text="Hitters or pitchers, stats or ratings, one file or a whole folder. A re-export merges with what's on file: a later value wins and a blank never replaces one. Exports from a later game open that game's snapshot."
+            title={ADD_DATA.title}
+            text={ADD_DATA.text}
           />
           {results ? (
             <UploadResults
@@ -185,7 +184,11 @@ export function Clubhouse() {
               {error}
             </p>
           ) : null}
-          <SnapshotTimeline games={team.games_per_season} snapshots={snapshots} counts={counted} />
+          <SnapshotTimeline
+            games={team.games_per_season}
+            snapshots={snapshots}
+            counts={counts.data ?? EMPTY_COUNTS}
+          />
         </section>
         <UploadNext coverage={snapshot.coverage} busy={busy} onFiles={upload} />
       </div>

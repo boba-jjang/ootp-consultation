@@ -1,10 +1,8 @@
 import {
   DATA_SETS,
-  DATA_SET_INFO,
   LAYERS,
   VIEW_MANIFESTS,
   columnNotesFor,
-  dataSetName,
   type Coverage,
   type ImportedFile,
   type Layer,
@@ -16,11 +14,11 @@ import {
 } from '@ootp/core';
 import { useEffect, useRef, useState } from 'react';
 
-import { upperFirst } from '../setup/exports.ts';
 import { FileButton } from '../setup/pieces.tsx';
 import { CheckIcon, InfoIcon } from '../ui/icons.tsx';
 import { Button, Chip, MatrixCell, Panel, Timeline } from '../ui/primitives.tsx';
 import styles from './Clubhouse.module.css';
+import { matrixHeadings, nextCards, timelineLabel } from './copy.ts';
 import { outcomeOf } from './results.ts';
 
 /**
@@ -34,7 +32,7 @@ const LAYER_LABELS: Record<Layer, string> = {
   ratings: 'Ratings',
 };
 
-/** Each upload day on the season, labelled with its game and its views. */
+/** Each upload day on the season, labelled with its game and the files it uses. */
 export function SnapshotTimeline({
   games,
   snapshots,
@@ -42,7 +40,7 @@ export function SnapshotTimeline({
 }: {
   games: number;
   snapshots: readonly StoredSnapshot[];
-  /** Team views on file per snapshot id, where known. */
+  /** The files each snapshot uses, per snapshot id, once counted. */
   counts: ReadonlyMap<string, number>;
 }) {
   return (
@@ -55,16 +53,10 @@ export function SnapshotTimeline({
       </div>
       <Timeline
         games={games}
-        snapshots={snapshots.map((snapshot) => {
-          const count = counts.get(snapshot.id);
-          return {
-            game: snapshot.gameNumber,
-            label:
-              count === undefined
-                ? snapshot.label
-                : `${snapshot.label}, ${count} ${count === 1 ? 'view' : 'views'}`,
-          };
-        })}
+        snapshots={snapshots.map((snapshot) => ({
+          game: snapshot.gameNumber,
+          label: timelineLabel(snapshot.label, counts.get(snapshot.id)),
+        }))}
       />
     </div>
   );
@@ -80,6 +72,7 @@ export function UploadNext({
   busy: boolean;
   onFiles: (files: Promise<Upload[]>) => void;
 }) {
+  const cards = nextCards(coverage);
   return (
     <Panel title="What to upload next" className={styles.next}>
       <div className={styles.layerBars}>
@@ -94,38 +87,28 @@ export function UploadNext({
         ))}
       </div>
       <p className={styles.muted}>{coverage.summary}</p>
-      {coverage.next.slice(0, 3).map(({ side, set }) => {
-        const name = dataSetName(side, set);
-        const views = DATA_SET_INFO[set].views[side];
-        return (
-          <article key={`${side}-${set}`} className={styles.card}>
-            <h3 className={styles.cardTitle}>{upperFirst(name)}</h3>
-            <div className={styles.chips}>
-              {views.map((view) => (
-                <Chip key={view}>{view}</Chip>
-              ))}
-            </div>
-            <p className={styles.muted}>
-              {coverage[side].sets[set] === 'partial'
-                ? 'Part of it is on file.'
-                : 'Not on file yet.'}{' '}
-              {views.length === 1 ? 'This view carries it' : 'These views carry it'}, or a custom
-              view with its columns.
-            </p>
-            <FileButton
-              variant="outline"
-              className={styles.cardAction}
-              label={`Upload files: ${name}`}
-              multiple
-              busy={busy}
-              onFiles={onFiles}
-            >
-              Upload files
-            </FileButton>
-          </article>
-        );
-      })}
-      {coverage.next.length === 0 ? (
+      {cards.map((card) => (
+        <article key={`${card.side}-${card.set}`} className={styles.card}>
+          <h3 className={styles.cardTitle}>{card.title}</h3>
+          <div className={styles.chips}>
+            {card.views.map((view) => (
+              <Chip key={view}>{view}</Chip>
+            ))}
+          </div>
+          <p className={styles.muted}>{card.detail}</p>
+          <FileButton
+            variant="outline"
+            className={styles.cardAction}
+            label={`Upload files: ${card.name}`}
+            multiple
+            busy={busy}
+            onFiles={onFiles}
+          >
+            Upload files
+          </FileButton>
+        </article>
+      ))}
+      {cards.length === 0 ? (
         <p className={styles.muted}>
           Every data set is on file for both sides. New exports refresh them.
         </p>
@@ -138,6 +121,7 @@ export function UploadNext({
 export function CoverageMatrix({ side }: { side: SideCoverage }) {
   const title = side.side === 'hitters' ? 'Hitters on file' : 'Pitchers on file';
   const players = side.players.length;
+  const headings = matrixHeadings(side.side);
   return (
     <Panel
       title={title}
@@ -160,12 +144,10 @@ export function CoverageMatrix({ side }: { side: SideCoverage }) {
               <tr>
                 <th scope="col">Player</th>
                 <th scope="col">Pos</th>
-                {DATA_SETS.map((set) => (
+                {headings.map(({ set, label, hint }) => (
                   <th key={set} scope="col">
-                    {DATA_SET_INFO[set].label[side.side]}
-                    <span className={styles.thViews}>
-                      {DATA_SET_INFO[set].carriedBy[side.side]}
-                    </span>
+                    {label}
+                    <span className={styles.thViews}>{hint}</span>
                   </th>
                 ))}
               </tr>
@@ -175,12 +157,9 @@ export function CoverageMatrix({ side }: { side: SideCoverage }) {
                 <tr key={player.name}>
                   <th scope="row">{player.name}</th>
                   <td className={styles.mono}>{player.position}</td>
-                  {DATA_SETS.map((set) => (
+                  {headings.map(({ set, label }) => (
                     <td key={set}>
-                      <MatrixCell
-                        label={DATA_SET_INFO[set].label[side.side]}
-                        state={player.sets[set]}
-                      />
+                      <MatrixCell label={label} state={player.sets[set]} />
                     </td>
                   ))}
                 </tr>

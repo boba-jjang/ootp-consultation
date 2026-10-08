@@ -304,7 +304,7 @@ export function Sheet() {
           <MatrixCell label="Bio" state="on" />
           <MatrixCell label="Stats" state="partial" />
           <MatrixCell label="Ratings" state="empty" />
-          <MatrixCell label="Bio" state="unavailable" />
+          <MatrixCell label="Bio" state="empty" />
         </div>
       </Section>
 

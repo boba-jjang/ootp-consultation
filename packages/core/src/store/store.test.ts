@@ -3,6 +3,7 @@ import { readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import {
+  IMPORTER_VERSION,
   assembleSnapshot,
   importUpload,
   loadSnapshot,
@@ -132,7 +133,9 @@ describe('importUpload never removes a stored file', () => {
     expect([...files.values()].map((file) => file.side)).toEqual(
       result.files.map((file) => file.side),
     );
-    expect([...files.values()].every((file) => file.importerVersion === '0.2.0')).toBe(true);
+    expect([...files.values()].every((file) => file.importerVersion === IMPORTER_VERSION)).toBe(
+      true,
+    );
   });
 
   it('adds the overlap files beside them, leaving the tables as they were', async () => {

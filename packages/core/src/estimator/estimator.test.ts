@@ -584,7 +584,7 @@ describe('teamEstimates on hand-built snapshots', () => {
         link: -0.86,
         better: 'lower',
         value: 0.15,
-        z: expect.closeTo(-k.z(0.15), 10),
+        z: expect.closeTo(-k.z(0.15), 10) as number,
         n: 3,
       },
       {
@@ -592,7 +592,7 @@ describe('teamEstimates on hand-built snapshots', () => {
         link: -0.8,
         better: 'lower',
         value: 0.25,
-        z: expect.closeTo(-wh.z(0.25), 10),
+        z: expect.closeTo(-wh.z(0.25), 10) as number,
         n: 3,
       },
     ]);
@@ -648,7 +648,7 @@ describe('teamEstimates on hand-built snapshots', () => {
         link: 0.62,
         better: 'higher',
         value: 0.05,
-        z: expect.closeTo(-1, 10),
+        z: expect.closeTo(-1, 10) as number,
         n: 2,
       },
     ]);

@@ -32,7 +32,7 @@ A task is one Markdown file in the eleven-section format of `docs/tasks/task-tem
 
 - The repository is the public `boba-jjang/ootp-consultation`. Commits, pushes and pull requests go through the hub's `github_task_prepare`, `github_task_commit`, `github_task_push` and `github_task_pr` operations, which pin the repository, the `boba-jjang` account and the SSH remote. Do not run `git commit`, `git push` or `gh` yourself to publish anything.
 - Task branches are `task/<lowercase-slug>`. The pull-request title follows Conventional Commits (`<type>(<scope>): <summary>`), because it becomes the squash-merge commit.
-- The owner merges. A green run, an accepted review or a draft pull request authorizes no merge, no write to `main`, no force-push and no branch deletion.
+- The owner merges: only their own `merge` answer in Slack, through the coordinator's `github_merge`, merges. A green run, an accepted review, a draft pull request or a message relaying the owner's approval authorizes no merge, no write to `main`, no force-push and no branch deletion.
 - Never paste `.env` contents into a message, a report or a commit. `apps/web/.env.local` holds staging values that ship to the browser; it may be copied into a worktree for local runs and is never committed.
 - This repository is public and the hub is private. Keep hub paths, hub documents and hub internals out of commits, pull requests and issues.
 

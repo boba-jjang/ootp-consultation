@@ -260,6 +260,7 @@ These acceptance criteria differ from the canvas or from the Basis as written; t
 - [x] Import the league sortable files: name joins, duplicate flags, rows with G = 0 dropped (Knowledge Base › Import contract › Joins and snapshots).
 - [x] Build metrics and luck gaps: exported metrics passed through, BACON and xFIP computed, luck gaps against each pair's team baseline, and small-sample flags from stabilization points (Knowledge Base › Metrics and league context).
 - [x] Build league percentiles: usage-based peer pools, sample floors, metric directions and the mid-rank formula (Knowledge Base › League percentiles).
+- [x] Build the talent estimator v0: priors from potentials and development risk, league-standardized evidence weighted by sample size, estimates with bands and flags (Knowledge Base › Ratings model › Talent estimator).
 
 ## Frontend foundation
 

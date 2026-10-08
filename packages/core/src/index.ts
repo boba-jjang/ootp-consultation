@@ -152,6 +152,26 @@ export {
   type PlayerPercentiles,
 } from './percentiles/percentiles.ts';
 export {
+  DEFAULT_ESTIMATOR_SETTINGS,
+  teamEstimates,
+  type ComponentEstimate,
+  type ComponentId,
+  type ComponentSettings,
+  type CompositeEstimate,
+  type CompositeId,
+  type CompositeSettings,
+  type EstimatorSample,
+  type EstimatorSettings,
+  type Evidence,
+  type EvidenceStat,
+  type HitterComponentId,
+  type PitcherComponentId,
+  type PlayerEstimates,
+  type RiskTier,
+  type Stance,
+  type StatEvidence,
+} from './estimator/estimator.ts';
+export {
   collectUploads,
   describeFile,
   replacementKey,

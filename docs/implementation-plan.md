@@ -250,7 +250,7 @@ These acceptance criteria differ from the canvas or from the Basis as written; t
 - [x] Add the four league sortable superstats exports to `fixtures/seattle-g42/` (Knowledge Base › Data sources › League sortable stats).
 - [x] Keep the older superstats copies in `fixtures/legacy/`, to test header-version handling.
 - [x] Add the Game 53 exports to `fixtures/seattle-g53/`: the owner's custom stats and superstats views for the team and the league (league pitching split into starters and relievers), the ratings views, a bio view listing both sides, and in `overlap/` the exports that repeat the snapshot's rows.
-- [ ] Import by column dictionary: any CSV, in any view and under any file name, fills one table per side and scope; parts and re-exports merge cell by cell, and coverage counts data sets (Knowledge Base › Import contract).
+- [x] Import by column dictionary: any CSV, in any view and under any file name, fills one table per side and scope; parts and re-exports merge cell by cell, and coverage counts data sets (Knowledge Base › Import contract).
 - [x] Detect each export's view and header version from its header row, with every version in the header manifest (Knowledge Base › Import contract › Header manifest).
 - [x] Route each export: read the CSV and file name, and route it as primary, supplemental or rejected, with its scope, side and import events (Knowledge Base › Import contract).
 - [x] Validate a snapshot across its files: names and positions, repeated columns, identities, the rating scale and league rows (Knowledge Base › Import contract › Invariants).

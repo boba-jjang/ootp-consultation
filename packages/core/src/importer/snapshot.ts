@@ -1,16 +1,9 @@
 import { RATING_COLUMNS } from '../ratings/columns.ts';
 import { measureCoverage, type Coverage } from './coverage.ts';
 import { scaleBounds, toTwentyEighty, type RatingScale } from '../ratings/scale.ts';
-import { importLeague, mergeRow, mergingTable, rowsOf } from './league.ts';
+import { importLeague, importTeam } from './league.ts';
 import type { Side, ViewId } from './manifest.ts';
-import {
-  positionSide,
-  type ExportRow,
-  type ImportEvent,
-  type Routing,
-  type RoutedExport,
-  type Scope,
-} from './route.ts';
+import type { ExportRow, ImportEvent, Routing, RoutedExport, Scope } from './route.ts';
 import {
   DEFAULT_IDENTITY_TOLERANCES,
   validateSnapshot,
@@ -55,39 +48,15 @@ export interface SnapshotSettings {
   tolerances?: IdentityTolerances;
 }
 
-const nameOf = (row: ExportRow) => (typeof row.Name === 'string' ? row.Name : '');
-
-/** The team's two tables, merged by name across the team files in the order given. */
-function teamTables(files: readonly RoutedExport[]) {
-  const events: SnapshotEvent[] = [];
-  const tables = { hitters: mergingTable(), pitchers: mergingTable() };
-  for (const file of files) {
-    if (file.scope !== 'team' || file.routing === 'rejected') {
-      continue;
-    }
-    for (const row of file.rows) {
-      // A file with rows on both sides, such as the bio view, places each row by its POS.
-      const side = file.side ?? positionSide(row.POS);
-      if (side !== undefined) {
-        mergeRow(tables[side], nameOf(row), row, file, 'team', events);
-      }
-    }
-  }
-  return {
-    hitters: rowsOf(tables.hitters, 'hitters'),
-    pitchers: rowsOf(tables.pitchers, 'pitchers'),
-    events,
-  };
-}
-
 /**
  * A snapshot's four tables, ratings still on the league's scale: Knowledge Base › Import
  * contract › Joins and snapshots. Every file fills them in the order given, which is upload
  * order: a player's row merges every file that lists him and keeps the place where he first
- * appeared, and a later differing value replaces an earlier one with a warning.
+ * appeared, a later differing value replaces an earlier one with a warning, and a blank
+ * never replaces a value.
  */
 export function mergeTables(files: readonly RoutedExport[]) {
-  const team = teamTables(files);
+  const team = importTeam(files);
   const league = importLeague(files);
   return {
     hitters: team.hitters,
@@ -148,7 +117,7 @@ export function assembleSnapshot(
 
 /** The most games any team hitter has played: the game number that dates a snapshot. */
 export function gameNumberOf(files: readonly RoutedExport[]): number | null {
-  return mostGames(teamTables(files).hitters);
+  return mostGames(importTeam(files).hitters);
 }
 
 function mostGames(hitters: readonly ExportRow[]): number | null {

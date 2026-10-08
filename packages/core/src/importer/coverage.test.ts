@@ -309,7 +309,9 @@ describe('measureCoverage counting key columns', () => {
   it('counts a blank cell as carried, since the export had the column', () => {
     const STATS_2 = 'seattle_arrows_lineups_-_overview_batting_stats_2.csv';
     const text = readFixtureText(`seattle-g42/${STATS_2}`);
-    const names = routeExport(STATS_2, text).rows.map((row) => String(row.Name));
+    const names = routeExport(STATS_2, text).rows.flatMap((row) =>
+      typeof row.Name === 'string' ? [row.Name] : [],
+    );
     const blank = names.reduce((edited, name) => editCell(edited, name, 'wOBA', ''), text);
     const files = [...without('batting_stats_2'), routeExport(STATS_2, blank)];
     expect(files.at(-1)?.rows.every((row) => row.wOBA === null)).toBe(true);

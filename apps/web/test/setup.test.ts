@@ -195,7 +195,7 @@ describe('the files read and the review, on Game 53', () => {
       title: 'Custom hitters view',
       detail: 'Carries part of hitter stats',
     });
-    const none = routeExport('mine.csv', 'POS,Name,Age,PA\r\nSS,Ann,25,40');
+    const none = routeExport('mine.csv', 'POS,Name,Age,wRC+\r\nSS,Ann,25,110');
     expect(fileLine(none).detail).toBe('Carries none of the columns coverage counts');
   });
 });

@@ -34,9 +34,9 @@ const NO_CSV = 'No CSV file was among those. OOTP exports are .csv files.';
 
 /**
  * The Clubhouse: everything on file for the team. Uploads go through the importer like the
- * first ones did: a re-export of a view replaces it, and an export with a new game number
- * opens that game's snapshot, which the screen follows. Each stored file can be replaced or
- * removed on its own.
+ * first ones did: a re-export merges with what's on file, a later value winning and a blank
+ * never replacing one, and an export with a new game number opens that game's snapshot,
+ * which the screen follows. Each stored file can be replaced or removed on its own.
  */
 export function Clubhouse() {
   const { team, snapshots, snapshotId, snapshot } = useShell();
@@ -169,7 +169,7 @@ export function Clubhouse() {
             busy={busy}
             onFiles={upload}
             title="Drop any OOTP export here"
-            text="Hitters or pitchers, stats or ratings, one file or a whole folder. A re-export of a view replaces the earlier copy; exports from a later game start a new snapshot."
+            text="Hitters or pitchers, stats or ratings, one file or a whole folder. A re-export merges with what's on file: a later value wins and a blank never replaces one. Exports from a later game open that game's snapshot."
           />
           {results ? (
             <UploadResults

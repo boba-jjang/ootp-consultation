@@ -1,4 +1,4 @@
-import { measureCoverage } from './coverage.ts';
+import { measureCoverage, type Coverage } from './coverage.ts';
 import type { ExportRow, RoutedExport } from './route.ts';
 import { gameNumberOf, mergeTables } from './snapshot.ts';
 
@@ -21,8 +21,8 @@ export interface ExportSummary {
   gameNumber: number | null;
   /** SctAcc from the default view, as the export spells it ("V.High"). */
   scoutingAccuracy: string | null;
-  /** OOTP's own team views recognized, the supplemental capture and league files apart. */
-  viewsRecognized: number;
+  /** The hitters' plus the pitchers' data sets the files fill, of the ten. */
+  dataSets: Coverage['dataSets'];
   /** Files that could not be used, with the importer's reason. */
   rejected: { name: string; reason: string }[];
 }
@@ -87,7 +87,7 @@ export function describeExports(files: readonly RoutedExport[]): ExportSummary {
     pitchers: tables.pitchers.length,
     gameNumber: gameNumberOf(files),
     scoutingAccuracy: defaultView ? onlyValue(defaultView.rows, 'SctAcc') : null,
-    viewsRecognized: coverage.views.onFile.length,
+    dataSets: coverage.dataSets,
     rejected: files.flatMap((file) =>
       file.routing === 'rejected'
         ? [

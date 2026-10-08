@@ -2,9 +2,9 @@ import {
   DATA_SETS,
   DATA_SET_INFO,
   LAYERS,
-  VIEW_DESCRIPTIONS,
   VIEW_MANIFESTS,
   columnNotesFor,
+  dataSetName,
   type Coverage,
   type ImportedFile,
   type Layer,
@@ -16,6 +16,7 @@ import {
 } from '@ootp/core';
 import { useEffect, useRef, useState } from 'react';
 
+import { upperFirst } from '../setup/exports.ts';
 import { FileButton } from '../setup/pieces.tsx';
 import { CheckIcon, InfoIcon } from '../ui/icons.tsx';
 import { Button, Chip, MatrixCell, Panel, Timeline } from '../ui/primitives.tsx';
@@ -69,7 +70,7 @@ export function SnapshotTimeline({
   );
 }
 
-/** The layers, the badge's sentence, and a card per view that would raise it. */
+/** The layers, the badge's sentence, and a card per data set still missing. */
 export function UploadNext({
   coverage,
   busy,
@@ -93,44 +94,45 @@ export function UploadNext({
         ))}
       </div>
       <p className={styles.muted}>{coverage.summary}</p>
-      {coverage.next.slice(0, 3).map((view) => {
-        const description = VIEW_DESCRIPTIONS[view];
+      {coverage.next.slice(0, 3).map(({ side, set }) => {
+        const name = dataSetName(side, set);
+        const views = DATA_SET_INFO[set].views[side];
         return (
-          <article key={view} className={styles.card}>
-            <h3 className={styles.cardTitle}>{description.title}</h3>
-            <Chip>{view}</Chip>
+          <article key={`${side}-${set}`} className={styles.card}>
+            <h3 className={styles.cardTitle}>{upperFirst(name)}</h3>
+            <div className={styles.chips}>
+              {views.map((view) => (
+                <Chip key={view}>{view}</Chip>
+              ))}
+            </div>
             <p className={styles.muted}>
-              {description.carries}.{description.unlocks ? ` Unlocks: ${description.unlocks}.` : ''}
+              {coverage[side].sets[set] === 'partial'
+                ? 'Part of it is on file.'
+                : 'Not on file yet.'}{' '}
+              {views.length === 1 ? 'This view carries it' : 'These views carry it'}, or a custom
+              view with its columns.
             </p>
             <FileButton
               variant="outline"
               className={styles.cardAction}
-              label={`Upload this view: ${view}`}
-              multiple={false}
+              label={`Upload files: ${name}`}
+              multiple
               busy={busy}
               onFiles={onFiles}
             >
-              Upload this view
+              Upload files
             </FileButton>
           </article>
         );
       })}
       {coverage.next.length === 0 ? (
-        <p className={styles.muted}>Every team view is on file. New exports refresh them.</p>
+        <p className={styles.muted}>
+          Every data set is on file for both sides. New exports refresh them.
+        </p>
       ) : null}
     </Panel>
   );
 }
-
-/** "stats 1 + stats 2": the views of a data set, short. */
-const shortViews = (views: readonly ViewId[]) =>
-  views
-    .map((view) =>
-      view === 'default' || view.startsWith('cus')
-        ? view
-        : view.replace(/^(batting|pitching)_/, '').replaceAll('_', ' '),
-    )
-    .join(' + ');
 
 /** One side's coverage matrix: players against the five data sets. */
 export function CoverageMatrix({ side }: { side: SideCoverage }) {
@@ -162,9 +164,7 @@ export function CoverageMatrix({ side }: { side: SideCoverage }) {
                   <th key={set} scope="col">
                     {DATA_SET_INFO[set].label[side.side]}
                     <span className={styles.thViews}>
-                      {DATA_SET_INFO[set].views[side.side].length === 0
-                        ? 'no view'
-                        : shortViews(DATA_SET_INFO[set].views[side.side])}
+                      {DATA_SET_INFO[set].carriedBy[side.side]}
                     </span>
                   </th>
                 ))}
@@ -191,13 +191,8 @@ export function CoverageMatrix({ side }: { side: SideCoverage }) {
       )}
       <p className={styles.legend}>
         <MatrixCell label="Legend" state="on" /> On file
-        <MatrixCell label="Legend" state="partial" /> One of two views
-        <MatrixCell label="Legend" state="empty" /> Empty, fills when its view is uploaded
-        {side.side === 'pitchers' ? (
-          <>
-            <MatrixCell label="Legend" state="unavailable" /> No view carries it
-          </>
-        ) : null}
+        <MatrixCell label="Legend" state="partial" /> Some of its columns
+        <MatrixCell label="Legend" state="empty" /> Empty, fills when a file carries it
       </p>
     </Panel>
   );

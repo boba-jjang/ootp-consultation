@@ -1,9 +1,4 @@
-import {
-  DEFAULT_TEAM_SETTINGS,
-  VIEW_DESCRIPTIONS,
-  parseTeamSettings,
-  type Upload,
-} from '@ootp/core';
+import { DEFAULT_TEAM_SETTINGS, dataSetName, parseTeamSettings, type Upload } from '@ootp/core';
 import {
   ViewTransition,
   addTransitionType,
@@ -26,6 +21,7 @@ import {
   addExports,
   prefill,
   removeExport,
+  snapshotLine,
   type Prefilled,
   type ReadExports,
 } from './exports.ts';
@@ -346,7 +342,6 @@ function StepReview({
 }) {
   const has = exports.uploads.length > 0;
   const { coverage, summary } = exports;
-  const players = summary.hitters + summary.pitchers;
   return (
     <>
       <div className={styles.intro}>
@@ -394,17 +389,15 @@ function StepReview({
         >
           {has ? `Game ${summary.gameNumber ?? '?'}` : 'None yet'}
           <br />
-          {has
-            ? `${coverage.views.onFile.length} views, ${players} players`
-            : 'Add exports once the team exists'}
+          {has ? snapshotLine(summary) : 'Add exports once the team exists'}
         </SummaryItem>
       </dl>
       <Panel title="On day one" meta={<CoverageBadge level={coverage.level} prefix="" />}>
         <p className={styles.muted}>{coverage.summary}</p>
         {coverage.next.length > 0 ? (
           <p className={styles.muted}>
-            Opens with more views:{' '}
-            {listOf(coverage.next.map((view) => VIEW_DESCRIPTIONS[view].title.toLowerCase()))}.
+            Opens with more data:{' '}
+            {listOf(coverage.next.map(({ side, set }) => dataSetName(side, set)))}.
           </p>
         ) : null}
       </Panel>

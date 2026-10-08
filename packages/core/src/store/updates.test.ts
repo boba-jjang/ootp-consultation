@@ -47,54 +47,73 @@ const game43Stats = (): Upload => {
 const notes: Upload = { name: 'notes.csv', text: 'a,b\n1,2\n' };
 
 describe('collectUploads', () => {
+  const kept = (uploads: Upload[]) => collectUploads(uploads).kept.map((pending) => pending.upload);
+
   it('keeps every game-42 export, and counts a file added twice once', () => {
     const all = uploads();
-    const collected = collectUploads([...all, ...all.slice(0, 3)]);
-    expect(collected.kept.map((pending) => pending.upload)).toEqual(all);
-    expect(collected.replaced).toEqual([]);
+    expect(kept([...all, ...all.slice(0, 3)])).toEqual(all);
+    expect(collectUploads(all)).not.toHaveProperty('replaced');
   });
 
-  it('lets a later export of a view replace the earlier one, as importUpload would', () => {
+  it('keeps a re-export beside the earlier copy of its view, as importUpload does', () => {
     const first = upload(STATS_1);
     const second = {
       ...first,
       text: editCell(first.text, 'Yoshitsugu Ishida', 'AVG', '.175'),
     };
     const other = upload('_lineups_-_overview_default.csv');
-    const collected = collectUploads([first, other, second]);
-    expect(collected.kept.map((pending) => pending.upload)).toEqual([other, second]);
-    expect(collected.replaced).toEqual([{ upload: first, by: second }]);
+    expect(kept([first, other, second])).toEqual([first, other, second]);
   });
 
-  it('names the file that stayed after a chain of replacements', () => {
-    const first = upload(STATS_1);
-    const second = { ...first, text: editCell(first.text, 'Yoshitsugu Ishida', 'AVG', '.175') };
-    const third = { ...first, text: editCell(first.text, 'Yoshitsugu Ishida', 'AVG', '.176') };
-    const collected = collectUploads([first, second, third]);
-    expect(collected.kept.map((pending) => pending.upload)).toEqual([third]);
-    expect(collected.replaced).toEqual([
-      { upload: first, by: third },
-      { upload: second, by: third },
+  it('keeps the same text under another name, and routes what it keeps', () => {
+    const stats = upload(STATS_1);
+    const copy = { ...stats, name: 'copy.csv' };
+    const collected = collectUploads([stats, stats, copy]);
+    expect(collected.kept.map((pending) => pending.upload)).toEqual([stats, copy]);
+    expect(collected.kept.map((pending) => pending.routed.view)).toEqual([
+      'batting_stats_1',
+      'batting_stats_1',
     ]);
   });
 
-  it('never lets the hitter capture replace the staff cus_pitch_pot', () => {
-    const staff = upload(STAFF_RATINGS);
-    const capture = upload(HITTER_CAPTURE);
-    const collected = collectUploads([staff, capture]);
+  it('keeps the hitter capture beside the staff cus_pitch_pot, and two rejected files', () => {
+    const collected = collectUploads([upload(STAFF_RATINGS), upload(HITTER_CAPTURE)]);
     expect(collected.kept.map((pending) => pending.routed.routing)).toEqual([
       'primary',
       'supplemental',
     ]);
-    expect(collected.replaced).toEqual([]);
+    expect(kept([notes, { name: 'other.csv', text: 'c,d\n3,4\n' }])).toHaveLength(2);
+  });
+});
+
+describe('replacementKey', () => {
+  const routed = (file: Upload) => routeExport(file.name, file.text);
+
+  it('is the view, scope and routing when both files have a known view', () => {
+    const stats = routed(upload(STATS_1));
+    expect(replacementKey(stats, routed(upload(STAFF_RATINGS)))).toBe(
+      'batting_stats_1|team|primary',
+    );
+    expect(replacementKey(routed(upload(HITTER_CAPTURE)), routed(upload(STAFF_RATINGS)))).toBe(
+      'cus_pitch_pot|team|supplemental',
+    );
   });
 
-  it('never replaces with or by a rejected file', () => {
-    const other = { name: 'other.csv', text: 'c,d\n3,4\n' };
-    const collected = collectUploads([notes, other]);
-    expect(collected.kept).toHaveLength(2);
-    expect(collected.replaced).toEqual([]);
-    expect(replacementKey(routeExport(notes.name, notes.text))).toBeNull();
+  it('is the side, scope and routing when either file has no known view', () => {
+    const custom = routeFixture(
+      'seattle-g53/seattle_arrows_lineups_-_overview_batting_stats_1_cust.csv',
+    );
+    const stats = routed(upload(STATS_1));
+    expect(replacementKey(custom, stats)).toBe('hitters|team|primary');
+    expect(replacementKey(stats, custom)).toBe('hitters|team|primary');
+    const bio = routeFixture('seattle-g53/seattle_arrows_lineups_-_overview_default.csv');
+    expect(replacementKey(bio, custom)).toBe('|team|primary');
+  });
+
+  it('is null for a rejected file', () => {
+    const rejected = routeExport(notes.name, notes.text);
+    expect(replacementKey(rejected, rejected)).toBeNull();
+    expect(replacementKey(rejected, routed(upload(STATS_1)))).toBeNull();
   });
 });
 
@@ -130,6 +149,39 @@ describe('replacementProblem', () => {
         routed(upload('_lineups_-_overview_batting_superstats_1.csv')),
       ),
     ).toBe('This file is batting_superstats_1, not the league’s batting_superstats_1.');
+  });
+
+  it('lets a custom team file replace only another file of its side and scope', () => {
+    const g53 = (path: string) => routeFixture(`seattle-g53/${path}`);
+    const stats = g53('seattle_arrows_lineups_-_overview_batting_stats_1_cust.csv');
+    expect(
+      replacementProblem(
+        stats,
+        53,
+        g53('seattle_arrows_lineups_-_overview_batting_superstats_1.csv'),
+      ),
+    ).toBeNull();
+    expect(
+      replacementProblem(stats, 53, routed(upload('_lineups_-_overview_custom_bat_pot.csv'))),
+    ).toBeNull();
+    expect(replacementProblem(stats, 53, g53('seattle_arrows_pitching_pitching_stats_1.csv'))).toBe(
+      'This file is a custom pitchers view, not a custom hitters view.',
+    );
+    expect(
+      replacementProblem(
+        stats,
+        53,
+        g53('rsl_statistics_player_statistics_-_sortable_stats_batting_superstats_1.csv'),
+      ),
+    ).toBe('This file is the league’s custom hitters view, not a custom hitters view.');
+  });
+
+  it('lets one bio view replace another, whichever sides it lists', () => {
+    const bio = routeFixture('seattle-g53/seattle_arrows_lineups_-_overview_default.csv');
+    expect(bio.side).toBeNull();
+    expect(
+      replacementProblem(bio, 53, routed(upload('_lineups_-_overview_default.csv'))),
+    ).toBeNull();
   });
 
   it('refuses an export from another game, which belongs to that game’s snapshot', () => {

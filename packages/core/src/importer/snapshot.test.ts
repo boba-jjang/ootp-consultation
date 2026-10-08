@@ -334,6 +334,53 @@ describe('assembleSnapshot merging files cell by cell', () => {
   });
 });
 
+describe('assembleSnapshot with blank cells (Knowledge Base › Joins and snapshots)', () => {
+  /** A hand-built team file of one hitter: PA and wOBA mark the hitters' side. */
+  const file = (name: string, header: string, cells: string) =>
+    routeExport(`club_lineups_-_overview_${name}.csv`, `POS,Name,${header}\r\nSS,Ann,${cells}`);
+  const ann = (...files: RoutedExport[]) => {
+    const snapshot = assembleSnapshot(files, { scale: '1-10' });
+    return { row: player(snapshot.hitters, 'Ann'), events: snapshot.events };
+  };
+  const WITH_VALUE = () => file('a', 'G,PA,wOBA', '10,40,.300');
+  const WITH_BLANK = () => file('b', 'G,PA,wOBA', '10,40,');
+
+  it('never lets a later blank replace a value, and logs nothing', () => {
+    const { row, events } = ann(WITH_VALUE(), WITH_BLANK());
+    expect(row?.wOBA).toBe(0.3);
+    expect(events).toEqual([]);
+  });
+
+  it('fills a blank with a later value, silently', () => {
+    const { row, events } = ann(WITH_BLANK(), WITH_VALUE());
+    expect(row?.wOBA).toBe(0.3);
+    expect(events).toEqual([]);
+  });
+
+  it('carries a blank column the row has no value for yet, and keeps it blank', () => {
+    const { row, events } = ann(file('a', 'G,PA', '10,40'), WITH_BLANK(), WITH_BLANK());
+    expect(row).toHaveProperty('wOBA', null);
+    expect(events).toEqual([]);
+  });
+
+  it('still lets a later value replace a differing one, with a warning', () => {
+    const { row, events } = ann(WITH_VALUE(), WITH_BLANK(), file('c', 'G,PA,wOBA', '10,40,.310'));
+    expect(row?.wOBA).toBe(0.31);
+    expect(events).toEqual([
+      expect.objectContaining({
+        code: 'value-replaced',
+        details: expect.objectContaining({
+          column: 'wOBA',
+          earlier: 0.3,
+          later: 0.31,
+          earlierFile: 'club_lineups_-_overview_a.csv',
+          laterFile: 'club_lineups_-_overview_c.csv',
+        }) as unknown,
+      }),
+    ]);
+  });
+});
+
 describe('gameNumberOf', () => {
   it('dates files by the most games any hitter has played', () => {
     expect(gameNumberOf(routed())).toBe(42);

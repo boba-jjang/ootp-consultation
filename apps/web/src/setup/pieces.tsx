@@ -1,15 +1,10 @@
 import {
   LAYERS,
-  LAYER_VIEWS,
-  VIEW_DESCRIPTIONS,
-  VIEW_MANIFESTS,
   type Coverage,
   type CoverageLevel,
   type ExportSummary,
   type Layer,
-  type RoutedExport,
   type Upload,
-  type ViewId,
 } from '@ootp/core';
 import { useRef, useState, type DragEvent, type ReactNode } from 'react';
 
@@ -25,13 +20,19 @@ import {
   Panel,
   type ButtonVariant,
 } from '../ui/primitives.tsx';
-import { scoutingAccuracyLabel, type PendingFile } from './exports.ts';
+import {
+  fileGroups,
+  fileLine,
+  layerSets,
+  scoutingAccuracyLabel,
+  type PendingFile,
+} from './exports.ts';
 import { readDrop, readFiles } from './files.ts';
 import styles from './Setup.module.css';
 
 /**
  * The pieces of the Create a Team flow that read nothing themselves, so the sheet can show
- * them: the drop zone, the best-first-upload card, what the files say and the views read.
+ * them: the drop zone, the best-first-upload card, what the files say and the files read.
  */
 
 /** A button that opens the file picker for CSV exports. */
@@ -174,8 +175,26 @@ const LAYER_COPY: Record<Layer, { title: string; level: CoverageLevel; text: str
   },
 };
 
-/** The three layers, as the setup board lists them: any export works, each layer adds. */
+/** One data set's line: the views that carry it, as chips, or a custom view. */
+function SetViews({ label, views }: { label: string; views: readonly string[] }) {
+  return (
+    <div className={styles.chips}>
+      <span className={styles.muted}>{label}:</span>
+      {views.map((view) => (
+        <Chip key={view}>{view}</Chip>
+      ))}
+      <span className={styles.muted}>or a custom view</span>
+    </div>
+  );
+}
+
+/**
+ * The three layers, as the setup board lists them: any export works, each layer adds. Each
+ * lists its data sets with the views that carry them; the bio set, which counts toward no
+ * layer, comes last.
+ */
 export function BestFirstUpload() {
+  const [bio] = layerSets(null);
   return (
     <Panel title="Best first upload" className={styles.best}>
       <p className={styles.muted}>
@@ -188,13 +207,17 @@ export function BestFirstUpload() {
             <CoverageBadge level={LAYER_COPY[layer].level} prefix="" />
           </div>
           <p className={styles.muted}>{LAYER_COPY[layer].text}</p>
-          <div className={styles.chips}>
-            {LAYER_VIEWS[layer].map((view) => (
-              <Chip key={view}>{view}</Chip>
-            ))}
-          </div>
+          {layerSets(layer).map((set) => (
+            <SetViews key={set.set} label={set.label} views={set.views} />
+          ))}
         </div>
       ))}
+      {bio ? (
+        <p className={styles.muted}>
+          Also read, though it counts toward no layer: the bio view ({bio.views.join(', ')}, or a
+          custom view), for ages and contracts.
+        </p>
+      ) : null}
     </Panel>
   );
 }
@@ -238,37 +261,9 @@ export function FoundInFiles({ summary }: { summary: ExportSummary }) {
   );
 }
 
-const MANIFEST_ORDER = Object.keys(VIEW_MANIFESTS) as ViewId[];
-const byManifest = (a: PendingFile, b: PendingFile) =>
-  MANIFEST_ORDER.indexOf(a.routed.view ?? 'default') -
-  MANIFEST_ORDER.indexOf(b.routed.view ?? 'default');
-
-/** A pending file's line: what it was read as, and what that brings. */
-function fileLine(file: RoutedExport): { title: string; detail: string } {
-  if (file.routing === 'rejected' || file.view === null) {
-    return {
-      title: file.name,
-      detail:
-        file.events.find((event) => event.level === 'error')?.message ??
-        'The app can’t read this file.',
-    };
-  }
-  if (file.routing === 'supplemental') {
-    return {
-      title: `${file.view} on the hitters`,
-      detail: 'Only DEF Pot is used, as the hitters’ ceiling',
-    };
-  }
-  if (file.scope === 'league') {
-    return { title: `League ${file.view}`, detail: 'League-wide, for percentiles later' };
-  }
-  return { title: file.view, detail: VIEW_DESCRIPTIONS[file.view].carries };
-}
-
 /**
- * The files read, per side, with the league files, the capture and the rejects apart. Each
- * can be removed before anything is saved; a file that replaced an earlier export of its
- * view says so.
+ * The files read, per side, with a team file on both sides, the league files, the capture
+ * and the rejects apart. Each can be removed before anything is saved.
  */
 export function FilesRead({
   files,
@@ -280,38 +275,13 @@ export function FilesRead({
   onRemove: (key: string) => void;
 }) {
   const used = files.filter((file) => file.routed.routing !== 'rejected').length;
-  const team = (side: 'hitters' | 'pitchers') =>
-    files
-      .filter(
-        (file) =>
-          file.routed.scope === 'team' &&
-          file.routed.routing === 'primary' &&
-          file.routed.side === side,
-      )
-      .sort(byManifest);
-  const groups: { title: string; empty?: string; rows: PendingFile[] }[] = [
-    { title: 'Hitters', empty: 'No hitter view yet.', rows: team('hitters') },
-    { title: 'Pitchers', empty: 'No pitcher view yet.', rows: team('pitchers') },
-    {
-      title: 'Also read',
-      rows: files
-        .filter(
-          (file) =>
-            file.routed.routing === 'supplemental' ||
-            (file.routed.scope === 'league' && file.routed.routing !== 'rejected'),
-        )
-        .sort(byManifest),
-    },
-    { title: 'Not used', rows: files.filter((file) => file.routed.routing === 'rejected') },
-  ];
-  const views = coverage.views.onFile.length;
   return (
     <Panel
-      title={`${views} ${views === 1 ? 'view' : 'views'} recognized`}
+      title={`${coverage.dataSets.found} of ${coverage.dataSets.total} data sets found`}
       meta={`${used} of ${files.length} files`}
       className={styles.views}
     >
-      {groups.map((group) =>
+      {fileGroups(files).map((group) =>
         group.rows.length === 0 && group.empty === undefined ? null : (
           <div key={group.title} className={styles.viewGroup}>
             <h3 className={styles.viewGroupTitle}>{group.title}</h3>
@@ -329,11 +299,6 @@ export function FilesRead({
                         {line.title === file.routed.name ? null : (
                           <span className={styles.fileName}>{file.routed.name}</span>
                         )}
-                        {file.replaced ? (
-                          <span className={styles.replaced}>
-                            Replaced an earlier copy: {file.replaced}
-                          </span>
-                        ) : null}
                       </span>
                       <Button
                         variant="ghost"

@@ -28,7 +28,8 @@ describe('describeExports on the Seattle game-42 files', () => {
       pitchers: 13,
       gameNumber: 42,
       scoutingAccuracy: 'V.High',
-      viewsRecognized: 11,
+      // Every set but the pitchers' bio, which no game-42 file carries.
+      dataSets: { found: 9, total: 10 },
       rejected: [],
     });
   });
@@ -45,8 +46,8 @@ describe('describeExports on the Seattle game-53 files', () => {
       pitchers: 13,
       gameNumber: 53,
       scoutingAccuracy: 'V.High',
-      // OOTP's own views among the files: the bio view and the two ratings views.
-      viewsRecognized: 3,
+      // Every set on both sides, read from the custom views as well as OOTP's own.
+      dataSets: { found: 10, total: 10 },
       rejected: [],
     });
   });
@@ -63,7 +64,7 @@ describe('describeExports with less, or worse, data', () => {
       pitchers: 0,
       gameNumber: null,
       scoutingAccuracy: null,
-      viewsRecognized: 0,
+      dataSets: { found: 0, total: 10 },
       rejected: [],
     });
   });

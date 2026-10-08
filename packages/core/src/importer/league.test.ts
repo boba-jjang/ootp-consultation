@@ -236,6 +236,21 @@ describe('importLeague joins and parts (hand-built)', () => {
     ]);
   });
 
+  it('never lets a later file’s blank replace a value, and says nothing', () => {
+    const files = snapshot();
+    const row = leagueFile(files, 'pitching_superstats_2').rows.find(
+      (candidate) => candidate.G !== 0,
+    );
+    if (!row) {
+      throw new Error('no pitcher with appearances');
+    }
+    const before = row.GS;
+    row.GS = null;
+    const league = importLeague(files);
+    expect(league.pitchers.find((candidate) => candidate.Name === row.Name)?.GS).toBe(before);
+    expect(league.events.map((event) => event.code)).toEqual(['dropped-no-appearances']);
+  });
+
   it('names the file a duplicate name was found in', () => {
     const files = snapshot();
     const first = leagueFile(files, 'pitching_superstats_1');

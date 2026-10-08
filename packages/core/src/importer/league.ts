@@ -1,6 +1,6 @@
 import { inColumnOrder } from './dictionary.ts';
 import type { Side } from './manifest.ts';
-import type { ExportRow, RoutedExport, Scope } from './route.ts';
+import { positionSide, type ExportRow, type RoutedExport, type Scope } from './route.ts';
 import type { SnapshotEvent } from './validate.ts';
 import type { CellValue } from './values.ts';
 
@@ -45,9 +45,11 @@ export interface MergingTable {
 export const mergingTable = (): MergingTable => ({ rows: new Map(), sources: new Map() });
 
 /**
- * Merges one file's row into a table cell by cell, files in the order given. Equal values
- * merge silently; a later differing value replaces the earlier one, and the warning names
- * the player, the column, both values and both files.
+ * Merges one file's row into a table cell by cell, files in the order given: Knowledge Base
+ * › Import contract › Invariants. Equal values merge silently. A blank never replaces a
+ * value: it fills only a column the row doesn't carry yet, and a later value fills a blank
+ * silently. A later differing value replaces an earlier one, and the warning names the
+ * player, the column, both values and both files.
  */
 export function mergeRow(
   table: MergingTable,
@@ -61,10 +63,11 @@ export function mergeRow(
   const sources = table.sources.get(key) ?? new Map<string, string>();
   for (const [column, value] of Object.entries(row)) {
     const earlier = merged[column];
-    if (Object.hasOwn(merged, column) && sameValue(earlier, value)) {
+    const carried = Object.hasOwn(merged, column);
+    if (carried && (value === null || sameValue(earlier, value))) {
       continue;
     }
-    if (Object.hasOwn(merged, column)) {
+    if (carried && earlier !== null) {
       const earlierFile = sources.get(column) ?? '';
       events.push({
         level: 'warning',
@@ -93,6 +96,33 @@ export function mergeRow(
 /** A merged table's rows, each with its columns in the side's table order. */
 export const rowsOf = (table: MergingTable, side: Side): ExportRow[] =>
   [...table.rows.values()].map((row) => inColumnOrder(row, side));
+
+/**
+ * The team's two tables, merged by name across the team files in the order given: a
+ * player's row merges every file that lists him and keeps the place where he first
+ * appeared. Rejected files are left out; the hitter capture adds its DEF Pot.
+ */
+export function importTeam(files: readonly RoutedExport[]) {
+  const events: SnapshotEvent[] = [];
+  const tables = { hitters: mergingTable(), pitchers: mergingTable() };
+  for (const file of files) {
+    if (file.scope !== 'team' || file.routing === 'rejected') {
+      continue;
+    }
+    for (const row of file.rows) {
+      // A file with rows on both sides, such as the bio view, places each row by its POS.
+      const side = file.side ?? positionSide(row.POS);
+      if (side !== undefined) {
+        mergeRow(tables[side], nameOf(row), row, file, 'team', events);
+      }
+    }
+  }
+  return {
+    hitters: rowsOf(tables.hitters, 'hitters'),
+    pitchers: rowsOf(tables.pitchers, 'pitchers'),
+    events,
+  };
+}
 
 /**
  * Merges the snapshot's league files into one table per side, files in the order given.

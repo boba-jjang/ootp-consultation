@@ -70,7 +70,7 @@ const SHEET_SUMMARY = {
   pitchers: 13,
   gameNumber: 42,
   scoutingAccuracy: 'V.High',
-  viewsRecognized: 9,
+  dataSets: SHEET_COVERAGE.dataSets,
   rejected: [],
 };
 
@@ -146,7 +146,14 @@ export function Sheet() {
         </div>
         <div className={styles.row}>
           <Gate
-            module={{ label: 'Dev lab', needs: ['custom_bat_pot', 'cus_pitch_pot'], arrives: null }}
+            module={{
+              label: 'Dev lab',
+              needs: [
+                { side: 'hitters', set: 'ratings' },
+                { side: 'pitchers', set: 'ratings' },
+              ],
+              arrives: null,
+            }}
             coverage={NOTHING_ON_FILE}
             clubhouse="/sheet"
           >

@@ -18,6 +18,7 @@ const required = () => {
   return settings;
 };
 const FIXTURES = fileURLToPath(new URL('../fixtures/seattle-g42/', import.meta.url));
+const GAME_53 = fileURLToPath(new URL('../fixtures/seattle-g53/', import.meta.url));
 const PREFIX = 'E2E Seattle Arrows';
 /** One team per run and project: the desktop and phone projects run at the same time. */
 const teamName = () =>
@@ -25,11 +26,14 @@ const teamName = () =>
 /** The second team, set up without files. */
 const blankName = () => `${teamName()} blank`;
 
-/** The 16 Seattle game-42 files, as paths. */
-const allFiles = () =>
-  readdirSync(FIXTURES)
+/** The CSV files directly in a fixture folder, as paths. */
+const csvFiles = (folder: string) =>
+  readdirSync(folder)
     .filter((name) => name.endsWith('.csv'))
-    .map((name) => `${FIXTURES}${name}`);
+    .map((name) => `${folder}${name}`);
+
+/** The 16 Seattle game-42 files. */
+const allFiles = () => csvFiles(FIXTURES);
 
 const STAFF_RATINGS = 'seattle_arrows_lineups_-_overview_cus_pitch_pot.csv';
 
@@ -84,7 +88,7 @@ test.describe('Create a Team from the fixtures', () => {
 
     await page.locator('input[type="file"][multiple]').setInputFiles(allFiles());
     await expect(page.getByRole('heading', { level: 2, name: 'Seattle Arrows' })).toBeVisible();
-    await expect(page.getByText('11 views recognized')).toBeVisible();
+    await expect(page.getByText('9 of 10 data sets found')).toBeVisible();
     await expectAccessible(page);
     await expectTargets(page);
     await expectNoSideScroll(page);
@@ -102,7 +106,7 @@ test.describe('Create a Team from the fixtures', () => {
     await page.getByRole('button', { name: 'Continue' }).click();
 
     await expect(page.getByRole('heading', { level: 1, name: 'Review and create' })).toBeVisible();
-    await expect(page.getByText('11 views, 25 players')).toBeVisible();
+    await expect(page.getByText('25 players, 9 of 10 data sets')).toBeVisible();
     await expect(page.getByText('Coverage is High')).toBeVisible();
     await page.getByRole('button', { name: 'Create team' }).click();
 
@@ -126,7 +130,7 @@ test.describe('Create a Team from the fixtures', () => {
   });
 
   test('updates the team’s exports file by file in the Clubhouse', async ({ page }) => {
-    test.setTimeout(180_000);
+    test.setTimeout(240_000);
     if (!session || !clubhouse) {
       throw new Error('the first test did not create the team');
     }
@@ -183,6 +187,18 @@ test.describe('Create a Team from the fixtures', () => {
     await page.getByRole('menuitem', { name: 'Add or update exports' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'The Clubhouse' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Choose files' })).toBeFocused();
+
+    // Game 53's 13 top-level files, custom views among them, start their own snapshot at High.
+    await chooseFiles(page, page.getByRole('button', { name: 'Choose files' }), csvFiles(GAME_53));
+    await expect(page.getByText('13 files read. Started the Game 53 snapshot.')).toBeVisible({
+      timeout: 90_000,
+    });
+    await expect(page.getByRole('link', { name: /Data coverage.*High/ })).toBeVisible();
+    await expect(page.getByText('12 players, 5 of 5 data sets')).toBeVisible();
+    await expect(page.getByText('13 players, 5 of 5 data sets')).toBeVisible();
+    await expectAccessible(page);
+    await expectTargets(page);
+    await expectNoSideScroll(page);
   });
 
   test('takes the first exports of a team set up without files', async ({ page }) => {

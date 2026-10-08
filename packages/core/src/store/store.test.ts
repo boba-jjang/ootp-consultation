@@ -175,6 +175,23 @@ describe('importUpload never removes a stored file', () => {
   });
 });
 
+describe('a re-export with a blank column', () => {
+  it('keeps what the earlier files gave, and logs nothing', async () => {
+    const { store, files } = memoryStore();
+    await importUpload(store, TEAM, uploads(), options);
+    const into = (await store.listSnapshots(TEAM))[0]?.id;
+    const blank = withEdit(uploads(), 'default', 'Yoshitsugu Ishida', 'SLR', '').filter((upload) =>
+      upload.name.endsWith('overview_default.csv'),
+    );
+    const added = await importUpload(store, TEAM, blank, { ...options, into });
+    expect(added.ok && added.files.map((file) => file.outcome)).toEqual(['added']);
+    expect(files.size).toBe(17);
+    const loaded = await loadSnapshot(store, into ?? '', '1-10');
+    expect(loaded.hitters.find((row) => row.Name === 'Yoshitsugu Ishida')?.SLR).toBe(600_000);
+    expect(loaded.events.map((event) => event.code)).toEqual(['dropped-no-appearances']);
+  });
+});
+
 describe('loadSnapshot', () => {
   it('re-reads the stored raw files into the same snapshot an import assembles', async () => {
     const { store } = memoryStore();

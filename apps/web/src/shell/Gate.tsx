@@ -1,16 +1,12 @@
-import { VIEW_DESCRIPTIONS, type Coverage, type ViewId } from '@ootp/core';
+import type { Coverage } from '@ootp/core';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 
 import { Locked } from '../ui/primitives.tsx';
-import { listOf } from '../ui/text.ts';
-import { gate, type Module } from './modules.ts';
-
-const named = (views: readonly ViewId[]) =>
-  listOf(views.map((view) => `${view} (${VIEW_DESCRIPTIONS[view].title.toLowerCase()})`));
+import { gate, namedNeeds, type Module } from './modules.ts';
 
 /**
- * The lock framework's shared wrapper: a module that lacks a view it needs, or whose screen
+ * The lock framework's shared wrapper: a module that lacks a data set it needs, or whose screen
  * isn't built yet, stays visible as the locked state and names what unlocks it. Panels
  * inside a screen use it the same way.
  */
@@ -33,7 +29,7 @@ export function Gate({
   if (state.kind === 'arrives') {
     const needs =
       state.missing.length > 0
-        ? `It will need ${named(state.missing)}, not on file yet.`
+        ? `It will need ${namedNeeds(state.missing)}, not on file yet.`
         : module.needs.length > 0
           ? 'Everything it needs is on file.'
           : 'It needs no upload.';
@@ -49,7 +45,7 @@ export function Gate({
       title={`${module.label} is locked`}
       unlocks={
         <>
-          Upload {named(state.missing)} to unlock it.{' '}
+          Upload {namedNeeds(state.missing)} to unlock it.{' '}
           <Link to={clubhouse}>Add data in the Clubhouse</Link>.
         </>
       }

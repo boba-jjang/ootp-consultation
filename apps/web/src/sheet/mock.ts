@@ -1,5 +1,6 @@
 import {
   VIEW_MANIFESTS,
+  canonicalColumn,
   measureCoverage,
   type ImportedFile,
   type RoutedExport,
@@ -9,7 +10,10 @@ import {
 
 import type { PendingFile } from '../setup/exports.ts';
 
-/** The sheet's pretend snapshot: nine views, three players a side, one reject, one league file. */
+/**
+ * The sheet's pretend snapshot: nine views, three players a side, a custom file, one reject
+ * and one league file. Each view's rows carry its columns, blank, so coverage counts them.
+ */
 const HITTERS = [
   { Name: 'Yoshitsugu Ishida', POS: 'C' },
   { Name: 'Jeong Lee', POS: 'SS' },
@@ -33,6 +37,15 @@ const NINE_VIEWS: ViewId[] = [
   'pitching_superstats_2',
 ];
 
+/** A view's columns, by their names in the tables, each blank. */
+const blankColumns = (view: ViewId) =>
+  Object.fromEntries(
+    (VIEW_MANIFESTS[view].versions.at(-1) ?? []).map((column) => [
+      canonicalColumn(view, column),
+      null,
+    ]),
+  );
+
 const teamFile = (view: ViewId): RoutedExport => ({
   name: `seattle_arrows_lineups_-_overview_${view}.csv`,
   view,
@@ -40,7 +53,10 @@ const teamFile = (view: ViewId): RoutedExport => ({
   scope: 'team',
   side: VIEW_MANIFESTS[view].side,
   routing: 'primary',
-  rows: VIEW_MANIFESTS[view].side === 'hitters' ? HITTERS : PITCHERS,
+  rows: (VIEW_MANIFESTS[view].side === 'hitters' ? HITTERS : PITCHERS).map((player) => ({
+    ...blankColumns(view),
+    ...player,
+  })),
   events:
     view === 'batting_superstats_1'
       ? [
@@ -56,6 +72,12 @@ const teamFile = (view: ViewId): RoutedExport => ({
 
 export const SHEET_FILES: RoutedExport[] = [
   ...NINE_VIEWS.map(teamFile),
+  {
+    ...teamFile('batting_stats_1'),
+    name: 'seattle_arrows_lineups_-_overview_batting_stats_1_cust.csv',
+    view: null,
+    version: null,
+  },
   {
     ...teamFile('batting_superstats_1'),
     name: 'rsl_statistics_player_statistics_-_sortable_stats_batting_superstats_1.csv',
@@ -88,12 +110,11 @@ export const SHEET_LOG: ImportedFile[] = SHEET_FILES.map((file, index) => ({
   events: file.events,
 }));
 
-/** The same files as Create a Team holds them, batting_stats_1 having replaced an earlier copy. */
+/** The same files as Create a Team holds them. */
 export const SHEET_PENDING: PendingFile[] = SHEET_FILES.map((file, index) => ({
   key: `sheet-pending-${String(index)}`,
   upload: { name: file.name, text: '' },
   routed: file,
-  replaced: file.view === 'batting_stats_1' && file.scope === 'team' ? file.name : null,
 }));
 
 /** One upload's results, with each outcome a file can have. */

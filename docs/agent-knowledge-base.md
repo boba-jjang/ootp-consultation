@@ -2,7 +2,7 @@
 
 Oct 4, 2026 · @Jay
 
-> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 7 October 2026.
+> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 8 October 2026.
 
 ## Agent brief
 
@@ -377,11 +377,15 @@ Observed stats need weighting by reliability before they count as talent. Approx
 | Hitters | K% | 60 PA |
 | Hitters | BB% | 120 PA |
 | Hitters | ISO | 160 AB |
+| Hitters | Doubles and triples (XBH rate) | 1,610 PA |
+| Hitters | Barrel% | 50 balls in play |
 | Hitters | BABIP | 820 balls in play |
 | Pitchers | K% | 70 batters faced |
 | Pitchers | BB% | 170 batters faced |
 | Pitchers | GB% | 70 balls in play |
 | Pitchers | BABIP | 2,000 balls in play |
+
+At each point, a sample correlates 0.7 with another sample of the same size ([FanGraphs](https://library.fangraphs.com/principles/sample-size/); barrel rate from a [FanGraphs Community study](https://community.fangraphs.com/has-barreled-contact-reached-statistical-stability/)). A sample of n therefore counts with weight n ÷ (n + k), where k = 0.43 × the point: it counts 0.7 at the point itself, and more as the season goes on.
 
 About 42 games in, no sample player was near either BABIP point. That is why the estimator leans on potentials and contact quality rather than BABIP-driven results.
 
@@ -430,22 +434,25 @@ The composites check out in the sample: Contact leans on avoid K's, and Movement
 
 ### Talent estimator
 
-1. Prior: potential is the ceiling. Development risk sets where the estimate starts below it and how wide its band is. Where risk isn't exported, age is the fallback: 28 and older sit at their potential.
-2. Evidence: map each component to the stats that track it (evidence map below), weighted by sample size against its stabilization point.
-3. Estimate: blend prior and evidence per component, then rebuild Contact and Movement.
-4. Output: an estimate with a confidence band, flagged when evidence and prior differ by more than one 1–10 step.
+1. Prior: potential is the ceiling. Development risk sets where the estimate starts below it and how wide its band is (Development risk, below). Where risk isn't exported, age is the fallback.
+2. Evidence: each component's stats (Evidence map, below) become z-scores in their league percentile pool (hitters, starters or relievers), signed so that higher is better. A component's stats combine weighted by their link, Stuff using K%'s 0.72, and are re-standardized over the pool. On 20–80 the evidence is 50 + 10 × z, held to 20–80.
+3. Weight: the evidence counts w = n ÷ (n + k). n is the component's sample and k is 0.43 × its stabilization point (Evidence map), times the risk multiplier (Development risk), and times 2 for a moderate stance. Prior-driven components take no weight; their evidence shows only as a check. Season length needs no setting: 42 games or 140 change only n.
+4. Estimate: prior + w × (evidence − prior). Contact and Movement move by the mean of their two components' moves. The band narrows to the risk band × √(1 − w), never below half a step.
+5. Output: the estimate with its band and weight, flagged when it sits more than half a step from the prior. Every constant here is a starting setting, to recalibrate as snapshots accumulate.
 
 ### Development risk
 
 Development risk is the scout's read on how reliably a player reaches his potential. OOTP 26 already showed it on a Very Low to Extreme scale, and OSA and a team's head scout can grade the same player differently ([forum thread](https://forums.ootpdevelopments.com/showthread.php?p=5184891)). OOTP's developer notes say high-accuracy scouts weigh each player's hidden development path, fast or slow, and his chance of talent swings ([developer guide](https://forums.ootpdevelopments.com/showthread.php?p=5188669)).
 
-| Development risk | Estimate starts at | Band around it | How far stats can move it |
-| --- | --- | --- | --- |
-| Very Low | The potential | ±½ step | Only after a stat passes its stabilization point |
-| Low | Half a step below potential | ±1 step | Moderately |
-| Medium | One step below | ±1½ steps | Substantially |
-| High, Very High, Extreme | Two or more steps below | ±2 steps or more | Stats lead |
-| Not exported | At potential from age 28, below it before | ±1 step | Moderately |
+| Development risk | Estimate starts at | Band around it | How far stats can move it | k multiplier |
+| --- | --- | --- | --- | --- |
+| Very Low | The potential | ±½ step | Only after a stat passes its stabilization point | ×4 |
+| Low | Half a step below potential | ±1 step | Moderately | ×2 |
+| Medium | One step below | ±1½ steps | Substantially | ×1 |
+| High | Two steps below | ±2 steps | Stats lead | ×½ |
+| Very High | Two and a half steps below | ±2½ steps | Stats lead | ×½ |
+| Extreme | Three steps below | ±3 steps | Stats lead | ×½ |
+| Not exported | At potential from age 28, one step below before | ±1 step | Moderately | ×2 |
 
 These are starting settings to calibrate, in 1–10 steps. Very Low risk narrows the band around the talent estimate; it doesn't make stats less noisy. In practice, a Very Low-risk player's stat swings read as luck and regress harder toward his ratings.
 
@@ -454,18 +461,18 @@ These are starting settings to calibrate, in 1–10 steps. Very Low risk narrows
 
 ### Evidence map
 
-| Component | Evidence | Link in the sample (r) | Estimator stance |
-| --- | --- | --- | --- |
-| Avoid K's | K%, whiff% | −0.86 with K%, −0.80 with whiff% | Data can move it |
-| Power | Barrel%, EV, xSLGCON | 0.87 barrel%, 0.89 EV, 0.85 xSLGCON | Data can move it |
-| Gap | Doubles and triples per AB | 0.62 | Moderate |
-| Eye | O-Swing%, BB% | −0.57 O-Swing%, 0.26 BB% | Moderate, through O-Swing% |
-| BABIP | xBACON, LD% | 0.15 xBACON, 0.26 LD% | Prior-driven |
-| Stuff | K%, whiff% | 0.44 K% (0.72 with 70+ batters faced), 0.67 whiff% | Data can move it past 70 batters faced |
-| Control | BB%, zone% | −0.80 BB%, 0.36 zone% | Data can move it |
-| HR avoidance | HR/FB, barrel% allowed | −0.48 HR/FB, 0.02 barrel% | Prior-driven |
-| BABIP allowed | xBACON allowed, BABIP | +0.64 xBACON (wrong direction), 0.06 BABIP | Prior-driven |
-| Speed (current) | Infield-hit rate | 0.90 | Validation check only |
+| Component | Evidence | Link in the sample (r) | Sample, stabilization point | Estimator stance |
+| --- | --- | --- | --- | --- |
+| Avoid K's | K%, whiff% | −0.86 with K%, −0.80 with whiff% | PA, 60 (K%) | Data can move it |
+| Power | Barrel%, EV, xSLGCON | 0.87 barrel%, 0.89 EV, 0.85 xSLGCON | Balls in play, 50 (barrel%) | Data can move it |
+| Gap | Doubles and triples per AB | 0.62 | PA, 1,610 (XBH rate) | Moderate |
+| Eye | O-Swing%, BB% | −0.57 O-Swing%, 0.26 BB% | PA, 120 (BB%) | Moderate, through O-Swing% |
+| BABIP | xBACON, LD% | 0.15 xBACON, 0.26 LD% | None | Prior-driven |
+| Stuff | K%, whiff% | 0.44 K% (0.72 with 70+ batters faced), 0.67 whiff% | Batters faced, 70 (K%) | Data can move it past 70 batters faced |
+| Control | BB%, zone% | −0.80 BB%, 0.36 zone% | Batters faced, 170 (BB%) | Data can move it |
+| HR avoidance | HR/FB, barrel% allowed | −0.48 HR/FB, 0.02 barrel% | None | Prior-driven |
+| BABIP allowed | xBACON allowed, BABIP | +0.64 xBACON (wrong direction), 0.06 BABIP | None | Prior-driven |
+| Speed (current) | Infield-hit rate | 0.90 | None | Validation check only |
 
 The sample is 12 hitters and 13 pitchers, so these links are directional. The pattern still holds as a design rule: strikeout, walk and power skills show in the stats quickly, while pitcher contact management doesn't show in contact superstats.
 
@@ -737,6 +744,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 | Consultation surface | Dashboard screens with an advisor drawer, plus a downloadable manager's card (design handoff) |
 | League scope | League sortable exports and percentiles are in v1: the league files import with the team views in Phase 2, and percentiles arrive with the Phase 4 models |
 | Import | Any CSV, in any view (OOTP's or custom) and under any file name: columns map through the column dictionary into one table per side and scope, and files merge cell by cell (7 October 2026) |
+| Talent estimator | Prior from the potential and development risk; evidence as league z-scores at 50 + 10 points per SD, weighted n ÷ (n + k) with k = 0.43 × the stabilization point × the risk and stance multipliers; flagged past half a step (8 October 2026) |
 
 ### Assumptions
 

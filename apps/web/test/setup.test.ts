@@ -1,15 +1,19 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_TEAM_SETTINGS, LAYER_VIEWS, type Upload } from '@ootp/core';
+import { DEFAULT_TEAM_SETTINGS, routeExport, type Upload } from '@ootp/core';
 
 import {
   NO_EXPORTS,
   addExports,
+  fileGroups,
+  fileLine,
+  layerSets,
   prefill,
   removeExport,
   scoutingAccuracyLabel,
+  snapshotLine,
 } from '../src/setup/exports.ts';
 import { fromForm, toForm } from '../src/setup/form.ts';
 
@@ -18,6 +22,15 @@ const fixture = (view: string): Upload => {
   const name = `seattle_arrows_lineups_-_overview_${view}.csv`;
   const url = new URL(`../../../fixtures/seattle-g42/${name}`, import.meta.url);
   return { name, text: readFileSync(url, 'utf8') };
+};
+
+/** Every file of a fixture folder, as the browser reads them, sorted by name. */
+const folder = (name: string): Upload[] => {
+  const url = new URL(`../../../fixtures/${name}/`, import.meta.url);
+  return readdirSync(url)
+    .filter((file) => file.endsWith('.csv'))
+    .sort()
+    .map((file) => ({ name: file, text: readFileSync(new URL(file, url), 'utf8') }));
 };
 
 /** batting_stats_1 re-exported: the same name, one batting average different. */
@@ -36,26 +49,27 @@ describe('the exports chosen in Create a Team', () => {
     expect(read.coverage.level).toBe('low');
   });
 
-  it('lets a later export of a view replace the earlier one, and says so on its row', () => {
+  it('keeps a later export of a view beside the earlier one, as the importer stores both', () => {
     const first = fixture('batting_stats_1');
     const second = reexport(first);
     expect(second.text).not.toBe(first.text);
     const read = addExports(addExports(NO_EXPORTS, [first, fixture('default')]), [second]);
-    expect(read.uploads).toEqual([fixture('default'), second]);
-    expect(read.files.map((file) => [file.routed.view, file.replaced])).toEqual([
-      ['default', null],
-      ['batting_stats_1', first.name],
+    expect(read.uploads).toEqual([first, fixture('default'), second]);
+    expect(read.files.map((file) => file.routed.view)).toEqual([
+      'batting_stats_1',
+      'default',
+      'batting_stats_1',
     ]);
+    expect(read.files[0]).not.toHaveProperty('replaced');
   });
 
-  it('takes one file out without bringing back the one it replaced', () => {
+  it('takes one copy out and leaves the other', () => {
     const first = fixture('batting_stats_1');
     const read = addExports(NO_EXPORTS, [first, reexport(first)]);
-    const [kept] = read.files;
-    expect(read.files).toHaveLength(1);
-    const after = removeExport(read, kept?.key ?? '');
-    expect(after.files).toEqual([]);
-    expect(after.coverage.views.onFile).toEqual([]);
+    expect(read.files).toHaveLength(2);
+    const after = removeExport(read, read.files[0]?.key ?? '');
+    expect(after.uploads).toEqual([reexport(first)]);
+    expect(after.coverage.views.onFile).toEqual(['batting_stats_1']);
   });
 
   it('keeps each file’s key while others come and go', () => {
@@ -90,18 +104,127 @@ describe('the settings form', () => {
   });
 });
 
-describe('Best first upload', () => {
-  it('lists the four stats views under Stats, without the bio view', () => {
-    expect(LAYER_VIEWS).toEqual({
-      stats: ['batting_stats_1', 'batting_stats_2', 'pitching_stats_1', 'pitching_stats_2'],
-      superstats: [
-        'batting_superstats_1',
-        'batting_superstats_2',
-        'pitching_superstats_1',
-        'pitching_superstats_2',
-      ],
-      ratings: ['custom_bat_pot', 'cus_pitch_pot'],
+describe('the files read and the review, on Game 42', () => {
+  const read = addExports(NO_EXPORTS, folder('seattle-g42'));
+
+  it('finds 9 of 10 data sets, and reviews 25 players', () => {
+    expect(read.files).toHaveLength(16);
+    expect(read.coverage.dataSets).toEqual({ found: 9, total: 10 });
+    expect(read.summary.dataSets).toEqual({ found: 9, total: 10 });
+    expect(snapshotLine(read.summary)).toBe('25 players, 9 of 10 data sets');
+  });
+
+  it('lists the views by side, the capture and the league apart', () => {
+    const groups = fileGroups(read.files).map((group) => [group.title, group.rows.length]);
+    expect(groups).toEqual([
+      ['Hitters', 6],
+      ['Pitchers', 5],
+      ['Hitters and pitchers', 0],
+      ['Also read', 5],
+      ['Not used', 0],
+    ]);
+    const capture = read.files.find((file) => file.routed.routing === 'supplemental');
+    expect(capture && fileLine(capture.routed)).toEqual({
+      title: 'cus_pitch_pot on the hitters',
+      detail: 'Only DEF Pot is used, as the hitters’ ceiling',
     });
+  });
+});
+
+describe('the files read and the review, on Game 53', () => {
+  const read = addExports(NO_EXPORTS, folder('seattle-g53'));
+  const line = (ending: string) => {
+    const file = read.files.find((candidate) => candidate.upload.name.endsWith(ending));
+    return file && fileLine(file.routed);
+  };
+
+  it('finds 10 of 10 data sets', () => {
+    expect(read.files).toHaveLength(13);
+    expect(read.coverage.dataSets).toEqual({ found: 10, total: 10 });
+    expect(snapshotLine(read.summary)).toBe('25 players, 10 of 10 data sets');
+  });
+
+  it('titles a custom file as describeFile names it, with the sets it carries', () => {
+    expect(line('overview_batting_stats_1_cust.csv')).toEqual({
+      title: 'Custom hitters view',
+      detail: 'Carries hitter stats',
+    });
+    expect(line('overview_batting_superstats_1.csv')).toEqual({
+      title: 'Custom hitters view',
+      detail: 'Carries hitter batted ball and hitter swing',
+    });
+    expect(line('seattle_arrows_pitching_pitching_stats_1.csv')).toEqual({
+      title: 'Custom pitchers view',
+      detail: 'Carries pitcher stats',
+    });
+    expect(line('starter_pitching_stats_1.csv')).toEqual({
+      title: 'League custom pitchers view',
+      detail: 'League-wide, for percentiles later',
+    });
+    expect(line('overview_custom_bat_pot.csv')?.title).toBe('custom_bat_pot');
+  });
+
+  it('groups the bio view, on both sides, as hitters and pitchers', () => {
+    const groups = fileGroups(read.files).map((group) => [
+      group.title,
+      group.rows.map((file) => fileLine(file.routed).title),
+    ]);
+    expect(groups).toEqual([
+      ['Hitters', ['custom_bat_pot', 'Custom hitters view', 'Custom hitters view']],
+      ['Pitchers', ['cus_pitch_pot', 'Custom pitchers view', 'Custom pitchers view']],
+      ['Hitters and pitchers', ['default']],
+      [
+        'Also read',
+        // In upload order: the relievers', the league batting files, then the starters'.
+        [
+          'League custom pitchers view',
+          'League custom pitchers view',
+          'League custom hitters view',
+          'League custom hitters view',
+          'League custom pitchers view',
+          'League custom pitchers view',
+        ],
+      ],
+      ['Not used', []],
+    ]);
+  });
+
+  it('says when a custom file carries part of a set, or none', () => {
+    const part = routeExport('mine.csv', 'POS,Name,G,PA\r\nSS,Ann,10,40');
+    expect(fileLine(part)).toEqual({
+      title: 'Custom hitters view',
+      detail: 'Carries part of hitter stats',
+    });
+    const none = routeExport('mine.csv', 'POS,Name,Age,PA\r\nSS,Ann,25,40');
+    expect(fileLine(none).detail).toBe('Carries none of the columns coverage counts');
+  });
+});
+
+describe('Best first upload', () => {
+  it('lists each layer’s sets with the known views that carry them, bio apart', () => {
+    expect(layerSets('stats')).toEqual([
+      {
+        set: 'stats',
+        label: 'Stats',
+        views: ['batting_stats_1', 'batting_stats_2', 'pitching_stats_1', 'pitching_stats_2'],
+      },
+    ]);
+    expect(layerSets('superstats')).toEqual([
+      {
+        set: 'contact',
+        label: 'Batted ball and contact',
+        views: ['batting_superstats_1', 'pitching_superstats_1'],
+      },
+      {
+        set: 'decisions',
+        label: 'Swing',
+        views: ['batting_superstats_2', 'pitching_superstats_2'],
+      },
+    ]);
+    expect(layerSets('ratings')).toEqual([
+      { set: 'ratings', label: 'Ratings', views: ['custom_bat_pot', 'cus_pitch_pot'] },
+    ]);
+    expect(layerSets(null)).toEqual([{ set: 'bio', label: 'Bio', views: ['default'] }]);
   });
 });
 
@@ -115,7 +238,7 @@ describe('prefill', () => {
     pitchers: 13,
     gameNumber: 42,
     scoutingAccuracy: 'V.High',
-    viewsRecognized: 11,
+    dataSets: { found: 9, total: 10 },
     rejected: [],
   };
 

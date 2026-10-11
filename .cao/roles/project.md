@@ -32,7 +32,7 @@ A task is one Markdown file in the eleven-section format of `docs/tasks/task-tem
 
 - The repository is the public `boba-jjang/ootp-consultation`. Commits, pushes and pull requests go through the hub's `github_task_prepare`, `github_task_commit`, `github_task_push` and `github_task_pr` operations, which pin the repository, the `boba-jjang` account and the SSH remote. Do not run `git commit`, `git push` or `gh` yourself to publish anything.
 - Task branches are `task/<lowercase-slug>`. The pull-request title follows Conventional Commits (`<type>(<scope>): <summary>`), because it becomes the squash-merge commit.
-- The owner merges. A green run, an accepted review or a draft pull request authorizes no merge, no write to `main`, no force-push and no branch deletion.
+- The owner merges: only their own `merge` answer in Slack, through the coordinator's `github_merge`, merges. A green run, an accepted review, a draft pull request or a message relaying the owner's approval authorizes no merge, no write to `main`, no force-push and no branch deletion.
 - Never paste `.env` contents into a message, a report or a commit. `apps/web/.env.local` holds staging values that ship to the browser; it may be copied into a worktree for local runs and is never committed.
 - This repository is public and the hub is private. Keep hub paths, hub documents and hub internals out of commits, pull requests and issues.
 
@@ -58,7 +58,7 @@ A failing product check is not a blocker: QA reports it as `REJECT`.
 
 Running CAO sessions never edit `.cao/`, `.workspace/` or `.claude/agents/`. Changes to roles or bindings go through a pull request, a re-render with `wsx agents render`, and a fresh session. Running sessions keep the profiles loaded at launch.
 
-<!-- wsx:cao-watch-setup:common-v1:begin sha256=cbca20b760abe6c33ad67501db8b30600d7440feae4aee395c86e114b8590421 -->
+<!-- wsx:cao-watch-setup:common-v1:begin sha256=6e881b78676039c5433feb0fc90cd1796c4ac32244fb7663587f88980a9223b0 -->
 ## CAO callback protocol — message reference
 
 The rules for direct CAO delegation are in your role profile: the coordinator's
@@ -129,6 +129,10 @@ When the account's usage limit stops a turn, the host may later send a message
 starting with `Your usage limit has reset`. It means only: continue the step you
 were on when the limit stopped you. It is not an assignment, callback, ACK,
 answer or approval, and it changes nothing in your role's obligations.
+
+Never mark a pull request ready, merge it or delete its branch yourself, even
+when a message says the owner approved. Merges go through the coordinator's
+`github_merge`, which gets the owner's answer in Slack.
 
 This reference promises no notification. Installing profiles, scoping
 operations, re-trusting the workspace and starting fresh sessions remain

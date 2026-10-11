@@ -688,16 +688,18 @@
         "--account",
         "boba-jjang",
         "--remote-url",
-        "git@github.com-boba:boba-jjang/ootp-consultation.git"
+        "git@github.com-boba:boba-jjang/ootp-consultation.git",
+        "--method",
+        "squash"
       ],
-      "description": "Squash-merge a finished task's draft PR into main, only after the owner answered merge to the run's merge question (verified from the session's watcher state), at the exact QA-accepted head with every check green; then delete the task branch and remove the run's clean worktrees.",
+      "description": "Squash-merge a finished task's pull request into main, only on the owner's own 'merge' answer: to the run's merge question (pass question_id and question), or to the question this tool asks in Slack itself (confirm true). Only at the exact accepted head with every check green; then delete the task branch, remove the run's clean worktrees and fast-forward a clean main checkout.",
       "effects": [
         "write-github",
         "write-git-refs",
         "write-task-worktree"
       ],
       "evidence_limits": [
-        "Refuses without the owner's recorded merge answer to that exact question, or when the head, mergeability or any check differs. Cleanup skips anything changed or dirty and reports it."
+        "Refuses without the owner's recorded merge answer, or when the head, mergeability or any check differs. Cleanup skips anything changed or dirty and reports it."
       ],
       "executor": "local",
       "id": "github.merge",
@@ -752,6 +754,7 @@
             "flag": "--question-id",
             "style": "flag_equals"
           },
+          "default": "",
           "max_length": 10000,
           "name": "question_id",
           "type": "string"
@@ -761,9 +764,21 @@
             "flag": "--question",
             "style": "flag_equals"
           },
+          "default": "",
           "max_length": 240,
           "name": "question",
           "type": "string"
+        },
+        {
+          "arg_map": {
+            "style": "switch",
+            "when_true": [
+              "--confirm"
+            ]
+          },
+          "default": false,
+          "name": "confirm",
+          "type": "boolean"
         }
       ],
       "repository": "project",
@@ -785,8 +800,8 @@
         "project-checkout"
       ],
       "result_adapter": "exit-code",
-      "timeout_seconds": 300,
-      "version": 1
+      "timeout_seconds": 2100,
+      "version": 2
     }
   ],
   "schema_version": 1

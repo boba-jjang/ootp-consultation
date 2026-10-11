@@ -1,11 +1,11 @@
 {
-  "generation": "328889245b3e5b2124f142cb3419883adad5e9705677041ae0f410908f7553d6",
+  "generation": "e7c5db7ff6bc3c462adc4ea69fde0bd868aacad70ccba1fd397a5a7c064405a2",
   "inputs": {
-    ".cao/roles/cao-callback-protocol.md": "cbca20b760abe6c33ad67501db8b30600d7440feae4aee395c86e114b8590421",
-    ".cao/roles/ootp_code_owner.md": "85e96584e71946581bf1f7a0a0c1497a103fce49d6a28242e38f1b7c74e60544",
+    ".cao/roles/cao-callback-protocol.md": "6e881b78676039c5433feb0fc90cd1796c4ac32244fb7663587f88980a9223b0",
+    ".cao/roles/ootp_code_owner.md": "59c4600857d512772296e12ceaca9240435e46a4b80780b7f11acff2b7d3a72a",
     ".cao/roles/ootp_developer.md": "23d0861c491f8c5416963c980b481285e69a83ca721bd12f0f1d732f8fa2bdec",
     ".cao/roles/ootp_qa.md": "59139a59e0141c1c0dc781d6bff2cdeba946bfda86ec0d8ac93980f452ae67e1",
-    ".cao/roles/project.md": "26b5cd276862df5027a6a1db5f4bface781debaf4954072c9f7de38d57a861ff",
+    ".cao/roles/project.md": "acf4fd2f2605e17fe764da8c9aeb17c6856d81d8edfbc7fdc7c47596de20f2d3",
     ".workspace/agent-contract.json": "7438261b1c30b490d62d590901de10c190c1cf8d2eb43748541af25db83dde52",
     ".workspace/native-agents.json": "17a5d75db703acb60eeadbe84d4ecd785d8b359cd1ce072be07f40ca0043b81b",
     ".workspace/role-bindings.json": "9c7145bb6dfe5db8fb802ca187b93c6ec789fa39230ccf06aa37c4661022031d",
@@ -13,14 +13,14 @@
     "docs/tasks/authoring-guide.md": "f50c1adf8cfaef3d50c63b0bda21d1c1a7c03668c4ab65a6b4efff343cf0f2d9"
   },
   "outputs": {
-    ".cao/agent_store/_base.md": "0d79859c1c75b49032acfb153fc39eacf59b51724fdd13d8ca6751481c8a025e",
-    ".cao/agent_store/ootp_code_owner.md": "747e35328171fd67fa6bfae4dbe661093e523a0dd2476161ef1a9688ced45c1b",
-    ".cao/agent_store/ootp_code_owner_claude.md": "2b9dc9a70160af31a8d12cd59b14d7e518412964da527d3db76d30e215216386",
+    ".cao/agent_store/_base.md": "726a4344472f83185099fa6b41b89f6c878ff9ab3ec36e747c562445aa694144",
+    ".cao/agent_store/ootp_code_owner.md": "0831ba14d625f61743243b7e067fa976b6851f9888e53402d26c3100f97985e8",
+    ".cao/agent_store/ootp_code_owner_claude.md": "77e61930bc5ef7e2809b2b92367fd0d29646f96e3066d8cf92b7b84c48795ea3",
     ".cao/agent_store/ootp_developer.md": "cd12bbdc64112a444688871486f3cb9fb7feb8d232e2a1a75ecb20cb1439271f",
     ".cao/agent_store/ootp_developer_claude.md": "0f0baf3c4afe846b46a449f1fda704f38849c556f83fe562c07926c09b4f3e8a",
     ".cao/agent_store/ootp_qa.md": "a42687c6a6e11130c450ca23c59fb2ecb7243145f008b09cd52e18d9e55aec4d",
     ".cao/agent_store/ootp_qa_claude.md": "7040bb298d3b8f57e7f906eb269647b2bed524b3e5da1a1fce7da8ac9cf23cb6",
-    ".claude/agents/ootp-code-owner.md": "162adccabfda1e1c2d9eeed65d30d23c867330dc7f7221a3e0a05055acfd86dc",
+    ".claude/agents/ootp-code-owner.md": "f88c82be9f09e44b3a74c8f32083a66840d29265ab35bd28cad72b801a6589ba",
     ".claude/agents/ootp-developer.md": "5b8d2cec7c2d05fef85e8a8df46847b02db9ea06223d0e36647a4f4185dd8f6b",
     ".claude/agents/ootp-qa.md": "ba9aceb4090db6f394ee5df3dc2bdb6cba6a21ca4083b09a2fea18cfe6330ee2"
   },

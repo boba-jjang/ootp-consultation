@@ -144,6 +144,7 @@ export {
   METRIC_DIRECTIONS,
   midRankPercentile,
   percentilePools,
+  roleOf,
   teamPercentiles,
   type MetricDirection,
   type PeerPool,

@@ -183,10 +183,9 @@ describe('roleOf (Knowledge Base § 8 Peer pools; § 14 Assumptions, Starter by 
     const results = teamPercentiles(seattle, DEFAULT_PERCENTILE_SETTINGS);
     expect(seattle.pitchers.length).toBeGreaterThan(0);
     for (const row of seattle.pitchers) {
-      const ranked = results.find(
-        (result) => result.side === 'pitchers' && result.name === row.Name,
-      );
-      expect(ranked?.pool ?? null, String(row.Name)).toBe(roleOf(row, DEFAULT_PERCENTILE_SETTINGS));
+      const name = typeof row.Name === 'string' ? row.Name : '';
+      const ranked = results.find((result) => result.side === 'pitchers' && result.name === name);
+      expect(ranked?.pool ?? null, name).toBe(roleOf(row, DEFAULT_PERCENTILE_SETTINGS));
     }
   });
 });

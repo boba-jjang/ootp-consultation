@@ -117,7 +117,7 @@ The owner's custom fielding view, exported from the Fielding screen at about gam
 | `seattle-height.csv` | 12 × 61 | The team's 12 hitters: height, handedness, every fielding component, DEF and DEF Pot at the played position, the potential rating at each position (P Pot to RF Pot, "-" where he can't play there) and fielding stats (games, innings, chances, assists, putouts, errors, double plays, fielding percentage, range factor, zone rating, efficiency, balls in zone by difficulty, catcher stats, framing runs, arm runs). POS is the roster listing: Shinn LF and Geng 2B |
 | `rsl-team-fielding.csv` | 508 × 62 | The league's fielders, the same columns plus TM. POS is the position each player plays now (Shinn 1B, Geng CF); DEF, DEF Pot and the stats refer to it. 11 rows are DH only and 6 are pitchers. TM is the abbreviation (SEA), where the batting views give the city; 58 codes appear, the 30 big-league teams with 13 to 19 players each and minor-league affiliates with 1 to 5 |
 
-The importer rejects both today as `both-sides`: the fielding components read as hitters' markers and DEF Pot, DP and IP as pitchers', with 36 columns unknown. The fielding-view import teaches it this view; until then the three fixture walkers skip this folder.
+The importer rejects both today as `both-sides`: the fielding components read as hitters' markers and DEF Pot, DP and IP as pitchers', with 41 columns unknown. The fielding-view import teaches it this view; until then the three fixture walkers skip this folder.
 
 ### Checks already run on seattle-g70/
 

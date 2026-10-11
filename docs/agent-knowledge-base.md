@@ -2,7 +2,7 @@
 
 Oct 4, 2026 · @Jay
 
-> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 8 October 2026.
+> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 11 October 2026.
 
 ## Agent brief
 
@@ -468,7 +468,7 @@ These are starting settings to calibrate, in 1–10 steps. Very Low risk narrows
 | Gap | Doubles and triples per AB | 0.62 | PA, 1,610 (XBH rate) | Moderate |
 | Eye | O-Swing%, BB% | −0.57 O-Swing%, 0.26 BB% | PA, 120 (BB%) | Moderate, through O-Swing% |
 | BABIP | xBACON, LD% | 0.15 xBACON, 0.26 LD% | None | Prior-driven |
-| Stuff | K%, whiff% | 0.44 K% (0.72 with 70+ batters faced), 0.67 whiff% | Batters faced, 70 (K%) | Data can move it past 70 batters faced |
+| Stuff | K%, whiff% | 0.44 K% (0.72 with 70+ batters faced), 0.67 whiff% | Batters faced, 70 (K%) | Data can move it; no gate, the weight just grows with batters faced |
 | Control | BB%, zone% | −0.80 BB%, 0.36 zone% | Batters faced, 170 (BB%) | Data can move it |
 | HR avoidance | HR/FB, barrel% allowed | −0.48 HR/FB, 0.02 barrel% | None | Prior-driven |
 | BABIP allowed | xBACON allowed, BABIP | +0.64 xBACON (wrong direction), 0.06 BABIP | None | Prior-driven |

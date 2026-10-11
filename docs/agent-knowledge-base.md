@@ -155,7 +155,7 @@ The user exports these from the league's player statistics screen, in any view, 
 | Pitching superstats 1 and 2 (Game 42) | Every listed pitcher: 446, including 31 with no appearances and 4 position players | No team column, so rows match on name; the app applies its own sample floors (section 8) |
 | Custom batting stats and superstats (Game 53) | Qualified hitters: 199 | Standard stats, wRC+ and wRAA, and every superstats column. The superstats file carries TM and the stats file doesn't, so stats rows take their team from the superstats rows |
 | Custom pitching stats and superstats (Game 53) | Every listed pitcher, in two parts by listed position: 246 starters and 212 relievers, 458 in all and 426 with appearances | A league row's POS can differ from the team's listing: one Seattle hitter is 2B on the team and CF in the league files |
-| Custom fielding (at about game 70) | Every player with fielding time: 508, including 11 who only DH and 6 pitchers | POS is the position each player currently plays, not the roster listing (the owner confirmed Shinn at 1B and Geng in CF); DEF, DEF Pot and the stats refer to it. FRM and ARM are near zero for everyone at this point of the season. TM is the team abbreviation (SEA), where the batting views give the city (Seattle), and 58 codes appear: the 30 big-league teams with 13 to 19 players each, and minor-league affiliates with 1 to 5 |
+| Custom fielding (at about game 70) | Every player with fielding time: 508, including 11 who only DH and 6 pitchers | POS is the position each player currently plays, not the roster listing (the owner confirmed Shinn at 1B and Geng in CF); DEF, DEF Pot and the stats refer to it. FRM and ARM are near zero for everyone at this point of the season. TM is the team's short code (SEA), the form every export uses from now on, where the Game 42 and Game 53 batting views give the city (Seattle), and 58 codes appear: the 30 big-league teams with 13 to 19 players each, and minor-league affiliates with 1 to 5 |
 
 ### Sample data set
 
@@ -283,7 +283,7 @@ The league sortable files reuse these headers: at Game 42 the league batting\_su
 | SctAcc | V.High in the sample | Ordinal scouting accuracy |
 | WE, INT | Low, Normal, High | Ordinal 0–2; more levels may exist |
 | Risk | Very Low, Low and Medium in the sample; OOTP's full scale is Very Low, Low, Medium, High, Very High, Extreme | Ordinal 0–5 |
-| TM | The city in the batting views (Seattle); the abbreviation in the fielding view (SEA) | Stored as exported. No map between the two forms yet, so a league fielding row joins a batting row only when both carry the same form (open question) |
+| TM | The team's short code (SEA), as the fielding view gives it and every export gives it from now on; the Game 42 and Game 53 batting views give the city (Seattle) | Stored as the short code. One alias covers the older exports: Seattle reads as SEA (the owner, 11 October 2026). Any other city name is stored as exported, with no map, so its rows join a fielding row only under the same form |
 
 ### Invariants
 
@@ -297,7 +297,7 @@ The league sortable files reuse these headers: at Game 42 the league batting\_su
 
 - A snapshot keeps four tables: team hitters, team pitchers, league hitters and league pitchers, with one row per player and one column per dictionary column. Every file of the snapshot fills them, and a player's row merges every file that lists him.
 - Team rows join on Name; jersey number is a cross-check.
-- League batting rows join on team plus name. A league batting file without TM takes each row's team from the snapshot's other league batting rows with that name; a name with no single team is flagged and left out. League pitching rows join on name, and a name listed twice in one file is flagged and left out.
+- League batting rows join on team plus name. A league batting file without TM takes each row's team from the snapshot's other league batting rows with that name, never from the fielding view's rows; a name with no single team is flagged and left out. League pitching rows join on name, and a name listed twice in one file is flagged and left out.
 - Parts combine: a filtered export (starters, relievers or qualified players only) adds its rows, and a row repeated in two files merges into one.
 - A name can appear on both sides when a position player pitches or a pitcher bats; each side keeps its own record.
 - Hitter age comes from the bio view; pitcher age from the bio view or cus\_pitch\_pot.
@@ -794,7 +794,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 - [ ] The catcher's run scale: zone rating barely moves with a catcher's rating, and framing runs are near zero at this point of the season. The 8 runs per 10 points is a placeholder to re-check at season end.
 - [ ] Should fielding become a sixth data set for coverage, and get percentiles? Both wait for the fielding view to be imported.
 - [ ] Current per-position ratings (the columns without Pot) aren't exported yet. With them, the inexperience discount would be read from the view instead of assumed.
-- [ ] Team names come in two forms, the city in the batting views and the abbreviation in the fielding view. A map between them, learned from a view that carries both or set by the owner, would let the fielding and batting rows of one snapshot join.
+- [x] Team names come in two forms, the city in the batting views and the abbreviation in the fielding view. Answered: every export uses the short code from now on, and the importer reads Seattle in the Game 42 and Game 53 exports as SEA, with no other map (the owner, 11 October 2026).
 
 ## Delivery plan
 
@@ -814,7 +814,7 @@ Phase gates close in order. Inside a phase, modules follow the Depends on column
 | League file import with name-join rules and duplicate flags | 4, 5 | 2 | Value parsers | 214 hitter rows and 446 pitcher rows load; zero-appearance rows drop |
 | Scale conversion | 7 | 2 | Value parsers | Round-trip tests between 1–10 and 20–80 |
 | Column-dictionary import: four tables per snapshot, parts and re-exports merged cell by cell, coverage by data set | 4, 5 | 4 | Fixtures | Game 42 and Game 53 assemble from their files in any combination; the overlap files change nothing; coverage is High for both |
-| Fielding-view import: its columns in the dictionary, fielding counts kept apart from batting and pitching, rows placed by POS | 4, 5 | 4 | Column-dictionary import | The fielding fixtures read completely, 12 team and 508 league rows; Game 42 and Game 53 unchanged |
+| Fielding-view import: its columns in the dictionary, fielding counts kept apart from batting and pitching, rows placed by POS | 4, 5 | 4 | Column-dictionary import | The fielding fixtures read completely, 12 team and 508 league rows; Game 42 and Game 53 unchanged but for Seattle's TM, which reads SEA |
 | Metrics: pass-through, BACON, luck gaps against each pair's baseline | 6 | 4 | Team store | Fixture BACON and each pair's baseline match section 6 |
 | Percentiles: usage-based pools, floors, directions, mid-rank formula | 8 | 4 | League file import | Pools of 214, 151 and 260; 144 starters and 218 relievers after floors |
 | Talent estimator v0 | 7 | 4 | Metrics, scale conversion | Every fixture player gets an estimate and band; disagreements over one step are flagged |

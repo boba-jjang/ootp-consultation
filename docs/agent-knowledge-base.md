@@ -569,11 +569,11 @@ The shares are the standardized contributions of a straight-line fit of each pos
 ### Eligibility matrix
 
 - Rows are players; columns are C, 1B, 2B, 3B, SS, LF, CF and RF, plus DH, which anyone can fill.
-- The played position uses DEF, with DEF Pot as its ceiling.
+- The played position uses DEF, with DEF Pot as its ceiling. It is the POS of the player's fielding-view row where the view is on file, and the roster POS otherwise, which can name another position: at Game 53 Shinn's DEF is his first-base rating while the roster lists him in left.
 - Every other position uses the game's potential rating from the fielding view, less one step for inexperience. Without the fielding view, it uses the component formula above, less one step. Both are held to the scale.
 - Ineligible: "-" in the fielding view; without it, a formula result below 1, or no catcher ratings at C. A flagged position (the floors above) is excluded only when configured.
-- Runs at a position: (rating on 20–80 − 50) ÷ 10 × the position's runs per 10 points, plus the player's exported arm runs where the fielding view has them. The matrix produces these fielding-run estimates for the lineup optimizer.
-- Runs are stated per season, not per 150 games: the 150-game rate times the team's games per season over 150. Games per season is a team setting (152 in the RSL, playoffs excluded). A player's own zone rating, shown beside the estimate as a check, is scaled the same way from his innings and counts only past an innings floor, so a 70-game export and a full season read alike.
+- Runs at a position: (rating on 20–80 − 50) ÷ 10 × the position's runs per 10 points, plus, at the played position, the player's exported arm runs (ARM) where the fielding view has them. The runs per 10 points come from zone rating alone, so arm runs add without counting twice. The matrix produces these fielding-run estimates for the lineup optimizer.
+- Runs are stated per season, not per 150 games: the 150-game rate times the team's games per season over 150. Games per season is a team setting (152 in the RSL, playoffs excluded). A player's own zone rating, shown beside the estimate as a check, is scaled the same way from his innings, as are his arm runs, and both count only past an innings floor (200 innings, the floor of the runs fit; a setting), so a 70-game export and a full season read alike.
 - Every constant is a setting, fitted on the league's fielding export and refitted when a new one arrives.
 
 ## Strategy rules
@@ -818,7 +818,7 @@ Phase gates close in order. Inside a phase, modules follow the Depends on column
 | Metrics: pass-through, BACON, luck gaps against each pair's baseline | 6 | 4 | Team store | Fixture BACON and each pair's baseline match section 6 |
 | Percentiles: usage-based pools, floors, directions, mid-rank formula | 8 | 4 | League file import | Pools of 214, 151 and 260; 144 starters and 218 relievers after floors |
 | Talent estimator v0 | 7 | 4 | Metrics, scale conversion | Every fixture player gets an estimate and band; disagreements over one step are flagged |
-| Defensive model and eligibility matrix | 9 | 4 | Scale conversion, fielding-view import | Every slot covered, DH included; non-catchers ineligible at C; DEF Pot caps the played position; the matrix reads the fielding fixtures' position ratings as the game gives them, and the fitted formula lands within one step of them for 95% of league players |
+| Defensive model and eligibility matrix | 9 | 4 | Scale conversion, fielding-view import | Every slot covered, DH included; non-catchers ineligible at C; DEF Pot caps the played position; the matrix reads the fielding fixtures' position ratings as the game gives them, and the fitted formula, rounded to a step and held to the scale, lands within one step of the game's rating for 95% of the league's position ratings (98.6% of 2,413 on the Game 70 export; first base is lowest, at 94.7%) |
 | Strategy rules engine | 10 | 4 | Talent estimator, defensive model | Gates read from configuration; the fixture yields a moderate shift |
 | Lineup selection with the assignment model | 11 | 4 | Talent estimator, defensive model | A legal nine on the fixture, with CF and DH filled when enabled |
 | Batting order: Markov model with The Book fallback | 11 | 4 | Lineup selection | Run expectancy matches a hand-computed toy lineup |

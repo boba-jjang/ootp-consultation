@@ -141,6 +141,7 @@ The user exports these from the team's screens (Lineups overview, Pitching), one
 | Custom batting superstats (Game 53, 56 columns) | Hitters | Both batting superstats views in one, plus batting and baserunning run values (BatR, BsR), swing counts (SW, WH, OSW, CH) and pitches completely out of the zone (ZX) |
 | Custom pitching stats (Game 53, 61 columns, from the Pitching screen) | Pitchers | Both pitching stats views in one, plus save opportunities, blown-save rate, the opponents' line (AB, 1B, 2B, 3B, TB, OBP, SLG, OPS), BRA/9, H/9, K%, BB%, K%-BB%, sacrifices, wild pitches, inherited runners scored, LOB%, FIP- and rWAR. It leaves out the usage columns SD, MD, RA, GF, QS, QS%, CG, CG%, SHO, PPG, RSG, GO%, SB and CS |
 | Custom pitching superstats (Game 53, 46 columns) | Pitchers | Both pitching superstats views in one, plus infield and bunt hits, batted-ball direction, launch angle and ZX. It leaves out CH and the run values |
+| Custom fielding (61 columns, from the Fielding screen; a later snapshot than Game 53) | Hitters and pitchers, each row by POS | Height, handedness, every fielding component, DEF and DEF Pot at the played position, the game's potential rating at each of the eight positions (P Pot to RF Pot), and fielding stats: games, innings, chances, assists, putouts, errors, double plays, fielding percentage, range factor, zone rating, efficiency, stolen-base attempts and runners thrown out, passed balls, catcher's ERA, balls in zone by difficulty, framing runs and arm runs |
 
 Run on the hitters, cus\_pitch\_pot becomes a supplemental capture: only its DEF Pot column is used, as the hitters' DEF ceiling (section 9).
 
@@ -154,19 +155,21 @@ The user exports these from the league's player statistics screen, in any view, 
 | Pitching superstats 1 and 2 (Game 42) | Every listed pitcher: 446, including 31 with no appearances and 4 position players | No team column, so rows match on name; the app applies its own sample floors (section 8) |
 | Custom batting stats and superstats (Game 53) | Qualified hitters: 199 | Standard stats, wRC+ and wRAA, and every superstats column. The superstats file carries TM and the stats file doesn't, so stats rows take their team from the superstats rows |
 | Custom pitching stats and superstats (Game 53) | Every listed pitcher, in two parts by listed position: 246 starters and 212 relievers, 458 in all and 426 with appearances | A league row's POS can differ from the team's listing: one Seattle hitter is 2B on the team and CF in the league files |
+| Custom fielding (the same later snapshot) | Every player with fielding time: 508, including 11 who only DH and 6 pitchers | POS is the position each player currently plays, not the roster listing (the owner confirmed Shinn at 1B and Geng in CF); DEF, DEF Pot and the stats refer to it. FRM and ARM are near zero for everyone at this point of the season |
 
 ### Sample data set
 
-- One team, the Seattle Arrows of the RSL, at two points in one season. These files are the test fixtures.
+- One team, the Seattle Arrows of the RSL, at three points in one season. These files are the test fixtures.
   - Game 42 (`fixtures/seattle-g42/`): 12 hitters, 13 pitchers, 11 team views in OOTP's own layouts, and four league files.
   - Game 53 (`fixtures/seattle-g53/`): 12 hitters (two of them new) and the same 13 pitchers, in the owner's custom views, with league standard stats and a bio view that lists both sides.
+  - A later fielding export: the team's 12 hitters and the league's 508 fielders in the owner's custom fielding view, with heights (section 9).
 - The league files come from the same snapshot as the team's, and the team's rows match the team views, apart from one league position at Game 53.
 - The league rates players on a 1–10 scale and hides current batting and pitching ratings.
 
 ### Not yet used
 
 - OOTP database dumps: full league tables keyed by player ID, including ratings (later, per section 2).
-- Opponent rosters, handedness splits, per-position ratings, league totals over every player (the league batting files list qualified hitters only), park factors and injury proneness. None has been provided, so the app treats them as unavailable (section 14). League standard stats and a pitcher bio view arrived with Game 53.
+- Opponent rosters, handedness splits, league totals over every player (the league batting files list qualified hitters only), park factors and injury proneness. None has been provided, so the app treats them as unavailable (section 14). Per-position ratings, once on this list, arrived with the fielding view (section 9).
 
 ## Import contract
 
@@ -183,6 +186,7 @@ The importer reads any CSV column by column through the column dictionary, fills
   - HLD is the hold-runners rating in a file with pitching potentials, and holds elsewhere.
   - Avg% in hitters' files and Med% in pitchers' are the same middle contact bucket, one canonical Med%.
   - Batting and pitching columns that share a name (K, BB, HR, H, R, AVG, OBP, SLG, BABIP, SB, CS, HP, WAR, WPA and the superstats columns) mean the hitter's own result in a hitters' file and the result allowed in a pitchers' file. Each side's table keeps its own.
+  - In a fielding file (one with TC, ZR or EFF), G, GS, IP, E, A, PO, DP and PCT are fielding counts, canonical Fielding G, Fielding GS, Fielding IP (as outs, like IP), Fielding E, Fielding A, Fielding PO, Fielding DP and Fielding PCT, never the batting or pitching ones. Its ARM is arm runs and its RNG is range factor, apart from IF ARM, OF ARM, IF RNG and OF RNG. Its DEF Pot is the hitters' DEF Pot, as in the capture.
 
 ### Known views
 
@@ -212,8 +216,9 @@ The league sortable files reuse these headers: at Game 42 the league batting\_su
 
 - A file's side comes from its columns. Columns only one side's views carry mark the side: PA, RBI, wOBA, OPS+, TM, Avg%, the batting potentials and the fielding components for hitters; IP, BF, ERA, xERA, Med%, the pitching potentials, STM and VELO for pitchers. The dictionary lists every marker. A file with markers from both sides is rejected.
 - A file with no marker, such as the bio view or a pitching swing-decisions file, takes its side from its rows' POS: in a team file each row by its own POS, and in a league file every row by the side most rows list.
+- A fielding file (TC, ZR or EFF present) lists both sides and places every row by its POS, team or league: its hitter-only columns don't mark it, and its IP, DP and DEF Pot aren't pitching markers there.
 - In a team file with a side, a row from the other side is left out and logged, with one exception: the pitching ratings view run on hitters supplies those hitters' DEF Pot, their DEF ceiling (section 9).
-- In a league file, every row goes to the file's side, even when its POS is from the other side: league pitching files list position players who pitched, and league batting files can list a pitcher who batted.
+- In a league file, every row goes to the file's side, even when its POS is from the other side: league pitching files list position players who pitched, and league batting files can list a pitcher who batted. A fielding file is the exception: its rows go by POS.
 - Scope: a TM column with more than one team makes a league file, and one team a team file. Without TM, OOTP's league or team file prefix decides; failing both, a file with more than 60 rows is a league file (a setting).
 
 ### Columns that need special handling
@@ -258,6 +263,11 @@ The league sortable files reuse these headers: at Game 42 the league batting\_su
 | ZX | The view editor's Misses: pitches completely out of the zone | None |
 | wRC, wRC+, FIP-, BRA/9, H/9 | Weighted runs created and its league-adjusted index; FIP indexed to the league (100 is average, lower is better); baserunners and hits per nine innings | None |
 | POS in league files | A league row can show a different position from the team's listing (one Seattle hitter: 2B on the team, CF in the league files) | Each table keeps its own; team and league POS are never compared |
+| G, GS, IP, E, A, PO, DP, PCT in a fielding file | Fielding counts under batting and pitching names, in a file with TC, ZR or EFF | Canonical Fielding G, Fielding GS, Fielding IP (outs, like IP) and so on (Column dictionary); never merged with the batting or pitching columns |
+| P Pot, C Pot, 1B Pot, 2B Pot, 3B Pot, SS Pot, LF Pot, CF Pot, RF Pot | The game's potential rating at each position, on the league's scale; "-" where he can't play there | A rating, stored on 20–80; "-" stays null and means ineligible |
+| ZR, EFF, FRM, ARM, RNG | Zone rating in runs ("-0.0" occurs), efficiency without a leading zero (".979"), framing runs, arm runs, range factor | Parse as float; "-0.0" is 0 |
+| BIZ-R%, BIZ-L%, BIZ-E%, BIZ-U%, BIZ-Z% | Share of the balls in each zone bucket that were fielded, with the sign (94.7%) | Strip the sign, divide by 100 |
+| RTO% | Runners thrown out, a percent without the sign (28.6) | Divide by 100 |
 
 ### Enumerations
 
@@ -329,6 +339,8 @@ Use OOTP's exported metrics where they exist and compute only what's missing. Fr
 | xERA | Exported | Expected ERA from contact quality allowed |
 | Run values | Exported | Results-based: in the sample, the staff's best RV belonged to its weakest strikeout pitcher |
 | Luck gaps | Derived | wOBA − xwOBA, BACON − xBACON, ERA − FIP, ERA − xERA, HR/FB against barrel rate |
+| ZR, EFF | Exported (fielding view) | Zone rating in runs above average, and defensive efficiency; the defensive model's run scale is fitted on ZR per 150 games (section 9) |
+| FRM, ARM | Exported (fielding view) | Catcher framing runs and arm runs; near zero for everyone in the sample at this point of the season |
 
 ### Formulas
 
@@ -521,42 +533,47 @@ P_i = 100 \times \frac{\#\{j : v_j \text{ worse than } v_i\} + \tfrac{1}{2}\,\#\
 
 - Game 42's league batting file lacks the contact-only expected stats (xBACON, xSLGCON, xwOBACON), so hitters get no league percentiles for them there; Game 53's league files carry them.
 - Game 53's league files carry standard stats (K%, BB%, wOBA and the rest), but the directions table covers superstats only, so there are no standard-stat percentiles yet. Adding them is a later decision.
+- The fielding view's ZR, EFF, FRM and ARM have no percentiles yet; they would need innings floors by position. A later decision.
 
 ## Defensive model
 
-Defensive decisions read the fielding components. DEF covers only the listed position and can hide differences that matter, such as framing.
+Defensive decisions read the game's position ratings where the fielding view is on file, and the fielding components where it isn't. DEF covers only the position the player plays and can hide differences that matter, such as framing.
 
 ### What drives each position
 
-Weights come from the research, which took them from community reverse-engineering (OOTP Calculator, Reddit spreadsheets). Store them as configuration.
+The game rates every player at every position, and the fielding view exports those ratings. Where the view is on file, the app reads them. Where it isn't, it estimates them from the components with the weights below, fitted to the league's fielding export. The research's tiers (OOTP Calculator, Reddit spreadsheets) agree with the fit on what matters most at each position, except that range, not height, leads at first base, and the three catcher components weigh about the same.
 
-| Position | Critical | Secondary | Tertiary | Low impact | Neutral floor |
-| --- | --- | --- | --- | --- | --- |
-| C | Framing | Ability (stands in for blocking), arm | Error | Range, turn DP | Not stated |
-| 1B | Player height | Error | Range | Arm, turn DP | Defense worth only 1.0–1.5 WAR from 30 to 80 grade |
-| 2B | Range (about 60–70% of the weight) | Turn DP | Error | Arm | Not stated |
-| 3B | Arm, must be elite | Range | Error | Turn DP | Not stated |
-| SS | Range, must be elite | Arm | Turn DP | Error | Range 60–65 (7–8 on 1–10) |
-| LF | Range | Error | Arm | Turn DP | Not stated |
-| CF | Range, very heavily weighted | Error | Arm | Turn DP | Range 60–65 (7–8 on 1–10) |
-| RF | Range | Arm, must be elite | Error | Turn DP | Not stated |
+| Position | Rating from the components (share of the fit) | Runs per 10 rating points, per 150 games | Flag |
+| --- | --- | --- | --- |
+| C | Arm .35, framing .33, blocking (C ABI) .32 | 8, a placeholder: zone rating barely moves with the rating (0.8), and framing runs are near zero so far | None stated |
+| 1B | Range .58, error .25, height .15 (0.2 rating points per inch), arm and turn DP under .02 | 2.4 | None |
+| 2B | Range .44, turn DP .29, error .22, arm .05 | 6.6 | None |
+| 3B | Arm .38, error .28, range .24, turn DP .11 | 7.4 | None |
+| SS | Range .36, arm .22, turn DP .22, error .20 | 8.6 | Range below 7 |
+| LF | Range .71, arm .15, error .14 | 5.0 | None |
+| CF | Range .72, arm .17, error .11 | 8.8 | Range below 7 |
+| RF | Range .60, arm .30, error .10 | 7.1 | None |
+
+The shares are the standardized contributions of a straight-line fit of each position's potential rating on the components, over the 508 players of the league's fielding export; the fit explains 91% of the game's first-base ratings and 94–97% elsewhere. The game shows "-" where its rating falls below 1, with hard floors on top: an arm of 1 bars 2B, 3B and SS even with range 8. The runs come from zone rating per 150 games regressed on the current rating at the played position, 30 to 45 players per position with 200 or more innings (r .4–.7); arm runs (ARM) add to zone rating where the view carries them. Every number here is a setting, refitted when a new fielding export arrives.
 
 ### DEF, DEF Pot and components
 
-- DEF is the current rating at the listed position; DEF Pot is its ceiling. For pitchers, the position is P.
-- DEF can't be rebuilt from components. In the sample, a left fielder with better range and arm than a teammate rated 6 sat at DEF 3, with DEF Pot 5: the gap is experience at the position.
+- DEF is the current rating at the position the player currently plays, which the fielding view's POS names and the roster's POS may not: at the fielding export Shinn is listed LF but plays 1B, and Geng 2B but plays CF. DEF Pot is its ceiling there. For pitchers, the position is P.
+- The fielding view carries the game's potential rating at each of the eight positions (C Pot to RF Pot, and P Pot), with "-" where he can't play there. At the played position it equals DEF Pot for every one of the league's 490 fielders.
+- The gap between DEF and DEF Pot is experience at the position. Across the league it is zero for 462 of 490 fielders, one step for 25, two for 2 and six for 1. At Game 42 a left fielder with better range and arm than a teammate rated 6 sat at DEF 3, with DEF Pot 5.
 - DEF can hide framing. Two sample catchers both showed DEF 7 while framing at 9 and 7.
 - OOTP 27 exports have no separate blocking rating, so blocking logic keys off C ABI.
-- Non-catchers carry 1 in every catcher column, which means "can't catch".
+- Non-catchers carry 1 in every catcher column, which means "can't catch"; the fielding view shows "-" at C for them.
 - The research says range declines from the early 30s, and a faster aging setting speeds that up.
 
 ### Eligibility matrix
 
 - Rows are players; columns are C, 1B, 2B, 3B, SS, LF, CF and RF, plus DH, which anyone can fill.
-- The listed position uses DEF, with DEF Pot as its ceiling.
-- Every other position uses a component-based ceiling from the weights above, discounted for inexperience, since per-position ratings aren't available.
-- A player without catcher ratings is ineligible at C. A critical component below its neutral floor is flagged, and excluded only when configured.
-- The matrix produces the fielding-run estimates the lineup optimizer uses.
+- The played position uses DEF, with DEF Pot as its ceiling.
+- Every other position uses the game's potential rating from the fielding view, less one step for inexperience. Without the fielding view, it uses the component formula above, less one step. Both are held to the scale.
+- Ineligible: "-" in the fielding view; without it, a formula result below 1, or no catcher ratings at C. A flagged position (the floors above) is excluded only when configured.
+- Runs per 150 games at a position: (rating on 20–80 − 50) ÷ 10 × the position's runs per 10 points, plus the player's exported arm runs where the fielding view has them. The matrix produces these fielding-run estimates for the lineup optimizer.
+- Every constant is a setting, fitted on the league's fielding export and refitted when a new one arrives.
 
 ## Strategy rules
 
@@ -733,7 +750,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 | Import path | Screen-view exports first; OOTP database dumps later |
 | Rating scale | Varies by league; an approximate conversion to 20–80 is fine |
 | Shared headers | Columns such as CON P and HLD resolve by view: the same header can mean different things in different views |
-| DEF semantics | DEF is the rating at the listed position; DEF Pot is its ceiling, at P for pitchers |
+| DEF semantics | DEF is the rating at the position the player currently plays, which the fielding view's POS names; DEF Pot is its ceiling, at P for pitchers; the fielding view adds the potential at every position (11 October 2026) |
 | Hidden current ratings | The app estimates current batting and pitching ratings |
 | Development risk | Replaces a fixed age cut in the estimator; age is only the fallback |
 | Percentile pools | Pitchers split into starters and relievers, closers with relievers |
@@ -745,6 +762,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 | League scope | League sortable exports and percentiles are in v1: the league files import with the team views in Phase 2, and percentiles arrive with the Phase 4 models |
 | Import | Any CSV, in any view (OOTP's or custom) and under any file name: columns map through the column dictionary into one table per side and scope, and files merge cell by cell (7 October 2026) |
 | Talent estimator | Prior from the potential and development risk; evidence as league z-scores at 50 + 10 points per SD, weighted n ÷ (n + k) with k = 0.43 × the stabilization point × the risk and stance multipliers; flagged past half a step (8 October 2026) |
+| Defensive model | Position ratings read from the fielding view where it's on file, else a component formula fitted to the league's fielding export; runs per 10 rating points per 150 games fitted on zone rating by position; one step off at an unlisted position; the catcher's runs a placeholder (11 October 2026) |
 
 ### Assumptions
 
@@ -756,7 +774,9 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 | Scale mapping | Linear between scale ends | 7 |
 | Risk tiers | Starting points and bands per tier | 7 |
 | Stabilization points | Approximate MLB values | 6 |
-| Positional weights and slider gates | Research values | 9, 10 |
+| Positional weights and slider gates | Weights fitted to the league's fielding export; slider gates from the research | 9, 10 |
+| Inexperience discount | One step below the potential at an unlisted position | 9 |
+| Catcher runs | 8 per 10 rating points, until framing runs accumulate | 9 |
 
 ### Open questions
 
@@ -767,9 +787,12 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 - [x] Hosting split: GitHub Pages, Vercel, or both with a defined role for each? Answered: Vercel hosts the app and the advisor function; GitHub holds the source and runs CI (implementation plan).
 - [x] Which scout's view do the exports use, the head scout or OSA? Development risk can differ between them. Answered: OSA. The scouting staff is disabled, so every export shows the same OSA view.
 - [ ] Does the league merge stats into scouting reports? If so, the estimator weights stats less.
-- [x] Does the view editor offer per-position ratings and handedness splits? Answered: neither has been provided, so both are treated as unavailable (sections 9–11).
+- [x] Does the view editor offer per-position ratings and handedness splits? Answered: per-position potential ratings come in the fielding view (section 9), since 11 October 2026; handedness splits still haven't been provided and stay unavailable (sections 10–11).
 - [x] Re-export the pitching ratings view with the staff listed, to get pitchers' work ethic, IQ and risk. Done: the staff cus\_pitch\_pot, the latest upload of that view, carries work ethic, IQ and risk for all 13 pitchers and is treated as part of the same snapshot.
 - [x] Can league standard stats and totals be exported, for wRC+, xFIP, luck baselines and standard-stat percentiles? Answered: from Game 53 the owner exports them through custom league views (qualified hitters, every pitcher), with wRC+ and wRAA. League totals over every player and park factors stay unavailable, and xFIP takes league HR/FB from the league pitching file.
+- [ ] The catcher's run scale: zone rating barely moves with a catcher's rating, and framing runs are near zero at this point of the season. The 8 runs per 10 points is a placeholder to re-check at season end.
+- [ ] Should fielding become a sixth data set for coverage, and get percentiles? Both wait for the fielding view to be imported.
+- [ ] Current per-position ratings (the columns without Pot) aren't exported yet. With them, the inexperience discount would be read from the view instead of assumed.
 
 ## Delivery plan
 
@@ -789,10 +812,11 @@ Phase gates close in order. Inside a phase, modules follow the Depends on column
 | League file import with name-join rules and duplicate flags | 4, 5 | 2 | Value parsers | 214 hitter rows and 446 pitcher rows load; zero-appearance rows drop |
 | Scale conversion | 7 | 2 | Value parsers | Round-trip tests between 1–10 and 20–80 |
 | Column-dictionary import: four tables per snapshot, parts and re-exports merged cell by cell, coverage by data set | 4, 5 | 4 | Fixtures | Game 42 and Game 53 assemble from their files in any combination; the overlap files change nothing; coverage is High for both |
+| Fielding-view import: its columns in the dictionary, fielding counts kept apart from batting and pitching, rows placed by POS | 4, 5 | 4 | Column-dictionary import | The fielding fixtures read completely, 12 team and 508 league rows; Game 42 and Game 53 unchanged |
 | Metrics: pass-through, BACON, luck gaps against each pair's baseline | 6 | 4 | Team store | Fixture BACON and each pair's baseline match section 6 |
 | Percentiles: usage-based pools, floors, directions, mid-rank formula | 8 | 4 | League file import | Pools of 214, 151 and 260; 144 starters and 218 relievers after floors |
 | Talent estimator v0 | 7 | 4 | Metrics, scale conversion | Every fixture player gets an estimate and band; disagreements over one step are flagged |
-| Defensive model and eligibility matrix | 9 | 4 | Scale conversion | Every slot covered, DH included; non-catchers ineligible at C; DEF Pot caps the listed position |
+| Defensive model and eligibility matrix | 9 | 4 | Scale conversion, fielding-view import | Every slot covered, DH included; non-catchers ineligible at C; DEF Pot caps the played position; the matrix reads the fielding fixtures' position ratings as the game gives them, and the fitted formula lands within one step of them for 95% of league players |
 | Strategy rules engine | 10 | 4 | Talent estimator, defensive model | Gates read from configuration; the fixture yields a moderate shift |
 | Lineup selection with the assignment model | 11 | 4 | Talent estimator, defensive model | A legal nine on the fixture, with CF and DH filled when enabled |
 | Batting order: Markov model with The Book fallback | 11 | 4 | Lineup selection | Run expectancy matches a hand-computed toy lineup |
@@ -850,6 +874,10 @@ Tasks that depend on an open question (section 14) carry it in their charter and
 | xFIP | FIP with home runs replaced by league HR/FB × fly balls |
 | Z%, ZS%, OS% | Zone rate; swing rate on pitches in the zone; swing rate on pitches outside it, the chase rate (Zone%, Z-Swing% and O-Swing%) |
 | ZX | The view editor's Misses: pitches completely out of the zone |
+| ZR, EFF | Zone rating, runs above average on balls in zone; defensive efficiency, plays made over balls in zone plus errors, 1.000 being average |
+| BIZ-R, BIZ-L, BIZ-E, BIZ-U, BIZ-Z, BIZ-I | Balls in zone by difficulty: routine, likely, even, unlikely, remote and impossible, each with the number fielded (m) and the share fielded (%) |
+| FRM, ARM | Catcher framing runs; arm runs |
+| RNG, TC, PCT, CER, CERA, PB, RTO, SBA | Range factor, total chances, fielding percentage, catcher earned runs and ERA, passed balls, runners thrown out, stolen-base attempts |
 
 ### Ratings and game terms
 
@@ -881,3 +909,5 @@ Tasks that depend on an open question (section 14) carry it in their charter and
 | TCR | Talent change randomness, a league setting for random talent swings |
 | VELO, VT | Velocity now; velocity potential |
 | WE, INT | Work ethic; intelligence (baseball IQ) |
+| C Pot to RF Pot, P Pot | The game's potential rating at each position; "-" means he can't play there |
+| Fielding view | The owner's custom view from the Fielding screen: components, DEF, position potentials and fielding stats, for the team and the league |

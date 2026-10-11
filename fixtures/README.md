@@ -1,9 +1,10 @@
 # Fixtures
 
-Real Out of the Park Baseball exports for the Seattle Arrows of the RSL, from two points in one season:
+Real Out of the Park Baseball exports for the Seattle Arrows of the RSL, from three points in one season:
 
 - `seattle-g42/`, the Game 42 save: the most games any hitter has played is 42, and the team's record is 25–19.
 - `seattle-g53/`, the Game 53 save.
+- `seattle-g70/`, the fielding view at about game 70.
 
 They are the golden test data for the importer and the models. Every file is stored byte for byte as exported (`.gitattributes` keeps their CRLF line endings), so never edit one by hand. Keep the file names: the importer records the name for provenance. They are the names OOTP gave each export, with two exceptions:
 
@@ -106,6 +107,23 @@ Exports that repeat rows already in the snapshot, row for row. Uploading them al
 - The league stats and superstats files list the same players: 199 hitters, 246 starters and 212 relievers.
 - Seattle's rows in the league files match the team files cell for cell, with one exception: Zhong-shan Geng is 2B in the team files and CF in the league files. 3 of the 12 hitters qualify for the league batting files (Han-lee Choi, Manichiro Kawasaki, Geng); the 13 pitchers are in the league pitching files, 5 starters and 8 relievers.
 - Ratings changed since Game 42 for four players: Hajime Ito's STU P 9 → 8, Hideji Yamanaka's DEF 3 → 4, Yoshitsugu Ishida's TDP 4 → 3 and Kiyohiro Kaneshiro's HLD 7 → 8.
+
+## seattle-g70/
+
+The owner's custom fielding view, exported from the Fielding screen at about game 70 (69 to 71, by team) on a different PC from the other exports: LF line endings and the owner's file names. No batting view came with it, so the snapshot has no game label; in the app it joins a snapshot through Add data's choice of which snapshot to add to.
+
+| File | Rows × columns | Notes |
+| --- | --- | --- |
+| `seattle-height.csv` | 12 × 61 | The team's 12 hitters: height, handedness, every fielding component, DEF and DEF Pot at the played position, the potential rating at each position (P Pot to RF Pot, "-" where he can't play there) and fielding stats (games, innings, chances, assists, putouts, errors, double plays, fielding percentage, range factor, zone rating, efficiency, balls in zone by difficulty, catcher stats, framing runs, arm runs). POS is the roster listing: Shinn LF and Geng 2B |
+| `rsl-team-fielding.csv` | 508 × 62 | The league's fielders, the same columns plus TM. POS is the position each player plays now (Shinn 1B, Geng CF); DEF, DEF Pot and the stats refer to it. 11 rows are DH only and 6 are pitchers. TM is the abbreviation (SEA), where the batting views give the city; 58 codes appear, the 30 big-league teams with 13 to 19 players each and minor-league affiliates with 1 to 5 |
+
+The importer rejects both today as `both-sides`: the fielding components read as hitters' markers and DEF Pot, DP and IP as pitchers', with 41 columns unknown. The fielding-view import teaches it this view; until then the three fixture walkers skip this folder.
+
+### Checks already run on seattle-g70/
+
+- Every row of `rsl-team-fielding.csv` matches the owner's first export of the view, without TM, on every shared column.
+- At the played position, the position-potential column equals DEF Pot for all 490 fielders with one.
+- The position potentials fit the fielding components with R² .91 at first base (with height) and .94 to .97 elsewhere (Knowledge Base › Defensive model).
 
 ## legacy/
 

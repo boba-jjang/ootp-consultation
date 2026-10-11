@@ -135,9 +135,10 @@ const PITCHER_MARKERS = [
 
 const HITTER_POSITIONS = new Set(['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH']);
 
+// seattle-g70/ is the fielding view; the fielding-view import adds its columns to the dictionary.
 const fixturePaths = () =>
   readdirSync(FIXTURES, { recursive: true, encoding: 'utf8' })
-    .filter((file) => file.endsWith('.csv'))
+    .filter((file) => file.endsWith('.csv') && !file.startsWith('seattle-g70/'))
     .map((file) => file.replaceAll('\\', '/'))
     .sort();
 

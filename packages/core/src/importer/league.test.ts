@@ -126,9 +126,9 @@ describe('importLeague on the game-53 league files (parts combine)', () => {
 
   it('gives the stats rows, which have no TM, the team of the superstats row by name', () => {
     expect(named(league.hitters, 'Manichiro Kawasaki')).toEqual([
-      expect.objectContaining({ TM: 'Seattle', POS: '3B', 'wRC+': 128, wRAA: 9 }),
+      expect.objectContaining({ TM: 'SEA', POS: '3B', 'wRC+': 128, wRAA: 9 }),
     ]);
-    expect(league.hitters.filter((row) => row.TM === 'Seattle').map((row) => row.Name)).toEqual([
+    expect(league.hitters.filter((row) => row.TM === 'SEA').map((row) => row.Name)).toEqual([
       'Han-lee Choi',
       'Manichiro Kawasaki',
       'Zhong-shan Geng',
@@ -261,5 +261,87 @@ describe('importLeague joins and parts (hand-built)', () => {
     expect(importLeague(files).events).toContainEqual(
       expect.objectContaining({ code: 'duplicate-name', file: first.name, scope: 'league' }),
     );
+  });
+});
+
+describe('importLeague with the fielding view (Knowledge Base › Import contract › Joins and snapshots)', () => {
+  const G70_TEAM = 'seattle-g70/seattle-height.csv';
+  const G70_LEAGUE = 'seattle-g70/rsl-team-fielding.csv';
+  const league = importLeague([G70_TEAM, G70_LEAGUE].map(routeFixture));
+
+  it('places the league file’s rows by POS: 502 hitters keyed on team plus name, 6 pitchers', () => {
+    expect(league.hitters).toHaveLength(502);
+    expect(league.pitchers).toHaveLength(6);
+    expect(league.events).toEqual([]);
+    expect(league.hitters.filter((row) => row.TM === 'SEA')).toHaveLength(13);
+    expect(league.hitters.find((row) => row.Name === 'Jin-soo Shinn')).toMatchObject({
+      TM: 'SEA',
+      POS: '1B',
+    });
+  });
+
+  it('does not take the team file’s TM-less rows into the league tables', () => {
+    expect(league.hitters.filter((row) => row.Name === 'Yoshitsugu Ishida')).toHaveLength(1);
+  });
+
+  it('keeps every hitter’s team when a TM-less Game 53 batting file comes beside the fielding view', () => {
+    const g53 = fixtureFiles('seattle-g53/').map(routeFixture);
+    const batting = g53.filter((file) => file.scope === 'league' && file.side === 'hitters');
+    const withTeam = batting.filter((file) => file.rows.every((row) => typeof row.TM === 'string'));
+    const withoutTeam = batting.filter((file) => file.rows.some((row) => row.TM === undefined));
+    expect(withoutTeam.length).toBeGreaterThan(0);
+    const fielding = routeFixture(G70_LEAGUE);
+    const joined = importLeague([...withoutTeam, fielding, ...withTeam]);
+    expect(joined.events.filter((event) => event.code === 'ambiguous-team')).toEqual([]);
+    for (const row of joined.hitters) {
+      expect(typeof row.TM, playerKey(row)).toBe('string');
+    }
+    // Each Seattle hitter has one league row, batting and fielding merged.
+    const seattle = joined.hitters.filter((row) => row.TM === 'SEA' && 'wRC+' in row);
+    expect(seattle.map((row) => row.Name).sort()).toEqual(
+      ['Han-lee Choi', 'Manichiro Kawasaki', 'Zhong-shan Geng'].sort(),
+    );
+    for (const row of seattle) {
+      expect(joined.hitters.filter((other) => playerKey(other) === playerKey(row))).toHaveLength(1);
+    }
+  });
+
+  it('takes the team of a TM-less batting row only from non-fielding league files', () => {
+    const batting = routeExport(
+      'rsl_statistics_player_statistics_-_sortable_stats_a.csv',
+      'POS,Name,wOBA\r\nSS,Ann Lee,.300',
+    );
+    const fielding = routeExport(
+      'f.csv',
+      'POS,Name,TM,TC\r\nSS,Ann Lee,BOS,30\r\nSS,Bo Kim,SEA,20',
+    );
+    const unfielded = routeExport(
+      'rsl_statistics_player_statistics_-_sortable_stats_b.csv',
+      'POS,Name,TM,PA\r\nSS,Ann Lee,Boston,100',
+    );
+    const result = importLeague([batting, fielding, unfielded]);
+    expect(
+      result.hitters
+        .filter((row) => row.Name === 'Ann Lee')
+        .map((row) => row.TM)
+        .sort(),
+    ).toEqual(['BOS', 'Boston']);
+    expect(result.events.filter((event) => event.code === 'ambiguous-team')).toEqual([]);
+  });
+
+  it('leaves another team’s city-form batting row and code-form fielding row apart', () => {
+    const batting = routeExport(
+      'a.csv',
+      'POS,Name,TM,PA\r\nSS,Ann Lee,Boston,100\r\nSS,Cy Day,Seattle,90',
+    );
+    const fielding = routeExport(
+      'b.csv',
+      'POS,Name,TM,TC\r\nSS,Ann Lee,BOS,30\r\nSS,Cy Day,SEA,20',
+    );
+    const result = importLeague([batting, fielding]);
+    expect(result.hitters.filter((row) => row.Name === 'Ann Lee')).toHaveLength(2);
+    expect(result.hitters.filter((row) => row.Name === 'Cy Day')).toEqual([
+      expect.objectContaining({ TM: 'SEA', PA: 90, TC: 20 }),
+    ]);
   });
 });

@@ -130,7 +130,7 @@ describe('validateSnapshot on the merged tables (Knowledge Base › Import contr
   it('checks the identities on the league tables too, after pitchers with G = 0 drop', () => {
     const files = snapshot();
     const league = file(files, 'batting_superstats_2', 'league');
-    const row = league.rows.find((candidate) => candidate.TM !== 'Seattle');
+    const row = league.rows.find((candidate) => candidate.TM !== 'SEA');
     if (row) {
       row.RV = 50;
     }

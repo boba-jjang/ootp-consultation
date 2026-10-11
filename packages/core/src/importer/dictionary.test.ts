@@ -135,10 +135,9 @@ const PITCHER_MARKERS = [
 
 const HITTER_POSITIONS = new Set(['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH']);
 
-// seattle-g70/ is the fielding view; the fielding-view import adds its columns to the dictionary.
 const fixturePaths = () =>
   readdirSync(FIXTURES, { recursive: true, encoding: 'utf8' })
-    .filter((file) => file.endsWith('.csv') && !file.startsWith('seattle-g70/'))
+    .filter((file) => file.endsWith('.csv'))
     .map((file) => file.replaceAll('\\', '/'))
     .sort();
 
@@ -151,9 +150,9 @@ const sortedKeys = (side: 'hitters' | 'pitchers' | 'both', marker: boolean) =>
     .sort();
 
 describe('COLUMN_DICTIONARY (Knowledge Base › Import contract › Column dictionary)', () => {
-  it('has one entry for each of the 204 header names in fixtures/', () => {
+  it('has one entry for each of the 245 header names in fixtures/, the fielding view’s 41 included', () => {
     const names = new Set(fixturePaths().flatMap(headerOf));
-    expect(names.size).toBe(204);
+    expect(names.size).toBe(245);
     expect(Object.keys(COLUMN_DICTIONARY).sort()).toEqual([...names].sort());
   });
 
@@ -163,7 +162,7 @@ describe('COLUMN_DICTIONARY (Knowledge Base › Import contract › Column dicti
     expect(sortedKeys('hitters', false)).toEqual([]);
     expect(sortedKeys('pitchers', false)).toEqual([]);
     expect(sortedKeys('both', true)).toEqual([]);
-    expect(sortedKeys('both', false)).toHaveLength(204 - 54 - 59);
+    expect(sortedKeys('both', false)).toHaveLength(245 - 54 - 59);
   });
 
   it('agrees with the fixtures: a marker appears only in its side’s files', () => {
@@ -187,8 +186,16 @@ describe('COLUMN_DICTIONARY (Knowledge Base › Import contract › Column dicti
   it('keeps each header as its own name, apart from Avg%, CON P and HLD', () => {
     const renamed = Object.entries(COLUMN_DICTIONARY)
       .filter(([header, entry]) => entry.canonical !== header)
-      .map(([header, entry]) => [header, entry.canonical]);
-    expect(renamed).toEqual([['Avg%', 'Med%']]);
+      .map(([header, entry]) => [header, entry.canonical])
+      .sort();
+    // The fielding view's own counts are named apart from batting and pitching.
+    expect(renamed).toEqual([
+      ['A', 'Fielding A'],
+      ['Avg%', 'Med%'],
+      ['E', 'Fielding E'],
+      ['PCT', 'Fielding PCT'],
+      ['PO', 'Fielding PO'],
+    ]);
     expect(COLUMN_DICTIONARY['CON P']).toMatchObject({ side: 'both', marker: false });
     expect(COLUMN_DICTIONARY.HLD).toMatchObject({ side: 'pitchers', marker: true });
   });
@@ -278,6 +285,94 @@ describe('readColumns', () => {
         hitters: [],
         pitchers: [],
       });
+    }
+  });
+});
+
+describe('the fielding view (Knowledge Base › Import contract › Column dictionary)', () => {
+  const FIELDING_HEADER = ['POS', 'Name', 'G', 'GS', 'IP', 'E', 'A', 'PO', 'DP', 'PCT', 'TC', 'ZR'];
+
+  it('knows all 41 columns the fielding view adds, and none marks a side', () => {
+    const added = [
+      ...['P', 'C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF'].map((position) => `${position} Pot`),
+      ...['TC', 'A', 'PO', 'E', 'PCT', 'RNG', 'ZR', 'EFF', 'SBA', 'RTO', 'RTO%', 'PB', 'CER'],
+      'CERA',
+      ...['R', 'L', 'E', 'U', 'Z'].flatMap((zone) => [
+        `BIZ-${zone}%`,
+        `BIZ-${zone}`,
+        `BIZ-${zone}m`,
+      ]),
+      'BIZ-I',
+      'FRM',
+      'ARM',
+    ];
+    expect(added).toHaveLength(41);
+    for (const column of added) {
+      expect(COLUMN_DICTIONARY[column], column).toMatchObject({ side: 'both', marker: false });
+    }
+  });
+
+  it('reads TC, ZR or EFF as a fielding file and names its counts apart', () => {
+    for (const marker of ['TC', 'ZR', 'EFF']) {
+      const header = ['POS', 'Name', 'G', 'GS', 'IP', 'DP', marker];
+      expect(canonicalName('G', header), marker).toBe('Fielding G');
+      expect(canonicalName('GS', header)).toBe('Fielding GS');
+      expect(canonicalName('IP', header)).toBe('Fielding IP');
+      expect(canonicalName('DP', header)).toBe('Fielding DP');
+    }
+    expect(canonicalName('E', FIELDING_HEADER)).toBe('Fielding E');
+    expect(canonicalName('A', FIELDING_HEADER)).toBe('Fielding A');
+    expect(canonicalName('PO', FIELDING_HEADER)).toBe('Fielding PO');
+    expect(canonicalName('PCT', FIELDING_HEADER)).toBe('Fielding PCT');
+  });
+
+  it('never merges them with the batting or pitching columns of a file without them', () => {
+    const batting = ['POS', 'Name', 'G', 'GS', 'PA'];
+    const pitching = ['POS', 'Name', 'G', 'GS', 'IP', 'DP'];
+    expect(canonicalName('G', batting)).toBe('G');
+    expect(canonicalName('IP', pitching)).toBe('IP');
+    expect(canonicalName('DP', pitching)).toBe('DP');
+  });
+
+  it('keeps ARM, RNG and DEF Pot as they are, apart from IF ARM, OF RNG and the rest', () => {
+    const names = readColumns([
+      'POS',
+      'Name',
+      'TC',
+      'ARM',
+      'RNG',
+      'IF ARM',
+      'OF RNG',
+      'DEF Pot',
+    ]).names;
+    expect(names).toEqual(['POS', 'Name', 'TC', 'ARM', 'RNG', 'IF ARM', 'OF RNG', 'DEF Pot']);
+  });
+
+  it('lets no column mark a side in a fielding file', () => {
+    const header = [
+      'POS',
+      'Name',
+      'TM',
+      'DEF',
+      'DEF Pot',
+      'IP',
+      'DP',
+      'IF RNG',
+      'wOBA',
+      'ERA',
+      'ZR',
+    ];
+    expect(readColumns(header).markers).toEqual({ hitters: [], pitchers: [] });
+    expect(readColumns(header.filter((column) => column !== 'ZR')).markers.hitters).toContain(
+      'DEF',
+    );
+  });
+
+  it('reads every column of both Game 70 files', () => {
+    for (const path of ['seattle-g70/seattle-height.csv', 'seattle-g70/rsl-team-fielding.csv']) {
+      const reading = readColumns(headerOf(path));
+      expect(reading.notRead, path).toEqual([]);
+      expect(reading.markers, path).toEqual({ hitters: [], pitchers: [] });
     }
   });
 });

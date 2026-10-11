@@ -64,6 +64,9 @@ const EXPECTED: Record<string, [ViewId, number] | null> = {
     1,
   ],
   // Game 53: three of OOTP's own views, and the owner's custom views.
+  // The fielding view (about game 70): custom headers, read by the fielding-view import.
+  'seattle-g70/rsl-team-fielding.csv': null,
+  'seattle-g70/seattle-height.csv': null,
   'seattle-g53/seattle_arrows_lineups_-_overview_default.csv': ['default', 1],
   'seattle-g53/seattle_arrows_lineups_-_overview_custom_bat_pot.csv': ['custom_bat_pot', 1],
   'seattle-g53/seattle_arrows_lineups_-_overview_cus_pitch_pot.csv': ['cus_pitch_pot', 1],

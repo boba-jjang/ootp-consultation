@@ -433,12 +433,17 @@ describe('parseCell on every fixture', () => {
     .filter((file) => file.endsWith('.csv'))
     .map((file) => file.replaceAll('\\', '/'));
 
+  // seattle-g70/ is the fielding view; its columns stay unknown until the fielding-view import.
+  const fielding = files.filter((file) => file.startsWith('seattle-g70/'));
+  const readable = files.filter((file) => !fielding.includes(file));
+
   it('walks every folder of fixtures/, Game 53 and its overlap included', () => {
     expect(files.filter((file) => file.startsWith('seattle-g53/'))).toHaveLength(19);
-    expect(files).toHaveLength(38);
+    expect(fielding).toHaveLength(2);
+    expect(files).toHaveLength(40);
   });
 
-  it.each(files)('parses every cell of %s through the dictionary', (path) => {
+  it.each(readable)('parses every cell of %s through the dictionary', (path) => {
     const rows = readFixture(path);
     expect(readColumns(Object.keys(rows[0] ?? {})).notRead).toEqual([]);
     for (const row of rows) {

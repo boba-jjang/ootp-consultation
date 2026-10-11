@@ -141,7 +141,7 @@ The user exports these from the team's screens (Lineups overview, Pitching), one
 | Custom batting superstats (Game 53, 56 columns) | Hitters | Both batting superstats views in one, plus batting and baserunning run values (BatR, BsR), swing counts (SW, WH, OSW, CH) and pitches completely out of the zone (ZX) |
 | Custom pitching stats (Game 53, 61 columns, from the Pitching screen) | Pitchers | Both pitching stats views in one, plus save opportunities, blown-save rate, the opponents' line (AB, 1B, 2B, 3B, TB, OBP, SLG, OPS), BRA/9, H/9, K%, BB%, K%-BB%, sacrifices, wild pitches, inherited runners scored, LOB%, FIP- and rWAR. It leaves out the usage columns SD, MD, RA, GF, QS, QS%, CG, CG%, SHO, PPG, RSG, GO%, SB and CS |
 | Custom pitching superstats (Game 53, 46 columns) | Pitchers | Both pitching superstats views in one, plus infield and bunt hits, batted-ball direction, launch angle and ZX. It leaves out CH and the run values |
-| Custom fielding (61 columns, from the Fielding screen; a later snapshot than Game 53) | Hitters and pitchers, each row by POS | Height, handedness, every fielding component, DEF and DEF Pot at the played position, the game's potential rating at each of the eight positions (P Pot to RF Pot), and fielding stats: games, innings, chances, assists, putouts, errors, double plays, fielding percentage, range factor, zone rating, efficiency, stolen-base attempts and runners thrown out, passed balls, catcher's ERA, balls in zone by difficulty, framing runs and arm runs |
+| Custom fielding (62 columns, from the Fielding screen, at about game 70) | Hitters and pitchers, each row by POS | Height, handedness, every fielding component, DEF and DEF Pot at the played position, the game's potential rating at each of the eight positions (P Pot to RF Pot), and fielding stats: games, innings, chances, assists, putouts, errors, double plays, fielding percentage, range factor, zone rating, efficiency, stolen-base attempts and runners thrown out, passed balls, catcher's ERA, balls in zone by difficulty, framing runs and arm runs |
 
 Run on the hitters, cus\_pitch\_pot becomes a supplemental capture: only its DEF Pot column is used, as the hitters' DEF ceiling (section 9).
 
@@ -155,14 +155,14 @@ The user exports these from the league's player statistics screen, in any view, 
 | Pitching superstats 1 and 2 (Game 42) | Every listed pitcher: 446, including 31 with no appearances and 4 position players | No team column, so rows match on name; the app applies its own sample floors (section 8) |
 | Custom batting stats and superstats (Game 53) | Qualified hitters: 199 | Standard stats, wRC+ and wRAA, and every superstats column. The superstats file carries TM and the stats file doesn't, so stats rows take their team from the superstats rows |
 | Custom pitching stats and superstats (Game 53) | Every listed pitcher, in two parts by listed position: 246 starters and 212 relievers, 458 in all and 426 with appearances | A league row's POS can differ from the team's listing: one Seattle hitter is 2B on the team and CF in the league files |
-| Custom fielding (the same later snapshot) | Every player with fielding time: 508, including 11 who only DH and 6 pitchers | POS is the position each player currently plays, not the roster listing (the owner confirmed Shinn at 1B and Geng in CF); DEF, DEF Pot and the stats refer to it. FRM and ARM are near zero for everyone at this point of the season |
+| Custom fielding (at about game 70) | Every player with fielding time: 508, including 11 who only DH and 6 pitchers | POS is the position each player currently plays, not the roster listing (the owner confirmed Shinn at 1B and Geng in CF); DEF, DEF Pot and the stats refer to it. FRM and ARM are near zero for everyone at this point of the season. TM is the team abbreviation (SEA), where the batting views give the city (Seattle), and 58 codes appear: the 30 big-league teams with 13 to 19 players each, and minor-league affiliates with 1 to 5 |
 
 ### Sample data set
 
 - One team, the Seattle Arrows of the RSL, at three points in one season. These files are the test fixtures.
   - Game 42 (`fixtures/seattle-g42/`): 12 hitters, 13 pitchers, 11 team views in OOTP's own layouts, and four league files.
   - Game 53 (`fixtures/seattle-g53/`): 12 hitters (two of them new) and the same 13 pitchers, in the owner's custom views, with league standard stats and a bio view that lists both sides.
-  - A later fielding export: the team's 12 hitters and the league's 508 fielders in the owner's custom fielding view, with heights (section 9).
+  - About game 70 (`fixtures/seattle-g70/`): the team's 12 hitters and the league's 508 fielders in the owner's custom fielding view, with heights and team codes (section 9). No batting view came with it, so that snapshot carries no game label.
 - The league files come from the same snapshot as the team's, and the team's rows match the team views, apart from one league position at Game 53.
 - The league rates players on a 1–10 scale and hides current batting and pitching ratings.
 
@@ -283,6 +283,7 @@ The league sortable files reuse these headers: at Game 42 the league batting\_su
 | SctAcc | V.High in the sample | Ordinal scouting accuracy |
 | WE, INT | Low, Normal, High | Ordinal 0–2; more levels may exist |
 | Risk | Very Low, Low and Medium in the sample; OOTP's full scale is Very Low, Low, Medium, High, Very High, Extreme | Ordinal 0–5 |
+| TM | The city in the batting views (Seattle); the abbreviation in the fielding view (SEA) | Stored as exported. No map between the two forms yet, so a league fielding row joins a batting row only when both carry the same form (open question) |
 
 ### Invariants
 
@@ -571,7 +572,8 @@ The shares are the standardized contributions of a straight-line fit of each pos
 - The played position uses DEF, with DEF Pot as its ceiling.
 - Every other position uses the game's potential rating from the fielding view, less one step for inexperience. Without the fielding view, it uses the component formula above, less one step. Both are held to the scale.
 - Ineligible: "-" in the fielding view; without it, a formula result below 1, or no catcher ratings at C. A flagged position (the floors above) is excluded only when configured.
-- Runs per 150 games at a position: (rating on 20–80 − 50) ÷ 10 × the position's runs per 10 points, plus the player's exported arm runs where the fielding view has them. The matrix produces these fielding-run estimates for the lineup optimizer.
+- Runs at a position: (rating on 20–80 − 50) ÷ 10 × the position's runs per 10 points, plus the player's exported arm runs where the fielding view has them. The matrix produces these fielding-run estimates for the lineup optimizer.
+- Runs are stated per season, not per 150 games: the 150-game rate times the team's games per season over 150. Games per season is a team setting (152 in the RSL, playoffs excluded). A player's own zone rating, shown beside the estimate as a check, is scaled the same way from his innings and counts only past an innings floor, so a 70-game export and a full season read alike.
 - Every constant is a setting, fitted on the league's fielding export and refitted when a new one arrives.
 
 ## Strategy rules
@@ -792,6 +794,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 - [ ] The catcher's run scale: zone rating barely moves with a catcher's rating, and framing runs are near zero at this point of the season. The 8 runs per 10 points is a placeholder to re-check at season end.
 - [ ] Should fielding become a sixth data set for coverage, and get percentiles? Both wait for the fielding view to be imported.
 - [ ] Current per-position ratings (the columns without Pot) aren't exported yet. With them, the inexperience discount would be read from the view instead of assumed.
+- [ ] Team names come in two forms, the city in the batting views and the abbreviation in the fielding view. A map between them, learned from a view that carries both or set by the owner, would let the fielding and batting rows of one snapshot join.
 
 ## Delivery plan
 

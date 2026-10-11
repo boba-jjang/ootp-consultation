@@ -146,8 +146,9 @@ function addColumn(text: string, column: string, value: string): string {
 
 describe('routeExport on the fixtures', () => {
   it('has an expectation for every CSV in fixtures/', () => {
+    // seattle-g70/ is the fielding view, rejected until the fielding-view import reads it.
     const files = readdirSync(FIXTURES, { recursive: true, encoding: 'utf8' })
-      .filter((file) => file.endsWith('.csv'))
+      .filter((file) => file.endsWith('.csv') && !file.startsWith('seattle-g70/'))
       .map((file) => file.replaceAll('\\', '/'));
     expect(files.sort()).toEqual(Object.keys(EXPECTED).sort());
   });

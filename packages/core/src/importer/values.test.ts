@@ -374,6 +374,37 @@ const ROW_TESTS: Record<string, () => void> = {
     expect(valueOf(G53_BATTING, 'Zhong-shan Geng', 'POS')).toBe('2B');
     expect(valueOf(G53_LEAGUE_BATTING, 'Zhong-shan Geng', 'POS')).toBe('CF');
   },
+
+  // The fielding view's columns (Knowledge Base › Data sources); its fixtures arrive with the
+  // fielding-view import, so these pin the parse rules on cells copied from the export.
+  'P Pot, C Pot, 1B Pot, 2B Pot, 3B Pot, SS Pot, LF Pot, CF Pot, RF Pot': () => {
+    expect(parsed('C Pot', '-')).toBeNull();
+    expect(parsed('SS Pot', '7')).toBe(7);
+    expect(parsed('P Pot', '10')).toBe(10);
+  },
+
+  'ZR, EFF, FRM, ARM, RNG': () => {
+    expect(parsed('ZR', '-0.0')).toBe(0);
+    expect(parsed('ZR', '-4.5')).toBe(-4.5);
+    expect(parsed('EFF', '.979')).toBe(0.979);
+    expect(parsed('FRM', '0.4')).toBe(0.4);
+    expect(parsed('ARM', '-1.8')).toBe(-1.8);
+    expect(parsed('RNG', '8.29')).toBe(8.29);
+  },
+
+  'BIZ-R%, BIZ-L%, BIZ-E%, BIZ-U%, BIZ-Z%': () => {
+    expect(parsed('BIZ-R%', '94.7%')).toBeCloseTo(0.947, 12);
+    expect(parsed('BIZ-L%', '100.0%')).toBe(1);
+    expect(parsed('BIZ-E%', '50.0%')).toBe(0.5);
+    expect(parsed('BIZ-U%', '0.0%')).toBe(0);
+    expect(parsed('BIZ-Z%', '12.5%')).toBe(0.125);
+  },
+
+  'RTO%': () => {
+    expect(parsed('RTO%', '28.6')).toBeCloseTo(0.286, 12);
+    expect(parsed('RTO%', '50.0')).toBe(0.5);
+    expect(parsed('RTO%', '0.0')).toBe(0);
+  },
 };
 
 /** First-column labels of the special-handling table, as the Knowledge Base writes them. */

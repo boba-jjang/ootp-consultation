@@ -263,8 +263,7 @@ The league sortable files reuse these headers: at Game 42 the league batting\_su
 | ZX | The view editor's Misses: pitches completely out of the zone | None |
 | wRC, wRC+, FIP-, BRA/9, H/9 | Weighted runs created and its league-adjusted index; FIP indexed to the league (100 is average, lower is better); baserunners and hits per nine innings | None |
 | POS in league files | A league row can show a different position from the team's listing (one Seattle hitter: 2B on the team, CF in the league files) | Each table keeps its own; team and league POS are never compared |
-| G, GS, IP, E, A, PO, DP, PCT in a fielding file | Fielding counts under batting and pitching names, in a file with TC, ZR or EFF | Canonical Fielding G, Fielding GS, Fielding IP (outs, like IP) and so on (Column dictionary); never merged with the batting or pitching columns |
-| P Pot, C Pot, 1B Pot, 2B Pot, 3B Pot, SS Pot, LF Pot, CF Pot, RF Pot | The game's potential rating at each position, on the league's scale; "-" where he can't play there | A rating, stored on 20–80; "-" stays null and means ineligible |
+| P Pot, C Pot, 1B Pot, 2B Pot, 3B Pot, SS Pot, LF Pot, CF Pot, RF Pot | The game's potential rating at each position, on the league's scale; "-" where he can't play there | "-" stays null and means ineligible; a number parses as is, the rating on the league's scale |
 | ZR, EFF, FRM, ARM, RNG | Zone rating in runs ("-0.0" occurs), efficiency without a leading zero (".979"), framing runs, arm runs, range factor | Parse as float; "-0.0" is 0 |
 | BIZ-R%, BIZ-L%, BIZ-E%, BIZ-U%, BIZ-Z% | Share of the balls in each zone bucket that were fielded, with the sign (94.7%) | Strip the sign, divide by 100 |
 | RTO% | Runners thrown out, a percent without the sign (28.6) | Divide by 100 |

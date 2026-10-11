@@ -44,6 +44,12 @@ const NO_FLY_BALLS = 999.99;
 
 /** Percent strings such as "22.5%", in the superstats_1 views. */
 const PERCENT_STRINGS = new Set([
+  // The fielding view's balls-in-zone shares.
+  'BIZ-R%',
+  'BIZ-L%',
+  'BIZ-E%',
+  'BIZ-U%',
+  'BIZ-Z%',
   'LD%',
   'GB%',
   'FB%',
@@ -64,6 +70,8 @@ const PERCENT_STRINGS = new Set([
 
 /** Percent units without the sign, such as 28.6: BB%, K%, IRS%, the superstats_2 rates, SB%, LOB% and K%-BB%. */
 const PERCENT_UNITS = new Set([
+  // The fielding view's runners thrown out.
+  'RTO%',
   'BB%',
   'K%',
   'IRS%',

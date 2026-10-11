@@ -4,6 +4,7 @@ import {
   DEFAULT_ESTIMATOR_SETTINGS,
   DEFAULT_PERCENTILE_SETTINGS,
   assembleSnapshot,
+  roleOf,
   teamEstimates,
   toTwentyEighty,
   type ComponentEstimate,
@@ -693,6 +694,23 @@ describe('teamEstimates on hand-built snapshots', () => {
     expect(componentOf(reliever, 'stuff').evidence).toBeNull();
   });
 
+  it('shares the percentiles’ usage rule: starts at the starter share make a starter', () => {
+    // Five starts in ten games sit exactly at the default share of 0.5.
+    const atShare = pitcher('Dot', { G: 10, GS: 5, BF: 70 });
+    expect(roleOf(atShare, DEFAULT_PERCENTILE_SETTINGS)).toBe('starters');
+    expect(only(built({ pitchers: [atShare] })).pool).toBe('starters');
+    const below = pitcher('Dot', { G: 10, GS: 4, BF: 70 });
+    expect(roleOf(below, DEFAULT_PERCENTILE_SETTINGS)).toBe('relievers');
+    expect(only(built({ pitchers: [below] })).pool).toBe('relievers');
+    // The estimator reads the share from the percentile settings it carries.
+    const stricter: EstimatorSettings = {
+      ...DEFAULT_ESTIMATOR_SETTINGS,
+      pools: { ...DEFAULT_PERCENTILE_SETTINGS, starterShare: 0.6 },
+    };
+    expect(roleOf(atShare, stricter.pools)).toBe('relievers');
+    expect(only(built({ pitchers: [atShare] }), stricter).pool).toBe('relievers');
+  });
+
   it('leaves out a component whose potential is missing, and its composite', () => {
     const player = only(built({ hitters: [hitter('Ann', { 'HT P': null })] }));
     expect(player.components).not.toHaveProperty('babip');
@@ -714,6 +732,57 @@ describe('teamEstimates on hand-built snapshots', () => {
     expect(contact?.estimate).toBeCloseTo(r(6) + ((avoidKs.move + babip.move) / 2) * STEP, 10);
     expect(contact?.band).toBeCloseTo((avoidKs.band + babip.band) / 2, 10);
     expect(contact?.flag).toBe(Math.abs(contact?.move ?? 0) > 0.5);
+  });
+
+  describe('holds a composite estimate to 20–80, its move and flag following the held estimate', () => {
+    // Medium risk puts each prior one step below its potential, and 400 plate appearances
+    // against k = 25.8 weigh the evidence 0.94. A K% of 0 or 0.6 sits far outside the pool's
+    // 0.1 to 0.3, so Avoid K's alone would carry Contact past the scale.
+    const contactOf = (values: ExportRow) => {
+      const player = only(built({ hitters: [hitter('Ann', { PA: 400, ...values })] }));
+      const avoidKs = componentOf(player, 'avoidKs');
+      const babip = componentOf(player, 'babip');
+      const contact = player.composites.contact;
+      if (!contact) {
+        throw new Error('Ann has no Contact');
+      }
+      return { avoidKs, babip, contact, meanMove: (avoidKs.move + babip.move) / 2 };
+    };
+
+    it('at 80: a Contact P of 10 whose Avoid K’s moves up by steps', () => {
+      const { avoidKs, babip, contact, meanMove } = contactOf({ 'K%': 0, 'Contact P': r(10) });
+      expect(contact.prior).toBeCloseTo(80 - STEP, 10);
+      expect(meanMove).toBeGreaterThan(1);
+      expect(contact.prior + meanMove * STEP).toBeGreaterThan(80);
+      expect(contact.estimate).toBe(80);
+      // (80 − prior) ÷ step: the one step the hold allowed, not the components' mean.
+      expect(contact.move).toBeCloseTo(1, 10);
+      expect(contact.move).toBeLessThan(meanMove);
+      expect(contact.flag).toBe(true);
+      expect(contact.band).toBeCloseTo((avoidKs.band + babip.band) / 2, 10);
+    });
+
+    it('at 20: a Contact P of 3 whose Avoid K’s moves down by steps', () => {
+      const { avoidKs, babip, contact, meanMove } = contactOf({ 'K%': 0.6, 'Contact P': r(3) });
+      expect(contact.prior).toBeCloseTo(20 + STEP, 10);
+      expect(meanMove).toBeLessThan(-1);
+      expect(contact.prior + meanMove * STEP).toBeLessThan(20);
+      expect(contact.estimate).toBe(20);
+      expect(contact.move).toBeCloseTo(-1, 10);
+      expect(contact.move).toBeGreaterThan(meanMove);
+      expect(contact.flag).toBe(true);
+      expect(contact.band).toBeCloseTo((avoidKs.band + babip.band) / 2, 10);
+    });
+
+    it('leaves the flag off when the hold keeps the estimate within half a step', () => {
+      // Very Low risk: the prior is the potential, 80, so the held estimate can't move.
+      const { contact, meanMove } = contactOf({ Risk: 0, 'K%': 0, 'Contact P': r(10) });
+      expect(contact.prior).toBe(80);
+      expect(meanMove).toBeGreaterThan(0.5);
+      expect(contact.estimate).toBe(80);
+      expect(contact.move).toBe(0);
+      expect(contact.flag).toBe(false);
+    });
   });
 
   it('measures the step on the league’s scale', () => {

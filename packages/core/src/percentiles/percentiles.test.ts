@@ -8,6 +8,7 @@ import {
   assembleSnapshot,
   midRankPercentile,
   percentilePools,
+  roleOf,
   routeExport,
   teamPercentiles,
   type ExportRow,
@@ -143,6 +144,50 @@ describe('METRIC_DIRECTIONS (Knowledge Base › League percentiles › Metric di
   it('shows no xERA for hitters and has no IFH% for pitchers', () => {
     expect(METRIC_DIRECTIONS.xERA).not.toHaveProperty('hitters');
     expect(METRIC_DIRECTIONS['IFH%']).not.toHaveProperty('pitchers');
+  });
+});
+
+describe('roleOf (Knowledge Base § 8 Peer pools; § 14 Assumptions, Starter by usage)', () => {
+  const pitcher = (games: number | null, starts: number | null): ExportRow => ({
+    POS: 'SP',
+    Name: 'Dot',
+    G: games,
+    GS: starts,
+  });
+
+  it('makes a starter of games started at exactly the starter share, a reliever below it', () => {
+    expect(roleOf(pitcher(10, 5), DEFAULT_PERCENTILE_SETTINGS)).toBe('starters');
+    expect(roleOf(pitcher(10, 4), DEFAULT_PERCENTILE_SETTINGS)).toBe('relievers');
+    expect(roleOf(pitcher(10, 10), DEFAULT_PERCENTILE_SETTINGS)).toBe('starters');
+    expect(roleOf(pitcher(1, 1), DEFAULT_PERCENTILE_SETTINGS)).toBe('starters');
+    expect(roleOf(pitcher(1, 0), DEFAULT_PERCENTILE_SETTINGS)).toBe('relievers');
+    // Nine games: the share falls between four and five starts.
+    expect(roleOf(pitcher(9, 5), DEFAULT_PERCENTILE_SETTINGS)).toBe('starters');
+    expect(roleOf(pitcher(9, 4), DEFAULT_PERCENTILE_SETTINGS)).toBe('relievers');
+  });
+
+  it('reads the share from the settings', () => {
+    const stricter = { ...DEFAULT_PERCENTILE_SETTINGS, starterShare: 0.8 };
+    expect(roleOf(pitcher(10, 8), stricter)).toBe('starters');
+    expect(roleOf(pitcher(10, 7), stricter)).toBe('relievers');
+  });
+
+  it('gives no role without appearances, games or a games-started count', () => {
+    expect(roleOf(pitcher(0, 0), DEFAULT_PERCENTILE_SETTINGS)).toBeNull();
+    expect(roleOf(pitcher(null, 3), DEFAULT_PERCENTILE_SETTINGS)).toBeNull();
+    expect(roleOf(pitcher(5, null), DEFAULT_PERCENTILE_SETTINGS)).toBeNull();
+    expect(roleOf({ POS: 'SP', Name: 'Dot' }, DEFAULT_PERCENTILE_SETTINGS)).toBeNull();
+  });
+
+  it('names the pool each Seattle pitcher is ranked in on the game-42 files', () => {
+    const results = teamPercentiles(seattle, DEFAULT_PERCENTILE_SETTINGS);
+    expect(seattle.pitchers.length).toBeGreaterThan(0);
+    for (const row of seattle.pitchers) {
+      const ranked = results.find(
+        (result) => result.side === 'pitchers' && result.name === row.Name,
+      );
+      expect(ranked?.pool ?? null, String(row.Name)).toBe(roleOf(row, DEFAULT_PERCENTILE_SETTINGS));
+    }
   });
 });
 

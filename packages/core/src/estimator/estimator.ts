@@ -4,6 +4,7 @@ import type { Snapshot } from '../importer/snapshot.ts';
 import {
   DEFAULT_PERCENTILE_SETTINGS,
   percentilePools,
+  roleOf,
   type PeerPool,
   type PercentileSettings,
 } from '../percentiles/percentiles.ts';
@@ -329,12 +330,13 @@ export interface CompositeEstimate {
   /** From its own potential and the player's risk, as a component's. */
   prior: number;
   priorBand: number;
-  /** prior + move × step. */
+  /** prior + the mean of its components' moves × step, held to 20–80. */
   estimate: number;
   /** The mean of its components' bands, in points either way. */
   band: number;
-  /** The mean of its components' moves, in display steps. */
+  /** (estimate − prior) in display steps: the components' mean move, unless the hold cut it. */
   move: number;
+  /** The held estimate sits more than flagSteps from the prior. */
   flag: boolean;
 }
 
@@ -389,16 +391,6 @@ const meanOf = (values: readonly number[]) =>
 /** Population SD. */
 function sdOf(values: readonly number[], mean: number): number {
   return Math.sqrt(values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length);
-}
-
-/** A pitcher's role by usage, as League percentiles › Peer pools; null without appearances. */
-function roleOf(row: ExportRow, settings: PercentileSettings): 'starters' | 'relievers' | null {
-  const games = numberOf(row.G);
-  const starts = numberOf(row.GS);
-  if (games === null || games <= 0 || starts === null) {
-    return null;
-  }
-  return starts >= settings.starterShare * games ? 'starters' : 'relievers';
 }
 
 /** Where the prior starts and how wide its band is, in steps, with k's risk multiplier. */
@@ -566,7 +558,11 @@ function estimateComponent(
   };
 }
 
-/** Knowledge Base › Talent estimator, step 4: a composite moves by its components' mean move. */
+/**
+ * Knowledge Base › Talent estimator, step 4: a composite moves by its components' mean move,
+ * and its estimate is held to 20–80 like a component's. The move and the flag follow the held
+ * estimate, so neither reports a change the estimate didn't make.
+ */
 function estimateComposite(
   context: PlayerContext,
   composite: CompositeId,
@@ -579,13 +575,14 @@ function estimateComposite(
   if (start === null || first === undefined || second === undefined) {
     return null;
   }
-  const move = (first.move + second.move) / 2;
+  const estimate = clampRating(start.prior + ((first.move + second.move) / 2) * context.step);
+  const move = (estimate - start.prior) / context.step;
   return {
     composite,
     column: config.column,
     from: config.from,
     ...start,
-    estimate: start.prior + move * context.step,
+    estimate,
     band: (first.band + second.band) / 2,
     move,
     flag: Math.abs(move) > context.settings.flagSteps,

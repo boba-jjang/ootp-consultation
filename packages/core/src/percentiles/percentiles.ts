@@ -100,8 +100,15 @@ const PITCHER_POSITIONS = new Set(['SP', 'RP', 'CL']);
 
 const numberOf = (value: unknown) => (typeof value === 'number' ? value : null);
 
-/** A pitcher's role by usage; null without appearances. Closers fall where usage puts them. */
-function roleOf(row: ExportRow, settings: PercentileSettings): 'starters' | 'relievers' | null {
+/**
+ * A pitcher's role by usage: Knowledge Base › League percentiles › Peer pools. A starter has
+ * games started at or above the starter share of games; null without appearances. Closers
+ * fall where usage puts them. The talent estimator shares this rule.
+ */
+export function roleOf(
+  row: ExportRow,
+  settings: PercentileSettings,
+): 'starters' | 'relievers' | null {
   const games = numberOf(row.G);
   const starts = numberOf(row.GS);
   if (games === null || games <= 0 || starts === null) {

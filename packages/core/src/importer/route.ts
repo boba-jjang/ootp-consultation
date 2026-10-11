@@ -1,7 +1,7 @@
 import { IMPORTER_VERSION } from '../version.ts';
 import { parseCsv } from './csv.ts';
 import { detectView } from './detect.ts';
-import { PITCHING_POTENTIALS, readColumns } from './dictionary.ts';
+import { PITCHING_POTENTIALS, isFieldingHeader, readColumns } from './dictionary.ts';
 import { VIEW_MANIFESTS, type Side, type ViewId } from './manifest.ts';
 import { parseCell, type CellValue } from './values.ts';
 
@@ -60,7 +60,7 @@ export const LEAGUE_VIEWS: ReadonlySet<ViewId> = new Set([
 ]);
 
 const HITTER_POSITIONS = new Set(['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH']);
-const PITCHER_POSITIONS = new Set(['SP', 'RP', 'CL']);
+const PITCHER_POSITIONS = new Set(['SP', 'RP', 'CL', 'P']);
 
 /** The side a listed position belongs to; undefined for a blank or unknown one. */
 export function positionSide(position: CellValue | undefined): Side | undefined {
@@ -211,6 +211,28 @@ export function routeExport(
     if (side) {
       counts[side] += 1;
     }
+  }
+  if (isFieldingHeader(columns)) {
+    // A fielding file: no column marks a side, so every row goes by its POS on both scopes.
+    const unplaced = result.rows.filter((row) => positionSide(row.POS) === undefined);
+    if (unplaced.length > 0) {
+      result.rows = result.rows.filter((row) => !unplaced.includes(row));
+      info(
+        'unplaced-rows',
+        `Left out ${unplaced.map(nameOf).join(', ')}: the POS names neither a hitter's nor a pitcher's position.`,
+        { names: unplaced.map(nameOf) },
+      );
+    }
+    if (result.rows.length === 0) {
+      return reject(
+        'side-unknown',
+        "Neither the file's columns nor its rows' POS say whether it lists hitters or pitchers.",
+        counts,
+      );
+    }
+    result.side = counts.pitchers === 0 ? 'hitters' : counts.hitters === 0 ? 'pitchers' : null;
+    result.routing = 'primary';
+    return result;
   }
   const marked: Side | null =
     hitterMarkers.length > 0 ? 'hitters' : pitcherMarkers.length > 0 ? 'pitchers' : null;

@@ -117,7 +117,10 @@ describe('assembleSnapshot on the Seattle game-42 files (the Phase 2 gate)', () 
       ),
     );
     expect(snapshot.league.hitters.map(playerKey)).toEqual(
-      readFixture(leagueView('batting_superstats_1')).map(playerKey),
+      // TM Seattle reads as SEA; the raw file keeps the city.
+      readFixture(leagueView('batting_superstats_1')).map((row) =>
+        playerKey(row).replace(/^Seattle\|/, 'SEA|'),
+      ),
     );
   });
 
@@ -437,7 +440,7 @@ describe('assembleSnapshot on the Game 70 fielding files (Knowledge Base › Imp
       const other = snapshot.league.hitters.find(
         (candidate) => candidate.TM === 'SEA' && candidate.Name === row.Name,
       );
-      expect(other, String(row.Name)).toBeDefined();
+      expect(other, playerKey(row)).toBeDefined();
     }
   });
 

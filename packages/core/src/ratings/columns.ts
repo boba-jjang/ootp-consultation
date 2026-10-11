@@ -35,4 +35,14 @@ export const RATING_COLUMNS: ReadonlySet<string> = new Set([
   'STM',
   'Hold runners',
   'DEF Pot',
+  // The potential rating at each position (the fielding view).
+  'P Pot',
+  'C Pot',
+  '1B Pot',
+  '2B Pot',
+  '3B Pot',
+  'SS Pot',
+  'LF Pot',
+  'CF Pot',
+  'RF Pot',
 ]);

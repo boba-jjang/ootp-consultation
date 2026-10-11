@@ -169,7 +169,10 @@ describe('COLUMN_DICTIONARY (Knowledge Base › Import contract › Column dicti
     // A file's side is the side most of its rows list. The hitter capture lists hitters in
     // the pitching ratings view, so it says nothing about which side its columns belong to.
     const seen = { hitters: new Set<string>(), pitchers: new Set<string>() };
-    for (const path of fixturePaths().filter((file) => !file.includes('hitter_capture'))) {
+    // A fielding file lists both sides and marks neither.
+    const skipped = (file: string) =>
+      file.includes('hitter_capture') || file.startsWith('seattle-g70/');
+    for (const path of fixturePaths().filter((file) => !skipped(file))) {
       const rows = readFixture(path);
       const hitters = rows.filter((row) => HITTER_POSITIONS.has(row.POS ?? '')).length;
       const side = hitters * 2 > rows.length ? 'hitters' : 'pitchers';

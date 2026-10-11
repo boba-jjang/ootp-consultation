@@ -234,8 +234,60 @@ const SHARED = [
   'Risk',
 ] as const;
 
+/** The fielding view's own columns (Knowledge Base › Data sources), carried by no side's files. */
+const FIELDING_VIEW = [
+  'P Pot',
+  'C Pot',
+  '1B Pot',
+  '2B Pot',
+  '3B Pot',
+  'SS Pot',
+  'LF Pot',
+  'CF Pot',
+  'RF Pot',
+  'TC',
+  'A',
+  'PO',
+  'E',
+  'PCT',
+  'RNG',
+  'ZR',
+  'EFF',
+  'SBA',
+  'RTO',
+  'RTO%',
+  'PB',
+  'CER',
+  'CERA',
+  'BIZ-R%',
+  'BIZ-R',
+  'BIZ-Rm',
+  'BIZ-L%',
+  'BIZ-L',
+  'BIZ-Lm',
+  'BIZ-E%',
+  'BIZ-E',
+  'BIZ-Em',
+  'BIZ-U%',
+  'BIZ-U',
+  'BIZ-Um',
+  'BIZ-Z%',
+  'BIZ-Z',
+  'BIZ-Zm',
+  'BIZ-I',
+  'FRM',
+  'ARM',
+] as const;
+
 /** Avg% in hitters' files and Med% in pitchers' are the same middle contact bucket. */
-const RENAMED: Readonly<Record<string, string>> = { 'Avg%': 'Med%' };
+const RENAMED: Readonly<Record<string, string>> = {
+  'Avg%': 'Med%',
+  // Fielding counts, kept apart from the batting and pitching columns of the same names.
+  A: 'Fielding A',
+  E: 'Fielding E',
+  PO: 'Fielding PO',
+  PCT: 'Fielding PCT',
+};
 
 const entries = (columns: readonly string[], side: Side | 'both') =>
   columns.map((column): [string, ColumnEntry] => [
@@ -248,12 +300,22 @@ export const COLUMN_DICTIONARY: Readonly<Record<string, ColumnEntry>> = Object.f
   ...entries(SHARED, 'both'),
   ...entries(HITTER_MARKERS, 'hitters'),
   ...entries(PITCHER_MARKERS, 'pitchers'),
+  ...entries(FIELDING_VIEW, 'both'),
 ]);
 
 /** A file with any of these reads CON P as Contact P. */
 const BATTING_POTENTIALS = ['HT P', 'K P', 'GAP P', 'POW P', 'EYE P'];
 /** A file with any of these reads CON P as Control P and HLD as the hold-runners rating. */
 export const PITCHING_POTENTIALS = ['STU P', 'MOV P', 'HRA P', 'PBABIP P'];
+
+/** A file with any of these is a fielding file (Knowledge Base › Import contract › Column dictionary). */
+const FIELDING_FILE_COLUMNS = ['TC', 'ZR', 'EFF'];
+/** In a fielding file these are the fielding counts, not the batting or pitching columns. */
+const FIELDING_COUNTS = ['G', 'GS', 'IP', 'DP'];
+
+/** Whether a header (or a table's column names) is a fielding file's. */
+export const isFieldingHeader = (header: readonly string[]) =>
+  FIELDING_FILE_COLUMNS.some((column) => header.includes(column));
 
 const hasAny = (header: readonly string[], columns: readonly string[]) =>
   columns.some((column) => header.includes(column));
@@ -266,6 +328,9 @@ export function canonicalName(column: string, header: readonly string[]): string
   const entry = COLUMN_DICTIONARY[column];
   if (entry === undefined) {
     return null;
+  }
+  if (FIELDING_COUNTS.includes(column) && isFieldingHeader(header)) {
+    return `Fielding ${column}`;
   }
   if (column === 'CON P') {
     if (hasAny(header, BATTING_POTENTIALS)) {
@@ -296,6 +361,7 @@ export interface ColumnReading {
 /** Reads a header through the dictionary. */
 export function readColumns(header: readonly string[]): ColumnReading {
   const reading: ColumnReading = { names: [], notRead: [], markers: { hitters: [], pitchers: [] } };
+  const fielding = isFieldingHeader(header);
   for (const column of header) {
     const entry = COLUMN_DICTIONARY[column];
     const name = canonicalName(column, header);
@@ -303,7 +369,8 @@ export function readColumns(header: readonly string[]): ColumnReading {
       reading.notRead.push(column);
     }
     reading.names.push(name === null || DROPPED_COLUMNS.has(column) ? null : name);
-    if (entry?.marker && entry.side !== 'both') {
+    // No column of a fielding file marks a side; its rows go by POS.
+    if (!fielding && entry?.marker && entry.side !== 'both') {
       reading.markers[entry.side].push(column);
     }
   }

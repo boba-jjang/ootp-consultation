@@ -317,7 +317,7 @@ describe('importLeague with the fielding view (Knowledge Base › Import contrac
     );
     const unfielded = routeExport(
       'rsl_statistics_player_statistics_-_sortable_stats_b.csv',
-      'POS,Name,TM,PA\r\nSS,Ann Lee,Boston,100',
+      'POS,Name,TM,PA\r\nSS,Ann Lee,Boston,100\r\nSS,Bo Kim,Aces,90',
     );
     const result = importLeague([batting, fielding, unfielded]);
     expect(

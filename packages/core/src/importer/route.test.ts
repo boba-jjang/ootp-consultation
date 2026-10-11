@@ -546,14 +546,14 @@ describe('routeExport on the fielding view (Knowledge Base â€º Import contract â
       'Fielding PCT': 1,
       ZR: 0.1,
       EFF: 0.979,
-      'RTO%': 0.286,
-      'BIZ-R%': 0.947,
       CERA: 4.33,
       DEF: 7,
       'DEF Pot': 7,
       'C Pot': 7,
       'SS Pot': null,
     });
+    expect(row?.['RTO%']).toBeCloseTo(0.286, 10);
+    expect(row?.['BIZ-R%']).toBeCloseTo(0.947, 10);
     expect(row).not.toHaveProperty('G');
     expect(row).not.toHaveProperty('IP');
     expect(row).not.toHaveProperty('E');

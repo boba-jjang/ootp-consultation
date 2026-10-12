@@ -284,7 +284,8 @@ describe('the Game 53 selection (req-slots, req-assignment, req-alternatives)', 
     expect(at(lineup, 'C').battingRuns).toBeCloseTo(-11.0471, 3);
     expect(at(lineup, 'C').fieldingRuns).toBeCloseTo(8.1067, 3);
     expect(at(lineup, 'C').value).toBeCloseTo(-2.3523, 3);
-    expect(at(lineup, 'C2')).toMatchObject({ share: 0.2, source: 'played' });
+    expect(at(lineup, 'C2')).toMatchObject({ source: 'played' });
+    expect(at(lineup, 'C2').share).toBeCloseTo(0.2, 9);
     expect(at(lineup, 'C2').fieldingRuns).toBeCloseTo(8.1067, 3);
     expect(at(lineup, 'C2').value).toBeCloseTo(-1.7602, 3);
     expect(at(lineup, '1B')).toMatchObject({ share: 1, source: 'formula' });
@@ -328,7 +329,8 @@ describe('the Game 53 selection (req-slots, req-assignment, req-alternatives)', 
     const shared = selectLineup(g53, team, { ...DEFAULT_LINEUP_SETTINGS, catcherShare: 0.6 });
     expect(at(shared, 'C')).toMatchObject({ name: 'Yasuhiro Tsumoto', share: 0.6 });
     expect(at(shared, 'C').value).toBeCloseTo(0.6 * (-11.0471 + 8.1067), 3);
-    expect(at(shared, 'C2')).toMatchObject({ name: 'Yoshitsugu Ishida', share: 0.4 });
+    expect(at(shared, 'C2')).toMatchObject({ name: 'Yoshitsugu Ishida' });
+    expect(at(shared, 'C2').share).toBeCloseTo(0.4, 9);
     expect(at(shared, 'C2').value).toBeCloseTo(0.4 * (-16.9075 + 8.1067), 3);
   });
 
@@ -412,15 +414,19 @@ describe('hand-built rosters (Open questions 5 and 6)', () => {
     expect(at(lineup, 'DH')).toMatchObject({ name: 'Bat Only', fieldingRuns: 0, source: null });
   });
 
-  it('fills the nine before the backup: a second catcher DHs rather than backs up', () => {
-    // Nine hitters for ten slots. The poor-hitting second catcher is worth −17.18 as the backup
-    // and −94.00 at DH, but the nine come first, so he DHs and the backup stays empty.
+  it('fills the nine before the backup: a second catcher plays rather than backs up', () => {
+    // Nine hitters for ten slots. With every slot in play the best fill leaves DH empty: the
+    // poor-hitting second catcher is worth −17.18 as the backup and −94.00 at DH. The nine come
+    // first, so both catchers play and the backup stays empty. The catcher share discounts the
+    // weaker bat, so he catches (0.8 × (−94.00 + 8.11) = −68.71) and the better one DHs (17.80):
+    // −50.91 together, against −73.27 the other way round.
     const roster = [...nine.slice(0, 8), player('Second C', 'C', 30)];
     const lineup = selectLineup(handBuilt(roster), team);
     expect(lineup.feasible).toBe(true);
-    expect(nameAt(lineup, 'C')).toBe('Starter C');
-    expect(nameAt(lineup, 'DH')).toBe('Second C');
-    expect(at(lineup, 'DH').value).toBeCloseTo(handRuns(30), 3);
+    expect(nameAt(lineup, 'C')).toBe('Second C');
+    expect(at(lineup, 'C').value).toBeCloseTo(0.8 * (handRuns(30) + handFielding(8)), 3);
+    expect(nameAt(lineup, 'DH')).toBe('Starter C');
+    expect(at(lineup, 'DH').value).toBeCloseTo(handRuns(60), 3);
     expect(lineup.backup).toBeNull();
     expect(lineup.flags.map((flag) => flag.code)).toEqual(['no-backup-catcher']);
   });

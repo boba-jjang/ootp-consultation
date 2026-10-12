@@ -163,6 +163,7 @@ The user exports these from the league's player statistics screen, in any view, 
   - Game 42 (`fixtures/seattle-g42/`): 12 hitters, 13 pitchers, 11 team views in OOTP's own layouts, and four league files.
   - Game 53 (`fixtures/seattle-g53/`): 12 hitters (two of them new) and the same 13 pitchers, in the owner's custom views, with league standard stats and a bio view that lists both sides.
   - About game 70 (`fixtures/seattle-g70/`): the team's 12 hitters and the league's 508 fielders in the owner's custom fielding view, with heights and team codes (section 9). No batting view came with it, so that snapshot carries no game label.
+  - About game 71 (`fixtures/seattle-g71/`): the owner's latest custom views for the team and the whole league: batting stats and superstats, hitters' and pitchers' ratings (custom\_bat\_pot and cus\_pitch\_pot), fielding stats (with heights), fielding ratings (the fielding components, DEF, DEF Pot and age), and pitching stats and superstats. Every view carries TM, and the league files list every player, 517 hitters and 481 pitchers, not qualified ones only.
 - The league files come from the same snapshot as the team's, and the team's rows match the team views, apart from one league position at Game 53.
 - The league rates players on a 1–10 scale and hides current batting and pitching ratings.
 
@@ -185,8 +186,8 @@ The importer reads any CSV column by column through the column dictionary, fills
   - CON P is Contact P in a file with batting potentials (HT P, K P, GAP P, POW P, EYE P), and Control P in one with pitching potentials (STU P, MOV P, HRA P, PBABIP P).
   - HLD is the hold-runners rating in a file with pitching potentials, and holds elsewhere.
   - Avg% in hitters' files and Med% in pitchers' are the same middle contact bucket, one canonical Med%.
-  - Batting and pitching columns that share a name (K, BB, HR, H, R, AVG, OBP, SLG, BABIP, SB, CS, HP, WAR, WPA and the superstats columns) mean the hitter's own result in a hitters' file and the result allowed in a pitchers' file. Each side's table keeps its own.
-  - In a fielding file (one with TC, ZR or EFF), G, GS, IP, E, A, PO, DP and PCT are fielding counts, canonical Fielding G, Fielding GS, Fielding IP (as outs, like IP), Fielding E, Fielding A, Fielding PO, Fielding DP and Fielding PCT, never the batting or pitching ones. Its ARM is arm runs and its RNG is range factor, apart from IF ARM, OF ARM, IF RNG and OF RNG. Its DEF Pot is the hitters' DEF Pot, as in the capture.
+  - Batting and pitching columns that share a name (K, BB, HR, H, R, AVG, OBP, SLG, BABIP, SB, CS, HP, WAR, WPA and the superstats columns) mean the hitter's own result in a hitters' file and the result allowed in a pitchers' file. Each side's table keeps its own. GB and FB, the pitchers' ground-ball and fly-ball counts, are apart from the rates GB% and FB%: GO% = GB ÷ (GB + FB).
+  - In a fielding file (one with TC, ZR or EFF, or with the fielding components together with DEF Pot, as in the fielding ratings view), G, GS, IP, E, A, PO, DP, TP and PCT are fielding counts, canonical Fielding G, Fielding GS, Fielding IP (as outs, like IP), Fielding E, Fielding A, Fielding PO, Fielding DP, Fielding TP (triple plays) and Fielding PCT, never the batting or pitching ones. Its ARM is arm runs and its RNG is range factor, apart from IF ARM, OF ARM, IF RNG and OF RNG. Its DEF Pot belongs to each row's own side: a hitter's as in the capture, a pitcher's as in cus\_pitch\_pot.
 
 ### Known views
 
@@ -210,13 +211,13 @@ These are the headers OOTP's views export, kept to describe uploads and to sugge
 | Custom pitching stats (Game 53) | POS, #, Name, T, G, GS, W, L, WIN%, SVO, SV, SV%, BS, BS%, HLD, IP, BF, AB, HA, 1B, 2B, 3B, HR, TB, R, ER, BB, K, HP, ERA, AVG, OBP, SLG, OPS, BABIP, WHIP, BRA/9, HR/9, H/9, BB/9, K/9, K/BB, K%, BB%, K%-BB%, SH, SF, WP, DP, IR, IRS, IRS%, LOB%, pLi, ERA+, FIP, FIP-, WPA, WAR, rWAR, SIERA |
 | Custom pitching superstats (Game 53) | POS, Name, G, GS, BIP, GB/FB, LD%, GB%, FB%, IFFB, HR/FB, IFH%, BUH%, Pull%, Cent%, Oppo%, Soft%, Med%, Solid%, EV, mEV, LA, BAR%, HHi%, xBACON, xSLGCON, xwOBACON, xBA, xSLG, xwOBA, xERA, PI, SW, WH, OSW, ZX, OS%, ZS%, SW%, OC%, ZC%, CTC%, WH%, CH%, Z%, CL% |
 
-The league sortable files reuse these headers: at Game 42 the league batting\_superstats\_1 is v1 and the other three match the team versions, and at Game 53 the league files use the team's custom views.
+The league sortable files reuse these headers: at Game 42 the league batting\_superstats\_1 is v1 and the other three match the team versions, and at Game 53 the league files use the team's custom views. At Game 71 every custom view carries TM, the custom pitching stats add GB and FB (counts), and two fielding views join them: fielding stats (with HT) and fielding ratings (the fielding components, DEF, DEF Pot, Age and SctAcc).
 
 ### Side and scope
 
-- A file's side comes from its columns. Columns only one side's views carry mark the side: PA, RBI, wOBA, OPS+, TM, Avg%, the batting potentials and the fielding components for hitters; IP, BF, ERA, xERA, Med%, the pitching potentials, STM and VELO for pitchers. The dictionary lists every marker. A file with markers from both sides is rejected.
+- A file's side comes from its columns. Columns only one side's views carry mark the side: PA, RBI, wOBA, OPS+, Avg%, the batting potentials and the fielding components for hitters; IP, BF, ERA, xERA, Med%, the pitching potentials, STM and VELO for pitchers. The dictionary lists every marker. A file with markers from both sides is rejected. TM, BAR and HHi mark no side: since Game 71 the owner's pitching views carry TM, and the pitching superstats carry BAR and HHi.
 - A file with no marker, such as the bio view or a pitching swing-decisions file, takes its side from its rows' POS: in a team file each row by its own POS, and in a league file every row by the side most rows list.
-- A fielding file (TC, ZR or EFF present) lists both sides and places every row by its POS, team or league: its hitter-only columns don't mark it, and its IP, DP and DEF Pot aren't pitching markers there.
+- A fielding file (TC, ZR or EFF present, or the fielding components with DEF Pot) lists both sides and places every row by its POS, team or league: its hitter-only columns don't mark it, and its IP, DP and DEF Pot aren't pitching markers there.
 - In a team file with a side, a row from the other side is left out and logged, with one exception: the pitching ratings view run on hitters supplies those hitters' DEF Pot, their DEF ceiling (section 9).
 - In a league file, every row goes to the file's side, even when its POS is from the other side: league pitching files list position players who pitched, and league batting files can list a pitcher who batted. A fielding file is the exception: its rows go by POS.
 - Scope: a TM column with more than one team makes a league file, and one team a team file. Without TM, OOTP's league or team file prefix decides; failing both, a file with more than 60 rows is a league file (a setting).
@@ -289,7 +290,7 @@ The league sortable files reuse these headers: at Game 42 the league batting\_su
 
 - Every row has Name and POS, and every column is in the column dictionary or listed in the import log as not read.
 - A player's value for a column is the same in every file that carries it, except POS between team and league files. When two files disagree, the later upload wins and the import log names both values. A blank never replaces a value: it fills only an empty cell, so a re-export with a blank column keeps what earlier files gave.
-- Identities hold, within rounding, on every merged row with appearances (league pitching rows with G = 0 carry no data and drop first): RV = RV-FB + RV-BR + RV-OFF (±0.15), WH% = WH / SW, CTC% = 100 − WH%, CH = OSW × (1 − OC%), FF% + BR% + OFF% = 100. A pitcher's BIP is checked against BF − K − BB − HBP with a tolerance of 1.
+- Identities hold, within rounding, on every merged row with appearances (league pitching rows with G = 0 carry no data and drop first, and hitter rows with no plate appearances are skipped): RV = RV-FB + RV-BR + RV-OFF (±0.15), WH% = WH / SW, CTC% = 100 − WH%, CH = OSW × (1 − OC%), FF% + BR% + OFF% = 100. A pitcher's BIP is checked against BF − K − BB − HBP with a tolerance of 1, and GO% against GB ÷ (GB + FB) within 0.006, since GO% has two decimals.
 - Ratings fall inside the league's declared scale.
 - League rows for the team's players equal the team's rows from the same snapshot, POS aside.
 
@@ -297,10 +298,10 @@ The league sortable files reuse these headers: at Game 42 the league batting\_su
 
 - A snapshot keeps four tables: team hitters, team pitchers, league hitters and league pitchers, with one row per player and one column per dictionary column. Every file of the snapshot fills them, and a player's row merges every file that lists him.
 - Team rows join on Name; jersey number is a cross-check.
-- League batting rows join on team plus name. A league batting file without TM takes each row's team from the snapshot's other league batting rows with that name, never from the fielding view's rows; a name with no single team is flagged and left out. League pitching rows join on name, and a name listed twice in one file is flagged and left out.
+- League batting rows join on team plus name. A league batting file without TM takes each row's team from the snapshot's other league batting rows with that name, never from the fielding view's rows; a name with no single team is flagged and left out. League pitching rows join on team plus name when the snapshot's league pitching rows carry TM, as the Game 71 exports do, and on name when none do, as at Games 42 and 53; a pitching row without TM then takes its team from the one league pitching row with that name and a TM. A key listed twice in one file is flagged and left out.
 - Parts combine: a filtered export (starters, relievers or qualified players only) adds its rows, and a row repeated in two files merges into one.
 - A name can appear on both sides when a position player pitches or a pitcher bats; each side keeps its own record.
-- Hitter age comes from the bio view; pitcher age from the bio view or cus\_pitch\_pot.
+- Age comes from the bio view or the fielding ratings view, and a pitcher's also from cus\_pitch\_pot; height from the bio view or either fielding view.
 - Every upload is stored as uploaded and stamped with team, snapshot date and importer version. Uploading never removes another file: an exact copy is skipped, and a later file's differing values replace earlier ones cell by cell, which the import log names; a blank cell never replaces a value. A later date adds a snapshot and keeps history; files from different dates are never merged into one snapshot.
 
 ### Data coverage
@@ -798,6 +799,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 - [ ] Current per-position ratings (the columns without Pot) aren't exported yet. With them, the inexperience discount would be read from the view instead of assumed.
 - [x] Team names come in two forms, the city in the batting views and the abbreviation in the fielding view. Answered: every export uses the short code from now on, and the importer reads Seattle in the Game 42 and Game 53 exports as SEA, with no other map (the owner, 11 October 2026).
 - [ ] The starting catcher's rest days: the lineup model leaves him out of those games. Letting him DH on them would need a second lineup.
+- [ ] The hitters' percentile pool: since Game 71 the league files list every hitter, not qualified ones only, which widens every evidence spread (K% from 4.66 to 7.05 points). Proposed floor: 3.1 PA per team game (183 hitters at Game 71), the qualified standard the earlier exports used.
 
 ## Delivery plan
 
@@ -818,6 +820,7 @@ Phase gates close in order. Inside a phase, modules follow the Depends on column
 | Scale conversion | 7 | 2 | Value parsers | Round-trip tests between 1–10 and 20–80 |
 | Column-dictionary import: four tables per snapshot, parts and re-exports merged cell by cell, coverage by data set | 4, 5 | 4 | Fixtures | Game 42 and Game 53 assemble from their files in any combination; the overlap files change nothing; coverage is High for both |
 | Fielding-view import: its columns in the dictionary, fielding counts kept apart from batting and pitching, rows placed by POS | 4, 5 | 4 | Column-dictionary import | The fielding fixtures read completely, 12 team and 508 league rows; Game 42 and Game 53 unchanged but for Seattle's TM, which reads SEA |
+| The owner's Game 71 exports: pitching views with TM, the fielding ratings view, pitchers keyed on team plus name | 4, 5 | 4 | Fielding-view import | All 16 Game 71 files read, none rejected: 12 team hitters and 13 team pitchers, 517 league hitters and 455 league pitchers; Game 42, 53 and 70 unchanged |
 | Metrics: pass-through, BACON, luck gaps against each pair's baseline | 6 | 4 | Team store | Fixture BACON and each pair's baseline match section 6 |
 | Percentiles: usage-based pools, floors, directions, mid-rank formula | 8 | 4 | League file import | Pools of 214, 151 and 260; 144 starters and 218 relievers after floors |
 | Talent estimator v0 | 7 | 4 | Metrics, scale conversion | Every fixture player gets an estimate and band; disagreements over one step are flagged |

@@ -2,7 +2,7 @@
 
 Oct 4, 2026 · @Jay
 
-> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 11 October 2026.
+> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 12 October 2026.
 
 ## Agent brief
 
@@ -627,7 +627,7 @@ The research's integer program gave each player one position and had no DH slot.
 - p runs over C, 1B, 2B, 3B, SS, LF, CF and RF, plus DH when the league uses it, and a tenth slot, the backup catcher, which carries the starting catcher's rest share (below).
 - o is projected batting runs per season from the talent estimator: PA × (5.0 + Σ b × (estimate − 50) ÷ 10) ÷ 600 over the five hitter components, with b in runs per 10 points: Power 13.2, Gap 7.5, BABIP 6.0, Eye 4.2 and Avoid K's 3.5, fitted on Game 53's 199 qualified league hitters (wRAA per 600 PA on the components' evidence, weighted by PA, R² .63). Its band follows from the components' bands as if they were independent. PA is a fixed baseline, 4.28 per game played (the league regulars' average at Game 53) times the team's games per season, the same for every slot: selection assigns positions, and the batting order sets the spread by spot. d is projected fielding runs at that position from the defensive model, and 0 at DH. A hitter with no estimate takes 0 batting runs and a flag.
 - The catcher slot carries a games share, 0.8 by default (the league's regular catchers catch 83% of their games at Game 53; Seattle's starter 67–72%), which scales the starter's batting and fielding runs. The backup-catcher slot carries the rest and takes the best remaining eligible catcher; it must be filled when one remains, and is flagged empty when none does. The starter's rest-day DH isn't modeled.
-- Output: the nine and the backup catcher with each one's batting runs, fielding runs, share and total; the bench with their values; and at each slot the cost of the best alternative, the total's drop when the chosen player is barred there. On Game 53 with DH, at the defaults: C Tsumoto, backup C Ishida, 1B Kamimura, 2B Geng, 3B Kawasaki, SS Choi, LF Shinn, CF Obata, RF Wang, DH Yamanaka; Li and Moon on the bench.
+- Output: the nine and the backup catcher with each one's batting runs, fielding runs, share and total; the bench with their values; and at each slot the cost of the best alternative, the total's drop when the chosen player is barred from that position; a catcher barred from catching neither starts nor backs up, so the backup slot's cost is empty when no other catcher exists. On Game 53 with DH, at the defaults: C Tsumoto, backup C Ishida, 1B Kamimura, 2B Geng, 3B Kawasaki, SS Choi, LF Shinn, CF Obata, RF Wang, DH Yamanaka; Li and Moon on the bench.
 - A roster of 25 gives 250 player–slot pairs; an exact assignment (the Hungarian algorithm) solves it instantly in plain TypeScript, with no library. Every constant here is a setting.
 
 ### Ordering

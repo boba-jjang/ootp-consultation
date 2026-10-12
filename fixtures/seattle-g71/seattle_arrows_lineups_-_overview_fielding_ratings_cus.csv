@@ -1,0 +1,13 @@
+POS,Name,TM,Age,T,C ABI,C FRM,C ARM,IF RNG,IF ERR,IF ARM,TDP,OF RNG,OF ERR,OF ARM,DEF,DEF Pot,SctAcc
+C,Yoshitsugu Ishida,SEA,25,R,7,7,7,3,3,6,3,3,1,7,7,7,V.High
+C,Yasuhiro Tsumoto,SEA,27,R,8,9,4,1,2,2,1,1,3,2,7,7,V.High
+LF,Jin-soo Shinn,SEA,25,R,1,1,1,4,4,6,4,3,6,6,7,7,V.High
+2B,Han-lee Choi,SEA,30,R,1,1,1,7,6,5,7,5,5,3,7,7,V.High
+2B,Ling-lai Li,SEA,27,R,1,1,1,7,6,6,6,6,5,7,6,6,V.High
+3B,Manichiro Kawasaki,SEA,28,R,1,1,1,5,8,9,5,3,5,5,7,7,V.High
+SS,Dong-hee Moon,SEA,23,R,1,1,1,7,8,7,8,2,5,7,7,7,V.High
+LF,Hideji Yamanaka,SEA,29,L,1,1,1,1,1,4,1,4,5,8,4,5,V.High
+2B,Zhong-shan Geng,SEA,28,R,1,1,1,7,5,5,6,7,10,7,7,7,V.High
+CF,Tomofumi Kamimura,SEA,23,L,1,1,1,8,5,1,1,7,5,4,3,4,V.High
+RF,Etsuji Obata,SEA,25,L,1,1,1,3,3,5,2,8,7,7,8,8,V.High
+RF,Daniel Wang,SEA,26,L,1,1,1,2,2,4,1,6,7,6,6,6,V.High

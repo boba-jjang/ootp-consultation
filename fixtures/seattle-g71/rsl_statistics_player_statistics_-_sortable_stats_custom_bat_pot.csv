@@ -1,0 +1,518 @@
+POS,Name,TM,B,T,WE,INT,CON P,HT P,K P,GAP P,POW P,EYE P,BUN,BFH,BBT,GBT,FBT,C ABI,C FRM,C ARM,IF RNG,IF ERR,IF ARM,TDP,OF RNG,OF ERR,OF ARM,SPE,STE,SR,RUN,DEF,Risk
+SP,Kingsley Bozek,LA,R,L,High,High,6,8,4,6,5,6,9,1,Groundball,Spray,Normal,1,1,1,6,7,7,4,1,1,1,2,1,5,3,10,Low
+C,Cole Chermak,BRK,R,R,Low,Low,5,5,5,4,4,9,3,1,Groundball,Pull,Pull,10,10,8,1,2,4,1,3,2,4,1,1,3,4,10,Very Low
+CF,Gurmu Jemadari,NYT,R,R,Normal,Normal,8,8,7,7,6,5,3,4,Line Drive,Normal,Normal,1,1,1,5,3,5,4,9,10,10,5,9,10,6,10,Very Low
+2B,Chris Kouri,YK,R,R,Normal,Normal,4,3,5,5,5,5,3,1,Normal,Normal,Spray,1,1,1,9,7,5,9,6,7,3,9,10,9,10,10,Very Low
+CF,David Kuthakwakulu,WAS,R,L,High,Normal,8,7,9,7,2,5,10,10,Line Drive,Normal,Normal,1,1,1,6,5,3,1,10,9,7,10,10,10,10,10,Very Low
+C,Leonelkis Prieto,NYT,R,R,Normal,High,3,1,6,1,1,2,10,10,Normal,Spray,Spray,10,9,10,7,4,9,3,6,3,8,10,10,10,10,10,Very Low
+C,Angel Ulloa,HOU,R,R,Normal,Normal,5,5,4,5,3,4,2,1,Normal,Spray,Spray,10,9,7,2,4,5,1,2,3,5,1,3,2,1,10,Very Low
+C,Hunter Begley,STL,S,R,High,Normal,5,5,6,7,4,7,2,1,Line Drive,Pull,Normal,9,9,6,1,2,2,1,1,1,2,1,1,1,1,9,Very Low
+2B,Jack Bird,BRK,R,R,Normal,Normal,8,8,9,8,2,5,6,1,Line Drive,Normal,Spray,1,1,1,8,7,8,7,4,6,8,5,6,7,9,9,Low
+SS,Zane Chwalek,VAN,R,R,Normal,Normal,8,7,10,6,4,2,4,5,Line Drive,Spray,Normal,1,1,1,10,7,9,10,4,4,2,9,10,9,10,9,Medium
+RF,Zahi Cobo,NYT,R,R,High,Low,8,8,7,6,8,7,2,7,Groundball,Normal,Normal,1,1,1,3,2,8,2,7,5,10,9,10,10,10,9,Low
+C,Aires Colmeiro,CIN,R,R,Normal,Normal,7,6,7,4,6,4,3,1,Normal,Normal,Pull,10,7,9,2,2,4,1,2,1,4,3,2,3,3,9,Medium
+C,Dante Cuadra,MIN,R,R,Normal,Normal,4,4,4,3,6,6,3,2,Normal,Normal,Spray,10,10,4,2,2,2,1,4,2,1,1,2,2,1,9,Very Low
+SS,Chaim Dijkstra,BUF,R,R,Normal,Normal,7,10,4,6,3,6,5,4,Line Drive,Pull,Spray,1,1,1,7,10,10,10,2,6,9,6,9,10,10,9,Low
+C,Nick Drexler,BAL,S,R,Normal,Normal,4,3,4,3,4,4,2,2,Normal,Normal,Spray,9,9,7,1,3,5,1,3,4,5,1,1,2,1,9,Very Low
+RF,Onel Escalante,MTL,L,L,High,Normal,4,4,4,10,5,6,6,5,Line Drive,Normal,Normal,1,1,1,7,5,5,1,8,7,8,5,4,10,4,9,Medium
+SS,Noah Gracey,DEN,R,R,High,High,4,4,4,5,1,7,4,1,Line Drive,Normal,Normal,1,1,1,8,10,10,10,3,4,9,6,3,9,7,9,Very Low
+SS,Ron Jollymour,CHI,L,R,Normal,High,5,6,4,6,8,6,2,1,Flyball,Pull,Normal,1,1,1,9,8,9,9,4,5,2,4,6,9,9,9,Low
+C,Eloy Laca,WAS,R,R,Low,Normal,7,9,5,3,4,7,4,1,Groundball,Spray,Spray,10,10,5,1,3,3,1,1,2,3,1,1,1,2,9,Very Low
+SS,Ruden Lopez,SF,R,R,Normal,Low,8,8,7,7,1,5,10,8,Line Drive,Normal,Normal,1,1,1,9,9,8,9,5,9,8,8,8,9,1,9,Medium
+1B,Tatsuma Matsuura,ANA,R,R,Normal,Normal,4,4,4,5,8,5,4,1,Flyball,Normal,Spray,1,1,1,4,5,4,3,1,1,2,2,4,4,3,9,Very Low
+2B,Elvin Perfecto,CIN,R,R,Normal,Normal,5,4,5,7,1,7,3,1,Line Drive,Ex. Pull,Normal,1,1,1,6,10,8,10,1,4,6,6,7,6,10,9,Low
+SS,Clive Pritchard,POR,R,R,Normal,Low,5,5,4,5,2,4,5,5,Groundball,Pull,Spray,1,1,1,9,8,10,9,5,6,10,7,6,10,8,9,Very Low
+SS,Kien Sa,VAN,R,R,Normal,Normal,7,9,5,6,5,4,7,7,Line Drive,Pull,Spray,1,1,1,9,10,7,8,4,4,7,7,8,10,10,9,Very Low
+2B,Eddie Simon,BOS,L,R,Normal,Normal,7,7,8,6,5,6,2,1,Groundball,Normal,Normal,1,1,1,7,7,8,9,4,5,7,3,4,3,5,9,Very Low
+SS,Menno Tabak,NYT,R,R,Normal,Normal,4,4,4,4,1,5,5,1,Line Drive,Normal,Normal,1,1,1,9,9,9,9,3,6,8,6,7,5,9,9,Very Low
+2B,Bobby Verkaik,YK,R,R,Normal,Normal,4,4,4,4,2,2,8,6,Normal,Pull,Normal,1,1,1,7,9,10,9,2,5,10,4,6,10,9,9,Very Low
+SS,Victor Yero,BRK,L,R,Normal,Normal,6,4,9,8,3,4,1,1,Line Drive,Pull,Normal,1,1,1,9,10,10,7,5,6,7,6,4,5,3,9,Low
+SS,Brian Zeeff,TUC,R,R,Low,Normal,7,5,8,7,6,4,2,5,Groundball,Normal,Normal,1,1,1,9,8,9,10,2,4,7,3,7,9,5,9,Low
+C,Dioelis Acebal,STL,R,R,Normal,High,4,4,3,3,7,5,2,1,Flyball,Pull,Spray,8,8,9,1,3,4,1,1,5,4,1,1,1,1,8,Low
+RF,Bobby Aguinaga,MIN,R,R,High,Normal,7,7,7,6,5,10,4,1,Line Drive,Pull,Normal,1,1,1,6,7,6,6,8,8,7,6,10,10,5,8,Very Low
+SS,Edgar Aldobrandini,POR,R,R,Normal,Normal,5,5,5,4,1,3,5,1,Groundball,Normal,Spray,1,1,1,8,10,7,9,3,5,7,8,8,10,10,8,Low
+CF,Jeremy Aldrich,PHI,R,R,Normal,Low,4,4,4,4,3,4,6,1,Normal,Spray,Pull,1,1,1,5,2,3,5,9,4,8,9,4,6,4,8,Very Low
+LF,Ileanna Alfaro,EDM,R,R,High,High,8,10,6,5,1,8,6,1,Line Drive,Spray,Normal,1,1,1,3,1,3,1,7,6,8,8,5,9,6,8,Medium
+2B,Willy Amavizca,BUF,R,R,Low,Normal,6,7,5,9,2,4,10,10,Line Drive,Normal,Pull,1,1,1,6,7,6,10,3,3,4,10,10,10,10,8,Very Low
+SS,Eliecer Arruebarrena,YK,R,R,Normal,High,4,3,6,4,1,2,5,4,Normal,Spray,Normal,1,1,1,9,7,8,10,7,5,6,4,8,10,10,8,Very Low
+CF,Raul Aviles,ME,R,L,High,High,3,3,3,4,1,3,7,7,Groundball,Normal,Normal,1,1,1,7,5,2,1,9,9,6,8,9,9,10,8,Very Low
+1B,Raymilson Bayam,BRK,R,R,Normal,Normal,5,6,4,9,6,10,10,4,Line Drive,Normal,Normal,1,1,1,4,5,7,4,3,4,6,5,6,10,9,8,Low
+CF,Joe Bird,MIN,R,R,Low,Normal,6,5,7,6,2,6,5,4,Normal,Normal,Normal,1,1,1,2,3,7,2,9,7,9,6,6,10,7,8,Low
+CF,Tommy Bomba,LA,R,L,High,Normal,4,3,6,5,1,5,10,4,Line Drive,Normal,Spray,1,1,1,1,1,2,1,9,4,6,5,4,9,7,8,Very Low
+C,Ray Boos,BOS,R,R,Normal,Normal,6,7,4,7,6,5,3,1,Line Drive,Normal,Normal,7,7,10,3,1,7,1,4,4,10,1,1,7,1,8,Low
+1B,Jose Buezo,KC,S,R,Normal,Normal,4,5,4,5,8,5,3,1,Flyball,Ex. Pull,Normal,1,1,1,4,5,3,4,3,3,4,1,1,2,2,8,Very Low
+RF,Keith Cassavaugh,SF,L,L,Normal,High,5,6,4,4,5,2,7,2,Flyball,Pull,Spray,1,1,1,4,3,7,1,6,6,10,5,7,6,10,8,Very Low
+SS,Jeremy Chickering,LA,R,R,High,Normal,6,5,7,6,2,4,3,2,Line Drive,Normal,Normal,1,1,1,9,8,7,8,7,5,5,3,4,10,1,8,Low
+3B,Lupe Corona,SD,R,R,Low,Normal,5,4,6,6,1,4,6,4,Line Drive,Normal,Spray,1,1,1,5,9,9,7,2,4,8,4,6,8,6,8,Very Low
+2B,DeMario Custodio,SF,R,R,Normal,Normal,7,8,6,6,5,2,2,6,Line Drive,Normal,Normal,1,1,1,8,5,7,7,6,5,7,9,10,10,10,8,Low
+3B,Jon Dante,SAN,R,R,High,Normal,8,10,5,8,4,7,2,3,Line Drive,Normal,Pull,1,1,1,6,6,10,10,2,6,9,7,7,10,10,8,Low
+1B,Mike Davidson,HOU,R,R,Normal,Normal,5,5,4,4,5,7,3,1,Normal,Normal,Normal,1,1,1,5,5,7,6,5,6,7,1,2,3,2,8,Very Low
+CF,Kadri Dhamo,BRK,L,R,High,Normal,6,6,6,9,3,9,3,1,Line Drive,Normal,Spray,1,1,1,4,2,4,3,8,10,6,4,6,10,5,8,Very Low
+C,Alrigo Dini,PHI,R,R,High,High,5,5,6,4,5,8,3,1,Normal,Normal,Normal,8,8,9,1,2,2,1,3,1,3,2,3,5,1,8,Very Low
+3B,Steve Dunn,CHE,R,R,Normal,Normal,4,4,4,4,4,5,4,3,Normal,Pull,Normal,1,1,1,8,7,9,5,2,3,8,2,3,7,1,8,Very Low
+1B,Justin Evans,LV,R,L,Normal,Normal,5,6,5,5,5,4,3,1,Normal,Normal,Pull,1,1,1,5,4,5,1,3,5,7,4,5,8,5,8,Very Low
+2B,Joel Feldewerth,BAL,R,R,High,Normal,6,6,6,3,1,7,7,9,Groundball,Pull,Pull,1,1,1,7,6,5,9,5,5,6,10,10,10,10,8,Very Low
+CF,Kazuyoshi Fujii,PHX,S,L,Low,Normal,4,3,4,3,1,4,5,1,Groundball,Normal,Normal,1,1,1,8,7,6,1,9,7,8,9,8,10,10,8,Very Low
+C,Che Gainza,PHI,R,R,Normal,Normal,3,2,4,3,7,6,2,1,Flyball,Pull,Spray,9,9,4,2,5,2,2,1,2,2,1,2,4,2,8,Very Low
+LF,Ray Garcia,DEN,L,L,Normal,Normal,5,5,5,5,6,4,3,1,Normal,Pull,Normal,1,1,1,6,4,4,1,8,5,8,8,8,10,9,8,Very Low
+C,Ricardo Garrido,TOR,S,R,Normal,Normal,4,4,4,3,6,5,3,1,Flyball,Ex. Pull,Normal,8,8,7,4,2,7,1,1,3,7,1,1,3,2,8,Very Low
+1B,Walter Gravel,CIN,L,R,Normal,Normal,6,6,6,6,6,4,2,4,Normal,Spray,Normal,2,2,1,5,6,10,3,2,4,9,9,9,8,9,8,Very Low
+SS,Dodger Hall Jr.,TOR,R,R,High,Normal,7,8,7,7,1,2,5,3,Line Drive,Normal,Spray,1,1,1,10,8,7,7,5,7,7,5,5,10,6,8,Low
+C,Joram Hegger,HAV,R,R,Normal,Normal,5,5,4,5,3,7,3,1,Groundball,Pull,Pull,8,9,6,2,3,4,1,2,5,4,1,2,2,1,8,Very Low
+SS,Steve Hemphill,ANC,R,R,Low,Normal,3,3,3,5,2,3,6,1,Normal,Normal,Spray,1,1,1,8,8,8,9,3,6,7,5,8,9,7,8,Very Low
+CF,Marcos Hiciano,YK,R,R,Normal,Normal,4,5,2,9,8,8,4,1,Normal,Normal,Spray,1,1,1,5,3,3,4,8,10,10,10,4,8,7,8,Low
+CF,Marvin Jackson,MIN,R,R,Normal,Normal,4,5,4,5,2,7,5,3,Groundball,Normal,Normal,1,1,1,6,4,8,5,8,7,10,6,9,10,9,8,Very Low
+C,Ryan Jarnagin,VAN,S,R,Normal,Normal,8,6,10,4,3,8,3,1,Groundball,Spray,Normal,9,9,7,3,4,5,1,2,2,4,1,1,3,1,8,Very Low
+C,O-jun Joh,YK,R,R,High,High,7,7,6,3,3,5,3,1,Groundball,Ex. Pull,Normal,9,9,6,2,5,5,2,1,1,3,1,3,4,1,8,Very Low
+C,David Johnson,MTL,R,R,High,Normal,3,2,4,1,5,3,2,1,Flyball,Normal,Pull,9,9,6,2,3,5,1,1,3,5,1,1,2,3,8,Very Low
+1B,Nick Johnston,MIA,R,R,Normal,Normal,5,6,5,7,5,5,3,5,Line Drive,Normal,Normal,1,1,1,4,5,4,5,3,4,2,7,8,10,7,8,Very Low
+CF,Du Kau,PHX,R,R,Normal,Normal,5,4,5,7,2,5,10,6,Line Drive,Normal,Spray,1,1,1,6,5,4,5,9,5,7,9,10,10,10,8,Low
+CF,Mike Kelly,KC,R,R,Normal,Normal,5,4,6,6,1,5,3,4,Line Drive,Pull,Normal,1,1,1,6,4,2,4,9,6,5,3,2,10,1,8,Low
+SS,Morgan Kirkpatrick,NYT,R,R,Normal,Low,4,4,4,3,4,5,6,2,Normal,Normal,Pull,1,1,1,9,7,10,5,5,6,9,4,9,10,6,8,Very Low
+LF,Robbie Klabunde,BAL,R,L,Normal,Normal,7,8,6,6,7,4,2,1,Groundball,Pull,Normal,1,1,1,5,4,7,1,7,7,9,7,10,10,10,8,Low
+2B,Hisatada Konda,TOR,R,R,Normal,High,5,5,5,6,3,8,5,1,Line Drive,Pull,Normal,1,1,1,8,8,4,6,4,5,3,1,2,9,1,8,Very Low
+CF,Abdel Laffita,BUF,R,L,Normal,Normal,4,4,4,4,5,4,3,3,Normal,Normal,Normal,1,1,1,6,5,8,1,9,4,10,6,5,10,7,8,Low
+CF,Josh Main,LV,R,R,Normal,High,4,5,3,8,1,6,3,1,Line Drive,Pull,Normal,1,1,1,2,4,4,3,9,10,5,5,8,10,8,8,Low
+C,Nick Majors,DEN,L,R,High,Normal,5,5,5,4,1,4,6,1,Groundball,Normal,Normal,8,8,8,6,3,5,1,1,1,6,2,3,2,2,8,Very Low
+3B,Pedro Marcial,MTL,R,R,Normal,Normal,5,5,5,6,6,4,5,1,Normal,Normal,Normal,1,1,8,4,8,10,4,2,6,10,4,3,5,4,8,Very Low
+C,Lyalya Markosiants,SF,R,R,High,High,6,7,6,6,7,9,9,7,Groundball,Spray,Spray,8,8,8,6,7,8,7,6,9,6,8,8,7,10,8,Very Low
+C,Steve Mayeux,CHI,R,R,Normal,Normal,4,4,4,3,3,5,4,2,Groundball,Normal,Pull,8,9,5,2,2,5,1,1,1,5,1,1,3,4,8,Very Low
+RF,Eric McCasland,BAL,R,R,Normal,High,4,4,3,4,8,6,10,1,Flyball,Normal,Spray,1,1,1,5,3,4,4,7,7,8,4,6,9,4,8,Very Low
+2B,Anaximander McKay,NYT,R,R,Normal,Normal,9,9,8,6,3,8,9,6,Line Drive,Normal,Normal,1,1,1,6,8,4,10,2,3,2,7,8,8,10,8,Very Low
+CF,Jose Mejia,HAV,R,R,Low,Low,4,4,4,6,6,5,3,1,Normal,Spray,Normal,1,1,1,6,5,6,6,8,8,10,7,7,10,8,8,Very Low
+LF,Billy Morf,PHX,R,R,High,Normal,8,7,8,6,8,9,2,5,Groundball,Normal,Pull,1,1,1,1,1,3,1,8,5,6,8,8,7,10,8,Very Low
+C,T.J. Nyenhuis,BUF,R,R,Normal,Normal,7,9,4,4,5,3,4,1,Line Drive,Normal,Normal,7,7,10,2,5,4,3,1,2,4,1,1,2,1,8,Medium
+RF,Etsuji Obata,SEA,L,L,Normal,Normal,5,8,4,6,8,8,3,5,Groundball,Normal,Spray,1,1,1,3,3,5,2,8,7,7,9,7,10,10,8,Low
+LF,Sean Oehlert,SF,R,R,Normal,Normal,8,7,8,8,4,4,3,4,Line Drive,Normal,Spray,1,1,1,6,4,2,4,7,6,7,6,5,9,5,8,Low
+2B,Kevin Patino,SA,L,R,Normal,Low,5,5,5,6,3,5,6,6,Line Drive,Pull,Spray,1,1,1,9,5,6,8,6,7,6,5,2,10,6,8,Very Low
+1B,Rickey Pfau,MTL,R,R,High,Normal,4,4,5,6,4,9,3,4,Normal,Pull,Normal,1,1,1,4,4,7,5,2,3,6,9,10,7,10,8,Very Low
+CF,Venceslau Pontes,LV,R,R,High,Normal,8,9,7,6,4,4,3,1,Line Drive,Ex. Pull,Normal,1,1,1,2,3,6,2,8,8,9,8,9,10,10,8,Low
+1B,Osmel Rivera,VAN,R,R,Normal,High,6,4,9,4,7,5,4,4,Flyball,Spray,Spray,1,1,1,5,3,3,2,2,2,4,4,3,7,7,8,Very Low
+CF,Tilmão Roboredo,DEN,R,R,Normal,Normal,5,5,4,5,2,4,3,1,Groundball,Normal,Normal,1,1,1,3,3,4,3,9,6,7,8,10,10,9,8,Very Low
+2B,Manny Roman,VAN,R,R,Normal,Normal,4,4,5,3,4,5,5,5,Normal,Spray,Pull,1,1,1,6,9,8,9,3,5,7,7,7,9,9,8,Very Low
+CF,Daichi Sakai,SAN,R,L,High,Normal,5,6,4,10,8,5,4,2,Line Drive,Normal,Spray,1,1,1,7,7,7,1,9,6,10,8,8,10,10,8,Medium
+LF,Felix Sanchez,POR,R,R,Normal,Normal,5,5,5,6,4,5,3,5,Groundball,Normal,Normal,1,1,1,1,2,5,1,7,8,7,8,9,10,9,8,Very Low
+RF,John Sauve,VAN,S,L,Low,Normal,4,4,5,6,7,4,2,3,Flyball,Normal,Normal,1,1,1,4,3,6,1,7,5,9,6,10,10,9,8,Very Low
+2B,Marcos Serna,BOS,R,R,Normal,Normal,7,5,8,5,3,6,5,1,Groundball,Normal,Normal,1,1,1,7,7,6,7,2,3,6,2,4,7,5,8,Low
+RF,Phil Sfindex,CHI,L,L,High,High,9,8,10,10,9,9,7,7,Line Drive,Normal,Normal,1,1,1,6,5,4,5,6,7,10,9,8,8,10,8,Extreme
+SS,Kevin Shouse,BOS,R,R,High,Normal,3,4,3,3,1,9,2,5,Normal,Normal,Normal,1,1,1,8,9,8,10,2,4,9,7,10,10,10,8,Very Low
+2B,Bin-ying Shui,DEN,R,R,High,Normal,5,6,4,6,2,2,4,2,Line Drive,Normal,Normal,1,1,1,8,5,6,6,6,4,5,6,9,10,10,8,Very Low
+3B,Danny Sifontes,SD,R,R,Low,Normal,4,4,5,6,4,8,9,1,Normal,Normal,Normal,1,1,1,6,8,9,9,5,8,9,3,3,10,2,8,Very Low
+3B,Kenny Sturdivant,TUC,R,R,Low,High,5,5,5,5,7,5,2,1,Flyball,Normal,Normal,1,1,1,7,8,8,6,3,6,8,4,6,6,7,8,Low
+RF,Leonilde Tigre,CHI,S,R,Normal,Low,5,5,6,7,9,5,3,1,Flyball,Pull,Normal,1,1,1,6,5,5,5,7,8,7,3,4,9,3,8,Very Low
+SS,Nate Tinsley,SAN,R,R,High,High,4,4,5,4,4,3,4,4,Normal,Normal,Normal,1,1,1,9,8,9,8,1,5,8,7,9,10,10,8,Very Low
+2B,Moala Tuuta,GAR,S,R,Normal,Normal,4,4,4,5,3,4,2,2,Groundball,Normal,Normal,1,1,1,8,8,6,7,4,4,7,8,8,10,10,8,Low
+RF,Victor Verdugo,TOR,R,R,Normal,Normal,5,5,5,4,4,5,3,4,Normal,Normal,Normal,1,1,1,5,4,6,5,7,5,9,4,4,7,7,8,Very Low
+1B,Dennis Videaux,LA,R,R,Normal,Normal,5,5,5,5,8,5,4,1,Flyball,Normal,Pull,1,1,2,4,5,7,3,3,4,7,2,3,4,3,8,Low
+LF,Timothy Waymouth,TOR,L,L,Normal,Normal,8,7,8,7,2,5,10,7,Line Drive,Normal,Normal,1,1,1,4,2,5,1,6,8,7,7,8,10,7,8,Low
+LF,Sardis Abrego,LV,L,L,Normal,Normal,3,4,3,6,9,9,3,1,Flyball,Normal,Pull,1,1,1,5,2,3,3,7,5,7,7,8,10,10,7,Very Low
+C,Joe Adams,TUC,R,R,Low,Normal,4,4,3,3,10,6,2,4,Flyball,Normal,Normal,7,6,9,4,3,8,1,4,1,9,4,2,6,4,7,Very Low
+LF,Jordan Alvarez,HAV,L,L,High,Normal,4,3,5,4,7,4,2,1,Flyball,Normal,Normal,1,1,1,2,2,4,1,6,9,6,4,6,8,7,7,Very Low
+SS,Jorge Amasifuen,HAM,S,R,High,High,6,5,7,7,1,4,5,1,Line Drive,Normal,Normal,1,1,1,7,8,10,7,4,4,9,3,2,4,5,7,Very Low
+C,Min-chor Ann,POR,S,R,Low,Normal,4,4,5,4,3,9,3,2,Normal,Normal,Normal,8,7,7,2,4,5,1,2,3,6,1,1,5,1,7,Very Low
+2B,Al Anzaldua,LA,R,R,Normal,Normal,6,5,8,8,5,3,9,4,Normal,Normal,Normal,1,1,1,8,6,4,5,2,3,2,8,8,9,10,7,Very Low
+1B,Takashi Araki,JC,R,R,Normal,Normal,5,4,5,4,6,7,9,7,Flyball,Normal,Spray,1,1,1,5,7,6,6,1,3,5,5,7,10,7,7,Low
+SS,Alex Arias,HAV,R,R,Normal,Normal,5,4,5,9,2,5,9,1,Line Drive,Spray,Normal,1,1,1,8,7,8,7,3,6,8,3,6,7,7,7,Low
+SS,German Barreto,CHI,R,R,Normal,Normal,4,3,5,3,5,1,4,2,Normal,Pull,Normal,1,1,1,7,8,7,7,6,7,7,8,7,10,9,7,Low
+C,Orly Basantes,LIN,R,R,Normal,Normal,4,4,5,5,4,9,3,1,Normal,Pull,Normal,7,6,10,1,2,3,1,2,3,3,3,4,6,3,7,Low
+RF,Mike Bishop,ME,R,R,Low,Low,4,5,4,8,5,6,3,1,Line Drive,Pull,Normal,1,1,1,4,4,5,4,6,6,8,5,5,6,6,7,Low
+CF,Armando Blea,TOR,S,R,Normal,Normal,5,5,5,6,2,6,10,7,Groundball,Spray,Spray,1,1,1,3,2,2,2,9,6,6,9,8,9,7,7,Low
+LF,Rick Brace,CHI,R,R,Normal,Normal,7,6,8,5,4,6,4,1,Normal,Normal,Normal,1,1,1,5,4,5,4,7,8,6,7,6,6,6,7,Medium
+3B,Alex Bran,ROC,S,R,High,Normal,4,4,5,8,5,6,4,1,Flyball,Pull,Normal,1,1,1,7,6,10,3,3,4,9,1,1,6,3,7,Medium
+CF,Mark Buchanan,HAM,S,L,High,Normal,5,4,6,4,4,8,4,3,Normal,Normal,Spray,1,1,1,1,2,3,1,8,6,6,7,8,10,10,7,Low
+2B,Billy Buelna,MTL,R,R,High,High,5,7,4,7,5,4,3,1,Line Drive,Pull,Normal,1,1,1,7,6,5,8,2,4,3,4,4,9,4,7,Very Low
+2B,Eddie Buelna,HB,R,R,Normal,Normal,4,4,5,4,4,7,4,3,Normal,Normal,Normal,1,1,1,6,7,5,8,6,8,6,2,3,6,4,7,Very Low
+2B,Sandy Canizares,WAS,S,R,High,Normal,9,9,8,10,4,6,2,1,Line Drive,Pull,Normal,1,1,1,6,7,3,8,4,6,2,5,2,3,3,7,Medium
+CF,Oscar Carrillo,MTL,L,L,Normal,Normal,5,6,4,6,2,4,2,1,Groundball,Ex. Pull,Normal,1,1,1,6,4,5,1,8,9,9,7,5,9,9,7,Low
+CF,Jordan Casanas,TOR,R,R,Normal,High,4,4,4,5,1,6,5,1,Groundball,Pull,Spray,1,1,1,7,6,2,6,8,9,6,7,10,10,10,7,Very Low
+2B,Axel Castiglione,SD,L,R,High,Normal,6,7,5,6,2,6,9,6,Groundball,Spray,Normal,1,1,1,8,5,4,7,3,6,3,1,2,10,2,7,Very Low
+SS,Jesus Castillo,SD,R,R,High,Normal,5,6,4,6,2,5,2,1,Line Drive,Pull,Spray,1,1,1,8,8,6,8,6,7,6,2,2,7,5,7,Very Low
+2B,Amdre Ceclio,GAR,L,R,Low,Normal,4,4,4,6,5,6,4,1,Normal,Pull,Spray,1,1,1,6,8,7,7,1,5,4,6,7,5,9,7,Very Low
+C,Sam Cestero,CHI,R,R,Normal,High,3,4,1,6,5,5,4,1,Normal,Normal,Spray,8,7,6,2,4,1,1,6,1,1,3,1,3,3,7,Very Low
+CF,Mark Chamblin,STL,R,R,Low,Normal,4,3,4,3,6,5,3,4,Flyball,Pull,Pull,1,1,1,8,5,3,5,8,7,6,2,3,6,2,7,Very Low
+LF,Koji Chinea,BAL,R,R,Normal,Normal,4,3,6,4,10,10,8,5,Flyball,Normal,Normal,1,1,1,4,3,2,3,7,4,5,6,7,10,9,7,Low
+3B,Luther Chipperfield,PHI,R,R,High,Normal,5,4,5,5,7,5,4,3,Flyball,Normal,Normal,1,1,1,7,8,8,5,4,3,7,1,1,5,1,7,Low
+CF,Jae-ho Choe,YK,R,R,Low,Normal,5,5,5,5,4,6,3,6,Normal,Normal,Normal,1,1,1,1,1,7,1,8,8,7,8,9,10,10,7,Low
+2B,Han-lee Choi,SEA,R,R,Normal,Normal,5,5,4,6,4,6,6,5,Line Drive,Normal,Spray,1,1,1,7,6,5,7,5,5,3,3,5,6,3,7,Very Low
+CF,Ryan Clifford,STL,R,R,Normal,Normal,5,5,4,4,4,7,3,3,Normal,Pull,Spray,1,1,1,7,8,7,7,8,6,7,1,2,6,2,7,Very Low
+RF,Charlie Cole,POR,L,L,High,Normal,7,8,5,4,4,4,1,1,Groundball,Ex. Pull,Normal,1,1,1,1,1,6,1,6,4,9,8,9,10,10,7,Very Low
+3B,Sam Cone,MIN,R,R,Normal,Normal,5,7,4,5,1,4,8,4,Groundball,Normal,Spray,1,1,1,8,9,6,10,5,9,7,8,10,10,10,7,Very Low
+C,David Cortez,YK,R,R,High,Normal,3,3,3,4,6,7,3,1,Flyball,Pull,Pull,7,8,6,1,4,4,1,1,3,5,1,2,2,1,7,Very Low
+1B,Ben Credeur,CHI,R,R,Low,Low,5,4,7,5,5,5,5,1,Normal,Spray,Normal,1,1,1,5,4,2,6,3,3,3,3,5,6,5,7,Low
+3B,Ed Cromsie,LV,R,R,Normal,Normal,8,8,7,10,3,6,3,1,Line Drive,Pull,Spray,1,1,1,4,8,9,4,4,5,9,3,3,4,5,7,Low
+C,Mark Crowley,PHX,R,R,Normal,High,7,6,7,4,4,5,6,1,Groundball,Normal,Spray,10,6,5,4,4,3,2,2,4,4,1,1,1,1,7,Low
+1B,Jeremy Curzon,YK,R,R,Normal,Low,4,5,3,6,7,7,3,1,Flyball,Pull,Pull,1,1,1,3,3,3,2,3,1,3,3,1,2,1,7,Low
+CF,Gabriel Dalmahoy,NYT,L,L,Normal,Low,5,6,5,6,4,5,7,7,Line Drive,Pull,Normal,1,1,1,5,3,7,1,8,9,9,5,5,10,5,7,Low
+LF,Cody Daniels,MIA,L,L,High,Normal,6,10,4,7,10,5,4,4,Groundball,Normal,Spray,1,1,1,4,3,3,1,7,7,5,5,5,7,5,7,Medium
+1B,Chris Eighmy,DEN,L,L,High,High,5,7,3,7,10,8,3,1,Flyball,Pull,Normal,1,1,1,5,4,3,2,3,2,2,1,1,2,1,7,Very Low
+LF,Leo Ekgart,HAV,R,R,Low,Low,7,5,10,1,1,5,10,10,Groundball,Spray,Spray,1,1,1,6,4,4,4,7,5,6,5,9,10,8,7,Very Low
+LF,Jose Fierro,YK,R,L,High,Normal,8,5,10,7,2,5,9,6,Line Drive,Normal,Normal,1,1,1,5,3,4,1,7,6,6,6,9,10,7,7,Very Low
+1B,Sergio Folha,SAN,L,L,High,Normal,4,4,4,6,7,9,9,3,Flyball,Normal,Spray,1,1,1,3,6,2,1,1,5,3,6,8,9,4,7,Very Low
+2B,Nala Forcelledo,CHI,R,R,High,Normal,6,6,6,5,5,6,5,2,Line Drive,Pull,Pull,1,1,1,6,9,5,5,1,4,4,10,10,10,10,7,Very Low
+C,Merlin Garbie,BUF,R,R,High,High,5,8,3,4,8,4,3,1,Flyball,Pull,Spray,8,8,7,2,3,4,1,1,4,3,2,2,3,4,7,Very Low
+LF,Nelson Garcia,BOS,R,R,Normal,High,7,9,5,7,4,5,1,2,Line Drive,Normal,Spray,1,1,1,5,4,4,4,6,7,6,3,5,9,7,7,Low
+2B,Carlos Garza,HAV,L,R,Low,Normal,6,6,7,3,4,6,5,3,Groundball,Pull,Spray,1,1,1,7,6,4,6,1,4,2,1,1,5,1,7,Low
+SS,Bruce Gasca,FRE,S,R,Normal,Low,4,3,4,4,1,3,5,4,Normal,Spray,Spray,1,1,1,8,9,6,7,1,6,5,5,4,7,5,7,Very Low
+CF,Bryce Gekas,SF,S,R,Low,Low,7,7,7,9,2,3,10,7,Line Drive,Pull,Normal,1,1,1,6,5,4,6,8,8,7,8,9,10,10,7,Low
+CF,Zhong-shan Geng,SEA,L,R,Normal,High,4,4,5,5,5,4,3,3,Normal,Pull,Normal,1,1,1,7,5,5,6,7,10,7,7,10,10,10,7,Very Low
+3B,Martyn Gheldere,ARL,R,R,High,High,5,4,5,5,6,3,9,7,Normal,Normal,Normal,1,1,1,7,6,10,3,2,6,9,6,8,10,8,7,Very Low
+C,Andy Gonzales,HAV,R,R,High,High,5,5,5,7,9,10,3,3,Flyball,Normal,Normal,7,7,8,2,3,6,1,1,2,6,4,8,10,8,7,Very Low
+CF,T.J. Gourley,INU,L,L,Normal,Normal,5,3,7,5,5,6,2,1,Normal,Normal,Normal,1,1,1,8,5,4,1,8,6,8,3,2,10,2,7,Low
+CF,Alberto Guardiola,KC,R,R,Low,Normal,5,4,5,5,2,5,5,3,Line Drive,Normal,Normal,1,1,1,3,2,4,3,8,5,8,7,8,10,9,7,Very Low
+C,Francisco Guerra,HOU,R,R,Normal,Normal,7,4,10,3,3,1,2,3,Normal,Spray,Pull,7,7,10,2,4,3,1,3,6,9,1,1,3,1,7,Medium
+LF,Hector Hernandez,WAS,R,R,Normal,Normal,4,4,5,5,4,4,2,4,Normal,Pull,Normal,1,1,1,6,4,4,5,6,7,7,2,3,10,1,7,Very Low
+LF,David Higby,HAV,L,R,High,Normal,5,6,5,7,3,7,3,5,Line Drive,Normal,Spray,1,1,1,5,6,3,6,6,8,5,8,9,10,10,7,Very Low
+1B,Matthew Hinojosa,AKR,R,R,High,Normal,2,2,2,4,8,5,2,1,Flyball,Pull,Normal,1,1,1,4,3,4,3,5,5,6,6,7,9,10,7,Very Low
+1B,Chris Horn,LV,R,R,High,Normal,5,4,5,7,7,5,4,1,Flyball,Pull,Normal,1,1,1,4,5,8,3,1,6,7,8,6,9,9,7,Very Low
+RF,Lucas Houghton,PHI,R,R,Normal,Normal,5,5,5,4,3,5,2,1,Normal,Pull,Pull,1,1,1,1,1,5,1,6,6,9,3,6,6,3,7,Very Low
+3B,Yin-ti Huan,TOR,R,R,High,Normal,4,4,5,4,5,6,4,1,Normal,Spray,Normal,1,1,1,7,7,8,7,4,6,8,3,8,10,7,7,Very Low
+1B,Mario Iglesias,CIN,L,R,High,Normal,5,5,5,4,3,6,3,1,Groundball,Pull,Normal,1,1,1,4,7,7,3,2,6,6,2,5,6,5,7,Very Low
+2B,Rod Inzunza,SB,R,R,Normal,Normal,7,7,7,3,4,5,6,2,Groundball,Normal,Spray,1,1,1,7,5,5,6,5,5,4,6,5,10,6,7,Low
+C,Yoshitsugu Ishida,SEA,S,R,Normal,Low,5,5,4,4,6,6,3,1,Normal,Pull,Spray,7,7,7,3,3,6,3,3,1,7,1,2,2,1,7,Low
+RF,Jarrett Jalomo,KC,L,L,Normal,Low,5,5,5,6,3,5,3,3,Line Drive,Spray,Spray,1,1,1,5,3,3,1,7,8,7,5,9,10,8,7,Low
+SS,Bert James,ME,R,R,Normal,Normal,4,4,5,4,1,3,7,8,Groundball,Normal,Pull,1,1,1,8,9,7,7,6,9,8,8,9,10,9,7,Very Low
+3B,Derek Jefferson,WAS,R,R,Low,Normal,4,3,6,3,9,9,10,5,Flyball,Pull,Spray,1,1,1,6,5,10,8,6,4,9,6,5,6,9,7,Very Low
+3B,Manichiro Kawasaki,SEA,R,R,Normal,Low,4,4,4,5,7,6,2,1,Flyball,Pull,Normal,1,1,1,5,8,9,5,3,5,5,3,3,5,5,7,Very Low
+1B,Michiyo Kazama,BRK,S,R,High,Normal,4,5,3,4,6,4,3,1,Normal,Pull,Normal,1,1,1,5,4,7,5,4,6,6,2,6,4,3,7,Very Low
+LF,Jimmy Keener,BRK,R,R,Normal,Normal,5,5,6,5,4,2,4,1,Normal,Normal,Normal,1,1,1,1,1,5,1,7,6,6,4,4,9,5,7,Very Low
+RF,Noah Lantzer,SB,R,R,Normal,Normal,8,7,8,5,1,4,3,1,Line Drive,Spray,Normal,1,1,1,4,3,6,3,6,6,9,5,7,9,2,7,Low
+SS,Levan Lavandera,KC,R,R,Normal,Normal,6,6,7,7,3,4,4,1,Line Drive,Pull,Normal,1,1,1,8,6,7,8,1,4,7,7,5,5,4,7,Extreme
+C,Eddie Leahy,WAS,S,R,Normal,Low,4,3,5,3,4,6,3,1,Normal,Ex. Pull,Normal,8,8,6,1,3,4,1,2,5,4,2,3,6,7,7,Very Low
+3B,Min-yul Lee,JOL,R,R,High,Normal,4,4,4,4,6,4,10,2,Flyball,Normal,Normal,1,1,1,7,6,10,3,6,5,9,3,5,7,4,7,Very Low
+3B,Kenny Leek,CHI,R,R,Normal,Normal,5,5,5,5,4,5,9,1,Groundball,Normal,Normal,1,1,1,5,6,9,7,4,6,10,1,5,8,1,7,Very Low
+3B,Alexjandria Leija,DEN,R,R,High,High,7,10,4,5,4,5,5,1,Line Drive,Pull,Spray,1,1,1,4,10,9,4,1,4,7,6,7,10,10,7,Very Low
+2B,Craig Lightsey,HOU,R,R,Normal,Low,5,5,6,6,4,5,3,1,Normal,Normal,Normal,1,1,1,7,6,8,6,6,6,7,7,6,10,10,7,Very Low
+1B,Al Lindberg,MTL,R,R,Normal,Normal,5,4,5,5,5,8,6,2,Normal,Pull,Normal,1,1,1,4,4,7,3,4,3,5,1,1,3,1,7,Very Low
+3B,Jason Lingo,SF,S,R,Low,Normal,5,7,5,5,3,5,3,1,Groundball,Spray,Spray,1,1,1,6,9,8,5,2,6,8,1,1,5,1,7,Very Low
+C,Whip Lund,LA,L,R,High,Normal,4,4,4,3,6,5,1,1,Normal,Normal,Normal,7,6,8,3,5,6,1,1,1,7,1,1,3,1,7,Very Low
+CF,Oscar Markuschewitz,TUC,L,L,High,Normal,7,8,6,4,4,3,6,1,Groundball,Pull,Pull,1,1,1,3,2,2,1,9,5,3,4,3,4,2,7,High
+CF,Francisco Mateus,BAL,L,L,High,Normal,5,6,5,4,5,4,10,8,Groundball,Spray,Spray,1,1,1,7,7,6,1,7,6,10,8,8,10,10,7,Very Low
+LF,Akiro Matsui,JOL,R,R,Normal,Low,5,7,4,5,5,6,3,1,Groundball,Ex. Pull,Normal,1,1,1,5,7,3,6,6,9,7,6,6,8,9,7,Very Low
+RF,Jose Montes,PHX,L,R,Normal,Low,6,6,6,6,9,4,1,1,Flyball,Normal,Normal,1,1,1,6,4,5,4,6,6,8,1,2,3,1,7,Low
+SS,Dong-hee Moon,SEA,R,R,High,Low,5,4,7,5,1,4,4,1,Groundball,Spray,Normal,1,1,1,7,8,7,8,2,5,7,4,6,8,6,7,Low
+SS,Graham Morgan,LA,L,R,Normal,High,4,5,4,5,1,4,6,1,Normal,Pull,Spray,1,1,1,7,10,6,9,2,8,5,4,5,9,4,7,Very Low
+RF,Hisatoshi Morita,BOS,R,R,High,Normal,6,5,7,6,3,5,5,1,Line Drive,Pull,Pull,1,1,1,1,1,4,2,7,6,7,4,8,9,6,7,Very Low
+2B,Renzo Mosquera,HAM,R,R,Normal,Low,7,8,6,5,1,5,8,1,Groundball,Normal,Normal,1,1,1,6,8,3,9,4,5,2,1,2,6,1,7,Low
+SS,Beanbag Mulvaney,BR,R,R,Normal,Normal,7,6,7,4,4,4,8,1,Line Drive,Normal,Normal,1,1,1,8,7,9,7,5,8,9,7,6,7,8,7,Medium
+SS,Ginjiro Muranaka,MTL,R,R,Normal,High,4,6,3,6,6,5,4,1,Line Drive,Pull,Normal,1,1,1,7,8,10,5,2,4,6,4,7,7,7,7,Very Low
+CF,Tenma Nakamura,POR,R,R,Low,Normal,5,5,5,5,2,3,8,6,Groundball,Pull,Normal,1,1,1,3,2,6,2,8,7,8,5,3,9,4,7,Medium
+C,Juan Nieves,KC,R,R,Normal,Normal,4,4,4,4,4,6,1,1,Normal,Normal,Normal,8,7,7,2,2,4,1,3,3,3,1,1,3,1,7,Very Low
+LF,Michinori Nobayashi,DEN,R,R,High,Normal,7,8,6,7,2,6,2,1,Line Drive,Normal,Normal,1,1,1,2,2,7,2,6,7,6,6,8,9,9,7,Very Low
+SS,Chotaro Okada,BUF,L,R,High,Normal,4,4,4,9,8,9,3,1,Flyball,Ex. Pull,Normal,1,1,1,7,9,8,9,2,6,6,7,8,9,10,7,Very Low
+C,Jose Olmos,PHX,R,R,Normal,Normal,3,2,4,3,7,6,5,2,Flyball,Normal,Normal,9,8,5,1,2,4,2,3,2,4,1,2,2,1,7,Very Low
+1B,Aaron Ottenbacher,WAS,S,R,Normal,High,5,6,4,4,9,3,3,3,Flyball,Pull,Spray,1,1,1,4,3,3,3,1,3,3,2,3,5,1,7,Very Low
+C,Phil Owens,KC,R,R,Normal,High,5,5,5,5,1,5,4,2,Groundball,Normal,Normal,8,7,5,3,4,3,1,3,3,2,1,1,1,1,7,Low
+SS,Omar Ozoa,MIN,R,R,Normal,Normal,4,5,4,5,6,8,2,4,Normal,Normal,Normal,1,1,1,8,7,8,7,5,4,7,2,2,9,4,7,Low
+RF,Julian Paul,FRE,R,R,Low,Normal,6,7,5,7,6,3,4,1,Groundball,Normal,Spray,1,1,1,3,3,5,3,6,6,7,7,6,8,8,7,Low
+2B,Mike Phibbs,DEN,R,R,High,Normal,7,7,6,6,5,4,5,3,Line Drive,Normal,Normal,1,1,1,7,9,5,5,4,4,3,3,6,6,5,7,Medium
+2B,Ben Pickett,SD,R,R,Normal,Normal,5,6,5,5,3,5,2,1,Normal,Ex. Pull,Pull,1,1,1,7,6,6,8,4,6,6,1,1,7,1,7,Low
+2B,Tyler Plantholt,LV,R,R,Normal,High,4,6,3,8,7,1,2,1,Normal,Pull,Spray,1,1,1,7,6,7,7,5,3,5,3,7,5,6,7,Very Low
+SS,Conor Prifti,WAS,S,R,Normal,Normal,5,7,4,9,3,3,5,1,Line Drive,Spray,Pull,1,1,1,8,7,9,7,7,5,8,9,7,9,7,7,Medium
+CF,Jose Puga,BUF,R,R,High,High,5,10,2,7,4,8,5,4,Line Drive,Normal,Normal,1,1,1,6,4,5,5,8,4,8,9,9,10,9,7,Low
+C,Angel Ramirez,SAN,R,R,High,Normal,5,4,6,4,7,8,2,2,Flyball,Normal,Spray,9,7,5,3,3,5,1,3,4,5,3,3,4,6,7,Very Low
+SS,Mike Ramirez,PHX,R,R,High,Low,5,5,4,3,6,6,4,4,Normal,Pull,Normal,1,1,1,8,8,6,9,5,6,6,2,4,9,5,7,Very Low
+2B,Ricky Rangel,LA,R,R,Low,Normal,7,4,10,6,3,3,3,2,Normal,Normal,Pull,1,1,1,7,6,5,6,1,4,5,1,3,5,2,7,Very Low
+1B,Ordanis Regueira,SF,R,R,Low,Normal,5,6,5,5,9,9,3,1,Flyball,Spray,Spray,1,1,1,4,3,1,2,2,3,4,4,5,7,8,7,Medium
+SP,Ed Rice,MIA,R,R,Normal,Normal,5,7,3,4,6,6,2,1,Groundball,Normal,Normal,1,1,1,4,3,3,2,3,2,2,3,2,8,5,7,Very Low
+CF,Danny Rocha,MTL,L,L,Normal,Normal,3,4,2,8,3,4,7,1,Normal,Normal,Spray,1,1,1,2,3,6,1,8,7,8,6,5,5,6,7,Medium
+SS,Edgardo Rodriguez,SF,R,R,High,High,4,4,3,6,4,5,2,4,Normal,Spray,Pull,1,1,1,9,7,4,8,7,6,8,6,9,10,9,7,Very Low
+LF,Bob Rogers Jr.,NYT,R,R,Low,Normal,5,5,5,6,4,6,3,5,Normal,Normal,Normal,1,1,1,5,4,7,4,6,5,10,9,9,10,10,7,Very Low
+LF,Bobby Rojas,BUF,L,L,High,Normal,4,5,3,4,8,8,3,5,Flyball,Pull,Normal,1,1,1,5,4,3,1,6,4,8,1,1,9,1,7,Very Low
+2B,Olly Roozeboom,PHX,R,R,Normal,Normal,7,7,6,6,4,5,9,7,Line Drive,Normal,Pull,1,1,1,7,5,7,8,5,5,7,5,7,10,6,7,Medium
+CF,Leon Rose,SD,R,R,Normal,Low,4,7,2,8,4,8,10,9,Line Drive,Spray,Pull,1,1,1,4,3,6,3,8,8,9,7,7,10,9,7,Very Low
+C,Alvaro Salazar,SAN,R,R,Normal,Normal,4,4,4,5,8,6,3,1,Flyball,Pull,Spray,8,6,6,2,2,5,2,2,2,5,1,3,2,1,7,Very Low
+CF,Raul Samaniego,HOU,S,R,Normal,Normal,8,5,10,5,6,4,3,6,Normal,Pull,Normal,1,1,1,8,5,6,5,8,7,9,6,7,10,6,7,Low
+RF,Brad Sandhoff,MIN,L,L,Normal,Normal,4,4,4,5,4,6,3,4,Groundball,Spray,Pull,1,1,1,4,3,3,1,6,6,8,7,7,10,9,7,Very Low
+LF,Mike Santoli,HAV,R,R,High,Normal,5,5,5,5,5,5,4,2,Groundball,Spray,Spray,1,1,1,4,5,5,5,7,5,8,6,9,10,10,7,Very Low
+C,Tom Sarmiento,CHI,R,R,High,High,6,7,5,7,5,4,4,1,Line Drive,Pull,Normal,5,5,10,1,3,10,4,1,2,10,1,2,5,1,7,Low
+2B,Joe Schachle,BAL,R,R,High,Normal,4,4,4,5,6,6,2,1,Normal,Normal,Normal,1,1,1,6,7,6,8,6,6,4,2,2,3,2,7,Low
+RF,Chad Schoepp,TOR,R,L,Normal,Normal,5,6,4,7,3,5,1,2,Line Drive,Pull,Spray,1,1,1,1,2,6,1,6,6,8,8,10,10,10,7,Very Low
+C,Tom Schwartzmiller,BAL,R,R,Normal,Low,4,4,5,4,6,4,3,1,Flyball,Normal,Normal,6,7,8,1,2,3,2,4,3,3,2,1,2,3,7,Very Low
+CF,Elmar Seiler,CHI,R,R,Normal,Normal,8,7,8,6,3,4,2,3,Groundball,Spray,Normal,1,1,1,7,5,6,8,8,8,6,1,4,10,1,7,Medium
+CF,Cesar Senas,VAN,R,R,High,Normal,6,6,7,8,3,1,10,8,Groundball,Pull,Pull,1,1,1,6,5,5,6,8,5,7,8,7,8,7,7,Medium
+1B,Tsuneteru Shimada,STL,R,R,Normal,Normal,5,4,5,8,7,10,3,6,Normal,Pull,Spray,1,1,1,4,5,5,5,2,5,3,7,8,10,9,7,Low
+1B,Jin-soo Shinn,SEA,R,R,Normal,High,5,5,5,4,8,4,2,3,Flyball,Normal,Pull,1,1,1,4,4,6,4,3,6,6,1,1,6,1,7,Very Low
+1B,Jim Snook,DEN,L,R,Normal,High,7,6,7,8,5,4,2,5,Line Drive,Normal,Spray,1,1,1,3,5,3,5,4,4,2,7,9,10,10,7,Low
+3B,Max Speed,TUC,R,R,High,Normal,4,4,4,8,8,5,3,2,Flyball,Normal,Normal,1,1,1,8,5,9,5,4,4,9,4,4,10,2,7,Medium
+CF,Rico Stanton,CHI,R,R,High,High,3,4,2,5,5,4,5,3,Normal,Pull,Normal,1,1,1,3,3,3,4,8,8,7,7,7,10,10,7,Low
+3B,Matt Steinruck,MTL,R,R,High,Normal,5,5,5,7,7,7,3,1,Flyball,Normal,Normal,1,1,1,7,7,8,7,5,5,8,1,1,10,1,7,Very Low
+3B,Robin Stevens,PHX,R,R,Normal,Normal,4,2,6,4,9,6,2,1,Flyball,Normal,Normal,1,1,1,6,6,10,3,3,4,8,8,5,8,9,7,Low
+RF,David Straub,POR,L,L,High,Normal,4,4,4,5,7,5,2,1,Flyball,Normal,Normal,1,1,1,4,4,5,1,6,6,8,4,4,5,6,7,Very Low
+LF,Geoff Tankersley,CIN,R,R,Normal,Normal,5,4,6,4,5,6,3,1,Flyball,Pull,Normal,1,1,1,3,2,3,2,7,6,6,6,9,9,8,7,Low
+RF,Alex Tejeda,WAS,L,L,Normal,Normal,4,3,5,5,7,5,2,1,Flyball,Normal,Normal,1,1,1,1,1,5,1,5,7,9,7,7,4,10,7,Very Low
+C,Carlos Tenorio,SD,R,R,Normal,Normal,5,4,5,4,6,8,3,1,Flyball,Spray,Normal,8,7,7,2,4,5,4,1,4,5,1,1,1,1,7,Low
+SS,Andres Trevino,CHI,S,R,Normal,Low,5,5,4,6,4,6,3,6,Normal,Pull,Normal,1,1,1,7,8,9,9,5,6,9,5,8,10,5,7,Low
+RF,Rikiya Tsuji,BOS,L,L,Normal,Normal,7,5,9,5,1,4,3,3,Line Drive,Normal,Spray,1,1,1,1,2,4,1,7,6,6,8,5,7,5,7,Low
+C,Yasuhiro Tsumoto,SEA,R,R,High,Normal,4,4,4,3,6,8,6,2,Flyball,Pull,Pull,8,9,4,1,2,2,1,1,3,2,1,4,5,4,7,Very Low
+RF,Louis Turnham,BR,R,R,Normal,High,6,9,4,8,5,6,1,1,Line Drive,Pull,Normal,1,1,1,3,3,5,2,5,10,9,3,4,5,4,7,Low
+3B,Terry van de Belt,SAN,R,R,Normal,Normal,6,5,6,6,4,4,3,2,Normal,Normal,Normal,1,1,1,5,7,9,10,3,7,9,4,6,10,7,7,Very Low
+2B,Ruben Vega,ME,L,R,Normal,Normal,4,6,3,7,6,7,3,4,Normal,Normal,Normal,1,1,1,8,6,4,7,7,9,8,5,10,10,10,7,Very Low
+3B,Manny Venzor,HOU,L,R,High,Normal,8,7,8,7,3,2,5,3,Line Drive,Spray,Pull,1,1,2,6,6,9,4,4,6,7,4,4,5,7,7,Very Low
+LF,Juan Villa,TUC,L,L,Low,Normal,7,5,10,4,2,8,6,1,Groundball,Normal,Normal,1,1,1,4,2,1,1,7,4,5,8,8,9,8,7,Medium
+C,Sam Waltz,WIC,L,R,High,Normal,3,1,4,3,7,5,3,2,Flyball,Pull,Spray,7,6,8,1,1,3,1,1,1,3,1,3,8,6,7,Very Low
+RF,Mayumi Watanabe,SAN,L,L,Normal,Normal,4,4,5,5,6,6,3,1,Normal,Pull,Normal,1,1,1,2,2,5,1,6,6,9,8,9,8,10,7,Very Low
+RF,Finn West,HOU,R,R,Normal,High,6,6,6,8,4,5,8,6,Line Drive,Normal,Pull,1,1,1,5,4,5,4,6,7,8,8,6,8,5,7,Low
+RF,Matt White,SF,R,L,High,Normal,4,4,5,4,9,6,5,1,Flyball,Normal,Normal,1,1,1,2,2,5,1,5,10,8,4,2,3,4,7,Low
+1B,Harold Wicks,BAL,R,R,Normal,Normal,7,8,5,6,9,8,2,4,Flyball,Normal,Normal,1,1,1,3,4,1,2,2,2,4,8,9,7,9,7,Low
+CF,Trevor Wise,SAN,R,R,Normal,Normal,7,5,8,9,2,6,3,4,Line Drive,Normal,Spray,1,1,1,3,2,8,2,8,5,10,5,5,10,7,7,Low
+3B,Alvin Witz,HB,R,R,Normal,Normal,4,6,2,7,8,4,4,1,Flyball,Pull,Pull,1,1,1,7,6,9,7,3,6,9,5,6,9,9,7,Low
+RF,Kurt Woodford,MIA,R,R,Low,Normal,5,5,6,5,7,5,3,1,Flyball,Ex. Pull,Pull,3,3,3,1,4,3,1,6,7,7,2,1,4,3,7,Very Low
+C,Adam Wysocki,DEN,R,R,High,High,3,3,4,3,7,8,3,2,Flyball,Normal,Pull,9,9,4,1,2,2,1,1,2,2,1,1,3,1,7,Very Low
+C,Jae-hong You,TOR,R,R,Normal,Normal,4,5,3,3,9,9,5,1,Flyball,Normal,Pull,7,7,8,2,2,8,4,2,6,8,1,1,2,1,7,Low
+2B,Min-gook You,JOL,L,R,Normal,Normal,5,4,5,4,3,4,6,5,Groundball,Normal,Normal,1,1,1,7,7,6,8,5,4,6,5,6,8,8,7,Very Low
+SS,Luis Zatarain,BUF,R,R,Normal,Normal,6,8,4,7,6,4,2,1,Line Drive,Pull,Normal,1,1,1,8,8,6,9,5,5,4,4,6,8,10,7,Very Low
+C,Carlos Zayas,ARL,S,R,Normal,High,5,6,4,5,4,5,10,1,Groundball,Spray,Normal,7,8,7,4,4,4,1,2,3,3,1,1,1,1,7,Low
+3B,Enriquillo Zelaya,YK,R,R,Normal,Normal,5,6,4,5,5,5,1,5,Line Drive,Normal,Normal,1,1,1,7,7,8,6,3,5,7,7,8,10,9,7,Very Low
+2B,Ruben Zertuche,ANA,R,R,High,High,5,7,3,5,4,5,3,1,Groundball,Pull,Normal,1,1,1,7,7,7,5,6,6,6,7,9,10,9,7,Very Low
+RF,Yuan Zhu,DEN,R,L,Normal,Normal,6,7,6,4,4,10,6,5,Groundball,Pull,Spray,1,1,1,1,1,5,1,6,5,9,7,6,10,7,7,Very Low
+SS,Stefan Zorn,HOU,R,R,Normal,High,3,2,5,3,5,8,2,2,Flyball,Pull,Spray,1,1,1,6,9,8,9,5,5,8,6,9,8,10,7,Very Low
+RF,Don Zufelt,MTL,R,R,Normal,Normal,7,8,7,5,4,5,6,1,Line Drive,Pull,Normal,1,1,1,3,2,7,2,6,6,8,2,2,6,1,7,Very Low
+RF,Edgar Albuja,STL,R,R,High,Normal,5,4,5,5,7,7,4,1,Flyball,Ex. Pull,Normal,1,1,1,4,3,4,4,6,5,6,6,9,8,9,6,Very Low
+CF,Jorgé Alcovas,BOS,R,R,Low,Normal,5,6,5,7,3,6,3,3,Line Drive,Normal,Normal,1,1,1,7,8,6,5,7,8,6,6,6,9,7,6,Medium
+1B,Ruben Archuleta,PHI,L,L,Normal,Normal,4,4,5,4,8,4,4,1,Flyball,Normal,Normal,1,1,1,4,4,5,1,3,5,6,1,1,4,4,6,Very Low
+LF,Trevor Augustine,KC,R,R,High,Normal,5,6,5,6,4,5,2,4,Line Drive,Normal,Normal,1,1,1,1,3,7,2,6,5,5,4,6,10,6,6,Very Low
+SS,Eli Avelar,BAL,R,R,Low,Normal,4,4,5,3,4,4,5,1,Normal,Pull,Pull,1,1,1,7,7,8,7,4,4,7,8,9,10,10,6,Very Low
+2B,Adir Barrabi,LA,R,R,Normal,Low,4,8,2,8,9,5,2,1,Flyball,Normal,Normal,1,1,1,6,5,6,7,4,5,5,2,4,7,5,6,Very Low
+LF,Yem Batista,SAN,L,L,High,Normal,5,5,5,8,8,4,2,1,Flyball,Normal,Spray,1,1,1,1,1,3,1,6,4,6,8,8,9,10,6,Very Low
+2B,Steve Bedoya,PHI,L,R,Normal,Normal,5,5,6,6,5,6,3,1,Normal,Pull,Normal,1,1,1,6,8,4,6,2,5,3,6,8,10,9,6,Low
+1B,Neosbel Benavides,STL,L,R,High,Normal,5,4,6,5,9,8,4,2,Flyball,Normal,Normal,1,1,1,4,3,3,3,4,5,6,1,1,1,2,6,Medium
+CF,Ramão Bizarro,LA,L,L,Normal,Normal,5,6,4,8,6,8,3,3,Line Drive,Spray,Normal,1,1,1,1,1,4,1,8,7,6,8,9,10,10,6,Very Low
+LF,Edward Black,PHI,R,L,Normal,High,5,5,5,5,6,4,3,1,Normal,Spray,Normal,1,1,1,5,3,3,1,6,4,7,4,9,9,6,6,Very Low
+2B,Jessie Bouchard,LV,S,R,Normal,Normal,5,4,5,5,4,9,5,1,Normal,Normal,Spray,1,1,1,5,6,7,7,3,4,6,4,8,10,6,6,Very Low
+C,Eppe Brand,ROC,R,R,Normal,Low,4,3,5,3,6,4,4,2,Normal,Normal,Normal,8,7,5,3,3,3,1,2,2,4,1,1,2,1,6,Very Low
+CF,Rusney Bravo,GUA,S,R,Low,Low,8,8,8,4,1,8,3,1,Line Drive,Spray,Spray,1,1,1,5,4,4,4,9,3,1,10,6,10,4,6,High
+LF,Bobby Brito,MTL,R,R,High,Low,5,6,4,7,8,8,4,1,Normal,Pull,Normal,1,1,1,2,1,5,1,5,5,9,5,8,9,7,6,Very Low
+3B,Jason Brown,ME,L,R,High,Normal,4,5,4,5,6,7,3,2,Normal,Pull,Normal,1,1,1,7,5,7,5,5,6,9,2,6,10,6,6,Very Low
+SS,Hector Bueno,STL,L,R,High,Low,4,4,4,4,5,6,3,4,Normal,Pull,Normal,1,1,1,8,7,5,8,6,7,5,4,7,10,6,6,Very Low
+2B,Dustin Calzada,CIN,S,R,Normal,Normal,7,7,7,10,4,9,2,1,Line Drive,Normal,Spray,1,1,1,6,5,4,8,3,3,3,7,5,8,7,6,Medium
+CF,Carlos Cano,CIN,R,R,High,Normal,5,6,5,9,1,6,3,1,Line Drive,Normal,Normal,1,1,1,7,6,4,6,7,7,6,10,9,10,10,6,Medium
+LF,Jose Carrasco,SD,L,L,High,Normal,4,5,4,4,4,10,5,3,Groundball,Normal,Pull,1,1,1,1,1,3,1,6,4,7,3,7,5,6,6,Very Low
+RF,Juan Carrizales,LV,L,L,Normal,Low,6,6,7,5,7,5,3,1,Groundball,Normal,Normal,1,1,1,2,2,4,1,6,6,7,1,2,6,1,6,Very Low
+2B,Craig Carroll,BRK,R,R,High,Normal,6,8,4,7,2,4,5,1,Line Drive,Normal,Normal,1,1,1,6,5,8,7,1,5,9,2,2,9,1,6,Very Low
+CF,Greg Cash,LV,L,L,Normal,Low,4,4,4,8,8,6,4,1,Flyball,Spray,Normal,1,1,1,7,7,5,1,8,5,8,5,6,10,7,6,Medium
+CF,Dave Castanon,VAN,R,R,Normal,Normal,4,4,3,6,6,5,10,3,Normal,Pull,Normal,1,1,1,4,4,4,4,7,8,7,3,4,10,8,6,Very Low
+3B,Gabe Castro,SF,S,R,High,Normal,7,6,8,5,5,6,2,4,Groundball,Normal,Spray,1,1,1,6,6,8,3,2,5,10,2,3,5,2,6,Low
+C,Tae-kyun Choi,MTL,R,R,High,Low,5,4,8,4,6,3,2,1,Normal,Normal,Normal,6,7,6,1,1,5,1,1,3,4,1,1,5,1,6,Low
+LF,Carmine Citti,BUF,R,L,Normal,Normal,4,5,4,4,6,10,2,1,Normal,Spray,Spray,1,1,1,3,3,3,1,6,5,6,6,8,8,9,6,Very Low
+LF,Wayne Curran,SF,L,L,Normal,Normal,5,4,6,5,7,8,4,1,Flyball,Pull,Pull,1,1,1,1,1,4,1,6,5,6,1,1,6,1,6,Low
+2B,Tarou Deguchi,MIA,R,R,Low,Normal,6,8,4,8,5,6,4,5,Line Drive,Pull,Pull,1,1,1,6,8,3,7,3,6,2,8,8,9,9,6,Low
+RF,Remo Donelli,CIN,L,L,Normal,Normal,5,5,4,5,8,5,1,1,Flyball,Normal,Normal,1,1,1,3,3,4,1,6,7,8,1,1,2,1,6,Low
+1B,Carlos Dorame,MIN,S,R,Normal,Normal,4,4,4,4,7,10,3,3,Flyball,Spray,Normal,1,1,1,4,3,4,4,6,4,5,6,9,10,9,6,Very Low
+3B,Ken Draves,SF,R,R,Normal,Normal,5,7,4,5,6,3,3,4,Groundball,Normal,Normal,1,1,1,6,5,9,7,3,4,8,1,2,7,3,6,Very Low
+1B,Pablo Fernandez,ROC,R,R,Low,Normal,5,5,4,4,5,7,3,1,Groundball,Normal,Normal,1,1,1,4,3,2,2,5,2,2,2,2,4,2,6,Very Low
+SS,Jim Flannery,TOR,R,R,Normal,Normal,3,2,4,3,4,6,9,8,Normal,Normal,Spray,1,1,1,9,6,4,6,8,6,6,6,6,8,8,6,Very Low
+CF,Adam Fleming,BOS,R,R,Normal,Normal,5,6,5,5,2,6,6,4,Groundball,Normal,Spray,1,1,1,3,4,8,2,7,9,10,3,5,10,3,6,Very Low
+SS,Eddie Flores,LV,R,R,Normal,Normal,4,4,5,5,4,5,3,5,Normal,Normal,Normal,1,1,1,7,7,7,8,5,5,8,7,7,9,10,6,Very Low
+C,Roberto Fondin,ME,R,R,Low,Normal,3,2,4,3,7,8,3,2,Flyball,Pull,Normal,7,6,7,2,3,6,1,2,4,7,2,1,10,5,6,Low
+SS,Chris Fonville,STL,R,R,Normal,High,6,8,4,6,4,5,2,1,Line Drive,Normal,Normal,1,1,1,5,8,10,8,1,5,8,7,9,10,10,6,Low
+3B,Per Fronteira,VAN,L,R,High,Normal,7,8,6,5,5,3,4,4,Groundball,Normal,Spray,1,1,1,5,6,9,4,4,3,5,1,1,8,4,6,Very Low
+LF,Marcos Galarraga,STL,R,R,Low,Normal,4,3,5,8,10,10,8,7,Flyball,Spray,Spray,1,1,1,5,3,3,4,6,6,6,4,6,7,4,6,Very Low
+2B,Hector Gallegos,HOU,L,R,Normal,Low,5,5,6,6,1,5,8,3,Line Drive,Normal,Spray,1,1,1,7,5,5,6,6,4,4,7,8,10,9,6,Low
+C,Jordan Garcia,CIN,R,R,Normal,Low,6,7,5,4,3,5,3,1,Normal,Pull,Normal,8,7,5,1,2,2,1,3,3,3,1,2,1,1,6,Very Low
+SS,Travis Glazebrook,HOU,R,R,Low,Normal,6,7,6,6,3,3,4,5,Line Drive,Normal,Normal,1,1,1,8,8,5,7,3,5,4,6,8,10,10,6,Very Low
+LF,Ferdinand Goehler,LA,L,L,Normal,High,4,5,3,10,7,7,9,7,Line Drive,Normal,Pull,1,1,1,6,4,4,1,5,6,6,5,5,10,2,6,Medium
+2B,Marcus Gomez,PHI,R,R,High,Normal,4,3,6,3,1,8,10,4,Normal,Normal,Normal,1,1,1,6,5,3,7,3,5,2,6,9,6,8,6,Low
+LF,Jose Gonzales,LA,R,R,Normal,Normal,7,8,5,10,7,4,2,1,Line Drive,Normal,Normal,1,1,1,3,3,4,3,5,4,6,5,7,6,5,6,Very Low
+SS,Brian Green,LV,R,R,Normal,Normal,5,5,5,5,4,5,5,3,Normal,Pull,Spray,1,1,1,9,5,6,6,3,4,6,5,9,9,9,6,Very Low
+SS,Tony Guerra,POR,S,R,High,High,4,4,4,5,8,5,3,1,Flyball,Pull,Normal,1,1,1,8,7,8,7,6,4,8,6,5,6,7,6,Low
+SS,Jake Herman,MTL,R,R,Normal,Normal,5,5,6,5,4,4,2,1,Normal,Pull,Normal,1,1,1,8,6,8,6,4,3,9,4,3,9,9,6,Very Low
+CF,Shane Hirsh,ME,L,L,Normal,Normal,6,5,7,5,4,4,3,4,Normal,Normal,Normal,1,1,1,1,1,4,1,7,9,8,2,3,6,5,6,Low
+1B,Chris Hodges,MIA,R,L,Normal,Normal,5,5,5,5,8,5,5,1,Flyball,Normal,Spray,1,1,1,3,3,6,1,5,5,10,4,4,8,3,6,Very Low
+3B,Vincent Horvers,PHI,R,R,Normal,Normal,4,5,3,5,8,6,4,1,Flyball,Pull,Normal,1,1,1,6,6,8,6,6,5,9,8,8,10,6,6,Very Low
+LF,Matty Hrinko,BUF,R,R,High,Low,5,5,5,5,3,10,2,1,Groundball,Pull,Normal,1,1,1,1,2,5,2,5,7,6,3,6,6,1,6,Very Low
+LF,Trevor Hutchinson,TUC,L,L,High,Normal,3,3,2,3,9,6,4,1,Flyball,Pull,Spray,1,1,1,3,2,3,1,5,9,6,6,5,5,10,6,Very Low
+CF,Mitsumasa Inouye,BRK,S,L,Normal,High,5,5,6,10,4,2,7,5,Line Drive,Pull,Spray,1,1,1,1,1,6,1,7,7,8,8,8,10,10,6,Very Low
+C,Osamu Izumi,AKR,R,R,Low,Normal,4,5,4,4,2,4,3,1,Groundball,Normal,Spray,8,8,5,2,3,5,1,2,2,5,1,1,2,4,6,Low
+2B,Dusty Kenison,SAN,R,R,High,Normal,6,5,8,5,3,8,9,1,Normal,Spray,Normal,1,1,1,5,7,6,8,3,5,6,5,8,8,9,6,Very Low
+RF,Todd Kozuch,MIA,L,L,High,Normal,5,7,4,7,7,5,3,1,Normal,Pull,Spray,1,1,1,2,2,5,1,5,6,9,7,8,9,8,6,Very Low
+LF,Mark Kubina,VAN,R,R,High,Normal,8,10,6,4,3,5,6,2,Line Drive,Normal,Normal,1,1,1,5,3,6,4,6,5,7,5,6,7,6,6,Very Low
+1B,Sung-hyo Kym,WAS,L,L,Normal,Normal,4,5,3,5,9,8,1,1,Flyball,Ex. Pull,Normal,1,1,1,4,3,4,1,3,2,3,2,4,4,2,6,Very Low
+C,Jose Laza,SF,R,R,Normal,High,5,6,5,5,2,6,2,1,Groundball,Pull,Spray,8,7,5,3,2,4,1,3,3,5,1,1,2,2,6,Very Low
+2B,Wook-jin Lee,MTL,R,R,Normal,Normal,5,6,4,5,5,6,3,1,Normal,Normal,Normal,1,1,1,7,7,9,5,4,4,8,2,3,2,3,6,Very Low
+2B,Ling-lai Li,SEA,L,R,High,Normal,4,3,5,3,3,9,6,3,Normal,Spray,Normal,1,1,1,7,6,6,6,6,5,7,3,3,7,9,6,Very Low
+CF,Jose Lima,PHX,L,R,High,Normal,4,3,4,5,2,5,7,8,Normal,Spray,Normal,1,1,1,2,2,4,1,7,7,5,10,10,7,10,6,Very Low
+3B,Eddie Lucero,PHX,R,R,Low,Low,4,4,4,4,4,8,2,1,Normal,Normal,Normal,1,1,1,8,6,8,10,6,6,7,2,2,10,1,6,Very Low
+LF,Jessie Mapp,OXN,L,L,Normal,Normal,5,6,4,6,8,5,4,1,Flyball,Pull,Normal,1,1,1,1,2,4,1,6,3,6,1,1,4,1,6,Medium
+CF,Juan Martinez,STL,R,R,Low,Normal,3,3,3,3,5,10,9,7,Normal,Normal,Normal,1,1,1,4,2,6,2,7,8,5,7,10,10,10,6,Very Low
+LF,Mike McKasson,TUC,S,L,High,Normal,7,8,6,5,7,9,2,1,Groundball,Spray,Normal,1,1,1,2,3,2,1,6,6,5,2,1,3,2,6,Low
+C,George Meilleur,SB,R,R,Low,Low,5,5,7,5,5,5,3,5,Normal,Normal,Spray,8,6,8,3,3,7,2,3,4,8,3,1,9,1,6,Low
+SS,Yosvani Melian,BUF,L,R,Normal,Normal,4,4,4,4,4,9,2,1,Normal,Normal,Pull,1,1,1,7,8,5,8,5,7,4,6,6,9,9,6,Very Low
+2B,Ryan Mellon,NYT,R,R,Normal,Normal,4,5,4,6,8,5,3,1,Normal,Ex. Pull,Normal,1,1,1,6,6,5,5,1,4,5,4,5,9,8,6,Very Low
+2B,Omar Monge,MIA,R,R,High,Normal,5,5,5,4,5,4,3,2,Normal,Pull,Spray,1,1,1,7,6,6,6,1,2,4,6,5,7,6,6,Very Low
+3B,Don Morash,TUC,R,R,Normal,Normal,3,2,4,3,8,9,2,3,Flyball,Spray,Spray,1,1,1,6,5,8,3,6,5,8,1,3,4,2,6,Very Low
+3B,Bonaventure Moser,TUC,R,R,Normal,Normal,9,9,7,7,2,5,5,4,Line Drive,Spray,Pull,1,1,1,5,6,7,10,3,5,7,4,7,9,5,6,Very Low
+LF,Danny Mrazek,OXN,R,L,High,Normal,7,6,8,5,4,4,3,1,Groundball,Pull,Normal,1,1,1,5,4,2,1,6,7,5,2,3,4,4,6,Very Low
+3B,Donner Munro,SD,S,R,Normal,High,5,5,5,5,6,6,3,2,Flyball,Normal,Normal,1,1,1,5,5,10,3,1,5,5,1,5,5,5,6,Very Low
+3B,DeMario Natividad,NYT,S,R,High,Normal,8,8,7,7,2,3,3,2,Line Drive,Spray,Pull,1,1,1,6,6,9,4,5,4,6,5,8,10,10,6,Very Low
+C,Eric Newland,MIN,R,R,Normal,Normal,8,7,8,5,2,4,2,1,Groundball,Pull,Normal,8,7,4,4,3,2,2,3,2,2,1,3,5,1,6,Low
+2B,Danny Nieto,VAN,L,R,High,Normal,7,5,8,6,5,5,3,2,Normal,Normal,Spray,1,1,1,7,5,5,6,6,5,7,5,8,10,7,6,Low
+3B,Nate Nisson,CHI,R,R,Normal,Normal,6,7,5,5,4,5,3,4,Groundball,Pull,Normal,1,1,1,6,6,7,6,5,5,7,4,5,10,6,6,Very Low
+2B,Brandon Nofziger,DEN,L,R,Normal,Normal,6,5,7,5,5,3,8,6,Normal,Normal,Normal,1,1,1,6,5,7,7,6,5,6,4,4,10,4,6,Very Low
+1B,Danny Ornelas,TUK,L,L,Normal,Normal,4,5,4,5,7,8,4,1,Flyball,Normal,Normal,1,1,1,4,5,4,1,4,3,6,5,8,9,10,6,Very Low
+2B,Fred Otto,PHX,R,R,Normal,Normal,7,5,8,8,2,6,7,3,Line Drive,Normal,Normal,1,1,1,7,6,5,6,5,3,5,4,6,10,5,6,Low
+2B,Mike Owens,BUF,R,R,High,Normal,7,5,8,5,4,4,7,1,Groundball,Pull,Spray,1,1,1,8,5,3,5,7,6,5,4,4,8,4,6,Very Low
+RF,Lucas Pamatz,LA,L,L,High,High,7,6,8,7,3,6,10,8,Line Drive,Spray,Normal,1,1,1,4,4,6,1,5,5,8,8,10,10,9,6,Very Low
+CF,Willie Pena,ARL,R,R,High,Normal,4,4,3,3,5,6,7,9,Normal,Normal,Normal,1,1,1,1,2,5,3,8,5,7,6,5,10,8,6,Very Low
+RF,Da-xia Peng,BAL,S,R,Normal,Normal,5,6,5,7,9,8,3,3,Flyball,Normal,Spray,1,1,1,6,5,7,6,5,5,8,6,9,10,10,6,Very Low
+3B,Alderaan Pike,YK,R,R,High,Normal,6,8,4,7,8,8,2,1,Line Drive,Normal,Normal,1,1,1,4,5,10,3,2,5,9,4,4,5,5,6,Very Low
+LF,Ruben Plascencia,HOU,R,R,High,Normal,4,4,4,5,7,5,4,1,Flyball,Normal,Normal,1,1,1,2,2,4,1,6,4,6,6,6,9,6,6,Very Low
+1B,Lan-quing Qiu,ME,R,R,Low,Normal,8,9,6,5,5,4,3,2,Groundball,Normal,Normal,1,1,1,4,3,4,6,2,2,3,5,7,4,9,6,Low
+3B,Isandro Ramirez,TOR,R,R,Normal,Normal,5,6,4,6,2,7,2,1,Groundball,Pull,Spray,1,1,1,6,5,9,4,6,6,9,1,2,4,1,6,Very Low
+CF,Victor Ramos,BRK,R,L,High,Low,4,4,4,1,4,4,9,3,Normal,Normal,Normal,1,1,1,5,5,2,1,7,8,6,6,6,9,10,6,Very Low
+LF,Paul Rees,MTL,L,L,High,High,6,5,8,5,6,5,3,1,Normal,Normal,Normal,1,1,1,4,3,1,1,6,4,3,3,4,8,3,6,Very Low
+LF,Ramiro Rexach,SD,L,L,Normal,Normal,7,8,6,6,3,7,3,1,Line Drive,Pull,Normal,1,1,1,1,1,4,1,5,4,7,7,8,4,9,6,Very Low
+3B,Nelson Rivera,KC,L,R,Normal,Low,6,5,8,4,4,4,4,3,Groundball,Spray,Pull,1,1,1,8,5,8,5,4,4,8,5,8,8,8,6,Low
+SS,Leonardo Ruiz,MIN,R,R,High,Normal,6,7,5,5,1,6,3,3,Line Drive,Normal,Spray,1,1,1,7,6,9,7,1,5,9,3,5,9,4,6,Very Low
+2B,Brandon Russell,KC,R,R,High,Normal,5,8,4,6,3,5,5,4,Line Drive,Pull,Spray,1,1,1,6,6,5,8,2,4,3,8,9,10,9,6,Very Low
+1B,Manny Sagastisado,CHI,R,R,Normal,Normal,5,4,7,5,6,7,4,4,Flyball,Pull,Normal,1,1,1,3,5,8,2,2,4,7,5,8,7,7,6,Very Low
+RF,Armando Salvat,PHI,R,R,Normal,High,7,8,6,5,4,5,5,1,Groundball,Normal,Normal,1,1,1,2,3,7,4,6,3,8,6,8,9,9,6,Low
+RF,Xavier Santa,PHI,L,R,Normal,High,7,7,7,6,5,7,3,1,Groundball,Normal,Spray,1,1,1,2,1,5,2,6,6,7,8,8,8,10,6,Low
+C,Allen Santos,VAN,L,R,Low,Normal,4,5,3,4,9,3,1,2,Flyball,Spray,Spray,7,7,7,3,4,3,1,1,2,4,4,5,9,7,6,Very Low
+2B,Marcos Sardinas,KC,R,R,Normal,Normal,5,4,7,6,1,6,9,8,Normal,Spray,Spray,1,1,1,5,6,5,10,4,5,3,3,5,9,7,6,Very Low
+LF,Jason Schaul,CAL,L,L,Low,Normal,4,3,5,3,7,9,4,1,Flyball,Normal,Pull,1,1,1,2,2,3,1,6,6,6,2,4,9,2,6,Very Low
+1B,Trevor Short,BOS,L,L,Normal,Normal,5,8,3,8,9,6,10,3,Line Drive,Pull,Normal,1,1,1,3,3,3,1,4,4,5,2,2,4,1,6,Medium
+3B,Dustin Siepker,HAV,R,R,High,Normal,5,6,4,9,4,5,4,1,Line Drive,Spray,Normal,1,1,1,6,5,7,8,3,5,8,6,9,9,7,6,Very Low
+LF,Xian-gan Sima,ME,L,R,Normal,Normal,7,7,6,7,3,2,3,2,Line Drive,Pull,Spray,1,1,1,1,1,3,1,6,5,7,6,6,9,7,6,Very Low
+3B,Jon Sitterley,BUF,L,R,Normal,Normal,5,4,6,6,3,6,3,3,Normal,Normal,Normal,1,1,1,5,5,8,6,1,5,2,3,7,4,6,6,Very Low
+CF,Yuki Soma,SP,R,R,Normal,Normal,5,5,5,5,5,4,3,4,Normal,Normal,Spray,1,1,1,3,2,5,2,7,6,7,5,5,8,6,6,Very Low
+3B,Carlos Sosa,ME,R,R,Normal,Normal,5,6,5,4,5,6,3,1,Normal,Pull,Spray,1,1,1,6,5,10,3,4,5,5,1,1,4,1,6,Low
+LF,Henry Sosa,BOS,L,L,Normal,Normal,6,8,4,6,9,8,2,1,Flyball,Pull,Normal,1,1,1,3,2,3,1,5,8,7,8,9,9,9,6,Low
+3B,Jamie Swanson,BOS,R,R,High,High,7,7,6,8,4,5,5,1,Line Drive,Spray,Spray,1,1,1,7,6,6,6,5,5,5,8,9,10,10,6,Low
+2B,Matt Szymanski,HOU,R,R,Normal,Normal,6,7,4,7,2,7,6,5,Line Drive,Normal,Pull,1,1,1,7,5,5,6,2,3,4,6,6,10,10,6,Very Low
+2B,Lanny Tabares,STL,L,R,Low,Low,6,7,4,5,5,9,2,3,Line Drive,Spray,Normal,1,1,1,6,7,7,6,4,6,6,2,5,5,3,6,Very Low
+C,Taiji Taira,NYT,R,R,Normal,Normal,5,7,4,4,5,5,2,1,Groundball,Pull,Normal,7,7,7,2,2,3,1,1,1,4,1,3,2,2,6,Very Low
+RF,Akinori Takata,TUC,L,L,Normal,Low,5,6,5,7,3,9,4,2,Line Drive,Normal,Normal,1,1,1,2,2,8,1,5,4,10,2,3,5,1,6,Medium
+3B,Bobby Tapia,CIN,R,R,Normal,High,7,7,7,6,5,6,5,1,Groundball,Pull,Normal,1,1,1,6,5,8,7,3,4,6,2,4,5,1,6,Low
+LF,Chris Teyes,CHI,R,R,Low,Low,5,5,5,5,3,6,4,2,Groundball,Normal,Normal,1,1,1,2,3,4,3,6,6,5,4,5,10,7,6,Very Low
+CF,D.J. Trigg,LA,R,R,Normal,High,7,8,5,5,3,6,4,2,Line Drive,Normal,Normal,1,1,1,2,4,2,4,7,9,4,2,3,7,1,6,Very Low
+3B,Javy Trinidad,MIN,R,R,Normal,Normal,5,5,5,5,6,5,3,4,Normal,Pull,Normal,1,1,1,8,6,6,7,7,5,8,7,9,10,9,6,Very Low
+2B,Edwin Valenzuela,STL,R,R,High,Normal,7,7,6,4,4,5,3,1,Line Drive,Normal,Normal,1,1,1,7,5,4,7,3,5,2,1,4,7,4,6,Low
+2B,Jordan Vasquez,HAV,R,R,Normal,Normal,4,3,5,4,4,7,2,4,Flyball,Normal,Normal,1,1,1,6,5,8,6,2,5,7,4,6,9,6,6,Very Low
+3B,Conrad Vermeeren,AKR,R,R,Low,Low,5,5,4,3,5,4,1,1,Normal,Pull,Normal,1,1,1,5,5,10,4,3,5,9,1,1,2,1,6,Very Low
+RF,Pedro Vido,BAL,L,L,High,Normal,4,4,4,6,8,9,3,1,Flyball,Spray,Normal,1,1,1,2,2,6,1,5,9,8,1,1,5,1,6,Low
+SS,Jonathan Villegas,MV,L,R,Normal,Normal,4,4,4,5,4,4,7,6,Normal,Normal,Normal,1,1,1,8,6,7,6,2,3,7,5,7,8,4,6,Very Low
+RF,Daniel Wang,SEA,R,L,Normal,Normal,6,7,5,7,4,5,5,1,Line Drive,Pull,Normal,1,1,1,2,2,4,1,6,7,6,7,8,9,5,6,Low
+C,Sean Waterhouse,MTL,R,R,Normal,Normal,5,8,4,5,4,7,3,1,Groundball,Ex. Pull,Pull,7,7,4,1,3,4,1,3,1,3,1,1,2,2,6,Low
+SS,Brad West,CHI,R,R,Normal,Normal,7,5,8,6,3,7,2,3,Normal,Normal,Spray,1,1,1,7,5,9,9,5,5,4,6,7,9,6,6,Medium
+RF,John Woodward,GAR,L,L,Normal,Normal,5,7,5,7,3,5,3,5,Line Drive,Normal,Spray,1,1,1,1,1,4,1,6,5,7,6,5,9,8,6,Low
+C,Chris Zamarron,LV,R,R,Normal,Normal,4,5,4,4,5,6,1,1,Normal,Ex. Pull,Pull,6,8,5,1,2,3,2,3,3,4,1,1,5,1,6,Very Low
+CF,Manny Alaniz,CIN,R,R,Normal,Normal,3,3,4,4,5,4,3,1,Flyball,Normal,Normal,1,1,1,2,2,7,2,7,5,9,3,3,6,4,5,Very Low
+SS,Matthew Allen,WAS,R,R,High,Normal,6,8,5,6,3,7,3,1,Line Drive,Pull,Spray,1,1,1,7,7,8,5,1,4,6,2,4,5,6,5,Very Low
+CF,Cristovão Alvelo,CHE,L,L,Low,Normal,7,6,9,6,2,3,3,1,Groundball,Normal,Normal,1,1,1,1,1,3,1,7,8,6,4,5,5,4,5,Very Low
+3B,Bejo Ananas,BUF,R,R,Normal,Normal,6,6,5,10,6,7,3,1,Line Drive,Spray,Normal,1,1,1,5,5,8,2,2,2,8,1,2,1,1,5,Very Low
+SS,Omar Anguiano,CIN,R,R,Normal,Normal,5,5,5,5,1,4,2,5,Line Drive,Normal,Normal,1,1,1,6,6,7,8,2,5,7,8,9,10,9,5,Very Low
+C,Arno Bachman,SD,R,R,Normal,Normal,4,4,4,8,3,5,2,1,Line Drive,Pull,Spray,7,6,5,1,2,4,1,2,1,4,1,1,2,1,5,Very Low
+2B,Antonio Bartra,QUA,L,R,Normal,Normal,6,5,7,4,2,5,7,1,Groundball,Spray,Spray,1,1,1,4,5,7,9,5,5,4,4,10,10,10,5,Very Low
+CF,Luis Bracero,AKR,S,R,Normal,Normal,3,3,3,4,3,6,8,6,Normal,Normal,Pull,1,1,1,1,3,4,1,7,9,6,6,7,8,8,5,Very Low
+C,Allen Braun,LV,S,R,Normal,Normal,4,4,4,7,10,4,5,1,Flyball,Pull,Normal,9,4,6,1,2,3,1,1,1,5,1,1,1,2,5,Very Low
+2B,Bingham Brown,MIA,R,R,Normal,Normal,5,6,5,10,8,6,2,1,Line Drive,Normal,Spray,1,1,1,6,5,4,7,5,6,2,8,6,9,10,5,Medium
+3B,David Campos,MIN,R,R,Normal,Normal,5,5,5,4,6,4,1,1,Normal,Spray,Normal,1,1,1,4,6,7,3,3,4,8,4,6,9,5,5,Very Low
+3B,Gap Cao,LIN,R,R,High,Normal,6,7,6,5,5,2,4,1,Groundball,Normal,Normal,1,1,1,7,7,7,6,4,5,7,5,5,6,3,5,High
+3B,Jonathan Casarrubias,BRK,L,R,Normal,Normal,5,6,5,5,4,5,2,1,Groundball,Pull,Spray,1,1,1,4,5,9,4,3,6,6,1,2,3,2,5,Low
+3B,Gilberto Cerda,MIN,R,R,High,Normal,9,10,6,10,3,9,4,1,Line Drive,Normal,Pull,1,1,1,5,5,9,4,4,5,9,3,3,6,6,5,Medium
+CF,Manuel Chavez,SF,R,R,Normal,Low,4,4,3,5,6,5,4,4,Normal,Normal,Normal,1,1,1,2,2,7,2,6,6,10,6,6,10,10,5,Very Low
+2B,Yifu Chen,JOL,S,R,Normal,Low,5,4,8,5,5,4,9,8,Normal,Normal,Normal,1,1,1,6,5,6,5,4,5,5,8,7,9,9,5,Low
+CF,B.J. Couch,CHI,L,L,Normal,Normal,4,4,5,4,5,5,2,4,Normal,Normal,Normal,1,1,1,4,3,3,1,7,6,6,7,8,9,10,5,Low
+1B,Hwui-ning Dan,POR,L,R,Normal,Normal,5,7,3,5,7,5,4,1,Groundball,Normal,Normal,1,1,1,2,3,3,2,1,2,2,1,2,4,2,5,Very Low
+3B,Bobby Diaz,MTL,L,R,High,Normal,6,5,7,4,1,5,6,1,Groundball,Pull,Spray,1,1,1,6,4,8,7,5,6,4,3,4,5,5,5,Very Low
+SS,Jake Doctor,LV,R,R,Normal,Normal,4,4,4,5,3,4,6,1,Normal,Pull,Normal,1,1,1,7,7,6,7,3,5,5,4,6,8,4,5,Very Low
+LF,Robby Duarte,ARL,R,L,High,Normal,6,8,4,6,4,5,4,1,Line Drive,Normal,Pull,1,1,1,2,2,2,1,5,5,4,4,7,9,9,5,Very Low
+2B,Francisco Duenas,MIA,R,R,High,Normal,5,6,4,6,5,7,3,1,Groundball,Normal,Pull,1,1,1,5,7,6,6,3,4,4,2,5,5,3,5,Very Low
+1B,Xadreque Esperana,POR,L,L,High,Normal,5,4,6,5,9,7,2,1,Flyball,Ex. Pull,Pull,1,1,1,3,3,6,1,3,6,8,3,3,1,5,5,Very Low
+LF,Marco Feron,HOU,L,L,High,High,7,10,5,8,3,3,10,5,Line Drive,Normal,Normal,1,1,1,4,4,3,1,4,8,5,8,10,10,10,5,Very Low
+2B,Jordan Flores,POR,R,R,Normal,High,6,5,8,4,4,6,7,5,Normal,Normal,Pull,1,1,1,5,5,4,7,3,6,3,2,1,8,2,5,Very Low
+2B,Ian Frost,CIN,R,R,Normal,Normal,4,4,4,6,5,9,3,2,Normal,Pull,Normal,1,1,1,6,5,5,5,1,4,4,6,4,9,6,5,Low
+C,Leo Garza,TUC,R,R,Normal,Normal,4,3,4,3,7,5,3,1,Flyball,Normal,Normal,7,7,5,3,4,4,3,1,3,2,1,1,2,1,5,Very Low
+RF,Ron Gideon,PHI,L,L,High,Normal,6,9,3,5,4,8,2,1,Line Drive,Normal,Normal,1,1,1,1,1,3,1,5,8,7,8,9,10,10,5,Very Low
+CF,Jason Gonzalez,MV,R,R,High,Normal,3,3,3,6,7,6,3,1,Flyball,Normal,Normal,1,1,1,5,6,3,6,7,5,7,7,9,7,9,5,Very Low
+3B,Caleb Graham,ARL,S,R,High,Normal,7,5,9,5,3,3,9,7,Groundball,Pull,Normal,1,1,2,6,6,8,3,4,5,8,6,7,8,5,5,Very Low
+CF,Danny Grandgeorge,TUC,L,L,High,Normal,5,4,5,4,2,6,6,5,Normal,Pull,Normal,1,1,1,6,5,3,1,7,7,7,2,2,8,3,5,Very Low
+1B,Alex Guilzar,PHX,R,R,High,Normal,5,5,5,6,9,6,3,1,Flyball,Spray,Normal,1,1,1,3,4,2,1,1,1,3,1,1,1,1,5,Very Low
+3B,Misael Hernandez,ANC,R,R,High,Normal,5,4,7,4,8,6,4,2,Flyball,Pull,Normal,1,1,1,5,6,8,4,4,6,9,3,2,6,7,5,Low
+1B,Cole Hickey,BUF,R,R,Normal,Normal,7,6,7,8,7,4,9,3,Normal,Normal,Normal,1,1,1,3,5,7,4,1,4,6,2,6,8,6,5,Very Low
+SS,Masakazu Inaba,MIA,R,R,Normal,Normal,8,5,10,7,1,2,6,6,Line Drive,Normal,Normal,1,1,1,7,7,4,7,3,5,3,6,9,10,5,5,Low
+2B,Yoennis Jova,SAN,L,R,Low,Normal,4,3,6,4,8,3,3,3,Flyball,Normal,Normal,1,1,1,5,7,6,8,2,4,7,1,2,6,1,5,Very Low
+2B,Jon Kaczmarek,VAN,L,R,Low,Normal,7,8,5,5,3,4,4,4,Line Drive,Normal,Normal,1,1,1,5,6,6,7,4,5,4,1,2,4,1,5,Very Low
+LF,Michael Keding,SD,L,L,Normal,Normal,4,3,5,7,9,9,3,1,Flyball,Normal,Normal,1,1,1,1,1,2,1,5,3,5,6,7,10,6,5,Medium
+3B,Michel Leon,SD,R,R,Normal,Normal,5,4,5,5,5,7,4,3,Flyball,Normal,Pull,1,1,1,6,5,8,4,3,4,8,4,7,9,7,5,Low
+3B,Alex Lomeli,NYT,R,R,Normal,Normal,10,9,9,4,3,5,2,1,Line Drive,Normal,Normal,1,1,1,4,5,9,3,4,5,8,3,5,5,4,5,High
+LF,Edgar Malhado,SD,R,L,High,Normal,4,4,5,4,7,10,3,1,Flyball,Spray,Normal,1,1,1,2,2,3,1,5,5,5,3,3,4,5,5,Very Low
+3B,Fernando Malleta,PHI,R,R,Normal,Normal,4,6,4,7,5,6,3,1,Line Drive,Pull,Spray,1,1,1,5,5,8,4,1,5,7,6,8,9,9,5,Very Low
+2B,Reinprecht Mann,LV,L,R,Normal,Normal,6,7,6,6,5,6,7,3,Normal,Spray,Pull,1,1,1,7,4,5,5,6,5,8,4,4,9,5,5,Very Low
+C,Tim McCarthy,WIC,R,R,Normal,High,4,3,6,4,7,5,4,1,Flyball,Spray,Pull,8,7,4,2,4,3,1,2,3,3,3,4,5,4,5,Low
+3B,Alex Monroy,MIA,R,R,Normal,Normal,6,6,6,5,6,4,4,4,Normal,Normal,Spray,1,1,1,4,4,9,3,3,4,8,8,7,10,9,5,Very Low
+C,Jose Neria,MIA,R,R,High,Normal,5,7,4,5,4,8,3,1,Groundball,Ex. Pull,Normal,6,6,5,1,4,2,1,2,1,2,1,3,3,1,5,Very Low
+1B,Wen-huan Niu,HOU,R,R,Normal,Normal,8,9,6,4,5,3,3,1,Groundball,Normal,Normal,1,1,1,3,3,4,1,4,3,2,1,1,2,1,5,Very Low
+3B,Jeff O'Donnell,PHI,R,R,High,Normal,5,5,5,6,7,5,3,1,Normal,Pull,Pull,1,1,1,7,5,7,3,2,5,7,4,5,10,4,5,Very Low
+1B,Emilio Oregon,MTL,L,R,Normal,High,3,3,3,5,8,7,3,1,Flyball,Ex. Pull,Normal,1,1,1,3,4,7,2,1,3,7,5,5,3,8,5,Very Low
+2B,Nick Phipps,BOS,S,R,Normal,Normal,4,4,5,3,6,7,2,1,Flyball,Normal,Spray,1,1,1,6,6,3,5,1,4,2,7,9,10,10,5,Low
+LF,Harold Pond,KC,S,L,High,Normal,6,7,5,3,4,8,3,3,Normal,Normal,Normal,1,1,1,2,2,5,1,4,7,5,4,5,6,5,5,Very Low
+2B,Danny Rubio,BAL,S,R,High,Normal,4,4,4,4,9,6,3,1,Flyball,Ex. Pull,Normal,1,1,1,6,5,3,6,2,6,1,5,6,10,7,5,Low
+2B,Jeremy Ruzicka,NYT,R,R,Normal,Low,9,10,7,5,3,8,7,6,Line Drive,Normal,Spray,1,1,1,5,5,4,7,4,4,3,4,7,8,5,5,Very Low
+C,Shichinosuke Sakai,BRK,R,R,Normal,Normal,6,6,6,3,6,3,3,1,Flyball,Normal,Normal,6,6,5,4,1,3,1,1,1,2,1,3,2,1,5,Low
+1B,Marcos Salinas,QUA,R,R,Normal,Normal,5,7,4,4,6,7,2,1,Normal,Pull,Normal,1,1,1,3,3,3,2,4,1,2,1,1,1,4,5,Medium
+1B,Jody Stewart,ME,L,L,Low,Normal,6,10,4,3,2,7,6,2,Line Drive,Spray,Normal,1,1,1,5,4,2,1,4,4,5,4,5,7,7,5,Low
+RF,Noah Taylor,SB,L,L,High,Normal,8,5,10,7,3,5,6,4,Line Drive,Normal,Spray,1,1,1,6,4,2,1,6,6,5,5,6,7,9,5,Very Low
+2B,David Tello,HIC,R,R,Normal,High,5,6,5,4,3,7,5,1,Groundball,Spray,Pull,1,1,1,5,7,5,5,4,5,4,3,5,6,1,5,Very Low
+2B,Aaron Trani,GUA,R,R,Normal,High,8,5,10,5,3,5,6,6,Groundball,Normal,Spray,1,1,1,7,5,4,4,3,7,3,8,8,9,6,5,Medium
+RF,Tillmam Velado,YK,L,L,Normal,Low,3,3,4,7,10,9,3,1,Flyball,Pull,Pull,1,1,1,2,2,1,1,5,6,7,6,9,9,6,5,Very Low
+1B,Mario Veras,CIN,L,L,Normal,High,5,5,5,3,5,4,3,2,Normal,Normal,Normal,1,1,1,3,3,4,1,6,5,7,5,8,9,9,5,Very Low
+SS,Robby Vieyra,KC,R,R,High,Normal,4,4,4,4,5,5,3,2,Normal,Normal,Normal,1,1,1,7,5,7,6,7,5,7,5,7,10,9,5,Very Low
+3B,Guignard Vitagliano,BAL,R,R,High,Low,7,7,6,3,5,4,6,2,Groundball,Normal,Spray,1,1,1,4,5,9,4,3,6,8,3,3,7,1,5,Very Low
+LF,Kuan Wang,BAL,R,R,Low,High,4,3,5,3,6,7,9,4,Flyball,Normal,Spray,1,1,1,1,3,5,1,5,6,8,4,7,8,6,5,Very Low
+1B,Jason Wedel,TOR,L,L,Normal,Normal,4,4,4,3,8,4,1,1,Flyball,Pull,Pull,1,1,1,3,3,4,1,3,1,1,1,3,2,1,5,Very Low
+3B,Luke Zakharov,STL,L,R,Normal,Low,4,3,4,5,8,6,2,1,Flyball,Pull,Pull,1,1,1,6,4,9,3,6,3,8,4,5,5,8,5,Very Low
+RF,Adam Adamski,MIA,L,L,Normal,Normal,5,7,4,6,7,5,2,1,Normal,Normal,Spray,1,1,1,1,1,3,1,4,5,6,2,3,5,9,4,Very Low
+1B,Tucker Adrian,SD,L,L,Normal,Normal,7,7,6,7,7,5,4,1,Line Drive,Normal,Normal,1,1,1,3,2,3,1,2,1,4,3,4,6,7,4,Medium
+RF,Joe Amaya,HOU,L,L,Normal,Normal,7,6,8,5,4,4,3,1,Normal,Ex. Pull,Spray,1,1,1,1,1,4,1,4,7,7,1,3,5,1,4,Low
+LF,Alonzo Armijo,MIA,R,R,Normal,High,9,8,9,5,1,4,2,1,Line Drive,Spray,Spray,1,1,1,1,1,5,1,4,4,7,2,3,3,5,4,Very Low
+CF,Keverne Brady,FRE,L,L,Normal,High,5,6,4,6,3,6,8,7,Groundball,Normal,Pull,1,1,1,3,3,5,1,6,5,8,7,10,10,10,4,Low
+C,Andre Casson,ME,S,R,Normal,Normal,4,4,4,5,5,7,6,1,Normal,Normal,Normal,4,8,3,3,2,7,2,1,3,8,2,3,3,1,4,Low
+3B,Ju-ho Cheon,GUA,R,R,Normal,Normal,5,6,4,5,5,9,2,1,Normal,Pull,Normal,1,1,1,3,4,8,3,4,5,8,3,3,5,4,4,Low
+CF,Luis Chicas,MIN,R,R,Normal,Normal,7,8,5,9,3,7,6,5,Line Drive,Normal,Spray,1,1,1,6,4,8,5,6,6,10,7,9,9,10,4,Low
+1B,Karl Cooper,PHX,L,L,Normal,Normal,5,5,6,5,8,5,3,2,Flyball,Normal,Normal,1,1,1,3,2,4,1,1,1,1,1,1,1,1,4,Very Low
+3B,Eddie Duarte,POR,R,R,Normal,Normal,4,4,4,5,6,7,3,1,Normal,Pull,Spray,1,1,1,3,6,7,3,1,3,6,2,6,6,4,4,Very Low
+C,Mario Guerrero,ANC,R,R,High,Low,6,5,7,4,5,5,3,2,Normal,Normal,Normal,5,6,4,1,2,2,1,2,4,3,1,4,7,3,4,Low
+1B,Domynguos Ivison,YK,L,R,Normal,Normal,5,7,4,5,3,7,3,1,Groundball,Pull,Normal,1,1,1,1,4,3,5,1,2,2,3,3,5,1,4,Very Low
+3B,Jonathan Johnsen,WAS,R,R,Normal,Normal,5,5,6,4,6,5,3,2,Normal,Normal,Spray,1,1,1,4,5,7,3,4,5,7,2,1,5,1,4,Very Low
+2B,Pusher Juarez,ME,R,R,High,Normal,6,7,5,6,2,6,4,2,Line Drive,Normal,Normal,1,1,1,5,5,5,6,3,4,7,3,6,8,3,4,Low
+C,Koson Kitano,MIA,R,R,Normal,Normal,5,5,4,3,4,5,2,2,Groundball,Pull,Pull,5,6,3,2,3,5,1,3,4,5,1,1,1,1,4,Very Low
+SS,Vance Kitchen,BAL,R,R,Normal,Normal,6,5,6,5,2,6,7,3,Normal,Pull,Normal,1,1,1,5,6,8,7,1,6,9,5,5,6,7,4,Very Low
+1B,Bu-wei Kuang,TOR,R,R,High,High,5,6,4,4,7,6,2,1,Flyball,Normal,Normal,1,1,1,2,4,2,1,2,1,4,1,2,3,1,4,Very Low
+LF,Allen Lafontaine,BRK,S,R,Normal,Normal,6,7,6,3,6,8,2,3,Groundball,Pull,Pull,1,1,1,1,1,4,1,4,4,7,1,4,2,1,4,Low
+1B,Maddox Lannigan,OXN,R,R,High,High,4,5,3,7,8,7,1,1,Flyball,Pull,Pull,1,1,1,3,2,5,1,1,2,2,1,1,1,1,4,Low
+2B,Bitgaram Mangjeol,JC,R,R,High,High,3,4,1,7,1,5,2,1,Line Drive,Normal,Normal,1,1,1,8,10,7,10,4,6,7,2,6,10,6,4,Very Low
+LF,Casey Marko,KC,L,R,Normal,Normal,5,5,5,5,4,5,5,1,Line Drive,Normal,Spray,1,1,1,1,4,2,4,4,7,4,5,6,6,9,4,Very Low
+C,Valerik Mirxayan,POR,R,R,Normal,Normal,4,6,4,8,7,4,3,1,Normal,Spray,Pull,7,5,4,2,2,3,1,3,3,3,1,1,2,1,4,Low
+LF,Matt Salmon,CHI,L,R,Low,Normal,4,4,3,6,9,4,2,1,Flyball,Normal,Spray,1,1,1,1,1,1,1,4,5,5,1,3,1,1,4,Very Low
+LF,Eric Trahan,WAS,R,R,Normal,Normal,8,8,8,8,5,6,3,1,Line Drive,Normal,Normal,1,1,1,2,3,1,2,5,3,3,3,1,2,1,4,Low
+1B,Tan Tsung,LV,R,R,High,Normal,6,5,6,6,6,5,3,5,Normal,Spray,Pull,1,1,1,2,3,2,2,2,2,1,2,2,10,1,4,Very Low
+LF,Hideji Yamanaka,SEA,R,L,High,Normal,7,6,6,7,6,9,4,1,Normal,Pull,Spray,1,1,1,1,1,4,1,4,5,8,2,2,9,1,4,Low
+1B,Danny Berrios,ME,L,L,Low,Normal,5,7,4,7,6,8,3,1,Groundball,Ex. Pull,Normal,1,1,1,1,3,3,1,3,3,3,2,1,5,1,3,Very Low
+CF,Tomofumi Kamimura,SEA,L,L,Normal,Normal,4,3,4,6,8,4,4,1,Flyball,Ex. Pull,Normal,1,1,1,8,5,1,1,7,5,4,4,4,9,3,3,Very Low
+SP,Yahya Kanoro,POR,L,L,Normal,Normal,5,6,5,6,8,5,3,1,Flyball,Pull,Spray,1,1,1,1,1,5,1,3,4,8,4,5,7,6,3,Very Low
+1B,Cesar Najar,CAL,R,R,Normal,Normal,4,6,3,5,8,5,3,2,Flyball,Pull,Pull,1,1,1,2,2,2,1,3,4,5,1,1,3,1,3,Very Low
+RF,Dave Palacios,PHI,L,L,Low,Low,4,4,4,4,7,10,4,3,Flyball,Pull,Pull,1,1,1,2,2,3,1,5,4,7,3,4,9,6,3,Very Low
+RF,Danny Perez,BR,L,L,Normal,Normal,7,6,8,5,3,4,6,1,Groundball,Normal,Pull,1,1,1,2,2,3,1,5,3,3,4,3,6,3,3,Medium
+SS,Lan-quing Rao,SP,R,R,High,Normal,5,5,6,7,6,7,3,1,Normal,Normal,Pull,1,1,1,5,6,4,7,6,7,6,6,5,9,8,3,Low
+C,Alex Rodriguez,BOS,R,R,Normal,Normal,4,5,4,4,5,5,3,2,Normal,Pull,Spray,5,4,5,2,1,3,1,4,2,5,2,2,1,3,3,Very Low
+C,Koji Shiraki,DEN,R,R,Low,Normal,3,2,4,2,6,6,5,1,Flyball,Pull,Pull,6,5,5,3,3,2,4,2,5,3,1,1,1,1,3,Low
+RP,Angelo Zelada,MIN,S,R,High,High,4,4,4,3,2,1,10,1,Groundball,Normal,Pull,1,1,1,1,1,7,2,1,1,2,1,1,1,1,3,Low
+1B,Cheng-qian Eng,JC,L,L,High,High,5,4,5,4,8,6,1,1,Flyball,Normal,Normal,1,1,1,1,3,3,1,1,1,2,3,2,2,5,2,Very Low
+SP,Danny Serrano,LA,R,R,Normal,Normal,6,5,8,5,5,3,3,1,Normal,Normal,Pull,6,7,5,1,4,4,1,1,4,4,3,3,5,9,2,Low
+1B,Brett Dekraker,POR,R,R,High,Normal,7,7,7,7,7,5,4,1,Line Drive,Normal,Normal,1,1,1,1,1,2,1,4,5,5,5,3,5,4,1,Low
+1B,Mario Murillo,HAV,R,R,Low,High,4,4,5,6,7,8,10,1,Flyball,Normal,Spray,1,1,1,1,1,4,1,1,5,6,1,1,1,1,1,Very Low
+SP,Ricky Zika,LA,R,R,High,High,5,4,6,7,9,7,2,1,Flyball,Normal,Spray,1,1,1,1,1,4,1,1,3,5,4,6,6,6,1,Very Low
+DH,Gentaro Arakawa,MIN,S,R,Normal,Low,8,7,9,7,7,7,1,1,Normal,Pull,Normal,1,1,1,2,3,3,4,4,4,3,1,1,1,1,-,Low
+DH,Bobby Badeaux,WAS,R,R,High,Normal,7,7,7,9,5,8,2,1,Line Drive,Normal,Pull,1,1,1,1,1,5,1,4,6,6,8,10,7,10,-,Very Low
+DH,Chris Brankin,ME,L,L,Normal,Normal,5,6,4,6,6,6,2,1,Normal,Pull,Normal,1,1,1,2,3,5,1,5,4,7,4,5,4,3,-,Very Low
+DH,Salomão Capucho,CIN,R,R,Normal,Normal,6,7,5,6,6,5,3,1,Normal,Pull,Pull,1,1,1,2,3,3,4,1,2,2,8,6,9,9,-,Low
+DH,Jairo Cedillo,POR,L,L,Normal,Normal,6,7,5,6,8,8,4,1,Flyball,Pull,Spray,1,1,1,5,5,1,1,3,4,5,3,6,9,5,-,Low
+DH,Matt Lawson,MIA,L,L,Normal,Normal,6,6,6,4,7,4,10,4,Groundball,Spray,Pull,1,1,1,1,1,3,1,2,4,5,3,5,7,4,-,Very Low
+DH,Luis Nungaray,STL,R,R,High,Normal,7,5,9,5,3,6,2,1,Groundball,Pull,Normal,1,1,1,1,3,6,2,4,4,7,2,1,4,1,-,Very Low
+RF,Jose Pedroza,TUC,L,R,Normal,Low,5,5,5,7,7,6,3,1,Flyball,Normal,Normal,1,1,1,1,1,6,1,1,4,8,1,1,2,1,-,Very Low
+DH,Felix Perez,YK,R,R,Normal,High,5,4,7,7,7,4,2,1,Flyball,Normal,Normal,1,1,1,2,2,1,2,2,2,2,5,7,2,9,-,Very Low
+DH,Jacob Testaverde,ME,R,R,Low,Low,7,7,7,7,8,9,3,1,Flyball,Spray,Spray,1,1,1,1,2,6,2,3,4,6,5,4,5,4,-,Very Low
+DH,Alex Trujillo,ANC,R,R,Normal,Normal,8,6,10,8,3,5,5,2,Line Drive,Spray,Normal,1,1,1,3,4,7,3,2,6,8,1,3,5,1,-,Medium
+DH,Innis Walker,SAN,L,L,Normal,High,6,5,7,9,10,10,4,2,Flyball,Spray,Normal,1,1,1,2,2,3,1,5,5,6,6,5,6,8,-,Medium
+DH,Alex Zendejas,HAV,L,L,Normal,Normal,4,5,3,6,8,8,2,1,Flyball,Normal,Normal,1,1,1,1,2,7,1,4,4,9,1,1,8,1,-,Very Low

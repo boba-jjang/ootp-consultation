@@ -436,10 +436,11 @@ describe('parseCell on every fixture', () => {
 
   const fielding = files.filter((file) => file.startsWith('seattle-g70/'));
 
-  it('walks every folder of fixtures/, Game 53 and its overlap included', () => {
+  it('walks every folder of fixtures/, Game 53 and its overlap and Game 71 included', () => {
     expect(files.filter((file) => file.startsWith('seattle-g53/'))).toHaveLength(19);
     expect(fielding).toHaveLength(2);
-    expect(files).toHaveLength(40);
+    expect(files.filter((file) => file.startsWith('seattle-g71/'))).toHaveLength(16);
+    expect(files).toHaveLength(56);
   });
 
   it.each(files)('parses every cell of %s through the dictionary', (path) => {
@@ -486,11 +487,67 @@ describe('TM as the team’s short code (Knowledge Base › Import contract › 
     expect(parseCell('TM', '')).toEqual({ ok: true, value: null });
   });
 
+  it('reads a TM of "-" as its own value, no team, and "-" as blank in every other column', () => {
+    // The owner's decision of 12 October 2026: Game 71's unattached pitchers show TM "-".
+    expect(parseCell('TM', '-')).toEqual({ ok: true, value: '-' });
+    for (const column of ['POS', 'Name', 'LG', 'AVG', 'GB/FB', 'VELO']) {
+      expect(parseCell(column, '-'), column).toEqual({ ok: true, value: null });
+    }
+    const path =
+      'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_pitching_stats_c.csv';
+    expect(valueOf(path, 'Alan Hand', 'TM')).toBe('-');
+    expect(valueOf(path, 'Matt Kloser', 'TM')).toBe('-');
+  });
+
   it('applies to the Game 42 and Game 53 files, team and league', () => {
     for (const path of [leagueView('batting_superstats_1'), teamView('batting_superstats_1')]) {
       const teams = new Set(routeFixture(path).rows.map((row) => row.TM));
       expect(teams.has('SEA'), path).toBe(true);
       expect(teams.has('Seattle'), path).toBe(false);
+    }
+  });
+});
+
+describe('the Game 71 counts (Knowledge Base › Import contract › Column dictionary)', () => {
+  const PITCHING =
+    'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_pitching_stats_c.csv';
+  const FIELDING = 'seattle-g71/seattle_arrows_lineups_-_overview_fielding_stats_cus.csv';
+
+  it('reads GB and FB as whole counts, beside GO% as a fraction', () => {
+    expect(valueOf(PITCHING, 'Bob Achbar', 'GB')).toBe(69);
+    expect(valueOf(PITCHING, 'Bob Achbar', 'FB')).toBe(88);
+    expect(valueOf(PITCHING, 'Bob Achbar', 'GO%')).toBe(0.44);
+    for (const column of ['GB', 'FB']) {
+      for (const raw of everyCell(PITCHING, column)) {
+        expect(Number.isInteger(parsed(column, raw)), `${column} "${raw}"`).toBe(true);
+      }
+    }
+  });
+
+  it('reads TP, the triple plays, as a whole count', () => {
+    for (const raw of everyCell(FIELDING, 'TP')) {
+      expect(Number.isInteger(parsed('TP', raw)), `TP "${raw}"`).toBe(true);
+    }
+  });
+});
+
+describe('VELO and VT at the top of the scale (the owner’s decision, 12 October 2026)', () => {
+  it('reads "100+ Mph" as the step after 99-101: low 100, high 102, midpoint 101', () => {
+    for (const column of ['VELO', 'VT']) {
+      expect(parsed(column, '100+ Mph'), column).toEqual({ low: 100, high: 102, mid: 101 });
+      expect(parsed(column, '99-101 Mph'), column).toEqual({ low: 99, high: 101, mid: 100 });
+    }
+    expect(parseCell('VELO', '100 Mph').ok).toBe(false);
+  });
+
+  it('reads Angelo Zelada’s VELO and VT in the Game 71 league ratings', () => {
+    const path = 'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_cus_pitch_pot.csv';
+    for (const column of ['VELO', 'VT']) {
+      expect(valueOf(path, 'Angelo Zelada', column), column).toEqual({
+        low: 100,
+        high: 102,
+        mid: 101,
+      });
     }
   });
 });

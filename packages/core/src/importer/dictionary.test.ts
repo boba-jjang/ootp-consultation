@@ -14,10 +14,10 @@ import {
 import { FIXTURES, readFixture, readFixtureText } from '../../test/fixtures.ts';
 
 // The markers, measured from the fixtures' headers: the columns only one side's files carry
-// (task Inputs and outputs; Knowledge Base › Import contract › Side and scope).
+// (task Inputs and outputs; Knowledge Base › Import contract › Side and scope). Since Game 71
+// the pitching views carry TM, BAR and HHi too, so those mark no side.
 const HITTER_MARKERS = [
   'Avg%',
-  'BAR',
   'BBT',
   'BFH',
   'BR%',
@@ -37,7 +37,6 @@ const HITTER_MARKERS = [
   'GBT',
   'GIDP',
   'H',
-  'HHi',
   'HT P',
   'IBB',
   'IF ARM',
@@ -63,7 +62,6 @@ const HITTER_MARKERS = [
   'SR',
   'STE',
   'TDP',
-  'TM',
   'UBR',
   'wOBA',
   'wRAA',
@@ -133,6 +131,10 @@ const PITCHER_MARKERS = [
   'xERA',
 ];
 
+// GB and FB, the pitchers' ground-ball and fly-ball counts, only pitchers' files carry, but
+// they mark no side (Knowledge Base › Import contract › Column dictionary).
+const PITCHER_COUNTS = ['FB', 'GB'];
+
 const HITTER_POSITIONS = new Set(['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH']);
 
 const fixturePaths = () =>
@@ -150,9 +152,9 @@ const sortedKeys = (side: 'hitters' | 'pitchers' | 'both', marker: boolean) =>
     .sort();
 
 describe('COLUMN_DICTIONARY (Knowledge Base › Import contract › Column dictionary)', () => {
-  it('has one entry for each of the 245 header names in fixtures/, the fielding view’s 41 included', () => {
+  it('has one entry for each of the 248 header names in fixtures/, the fielding view’s 41 and Game 71’s TP, GB and FB included', () => {
     const names = new Set(fixturePaths().flatMap(headerOf));
-    expect(names.size).toBe(245);
+    expect(names.size).toBe(248);
     expect(Object.keys(COLUMN_DICTIONARY).sort()).toEqual([...names].sort());
   });
 
@@ -162,7 +164,7 @@ describe('COLUMN_DICTIONARY (Knowledge Base › Import contract › Column dicti
     expect(sortedKeys('hitters', false)).toEqual([]);
     expect(sortedKeys('pitchers', false)).toEqual([]);
     expect(sortedKeys('both', true)).toEqual([]);
-    expect(sortedKeys('both', false)).toHaveLength(245 - 54 - 59);
+    expect(sortedKeys('both', false)).toHaveLength(248 - 51 - 59);
   });
 
   it('agrees with the fixtures: a marker appears only in its side’s files', () => {
@@ -171,7 +173,9 @@ describe('COLUMN_DICTIONARY (Knowledge Base › Import contract › Column dicti
     const seen = { hitters: new Set<string>(), pitchers: new Set<string>() };
     // A fielding file lists both sides and marks neither.
     const skipped = (file: string) =>
-      file.includes('hitter_capture') || file.startsWith('seattle-g70/');
+      file.includes('hitter_capture') ||
+      file.startsWith('seattle-g70/') ||
+      file.includes('_fielding_');
     for (const path of fixturePaths().filter((file) => !skipped(file))) {
       const rows = readFixture(path);
       const hitters = rows.filter((row) => HITTER_POSITIONS.has(row.POS ?? '')).length;
@@ -183,7 +187,7 @@ describe('COLUMN_DICTIONARY (Knowledge Base › Import contract › Column dicti
     const only = (side: 'hitters' | 'pitchers', other: 'hitters' | 'pitchers') =>
       [...seen[side]].filter((column) => !seen[other].has(column)).sort();
     expect(only('hitters', 'pitchers')).toEqual([...HITTER_MARKERS].sort());
-    expect(only('pitchers', 'hitters')).toEqual([...PITCHER_MARKERS].sort());
+    expect(only('pitchers', 'hitters')).toEqual([...PITCHER_MARKERS, ...PITCHER_COUNTS].sort());
   });
 
   it('keeps each header as its own name, apart from Avg%, CON P and HLD', () => {
@@ -198,6 +202,7 @@ describe('COLUMN_DICTIONARY (Knowledge Base › Import contract › Column dicti
       ['E', 'Fielding E'],
       ['PCT', 'Fielding PCT'],
       ['PO', 'Fielding PO'],
+      ['TP', 'Fielding TP'],
     ]);
     expect(COLUMN_DICTIONARY['CON P']).toMatchObject({ side: 'both', marker: false });
     expect(COLUMN_DICTIONARY.HLD).toMatchObject({ side: 'pitchers', marker: true });
@@ -366,9 +371,9 @@ describe('the fielding view (Knowledge Base › Import contract › Column dicti
       'ZR',
     ];
     expect(readColumns(header).markers).toEqual({ hitters: [], pitchers: [] });
-    expect(readColumns(header.filter((column) => column !== 'ZR')).markers.hitters).toContain(
-      'DEF',
-    );
+    // Without ZR, and without DEF Pot beside IF RNG, it's an ordinary file again.
+    const ordinary = header.filter((column) => column !== 'ZR' && column !== 'DEF Pot');
+    expect(readColumns(ordinary).markers.hitters).toContain('DEF');
   });
 
   it('reads every column of both Game 70 files', () => {
@@ -376,6 +381,77 @@ describe('the fielding view (Knowledge Base › Import contract › Column dicti
       const reading = readColumns(headerOf(path));
       expect(reading.notRead, path).toEqual([]);
       expect(reading.markers, path).toEqual({ hitters: [], pitchers: [] });
+    }
+  });
+});
+
+describe('the Game 71 columns (Knowledge Base › Import contract › Column dictionary)', () => {
+  const COMPONENTS = [
+    'C ABI',
+    'C FRM',
+    'C ARM',
+    'IF RNG',
+    'IF ERR',
+    'IF ARM',
+    'TDP',
+    'OF RNG',
+    'OF ERR',
+    'OF ARM',
+  ];
+
+  it('reads TM, BAR, HHi, GB and FB on both sides, marking none', () => {
+    for (const column of ['TM', 'BAR', 'HHi', 'GB', 'FB']) {
+      expect(COLUMN_DICTIONARY[column], column).toMatchObject({
+        canonical: column,
+        side: 'both',
+        marker: false,
+      });
+    }
+    expect(readColumns(['POS', 'Name', 'TM', 'BAR', 'HHi', 'GB', 'FB']).markers).toEqual({
+      hitters: [],
+      pitchers: [],
+    });
+  });
+
+  it('keeps the counts GB and FB apart from the rates GB% and FB%', () => {
+    const header = ['POS', 'Name', 'IP', 'GB', 'FB', 'GB%', 'FB%', 'GO%'];
+    expect(readColumns(header).names).toEqual(header);
+  });
+
+  it('reads TP as Fielding TP, beside Fielding DP', () => {
+    const header = ['POS', 'Name', 'TC', 'DP', 'TP'];
+    expect(readColumns(header).names).toEqual(['POS', 'Name', 'TC', 'Fielding DP', 'Fielding TP']);
+  });
+
+  it('reads any fielding component with DEF Pot as a fielding file', () => {
+    for (const component of COMPONENTS) {
+      const header = ['POS', 'Name', 'G', 'IP', 'DP', component, 'DEF', 'DEF Pot'];
+      expect(canonicalName('G', header), component).toBe('Fielding G');
+      expect(canonicalName('IP', header), component).toBe('Fielding IP');
+      expect(readColumns(header).markers, component).toEqual({ hitters: [], pitchers: [] });
+    }
+  });
+
+  it('reads neither the components without DEF Pot nor DEF Pot alone as a fielding file', () => {
+    const batting = ['POS', 'Name', 'G', ...COMPONENTS, 'DEF'];
+    expect(canonicalName('G', batting)).toBe('G');
+    expect(readColumns(batting).markers.hitters).toEqual([...COMPONENTS, 'DEF']);
+    const pitching = ['POS', 'Name', 'G', 'IP', 'STU P', 'DEF Pot'];
+    expect(canonicalName('G', pitching)).toBe('G');
+    expect(readColumns(pitching).markers.pitchers).toEqual(['IP', 'STU P', 'DEF Pot']);
+  });
+
+  it('reads every column of the 16 Game 71 files, the fielding files marking no side', () => {
+    const files = fixturePaths().filter((path) => path.startsWith('seattle-g71/'));
+    expect(files).toHaveLength(16);
+    for (const path of files) {
+      const reading = readColumns(headerOf(path));
+      expect(reading.notRead, path).toEqual([]);
+      if (path.includes('_fielding_')) {
+        expect(reading.markers, path).toEqual({ hitters: [], pitchers: [] });
+      } else {
+        expect(reading.markers.hitters.length * reading.markers.pitchers.length, path).toBe(0);
+      }
     }
   });
 });

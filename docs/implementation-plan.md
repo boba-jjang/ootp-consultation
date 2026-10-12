@@ -262,6 +262,7 @@ These acceptance criteria differ from the canvas or from the Basis as written; t
 - [x] Build metrics and luck gaps: exported metrics passed through, BACON and xFIP computed, luck gaps against each pair's team baseline, and small-sample flags from stabilization points (Knowledge Base › Metrics and league context).
 - [x] Build league percentiles: usage-based peer pools, sample floors, metric directions and the mid-rank formula (Knowledge Base › League percentiles).
 - [x] Build the talent estimator v0: priors from potentials and development risk, league-standardized evidence weighted by sample size, estimates with bands and flags (Knowledge Base › Ratings model › Talent estimator).
+- [x] Build the defensive model and eligibility matrix: position ratings from the fielding view, the fitted component formula where it's absent, one step off away from the played position, and fielding runs per season (Knowledge Base › Defensive model).
 
 ## Frontend foundation
 

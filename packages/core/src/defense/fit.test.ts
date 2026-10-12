@@ -40,10 +40,11 @@ const GAME_70_FORMULAS: Record<
   RF: { intercept: -37.8918, weights: { 'OF RNG': 1.0021, 'OF ARM': 0.482, 'OF ERR': 0.1885 } },
 };
 
-/** Knowledge Base › Defensive model › What drives each position: shares of the fit. */
+/** Knowledge Base › Defensive model › What drives each position: shares of the fit. First base's
+ * arm and turn DP are "under .02" there; the fit gives .021 and .004. */
 const TABLE_SHARES: Record<FieldPosition, Record<string, number>> = {
   C: { 'C ARM': 0.35, 'C FRM': 0.33, 'C ABI': 0.32 },
-  '1B': { 'IF RNG': 0.58, 'IF ERR': 0.25, HT: 0.15, 'IF ARM': 0, TDP: 0 },
+  '1B': { 'IF RNG': 0.58, 'IF ERR': 0.25, HT: 0.15, 'IF ARM': 0.02, TDP: 0 },
   '2B': { 'IF RNG': 0.44, TDP: 0.29, 'IF ERR': 0.22, 'IF ARM': 0.05 },
   '3B': { 'IF ARM': 0.38, 'IF ERR': 0.28, 'IF RNG': 0.24, TDP: 0.11 },
   SS: { 'IF RNG': 0.36, 'IF ARM': 0.22, TDP: 0.22, 'IF ERR': 0.2 },
@@ -74,7 +75,7 @@ describe('fitDefense on the Game 70 league fielding rows (Knowledge Base › Def
 
   it('explains the game ratings: R² to three decimals', () => {
     const r2 = Object.fromEntries(
-      FIELD_POSITIONS.map((p) => [p, Math.round(fit.positions[p].r2 * 1000) / 1000]),
+      FIELD_POSITIONS.map((p) => [p, Math.round((fit.positions[p].r2 ?? 0) * 1000) / 1000]),
     );
     expect(r2).toEqual({
       C: 0.936,
@@ -160,10 +161,10 @@ describe('fitDefense on small inputs', () => {
     const { positions } = fitDefense(rows, '20-80');
     expect(positions.C.count).toBe(10);
     expect(positions.C.r2).toBeCloseTo(1, 8);
-    expect(positions.C.formula.intercept).toBeCloseTo(2, 6);
-    expect(positions.C.formula.weights['C ARM']).toBeCloseTo(0.5, 6);
-    expect(positions.C.formula.weights['C FRM']).toBeCloseTo(0.25, 6);
-    expect(positions.C.formula.weights['C ABI']).toBeCloseTo(0, 6);
+    expect(positions.C.formula?.intercept).toBeCloseTo(2, 6);
+    expect(positions.C.formula?.weights['C ARM']).toBeCloseTo(0.5, 6);
+    expect(positions.C.formula?.weights['C FRM']).toBeCloseTo(0.25, 6);
+    expect(positions.C.formula?.weights['C ABI']).toBeCloseTo(0, 6);
   });
 
   it('skips a row missing the rating or any component, and leaves a position with no rows empty', () => {

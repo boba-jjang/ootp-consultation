@@ -117,7 +117,10 @@ describe('assembleSnapshot on the Seattle game-42 files (the Phase 2 gate)', () 
       ),
     );
     expect(snapshot.league.hitters.map(playerKey)).toEqual(
-      readFixture(leagueView('batting_superstats_1')).map(playerKey),
+      // TM Seattle reads as SEA; the raw file keeps the city.
+      readFixture(leagueView('batting_superstats_1')).map((row) =>
+        playerKey(row).replace(/^Seattle\|/, 'SEA|'),
+      ),
     );
   });
 
@@ -219,7 +222,7 @@ describe('assembleSnapshot on the Seattle game-53 files (task Context: the snaps
     expect(player(snapshot.hitters, 'Zhong-shan Geng')).toMatchObject({ POS: '2B' });
     expect(player(snapshot.league.hitters, 'Zhong-shan Geng')).toMatchObject({
       POS: 'CF',
-      TM: 'Seattle',
+      TM: 'SEA',
     });
   });
 
@@ -396,5 +399,53 @@ describe('gameNumberOf', () => {
   it('has no game number without a hitter stats view', () => {
     expect(gameNumberOf(routed().filter((file) => file.side === 'pitchers'))).toBeNull();
     expect(gameNumberOf([])).toBeNull();
+  });
+});
+
+describe('assembleSnapshot on the Game 70 fielding files (Knowledge Base › Import contract)', () => {
+  const files = fixtureFiles('seattle-g70/').map(routeFixture);
+  const snapshot = assembleSnapshot(files, { scale: '1-10' });
+
+  it('reads both files with no game label, 12 team hitters and no team pitchers', () => {
+    expect(snapshot.files.map((file) => file.routing)).toEqual(['primary', 'primary']);
+    expect(snapshot.files.map((file) => file.players).sort()).toEqual([12, 508]);
+    expect(snapshot.label).toBeNull();
+    expect(snapshot.gameNumber).toBeNull();
+    expect(snapshot.hitters).toHaveLength(12);
+    expect(snapshot.pitchers).toHaveLength(0);
+    expect(snapshot.league.hitters).toHaveLength(502);
+    expect(snapshot.league.pitchers).toHaveLength(6);
+  });
+
+  it('raises no value-replaced or league-mismatch event', () => {
+    const codes = snapshot.events.map((event) => event.code);
+    expect(codes).not.toContain('value-replaced');
+    expect(codes).not.toContain('league-mismatch');
+    expect(snapshot.events.filter((event) => event.level === 'error')).toEqual([]);
+  });
+
+  it('stores the position ratings on 20-80, C Pot equal to DEF Pot for Ishida', () => {
+    const ishida = player(snapshot.hitters, 'Yoshitsugu Ishida');
+    expect(ishida).toMatchObject({
+      'C Pot': 60,
+      'DEF Pot': 60,
+      'Fielding G': 47,
+      'Fielding IP': 1192,
+      'SS Pot': null,
+    });
+  });
+
+  it('keeps the same 12 rows in the league as in the team, but for POS', () => {
+    for (const row of snapshot.hitters) {
+      const other = snapshot.league.hitters.find(
+        (candidate) => candidate.TM === 'SEA' && candidate.Name === row.Name,
+      );
+      expect(other, playerKey(row)).toBeDefined();
+    }
+  });
+
+  it('leaves Game 53’s game number alone when the fielding view comes with it', () => {
+    const together = assembleSnapshot([...G53_TOP.map(routeFixture), ...files], { scale: '1-10' });
+    expect(together.gameNumber).toBe(53);
   });
 });

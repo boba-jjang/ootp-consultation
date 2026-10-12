@@ -131,6 +131,13 @@ const CONTRACT_STATUSES: Record<string, ContractStatus> = {
   'arbitr.': 'arbitration',
 };
 
+/**
+ * TM is stored as the team's short code. The one older form read is the city, as the Game 42
+ * and Game 53 exports spell it. Source: Knowledge Base › Import contract › Enumerations
+ * (TM, rev 146) and the owner's answer of 11 October 2026; no other form is mapped.
+ */
+export const TEAM_ALIASES: Readonly<Record<string, string>> = { Seattle: 'SEA' };
+
 const ok = (value: CellValue): CellResult => ({ ok: true, value });
 const fail = (column: string, raw: string): CellResult => ({
   ok: false,
@@ -153,6 +160,9 @@ export function parseCell(column: string, raw: string): CellResult {
   const text = raw.trim();
   if (DROPPED_COLUMNS.has(column) || text === '' || text === '-') {
     return ok(null);
+  }
+  if (column === 'TM') {
+    return ok(TEAM_ALIASES[text] ?? text);
   }
   if (TEXT.has(column)) {
     return ok(text);

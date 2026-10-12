@@ -14,6 +14,7 @@ import {
   leagueView,
   rawCell,
   readFixture,
+  routeFixture,
   teamView,
   type FixtureRow,
 } from '../../test/fixtures.ts';
@@ -322,7 +323,7 @@ const ROW_TESTS: Record<string, () => void> = {
   },
 
   'TM, LG': () => {
-    expect(valueOf(teamView('batting_superstats_1'), 'Yoshitsugu Ishida', 'TM')).toBe('Seattle');
+    expect(valueOf(teamView('batting_superstats_1'), 'Yoshitsugu Ishida', 'TM')).toBe('SEA');
     expect(valueOf(teamView('batting_superstats_1'), 'Yoshitsugu Ishida', 'LG')).toBe('RSL');
     const teams = new Set(everyCell(leagueView('batting_superstats_1'), 'TM'));
     expect(teams.size).toBe(30);
@@ -433,9 +434,7 @@ describe('parseCell on every fixture', () => {
     .filter((file) => file.endsWith('.csv'))
     .map((file) => file.replaceAll('\\', '/'));
 
-  // seattle-g70/ is the fielding view; its columns stay unknown until the fielding-view import.
   const fielding = files.filter((file) => file.startsWith('seattle-g70/'));
-  const readable = files.filter((file) => !fielding.includes(file));
 
   it('walks every folder of fixtures/, Game 53 and its overlap included', () => {
     expect(files.filter((file) => file.startsWith('seattle-g53/'))).toHaveLength(19);
@@ -443,7 +442,7 @@ describe('parseCell on every fixture', () => {
     expect(files).toHaveLength(40);
   });
 
-  it.each(readable)('parses every cell of %s through the dictionary', (path) => {
+  it.each(files)('parses every cell of %s through the dictionary', (path) => {
     const rows = readFixture(path);
     expect(readColumns(Object.keys(rows[0] ?? {})).notRead).toEqual([]);
     for (const row of rows) {
@@ -475,5 +474,23 @@ describe('parseCell on malformed values', () => {
   it('treats a blank cell as missing', () => {
     expect(parseCell('AVG', '')).toEqual({ ok: true, value: null });
     expect(parseCell('POS', ' ')).toEqual({ ok: true, value: null });
+  });
+});
+
+describe('TM as the team’s short code (Knowledge Base › Import contract › Enumerations, rev 146)', () => {
+  it('reads the older form Seattle as SEA, and every other value as exported', () => {
+    expect(parseCell('TM', 'Seattle')).toEqual({ ok: true, value: 'SEA' });
+    expect(parseCell('TM', 'SEA')).toEqual({ ok: true, value: 'SEA' });
+    expect(parseCell('TM', 'Boston')).toEqual({ ok: true, value: 'Boston' });
+    expect(parseCell('TM', 'BOS')).toEqual({ ok: true, value: 'BOS' });
+    expect(parseCell('TM', '')).toEqual({ ok: true, value: null });
+  });
+
+  it('applies to the Game 42 and Game 53 files, team and league', () => {
+    for (const path of [leagueView('batting_superstats_1'), teamView('batting_superstats_1')]) {
+      const teams = new Set(routeFixture(path).rows.map((row) => row.TM));
+      expect(teams.has('SEA'), path).toBe(true);
+      expect(teams.has('Seattle'), path).toBe(false);
+    }
   });
 });

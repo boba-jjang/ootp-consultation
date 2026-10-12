@@ -1,4 +1,4 @@
-import { inColumnOrder } from './dictionary.ts';
+import { inColumnOrder, isFieldingHeader } from './dictionary.ts';
 import type { Side } from './manifest.ts';
 import { positionSide, type ExportRow, type RoutedExport, type Scope } from './route.ts';
 import type { SnapshotEvent } from './validate.ts';
@@ -17,6 +17,10 @@ export interface LeagueTables {
   pitchers: ExportRow[];
   events: SnapshotEvent[];
 }
+
+/** Whether a file is a fielding file: its rows carry TC, ZR or EFF. */
+const isFieldingFile = (file: RoutedExport) =>
+  file.rows.length > 0 && isFieldingHeader(Object.keys(file.rows[0] ?? {}));
 
 const nameOf = (row: ExportRow) => (typeof row.Name === 'string' ? row.Name : '');
 
@@ -127,8 +131,9 @@ export function importTeam(files: readonly RoutedExport[]) {
 /**
  * Merges the snapshot's league files into one table per side, files in the order given.
  * Batting rows key on team plus name; a batting row without TM takes the team of the one
- * league batting row with that name and a TM, or is flagged and left out. Pitching rows key
- * on name. A key listed twice within one file can't be joined and is left out. Pitchers with
+ * league batting row with that name and a TM, or is flagged and left out; fielding files don't
+ * count there. Pitching rows key on name. A fielding file lists both sides, so its rows go by
+ * POS. A key listed twice within one file can't be joined and is left out. Pitchers with
  * G = 0 carry no data and are dropped.
  */
 export function importLeague(files: readonly RoutedExport[]): LeagueTables {
@@ -136,9 +141,11 @@ export function importLeague(files: readonly RoutedExport[]): LeagueTables {
   const tables: LeagueTables = { hitters: [], pitchers: [], events };
   const league = files.filter((file) => file.scope === 'league' && file.routing !== 'rejected');
 
-  // The teams each name has among the league batting rows that carry TM.
+  // The teams each name has among the league batting rows that carry TM, fielding files aside.
   const teams = new Map<string, Set<string>>();
-  for (const file of league.filter((candidate) => candidate.side === 'hitters')) {
+  for (const file of league.filter(
+    (candidate) => candidate.side === 'hitters' && !isFieldingFile(candidate),
+  )) {
     for (const row of file.rows) {
       if (typeof row.TM === 'string') {
         teams.set(nameOf(row), (teams.get(nameOf(row)) ?? new Set<string>()).add(row.TM));
@@ -148,10 +155,13 @@ export function importLeague(files: readonly RoutedExport[]): LeagueTables {
 
   for (const side of ['hitters', 'pitchers'] as const) {
     const sources = league
-      .filter((file) => file.side === side)
+      .filter((file) => file.side === side || file.side === null)
       .map((file) => ({
         file,
         rows: file.rows.flatMap((row) => {
+          if ((file.side ?? positionSide(row.POS)) !== side) {
+            return [];
+          }
           const name = nameOf(row);
           if (side === 'pitchers') {
             return [{ key: name, row }];

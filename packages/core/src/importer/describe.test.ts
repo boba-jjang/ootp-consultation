@@ -17,7 +17,7 @@ describe('describeExports on the Seattle game-42 files', () => {
     expect(summary).toMatchObject({
       teamName: 'Seattle Arrows',
       filePrefix: 'seattle_arrows',
-      teamColumn: 'Seattle',
+      teamColumn: 'SEA',
       leagueColumn: 'RSL',
     });
   });
@@ -40,7 +40,7 @@ describe('describeExports on the Seattle game-53 files', () => {
     expect(describeExports(fixtureFiles('seattle-g53/').map(routeFixture))).toEqual({
       teamName: 'Seattle Arrows',
       filePrefix: 'seattle_arrows',
-      teamColumn: 'Seattle',
+      teamColumn: 'SEA',
       leagueColumn: null,
       hitters: 12,
       pitchers: 13,

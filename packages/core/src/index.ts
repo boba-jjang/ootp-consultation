@@ -173,6 +173,31 @@ export {
   type StatEvidence,
 } from './estimator/estimator.ts';
 export {
+  DEFENSE_COMPONENTS,
+  FIELD_POSITIONS,
+  applyFormula,
+  fitDefense,
+  type DefenseFit,
+  type FieldPosition,
+  type PositionFit,
+  type PositionFormula,
+  type StepAgreement,
+} from './defense/fit.ts';
+export {
+  DEFAULT_DEFENSE_SETTINGS,
+  defenseMatrix,
+  type CellSource,
+  type DefenseFlag,
+  type DefenseMatrix,
+  type DefenseSettings,
+  type DefenseTeam,
+  type HitterDefense,
+  type PlayedCheck,
+  type PositionCell,
+  type SettingNote,
+  type Slot,
+} from './defense/defense.ts';
+export {
   collectUploads,
   describeFile,
   replacementKey,

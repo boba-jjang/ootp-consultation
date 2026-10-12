@@ -1,6 +1,12 @@
 import { readFileSync, readdirSync } from 'node:fs';
 
-import { routeExport, type ExportRow, type RoutedExport, type Snapshot } from '../src/index.ts';
+import {
+  assembleSnapshot,
+  routeExport,
+  type ExportRow,
+  type RoutedExport,
+  type Snapshot,
+} from '../src/index.ts';
 
 /** The repository's fixtures/ directory. */
 export const FIXTURES = new URL('../../../fixtures/', import.meta.url);
@@ -28,6 +34,10 @@ export const fixtureFiles = (folder: string): string[] =>
 /** A fixture routed under its own file name, as an upload would be. */
 export const routeFixture = (path: string): RoutedExport =>
   routeExport(path.split('/').at(-1) ?? path, readFixtureText(path));
+
+/** A fixture folder, such as 'seattle-g70/', assembled into a snapshot on the 1–10 scale. */
+export const fixtureSnapshot = (folder: string): Snapshot =>
+  assembleSnapshot(fixtureFiles(folder).map(routeFixture), { scale: '1-10' });
 
 const text = (value: unknown) => (typeof value === 'string' ? value : '');
 

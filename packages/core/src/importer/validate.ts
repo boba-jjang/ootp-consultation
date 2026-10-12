@@ -24,6 +24,8 @@ export interface IdentityTolerances {
   chaseWhiffs: number;
   /** A pitcher's BIP against BF − K − BB − HBP. Source: the Knowledge Base, 1. */
   ballsInPlay: number;
+  /** GO% against GB ÷ (GB + FB). Source: the Knowledge Base, 0.006, since GO% has two decimals. */
+  groundOuts: number;
 }
 
 export interface ValidationSettings {
@@ -39,6 +41,7 @@ export const DEFAULT_IDENTITY_TOLERANCES: IdentityTolerances = {
   pitchMix: 0.0015,
   chaseWhiffs: 0.5,
   ballsInPlay: 1,
+  groundOuts: 0.006,
 };
 
 export const DEFAULT_VALIDATION_SETTINGS: ValidationSettings = {
@@ -75,15 +78,16 @@ const num = (value: CellValue | undefined) => (typeof value === 'number' ? value
 const round = (value: number) => Math.round(value * 10_000) / 10_000;
 
 /**
- * The identities that fail on a row, within the tolerances. Rows with G = 0 carry no data
- * and are skipped; an identity whose columns the row lacks is skipped. A merged pitcher row
+ * The identities that fail on a row, within the tolerances. Rows with G = 0, and hitter rows
+ * with no plate appearances (PA 0 or blank; only hitters' files carry PA), carry no data and
+ * are skipped; an identity whose columns the row lacks is skipped. A merged pitcher row
  * brings BIP and BF − K − BB − HBP together from different files.
  */
 export function checkIdentities(
   row: ExportRow,
   tolerances: IdentityTolerances = DEFAULT_IDENTITY_TOLERANCES,
 ): IdentityFailure[] {
-  if (row.G === 0) {
+  if (row.G === 0 || row.PA === 0 || row.PA === null) {
     return [];
   }
   const failures: IdentityFailure[] = [];
@@ -141,6 +145,15 @@ export function checkIdentities(
       battersFaced - strikeouts - walks - hitBatters,
       bip,
       tolerances.ballsInPlay,
+    );
+  }
+  const [groundBalls, flyBalls] = [value('GB'), value('FB')];
+  if (groundBalls !== undefined && flyBalls !== undefined && groundBalls + flyBalls > 0) {
+    check(
+      'GO% = GB ÷ (GB + FB)',
+      groundBalls / (groundBalls + flyBalls),
+      value('GO%'),
+      tolerances.groundOuts,
     );
   }
   return failures;

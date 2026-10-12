@@ -32,11 +32,8 @@ const HITTER_MARKERS = [
   'wOBA',
   'PI/PA',
   'UBR',
-  'TM',
   'LG',
   'Avg%',
-  'BAR',
-  'HHi',
   'FF%',
   'BR%',
   'OFF%',
@@ -232,6 +229,13 @@ const SHARED = [
   'INT',
   'CON P',
   'Risk',
+  // Since Game 71 the pitching views carry TM, and the pitching superstats BAR and HHi.
+  'TM',
+  'BAR',
+  'HHi',
+  // The pitchers' ground-ball and fly-ball counts: GO% = GB ÷ (GB + FB). They mark no side.
+  'GB',
+  'FB',
 ] as const;
 
 /** The fielding view's own columns (Knowledge Base › Data sources), carried by no side's files. */
@@ -277,6 +281,7 @@ const FIELDING_VIEW = [
   'BIZ-I',
   'FRM',
   'ARM',
+  'TP',
 ] as const;
 
 /** Avg% in hitters' files and Med% in pitchers' are the same middle contact bucket. */
@@ -287,6 +292,7 @@ const RENAMED: Readonly<Record<string, string>> = {
   E: 'Fielding E',
   PO: 'Fielding PO',
   PCT: 'Fielding PCT',
+  TP: 'Fielding TP',
 };
 
 const entries = (columns: readonly string[], side: Side | 'both') =>
@@ -310,15 +316,29 @@ export const PITCHING_POTENTIALS = ['STU P', 'MOV P', 'HRA P', 'PBABIP P'];
 
 /** A file with any of these is a fielding file (Knowledge Base › Import contract › Column dictionary). */
 const FIELDING_FILE_COLUMNS = ['TC', 'ZR', 'EFF'];
+/** The ten fielding components: with DEF Pot, as in the fielding ratings view, they make a fielding file. */
+const FIELDING_COMPONENTS = [
+  'C ABI',
+  'C FRM',
+  'C ARM',
+  'IF RNG',
+  'IF ERR',
+  'IF ARM',
+  'TDP',
+  'OF RNG',
+  'OF ERR',
+  'OF ARM',
+];
 /** In a fielding file these are the fielding counts, not the batting or pitching columns. */
 const FIELDING_COUNTS = ['G', 'GS', 'IP', 'DP'];
 
-/** Whether a header (or a table's column names) is a fielding file's. */
-export const isFieldingHeader = (header: readonly string[]) =>
-  FIELDING_FILE_COLUMNS.some((column) => header.includes(column));
-
 const hasAny = (header: readonly string[], columns: readonly string[]) =>
   columns.some((column) => header.includes(column));
+
+/** Whether a header (or a table's column names) is a fielding file's. */
+export const isFieldingHeader = (header: readonly string[]) =>
+  hasAny(header, FIELDING_FILE_COLUMNS) ||
+  (header.includes('DEF Pot') && hasAny(header, FIELDING_COMPONENTS));
 
 /**
  * The name a column goes by in a file with this header, or null when the dictionary has no

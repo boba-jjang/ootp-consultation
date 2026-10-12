@@ -546,7 +546,7 @@ The game rates every player at every position, and the fielding view exports tho
 | Position | Rating from the components (share of the fit) | Runs per 10 rating points, per 150 games | Flag |
 | --- | --- | --- | --- |
 | C | Arm .35, framing .33, blocking (C ABI) .32 | 8, a placeholder: zone rating barely moves with the rating (0.8), and framing runs are near zero so far | None stated |
-| 1B | Range .58, error .25, height .15 (0.2 rating points per inch), arm and turn DP under .02 | 2.4 | None |
+| 1B | Range .58, error .25, height .15 (0.2 rating points per inch), arm .02, turn DP under .01 | 2.4 | None |
 | 2B | Range .44, turn DP .29, error .22, arm .05 | 6.6 | None |
 | 3B | Arm .38, error .28, range .24, turn DP .11 | 7.4 | None |
 | SS | Range .36, arm .22, turn DP .22, error .20 | 8.6 | Range below 7 |

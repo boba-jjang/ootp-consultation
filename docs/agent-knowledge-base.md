@@ -254,9 +254,9 @@ The league sortable files reuse these headers: at Game 42 the league batting\_su
 | DEF | Current position rating at the listed position | Link to POS |
 | DEF Pot | Position-rating potential at the listed position; P for pitchers | Ceiling for DEF |
 | C ABI, C FRM, C ARM | Catcher ability, framing, arm; non-catchers show 1 | 1 on a non-catcher means "can't catch" |
-| VELO, VT | Ranges such as "95-97 Mph"; VT reads as velocity potential | Low, high and midpoint |
+| VELO, VT | Ranges such as "95-97 Mph", one mph apart up to "99-101 Mph", then "100+ Mph" at the top; VT reads as velocity potential | Low, high and midpoint; "100+ Mph" reads as the next range up, 100 to 102, midpoint 101 |
 | SR | Steal rate: how often he tries to run | Separate from STE, the success skill |
-| TM, LG | Team and league, in the batting superstats views; a league file's rows span every team | Use as the namespace; league batting rows join on team plus name |
+| TM, LG | Team and league: both in the batting superstats views, TM in every Game 71 view; a league file's rows span every team; TM is "-" where a player has no team | Use as the namespace; league rows join on team plus name (Joins and snapshots), and a TM of "-" is its own value, meaning no team |
 | WE, INT | Work ethic and intelligence (baseball IQ) | Ordinal |
 | Risk | Development risk, Very Low to Extreme | Ordinal |
 | SB%, LOB%, K%-BB% | Percent units without the sign (85.7) | Divide by 100 |
@@ -298,7 +298,7 @@ The league sortable files reuse these headers: at Game 42 the league batting\_su
 
 - A snapshot keeps four tables: team hitters, team pitchers, league hitters and league pitchers, with one row per player and one column per dictionary column. Every file of the snapshot fills them, and a player's row merges every file that lists him.
 - Team rows join on Name; jersey number is a cross-check.
-- League batting rows join on team plus name. A league batting file without TM takes each row's team from the snapshot's other league batting rows with that name, never from the fielding view's rows; a name with no single team is flagged and left out. League pitching rows join on team plus name when the snapshot's league pitching rows carry TM, as the Game 71 exports do, and on name when none do, as at Games 42 and 53; a pitching row without TM then takes its team from the one league pitching row with that name and a TM. A key listed twice in one file is flagged and left out.
+- League batting rows join on team plus name. A league batting file without TM takes each row's team from the snapshot's other league batting rows with that name, never from the fielding view's rows; a name with no single team is flagged and left out. League pitching rows join on team plus name when the snapshot's league pitching files carry TM, as the Game 71 exports do, and on name when none do, as at Games 42 and 53. The fielding view's rows never decide this: Game 70's fielding view keys its pitchers on name, alone or added to Game 53. A pitching row without TM then takes its team from the one league pitching row with that name and a TM, never from the fielding view's rows. A TM of "-" (no team) keys as its own value. A key listed twice in one file is flagged and left out.
 - Parts combine: a filtered export (starters, relievers or qualified players only) adds its rows, and a row repeated in two files merges into one.
 - A name can appear on both sides when a position player pitches or a pitcher bats; each side keeps its own record.
 - Age comes from the bio view or the fielding ratings view, and a pitcher's also from cus\_pitch\_pot; height from the bio view or either fielding view.
@@ -497,7 +497,7 @@ Percentiles rank each player against the league in three peer pools: qualified h
 
 | Pool | Members | Size in the sample | Sample floor |
 | --- | --- | --- | --- |
-| Hitters | Every row of the league batting files, which are already qualified | 214 | As exported: qualified by plate appearances (the fewest balls in play in the sample is 77) |
+| Hitters | League hitters with at least 3.1 plate appearances per team game. A team's games are the most any of its hitters with PA has played; teams with fewer than 5 hitters with PA (affiliates) take the league's most. A row without PA is below the floor, and when no row carries PA (Game 42, or Game 70's fielding view alone) every listed hitter counts | 214 | 3.1 PA per team game, OOTP's qualifying rate, which the Game 42 and 53 exports applied themselves: it keeps all 199 at Game 53 and 199 of 517 at Game 71 |
 | Starters | Pitchers with at least half their games as starts | 151 | Starting setting: 60 balls in play, which keeps 144 |
 | Relievers | Everyone else who pitched, closers included | 260 | Starting setting: 30 balls in play, which keeps 218 |
 
@@ -544,18 +544,18 @@ Defensive decisions read the game's position ratings where the fielding view is 
 
 The game rates every player at every position, and the fielding view exports those ratings. Where the view is on file, the app reads them. Where it isn't, it estimates them from the components with the weights below, fitted to the league's fielding export. The research's tiers (OOTP Calculator, Reddit spreadsheets) agree with the fit on what matters most at each position, except that range, not height, leads at first base, and the three catcher components weigh about the same.
 
-| Position | Rating from the components (share of the fit) | Runs per 10 rating points, per 150 games | Flag |
+| Position | Rating from the components (share of the fit) | Runs per 10 rating points, per 150 games: zone rating plus arm runs (Game 71 fit) | Flag |
 | --- | --- | --- | --- |
-| C | Arm .35, framing .33, blocking (C ABI) .32 | 8, a placeholder: zone rating barely moves with the rating (0.8), and framing runs are near zero so far | None stated |
-| 1B | Range .58, error .25, height .15 (0.2 rating points per inch), arm .02, turn DP under .01 | 2.4 | None |
-| 2B | Range .44, turn DP .29, error .22, arm .05 | 6.6 | None |
-| 3B | Arm .38, error .28, range .24, turn DP .11 | 7.4 | None |
-| SS | Range .36, arm .22, turn DP .22, error .20 | 8.6 | Range below 7 |
-| LF | Range .71, arm .15, error .14 | 5.0 | None |
+| C | Arm .35, framing .33, blocking (C ABI) .32 | 0.8: zone rating and arm runs barely move with a catcher's rating; framing, blocking and throwing aren't valued yet | None stated |
+| 1B | Range .58, error .25, height .15 (0.2 rating points per inch), arm .02, turn DP under .01 | 2.0 | None |
+| 2B | Range .44, turn DP .29, error .22, arm .05 | 7.6 | None |
+| 3B | Arm .38, error .28, range .24, turn DP .11 | 6.8 | None |
+| SS | Range .36, arm .22, turn DP .22, error .20 | 9.3 | Range below 7 |
+| LF | Range .71, arm .15, error .14 | 3.4 | None |
 | CF | Range .72, arm .17, error .11 | 8.8 | Range below 7 |
-| RF | Range .60, arm .30, error .10 | 7.1 | None |
+| RF | Range .60, arm .30, error .10 | 6.0 | None |
 
-The shares are the standardized contributions of a straight-line fit of each position's potential rating on the components, over the 508 players of the league's fielding export; the fit explains 91% of the game's first-base ratings and 94–97% elsewhere. The game shows "-" where its rating falls below 1, with hard floors on top: an arm of 1 bars 2B, 3B and SS even with range 8. The runs come from zone rating per 150 games regressed on the current rating at the played position, 30 to 45 players per position with 200 or more innings (r .4–.7); arm runs (ARM) add to zone rating where the view carries them. Every number here is a setting, refitted when a new fielding export arrives.
+The shares are the standardized contributions of a straight-line fit of each position's potential rating on the components, over the 508 players of the league's fielding export; the fit explains 91% of the game's first-base ratings and 94–97% elsewhere. The game shows "-" where its rating falls below 1, with hard floors on top: an arm of 1 bars 2B, 3B and SS even with range 8. The runs come from zone rating plus arm runs per 150 games regressed on the current rating at the played position, over the fielders with 50 or more innings there (42 to 71 per position at Game 71), refit with each export. Every number here is a setting, refitted when a new fielding export arrives.
 
 ### DEF, DEF Pot and components
 
@@ -573,8 +573,8 @@ The shares are the standardized contributions of a straight-line fit of each pos
 - The played position uses DEF, with DEF Pot as its ceiling. It is the POS of the player's fielding-view row where the view is on file, and the roster POS otherwise, which can name another position: at Game 53 Shinn's DEF is his first-base rating while the roster lists him in left.
 - Every other position uses the game's potential rating from the fielding view, less one step for inexperience. Without the fielding view, it uses the component formula above, less one step. Both are held to the scale.
 - Ineligible: "-" in the fielding view; without it, a formula result below 1, or no catcher ratings at C. A flagged position (the floors above) is excluded only when configured.
-- Runs at a position: (rating on 20–80 − 50) ÷ 10 × the position's runs per 10 points, plus, at the played position, the player's exported arm runs (ARM) where the fielding view has them. The runs per 10 points come from zone rating alone, so arm runs add without counting twice. The matrix produces these fielding-run estimates for the lineup optimizer.
-- Runs are stated per season, not per 150 games: the 150-game rate times the team's games per season over 150. Games per season is a team setting (152 in the RSL, playoffs excluded). A player's own zone rating, shown beside the estimate as a check, is scaled the same way from his innings, as are his arm runs, and both count only past an innings floor (200 innings, the floor of the runs fit; a setting), so a 70-game export and a full season read alike.
+- Runs at a position per 150 games: the league line of zone rating plus arm runs against the rating (the table above), at the player's rating there. At the played position his own zone rating plus arm runs per 150 games move it by w = innings ÷ (innings + k), with k fitted on the league from how far fielders spread beyond their rating: 2,486 innings at Game 71, where the true spread is about ±2.8 runs, so w is 0.10 at 279 innings. The matrix produces these fielding-run estimates for the lineup optimizer.
+- Runs are stated per season, not per 150 games: the 150-game rate times the team's games per season over 150. Games per season is a team setting (152 in the RSL, playoffs excluded). A player's own zone rating and arm runs enter only through w, so a 70-game export and a full season read alike.
 - Every constant is a setting, fitted on the league's fielding export and refitted when a new one arrives.
 
 ## Strategy rules
@@ -626,17 +626,19 @@ The research's integer program gave each player one position and had no DH slot.
 ```
 
 - p runs over C, 1B, 2B, 3B, SS, LF, CF and RF, plus DH when the league uses it, and a tenth slot, the backup catcher, which carries the starting catcher's rest share (below).
-- o is projected batting runs per season from the talent estimator: PA × (5.0 + Σ b × (estimate − 50) ÷ 10) ÷ 600 over the five hitter components, with b in runs per 10 points: Power 13.2, Gap 7.5, BABIP 6.0, Eye 4.2 and Avoid K's 3.5, fitted on Game 53's 199 qualified league hitters (wRAA per 600 PA on the components' evidence, weighted by PA, R² .63). Its band follows from the components' bands as if they were independent. PA is a fixed baseline, 4.28 per game played (the league regulars' average at Game 53) times the team's games per season, the same for every slot: selection assigns positions, and the batting order sets the spread by spot. d is projected fielding runs at that position from the defensive model, and 0 at DH. A hitter with no estimate takes 0 batting runs and a flag.
-- The catcher slot carries a games share, 0.8 by default (the league's regular catchers catch 83% of their games at Game 53; Seattle's starter 67–72%), which scales the starter's batting and fielding runs. The backup-catcher slot carries the rest and takes the best remaining eligible catcher; it must be filled when one remains, and is flagged empty when none does. The starter's rest-day DH isn't modeled.
-- Output: the nine and the backup catcher with each one's batting runs, fielding runs, share and total; the bench with their values; and at each slot the cost of the best alternative, the total's drop when the chosen player is barred from that position; a catcher barred from catching neither starts nor backs up, so the backup slot's cost is empty when no other catcher exists. On Game 53 with DH, at the defaults: C Tsumoto, backup C Ishida, 1B Kamimura, 2B Geng, 3B Kawasaki, SS Choi, LF Shinn, CF Obata, RF Wang, DH Yamanaka; Li and Moon on the bench.
+- o is projected batting runs above average per season, from the league's own wOBA: o = (wOBA − lgwOBA) ÷ scale × PA, where wOBA = Σ w × rate over the batter's projected event rates (Ordering, below). The weights w, lgwOBA and the scale are recovered from each export's own wOBA and wRAA columns: at Game 71, wOBA = (0.715 uBB + 0.744 HBP + 0.906 1B + 1.273 2B + 1.600 3B + 2.041 HR) ÷ PA, which the fitted weights reproduce within .0006 on every hitter, and wRAA = (wOBA − 0.3264) ÷ 1.2224 × PA within 0.17 runs (Game 53: 0.713, 0.748, 0.905, 1.272, 1.604 and 2.051, with 0.3253 and 1.2293); a snapshot without those columns uses the settings, Game 71's values. Its band follows from the components' bands as if they were independent. PA is a flat baseline here, the pool's PA per game played (4.29 at Game 71) times the team's games per season: selection assigns positions, and the batting order sets the spread by spot. d is projected fielding runs at that position from the defensive model, and 0 at DH. A hitter with no estimate takes 0 batting runs and a flag.
+- The catcher slot carries a games share, the pool's catchers' median share of their team's games, refit each snapshot (0.77 at Game 71, 0.83 at Game 53, 0.8 where the files carry no games), which scales the starter's batting and fielding runs. The backup-catcher slot carries the rest and takes the best remaining eligible catcher; it must be filled when one remains, and is flagged empty when none does. The starter's rest-day DH isn't modeled.
+- After the batting order (below) sets each spot's PA, an exchange loop checks the nine: every bench hitter at every starter's position, and every swap of two starters' positions, each with the batting order re-optimized and judged by the chain's batting runs plus fielding runs. The best gain is taken until none remains; on Game 71 it keeps the nine.
+- Output: the nine and the backup catcher with each one's batting runs, fielding runs, share and total; the bench with their values; and at each slot the cost of the best alternative, the total's drop when the chosen player is barred from that position; a catcher barred from catching neither starts nor backs up, so the backup slot's cost is empty when no other catcher exists. On Game 71 with DH: C Tsumoto, backup C Ishida, 1B Shinn, 2B Choi, 3B Kawasaki, SS Moon, LF Kamimura, CF Geng, RF Obata, DH Yamanaka; Li and Wang on the bench.
 - A roster of 25 gives 250 player–slot pairs; an exact assignment (the Hungarian algorithm) solves it instantly in plain TypeScript, with no library. Every constant here is a setting.
 
 ### Ordering
 
-- A half-inning is a Markov chain with 24 base-out states (8 base states × 3 out counts) plus an absorbing three-out state.
-- Each batter's event probabilities (walk, HBP, single, double, triple, homer, strikeout, other outs, double plays) fill the transition matrix. They come from estimated talent, not raw season lines.
-- There are 9! = 362,880 possible orders. Score them all, or start from The Book's order and search swaps, if a full search is too slow in the browser.
-- The research claims an optimal order adds 3–25% more runs, about 3–4 wins. Verify by simulation before showing any gain to the user.
+- A half-inning is a Markov chain with 24 base-out states (8 base states × 3 out counts) plus an absorbing three-out state. With the batter due up it has 216 states; a game chains nine innings, each starting with the batter after the last one up, which gives runs per game and each spot's plate appearances.
+- Each batter's event probabilities (walk, HBP, single, double, triple, homer, strikeout, other outs, double plays) fill the transition matrix. They come from estimated talent, not raw season lines: unintentional walks, singles, doubles, homers and strikeouts per PA are straight lines in the five components' (estimate − 50) ÷ 10, refit on each snapshot's league hitters (all with PA, weighted by PA) against their evidence in the hitters' pool; evidence needs no potential, so league rows without ratings count. HBP, triples and intentional walks take the league rate, every rate holds at least 10% of its league rate, and other outs take the rest; a snapshot whose league files lack PA or the event counts, as at Game 42, uses the settings, Game 71's fit. At Game 71, ten points of eye add .020 unintentional walks per PA, of power .014 homers, of gap .016 doubles, and of avoid K's take .044 strikeouts away (R² .54, .66, .91 and .90); Game 53 gives .025, .014, .017 and .045. The same rates give selection its batting runs.
+- Base running (settings, approximate MLB rates): walks force runners only; a single scores a runner from second 60% of the time and takes a runner from first to third 28%; a double scores a runner from first 40%; an out in play with fewer than two outs scores a runner from third 50% and moves a runner from second to third 30%. Double plays take the share of in-play outs with a runner on first and fewer than two outs that reproduces the league's GIDP per PA (0.1395 at Game 71). Steals, wild pitches and errors aren't modeled, so the chain's runs scale by the league's runs per PA over a league-average lineup's in the chain (×1.099 at Game 71).
+- There are 9! = 362,880 possible orders, too many to score in the browser. The search starts from The Book's order and takes the best pairwise swap until none helps; on Game 53 that found the best of all 362,880.
+- The research claims an optimal order adds 3–25% more runs, about 3–4 wins; here it adds about 0.1% (1.0 run a season at Game 53). A gain shows only when the best order beats The Book's by 3 runs a season or more and a 200,000-game simulation confirms it beyond 2 standard errors; otherwise the card calls the orders equal. The output lists the order, runs per game and season, each spot's PA (733 at #1 to 599 at #9 at Game 71) and The Book's order with its runs. A league without the DH isn't covered yet: the exports carry no pitcher batting line.
 
 ```latex
 E = \tilde{M}E + b \qquad F = (I - Q)^{-1}
@@ -657,7 +659,9 @@ E is expected runs from each state, b the runs scored on each transition, and F 
 | 7–8 | Remaining hitters in descending wOBA |
 | 9 | Slight OBP preference over #8, to set up the top of the order |
 
-Platoon decisions need handedness splits and the opposing starter's hand, and neither is available.
+The app builds The Book's order from projected per-PA OBP, wOBA and home-run rate. It ranks the nine by wOBA. Of the top three, the highest OBP leads off, the one with more homers bats 4th and the other 2nd. Ranks 4 and 5 bat 3rd (more homers) and 5th. Of the rest, the highest OBP bats 6th, the best wOBA of the other three bats 7th, and of the last two the higher OBP bats 9th. Ties go by snapshot order; speed isn't used yet.
+
+Platoon decisions need handedness splits and the opposing starter's hand, and neither is available yet; the owner can export splits vs left and vs right, a planned task.
 
 ## Development planner
 
@@ -766,7 +770,8 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 | League scope | League sortable exports and percentiles are in v1: the league files import with the team views in Phase 2, and percentiles arrive with the Phase 4 models |
 | Import | Any CSV, in any view (OOTP's or custom) and under any file name: columns map through the column dictionary into one table per side and scope, and files merge cell by cell (7 October 2026) |
 | Talent estimator | Prior from the potential and development risk; evidence as league z-scores at 50 + 10 points per SD, weighted n ÷ (n + k) with k = 0.43 × the stabilization point × the risk and stance multipliers; flagged past half a step (8 October 2026) |
-| Defensive model | Position ratings read from the fielding view where it's on file, else a component formula fitted to the league's fielding export; runs per 10 rating points per 150 games fitted on zone rating by position; one step off at an unlisted position; the catcher's runs a placeholder (11 October 2026) |
+| Defensive model | Position ratings read from the fielding view where it's on file, else a component formula fitted to the league's fielding export; runs per 10 rating points per 150 games fitted on zone rating by position; one step off at an unlisted position; the catcher's runs a placeholder (11 October 2026); since 12 October, zone rating plus arm runs against the rating, moved by the player's own at the played position |
+| Lineup v2 | Batting runs from the league's own wOBA weights, scale and average, recovered from each export; event rates refit per snapshot; fielding runs from the league line moved by the player's own zone rating and arm runs; PA by batting spot from the Markov chain, with an exchange loop over the nine; the hitters' pool floored at 3.1 PA per team game (the owner, 12 October 2026) |
 
 ### Assumptions
 
@@ -780,7 +785,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 | Stabilization points | Approximate MLB values | 6 |
 | Positional weights and slider gates | Weights fitted to the league's fielding export; slider gates from the research | 9, 10 |
 | Inexperience discount | One step below the potential at an unlisted position | 9 |
-| Catcher runs | 8 per 10 rating points, until framing runs accumulate | 9 |
+| Catcher runs | The fitted line (0.8 per 10 points) until framing, blocking and throwing are valued | 9 |
 
 ### Open questions
 
@@ -799,7 +804,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 - [ ] Current per-position ratings (the columns without Pot) aren't exported yet. With them, the inexperience discount would be read from the view instead of assumed.
 - [x] Team names come in two forms, the city in the batting views and the abbreviation in the fielding view. Answered: every export uses the short code from now on, and the importer reads Seattle in the Game 42 and Game 53 exports as SEA, with no other map (the owner, 11 October 2026).
 - [ ] The starting catcher's rest days: the lineup model leaves him out of those games. Letting him DH on them would need a second lineup.
-- [ ] The hitters' percentile pool: since Game 71 the league files list every hitter, not qualified ones only, which widens every evidence spread (K% from 4.66 to 7.05 points). Proposed floor: 3.1 PA per team game (183 hitters at Game 71), the qualified standard the earlier exports used.
+- [x] The hitters' percentile pool: since Game 71 the league files list every hitter, not qualified ones only, which widens every evidence spread (K% from 4.66 to 7.05 points). Answered (the owner, 12 October 2026): 3.1 PA per team game, team by team, with affiliates at the league's most games; 199 of 517 hitters at Game 71, and all 199 at Game 53.
 
 ## Delivery plan
 
@@ -820,14 +825,16 @@ Phase gates close in order. Inside a phase, modules follow the Depends on column
 | Scale conversion | 7 | 2 | Value parsers | Round-trip tests between 1–10 and 20–80 |
 | Column-dictionary import: four tables per snapshot, parts and re-exports merged cell by cell, coverage by data set | 4, 5 | 4 | Fixtures | Game 42 and Game 53 assemble from their files in any combination; the overlap files change nothing; coverage is High for both |
 | Fielding-view import: its columns in the dictionary, fielding counts kept apart from batting and pitching, rows placed by POS | 4, 5 | 4 | Column-dictionary import | The fielding fixtures read completely, 12 team and 508 league rows; Game 42 and Game 53 unchanged but for Seattle's TM, which reads SEA |
-| The owner's Game 71 exports: pitching views with TM, the fielding ratings view, pitchers keyed on team plus name | 4, 5 | 4 | Fielding-view import | All 16 Game 71 files read, none rejected: 12 team hitters and 13 team pitchers, 517 league hitters and 455 league pitchers; Game 42, 53 and 70 unchanged |
+| The owner's Game 71 exports: pitching views with TM, the fielding ratings view, pitchers keyed on team plus name | 4, 5 | 4 | Fielding-view import | All 16 Game 71 files read, none rejected: 12 team hitters and 13 team pitchers, 517 league hitters and 455 league pitchers; Game 42, 53 and 70 read as before, also Game 53 with Game 70's fielding view added |
 | Metrics: pass-through, BACON, luck gaps against each pair's baseline | 6 | 4 | Team store | Fixture BACON and each pair's baseline match section 6 |
 | Percentiles: usage-based pools, floors, directions, mid-rank formula | 8 | 4 | League file import | Pools of 214, 151 and 260; 144 starters and 218 relievers after floors |
 | Talent estimator v0 | 7 | 4 | Metrics, scale conversion | Every fixture player gets an estimate and band; disagreements over one step are flagged |
 | Defensive model and eligibility matrix | 9 | 4 | Scale conversion, fielding-view import | Every slot covered, DH included; non-catchers ineligible at C; DEF Pot caps the played position; the matrix reads the fielding fixtures' position ratings as the game gives them, and the fitted formula, rounded to a step and held to the scale, lands within one step of the game's rating for 95% of the league's position ratings (98.6% of 2,413 on the Game 70 export; first base is lowest, at 94.7%) |
 | Strategy rules engine | 10 | 4 | Talent estimator, defensive model | Gates read from configuration; the fixture yields a moderate shift |
 | Lineup selection with the assignment model | 11 | 4 | Talent estimator, defensive model | A legal nine and a backup catcher on Game 42 and Game 53, with CF and DH filled when enabled; the Game 53 nine is the one section 11 states |
-| Batting order: Markov model with The Book fallback | 11 | 4 | Lineup selection | Run expectancy matches a hand-computed toy lineup |
+| Event rates and batting runs: the league's wOBA weights recovered per snapshot, event rates refit per snapshot, the hitters' pool floor | 8, 11 | 4 | Game 71 exports, talent estimator | On Game 71 the recovered weights give the export's wOBA within .0006 and its wRAA within 0.17 runs, the pool keeps 199 of 517 hitters, and the event-rate slopes are section 11's |
+| Batting order: Markov model with The Book fallback | 11 | 4 | Lineup selection, event rates and batting runs | Run expectancy matches hand-computed toy lineups (homer-or-strikeout gives 3h ÷ (1 − h) runs per inning); Game 71's order is Yamanaka, Obata, Kawasaki, Shinn, Kamimura, Choi, Geng, Moon, Tsumoto, with 733 PA at #1 to 599 at #9 |
+| Lineup v2: selection on the league-wOBA batting runs, the defensive blend, the catcher share and the exchange loop | 9, 11 | 4 | Event rates and batting runs, batting order | On Game 71: C Tsumoto (backup Ishida), 1B Shinn, 2B Choi, 3B Kawasaki, SS Moon, LF Kamimura, CF Geng, RF Obata, DH Yamanaka |
 | Development planner | 12 | 4 | Talent estimator, defensive model | Selection rules from section 12 reproduce the sample example |
 | Consultation output | 3 | 4–5 | Strategy rules, lineup and batting order, development planner | Every recommendation shows its evidence and confidence |
 | Backtest across snapshots | 2 | 6 | Team store, talent estimator | Adding a second snapshot reports estimator error per player |

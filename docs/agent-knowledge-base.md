@@ -624,9 +624,11 @@ The research's integer program gave each player one position and had no DH slot.
 \sum_{i} x_{i,p} = 1 \;\; \forall p, \qquad \sum_{p} x_{i,p} \le 1 \;\; \forall i, \qquad x_{i,p} = 0 \text{ where } i \text{ is ineligible at } p
 ```
 
-- p runs over C, 1B, 2B, 3B, SS, LF, CF and RF, plus DH when the league uses it.
-- o is projected batting runs from the talent estimator over a fixed plate-appearance baseline; d is projected fielding runs at that position from the defensive model, and 0 at DH.
-- A roster of about 25 players gives roughly 225 binary variables, which a browser solver library handles instantly.
+- p runs over C, 1B, 2B, 3B, SS, LF, CF and RF, plus DH when the league uses it, and a tenth slot, the backup catcher, which carries the starting catcher's rest share (below).
+- o is projected batting runs per season from the talent estimator: PA × (5.0 + Σ b × (estimate − 50) ÷ 10) ÷ 600 over the five hitter components, with b in runs per 10 points: Power 13.2, Gap 7.5, BABIP 6.0, Eye 4.2 and Avoid K's 3.5, fitted on Game 53's 199 qualified league hitters (wRAA per 600 PA on the components' evidence, weighted by PA, R² .63). Its band follows from the components' bands as if they were independent. PA is a fixed baseline, 4.28 per game played (the league regulars' average at Game 53) times the team's games per season, the same for every slot: selection assigns positions, and the batting order sets the spread by spot. d is projected fielding runs at that position from the defensive model, and 0 at DH. A hitter with no estimate takes 0 batting runs and a flag.
+- The catcher slot carries a games share, 0.8 by default (the league's regular catchers catch 83% of their games at Game 53; Seattle's starter 67–72%), which scales the starter's batting and fielding runs. The backup-catcher slot carries the rest and takes the best remaining eligible catcher; it must be filled when one remains, and is flagged empty when none does. The starter's rest-day DH isn't modeled.
+- Output: the nine and the backup catcher with each one's batting runs, fielding runs, share and total; the bench with their values; and at each slot the cost of the best alternative, the total's drop when the chosen player is barred there. On Game 53 with DH, at the defaults: C Tsumoto, backup C Ishida, 1B Kamimura, 2B Geng, 3B Kawasaki, SS Choi, LF Shinn, CF Obata, RF Wang, DH Yamanaka; Li and Moon on the bench.
+- A roster of 25 gives 250 player–slot pairs; an exact assignment (the Hungarian algorithm) solves it instantly in plain TypeScript, with no library. Every constant here is a setting.
 
 ### Ordering
 
@@ -795,6 +797,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 - [ ] Should fielding become a sixth data set for coverage, and get percentiles? Both wait for the fielding view to be imported.
 - [ ] Current per-position ratings (the columns without Pot) aren't exported yet. With them, the inexperience discount would be read from the view instead of assumed.
 - [x] Team names come in two forms, the city in the batting views and the abbreviation in the fielding view. Answered: every export uses the short code from now on, and the importer reads Seattle in the Game 42 and Game 53 exports as SEA, with no other map (the owner, 11 October 2026).
+- [ ] The starting catcher's rest days: the lineup model leaves him out of those games. Letting him DH on them would need a second lineup.
 
 ## Delivery plan
 
@@ -820,7 +823,7 @@ Phase gates close in order. Inside a phase, modules follow the Depends on column
 | Talent estimator v0 | 7 | 4 | Metrics, scale conversion | Every fixture player gets an estimate and band; disagreements over one step are flagged |
 | Defensive model and eligibility matrix | 9 | 4 | Scale conversion, fielding-view import | Every slot covered, DH included; non-catchers ineligible at C; DEF Pot caps the played position; the matrix reads the fielding fixtures' position ratings as the game gives them, and the fitted formula, rounded to a step and held to the scale, lands within one step of the game's rating for 95% of the league's position ratings (98.6% of 2,413 on the Game 70 export; first base is lowest, at 94.7%) |
 | Strategy rules engine | 10 | 4 | Talent estimator, defensive model | Gates read from configuration; the fixture yields a moderate shift |
-| Lineup selection with the assignment model | 11 | 4 | Talent estimator, defensive model | A legal nine on the fixture, with CF and DH filled when enabled |
+| Lineup selection with the assignment model | 11 | 4 | Talent estimator, defensive model | A legal nine and a backup catcher on Game 42 and Game 53, with CF and DH filled when enabled; the Game 53 nine is the one section 11 states |
 | Batting order: Markov model with The Book fallback | 11 | 4 | Lineup selection | Run expectancy matches a hand-computed toy lineup |
 | Development planner | 12 | 4 | Talent estimator, defensive model | Selection rules from section 12 reproduce the sample example |
 | Consultation output | 3 | 4–5 | Strategy rules, lineup and batting order, development planner | Every recommendation shows its evidence and confidence |

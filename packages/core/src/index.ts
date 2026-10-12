@@ -205,3 +205,19 @@ export {
   type CollectedUploads,
   type PendingUpload,
 } from './store/updates.ts';
+export { solveAssignment, type Assignment, type ProfitMatrix } from './lineup/assignment.ts';
+export {
+  DEFAULT_LINEUP_SETTINGS,
+  selectLineup,
+  type BattingRunsSettings,
+  type BenchEntry,
+  type ComponentRuns,
+  type HitterBatting,
+  type LineupFlag,
+  type LineupFlagCode,
+  type LineupSelection,
+  type LineupSettings,
+  type LineupSlot,
+  type LineupSnapshot,
+  type SlotEntry,
+} from './lineup/lineup.ts';

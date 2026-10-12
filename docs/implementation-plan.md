@@ -263,6 +263,7 @@ These acceptance criteria differ from the canvas or from the Basis as written; t
 - [x] Build league percentiles: usage-based peer pools, sample floors, metric directions and the mid-rank formula (Knowledge Base › League percentiles).
 - [x] Build the talent estimator v0: priors from potentials and development risk, league-standardized evidence weighted by sample size, estimates with bands and flags (Knowledge Base › Ratings model › Talent estimator).
 - [x] Build the defensive model and eligibility matrix: position ratings from the fielding view, the fitted component formula where it's absent, one step off away from the played position, and fielding runs per season (Knowledge Base › Defensive model).
+- [x] Build lineup selection with the assignment model: batting runs from the talent estimates, fielding runs from the eligibility matrix, a catcher share with a backup catcher, and the best nine by exact assignment (Knowledge Base › Lineup optimization › Selection).
 
 ## Frontend foundation
 

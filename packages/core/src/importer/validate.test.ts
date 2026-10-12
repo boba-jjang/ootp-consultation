@@ -3,6 +3,7 @@ import { readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import {
+  DEFAULT_IDENTITY_TOLERANCES,
   DEFAULT_VALIDATION_SETTINGS,
   checkIdentities,
   mergeTables,
@@ -12,7 +13,14 @@ import {
   type ValidationSettings,
   type ViewId,
 } from '../index.ts';
-import { FIXTURES, fixtureFiles, readFixtureText, routeFixture } from '../../test/fixtures.ts';
+import {
+  FIXTURES,
+  fixtureFiles,
+  playerKey,
+  readFixture,
+  readFixtureText,
+  routeFixture,
+} from '../../test/fixtures.ts';
 
 const csvFiles = (directory: string) =>
   readdirSync(new URL(directory, FIXTURES), { encoding: 'utf8' })
@@ -201,6 +209,23 @@ describe('validateSnapshot on the merged tables (Knowledge Base › Import contr
     expect(check([...files, rejected])).toEqual([]);
   });
 
+  it('finds one thing wrong in Game 71: Ryan Lloyd’s BIP, two off BF − K − BB − HBP', () => {
+    const files = fixtureFiles('seattle-g71/').map(routeFixture);
+    expect(check(files)).toEqual([
+      expect.objectContaining({
+        level: 'error',
+        code: 'identity',
+        scope: 'league',
+        details: {
+          name: 'Ryan Lloyd',
+          identity: 'BIP = BF − K − BB − HBP',
+          expected: 221,
+          found: 219,
+        },
+      }),
+    ]);
+  });
+
   it('reads its tolerances from the settings', () => {
     const strict = {
       ...DEFAULT_VALIDATION_SETTINGS,
@@ -217,11 +242,30 @@ describe('checkIdentities on every fixture row', () => {
     ...csvFiles('legacy/'),
     ...csvFiles('seattle-g53/'),
     ...csvFiles('seattle-g53/overlap/'),
+    ...csvFiles('seattle-g71/'),
   ];
+
+  // Game 71's hitters with no plate appearances, by team and name: their batting stats rows
+  // say PA 0, and their superstats rows, which carry no PA, are all zeros.
+  const noPlateAppearances = new Set(
+    csvFiles('seattle-g71/')
+      .filter((path) => path.endsWith('_batting_stats_c.csv'))
+      .flatMap(readFixture)
+      .filter((row) => row.PA === '0' || row.PA === '')
+      .map((row) => `${row.TM ?? ''}|${row.Name ?? ''}`),
+  );
+
+  it('knows Game 71’s 10 league hitters with no plate appearances', () => {
+    expect(noPlateAppearances.size).toBe(10);
+  });
 
   it.each(files)('holds on every row of %s', (path) => {
     const routed = route(path);
     for (const row of routed.rows) {
+      const key = playerKey(row);
+      if (path.startsWith('seattle-g71/') && noPlateAppearances.has(key)) {
+        continue;
+      }
       expect(checkIdentities(row), JSON.stringify(row.Name)).toEqual([]);
     }
   });
@@ -233,6 +277,37 @@ describe('checkIdentities on every fixture row', () => {
       { identity: 'BIP = BF − K − BB − HBP', expected: 139, found: 142 },
     ]);
     expect(checkIdentities({ ...row, BIP: 140 })).toEqual([]);
+  });
+
+  it('skips a hitter row with no plate appearances, PA 0 or blank, but checks one without PA', () => {
+    const empty = { 'WH%': 0, 'CTC%': 0, 'FF%': 0, 'BR%': 0, 'OFF%': 0 };
+    expect(checkIdentities({ ...empty, PA: 0 })).toEqual([]);
+    expect(checkIdentities({ ...empty, PA: null })).toEqual([]);
+    const failures = [
+      { identity: 'CTC% = 100 − WH%', expected: 1, found: 0 },
+      { identity: 'FF% + BR% + OFF% = 100', expected: 1, found: 0 },
+    ];
+    expect(checkIdentities({ ...empty, PA: 1 })).toEqual(failures);
+    expect(checkIdentities(empty)).toEqual(failures);
+  });
+
+  it('checks GO% against GB ÷ (GB + FB), within 0.006, when the pitcher has GB or FB', () => {
+    // Bob Achbar, Game 71: GB 69, FB 88, GO% .44.
+    const row = { G: 16, GB: 69, FB: 88, 'GO%': 0.44 };
+    expect(checkIdentities(row)).toEqual([]);
+    expect(checkIdentities({ ...row, 'GO%': 0.445 })).toEqual([]);
+    expect(checkIdentities({ ...row, 'GO%': 0.45 })).toEqual([
+      { identity: 'GO% = GB ÷ (GB + FB)', expected: 0.4395, found: 0.45 },
+    ]);
+    expect(checkIdentities({ G: 1, GB: 0, FB: 0, 'GO%': 0 })).toEqual([]);
+  });
+
+  it('reads the GO% tolerance from the settings', () => {
+    const row = { G: 16, GB: 69, FB: 88, 'GO%': 0.44 };
+    expect(DEFAULT_IDENTITY_TOLERANCES.groundOuts).toBe(0.006);
+    expect(checkIdentities(row, { ...DEFAULT_IDENTITY_TOLERANCES, groundOuts: 0 })).toEqual([
+      { identity: 'GO% = GB ÷ (GB + FB)', expected: 0.4395, found: 0.44 },
+    ]);
   });
 
   it('skips a pitcher row with G = 0', () => {

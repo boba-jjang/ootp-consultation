@@ -88,6 +88,23 @@ const EXPECTED: Record<string, [ViewId, number] | null> = {
   'seattle-g53/overlap/seattle_arrows_starter_pitching_pitching_superstat_1.csv': null,
   'seattle-g53/overlap/seattle_arrows_reliever_pitching_pitching_stats_1.csv': null,
   'seattle-g53/overlap/seattle_arrows_reliever_pitching_pitching_superstat_1.csv': null,
+  // Game 71: the owner's custom views, every one with TM, so none matches a known view.
+  'seattle-g71/seattle_arrows_lineups_-_overview_batting_stats_c.csv': null,
+  'seattle-g71/seattle_arrows_lineups_-_overview_batting_superstats_c.csv': null,
+  'seattle-g71/seattle_arrows_lineups_-_overview_custom_bat_pot.csv': null,
+  'seattle-g71/seattle_arrows_lineups_-_overview_cus_pitch_pot.csv': null,
+  'seattle-g71/seattle_arrows_lineups_-_overview_pitching_stats_c.csv': null,
+  'seattle-g71/seattle_arrows_lineups_-_overview_pitching_superstats_c.csv': null,
+  'seattle-g71/seattle_arrows_lineups_-_overview_fielding_stats_cus.csv': null,
+  'seattle-g71/seattle_arrows_lineups_-_overview_fielding_ratings_cus.csv': null,
+  'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_batting_stats_c.csv': null,
+  'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_batting_superstats_c.csv': null,
+  'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_custom_bat_pot.csv': null,
+  'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_cus_pitch_pot.csv': null,
+  'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_pitching_stats_c.csv': null,
+  'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_pitching_superstats_c.csv': null,
+  'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_fielding_stats_cus.csv': null,
+  'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_fielding_ratings_cus.csv': null,
 };
 
 const KNOWN = Object.entries(EXPECTED).flatMap(([path, expected]) =>

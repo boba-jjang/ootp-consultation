@@ -13,12 +13,15 @@ import type { CellValue } from './values.ts';
 export interface LeagueTables {
   /** One row per hitter, merged across the league batting files on team plus name. */
   hitters: ExportRow[];
-  /** One row per pitcher with appearances, merged across the league pitching files by name. */
+  /**
+   * One row per pitcher with appearances, merged across the league pitching files on team plus
+   * name when they carry TM, and by name when none does.
+   */
   pitchers: ExportRow[];
   events: SnapshotEvent[];
 }
 
-/** Whether a file is a fielding file: its rows carry TC, ZR or EFF. */
+/** Whether a file is a fielding file: its rows carry TC, ZR or EFF, or a fielding component with DEF Pot. */
 const isFieldingFile = (file: RoutedExport) =>
   file.rows.length > 0 && isFieldingHeader(Object.keys(file.rows[0] ?? {}));
 
@@ -130,52 +133,58 @@ export function importTeam(files: readonly RoutedExport[]) {
 
 /**
  * Merges the snapshot's league files into one table per side, files in the order given.
- * Batting rows key on team plus name; a batting row without TM takes the team of the one
- * league batting row with that name and a TM, or is flagged and left out; fielding files don't
- * count there. Pitching rows key on name. A fielding file lists both sides, so its rows go by
- * POS. A key listed twice within one file can't be joined and is left out. Pitchers with
- * G = 0 carry no data and are dropped.
+ * Batting rows key on team plus name; pitching rows too when any row of a league pitching
+ * file carries TM, and on name when none does, whatever TM the fielding files carry. A row without TM takes the team of the one league row of
+ * its side with that name and a TM, or is flagged and left out; fielding files don't count
+ * there. A fielding file lists both sides, so its rows go by POS. A key listed twice within
+ * one file can't be joined and is left out. Pitchers with G = 0 carry no data and are dropped.
  */
 export function importLeague(files: readonly RoutedExport[]): LeagueTables {
   const events: SnapshotEvent[] = [];
   const tables: LeagueTables = { hitters: [], pitchers: [], events };
   const league = files.filter((file) => file.scope === 'league' && file.routing !== 'rejected');
+  /** A file's rows on one side: all of them, or a fielding file's by POS. */
+  const rowsOn = (file: RoutedExport, side: Side) =>
+    file.rows.filter((row) => (file.side ?? positionSide(row.POS)) === side);
 
-  // The teams each name has among the league batting rows that carry TM, fielding files aside.
-  const teams = new Map<string, Set<string>>();
-  for (const file of league.filter(
-    (candidate) => candidate.side === 'hitters' && !isFieldingFile(candidate),
-  )) {
-    for (const row of file.rows) {
-      if (typeof row.TM === 'string') {
-        teams.set(nameOf(row), (teams.get(nameOf(row)) ?? new Set<string>()).add(row.TM));
+  // The teams each name has among each side's league rows that carry TM, fielding files aside.
+  const teams: Record<Side, Map<string, Set<string>>> = { hitters: new Map(), pitchers: new Map() };
+  for (const side of ['hitters', 'pitchers'] as const) {
+    for (const file of league.filter(
+      (candidate) => candidate.side === side && !isFieldingFile(candidate),
+    )) {
+      for (const row of file.rows) {
+        if (typeof row.TM === 'string') {
+          const named = teams[side].get(nameOf(row)) ?? new Set<string>();
+          teams[side].set(nameOf(row), named.add(row.TM));
+        }
       }
     }
   }
+  // Pitchers key on team plus name once a league pitching file carries TM, as since Game 71;
+  // a fielding file's TM doesn't count (the owner, 12 October 2026).
+  const pitchersByTeam = teams.pitchers.size > 0;
 
   for (const side of ['hitters', 'pitchers'] as const) {
     const sources = league
       .filter((file) => file.side === side || file.side === null)
       .map((file) => ({
         file,
-        rows: file.rows.flatMap((row) => {
-          if ((file.side ?? positionSide(row.POS)) !== side) {
-            return [];
-          }
+        rows: rowsOn(file, side).flatMap((row) => {
           const name = nameOf(row);
-          if (side === 'pitchers') {
+          if (side === 'pitchers' && !pitchersByTeam) {
             return [{ key: name, row }];
           }
           if (typeof row.TM === 'string') {
             return [{ key: `${row.TM}|${name}`, row }];
           }
-          const found = [...(teams.get(name) ?? [])].sort();
+          const found = [...(teams[side].get(name) ?? [])].sort();
           const [team] = found;
           if (found.length !== 1 || team === undefined) {
             events.push({
               level: 'warning',
               code: 'ambiguous-team',
-              message: `${name} has no TM in ${file.name}, and the league batting files list ${found.length === 0 ? 'no team' : `${String(found.length)} teams`} for that name, so the row is left out.`,
+              message: `${name} has no TM in ${file.name}, and the league ${side === 'hitters' ? 'batting' : 'pitching'} files list ${found.length === 0 ? 'no team' : `${String(found.length)} teams`} for that name, so the row is left out.`,
               details: { name, teams: found },
               file: file.name,
               view: file.view,

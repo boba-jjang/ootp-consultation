@@ -53,6 +53,25 @@ describe('describeExports on the Seattle game-53 files', () => {
   });
 });
 
+describe('describeExports on the Seattle game-71 files', () => {
+  it('reads the team, the roster and the game from the owner’s custom views', () => {
+    expect(describeExports(fixtureFiles('seattle-g71/').map(routeFixture))).toEqual({
+      teamName: 'Seattle Arrows',
+      filePrefix: 'seattle_arrows',
+      teamColumn: 'SEA',
+      leagueColumn: null,
+      hitters: 12,
+      pitchers: 13,
+      gameNumber: 71,
+      // No bio view came with them.
+      scoutingAccuracy: null,
+      // Every set but the bio views'.
+      dataSets: { found: 8, total: 10 },
+      rejected: [],
+    });
+  });
+});
+
 describe('describeExports with less, or worse, data', () => {
   it('has nothing to say about no files', () => {
     expect(describeExports([])).toEqual({

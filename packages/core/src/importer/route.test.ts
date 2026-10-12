@@ -10,7 +10,7 @@ import {
   type Side,
   type ViewId,
 } from '../index.ts';
-import { FIXTURES, leagueView, readFixtureText, teamView } from '../../test/fixtures.ts';
+import { FIXTURES, leagueView, playerKey, readFixtureText, teamView } from '../../test/fixtures.ts';
 
 const fileName = (path: string) => path.split('/').at(-1) ?? path;
 const route = (path: string, name = fileName(path)) => routeExport(name, readFixtureText(path));
@@ -20,6 +20,8 @@ type Expected = [ViewId | null, 'team' | 'league', Side | null, 'primary' | 'sup
 const G53 = 'seattle-g53/';
 const G53_TEAM = `${G53}seattle_arrows_lineups_-_overview_`;
 const G53_LEAGUE = `${G53}rsl_statistics_player_statistics_-_sortable_stats_`;
+const G71_TEAM = 'seattle-g71/seattle_arrows_lineups_-_overview_';
+const G71_LEAGUE = 'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_';
 
 // Every fixture and how it must route: the known view its header matches exactly (null for a
 // custom view), scope, the side its rows list (null when they list both), routing.
@@ -110,6 +112,24 @@ const EXPECTED: Record<string, Expected> = {
     'pitchers',
     'primary',
   ],
+  // Game 71 (task Context): the owner's custom views, every one with TM. The fielding files
+  // list both sides; the team's lists only its hitters.
+  [`${G71_TEAM}batting_stats_c.csv`]: [null, 'team', 'hitters', 'primary'],
+  [`${G71_TEAM}batting_superstats_c.csv`]: [null, 'team', 'hitters', 'primary'],
+  [`${G71_TEAM}custom_bat_pot.csv`]: [null, 'team', 'hitters', 'primary'],
+  [`${G71_TEAM}cus_pitch_pot.csv`]: [null, 'team', 'pitchers', 'primary'],
+  [`${G71_TEAM}pitching_stats_c.csv`]: [null, 'team', 'pitchers', 'primary'],
+  [`${G71_TEAM}pitching_superstats_c.csv`]: [null, 'team', 'pitchers', 'primary'],
+  [`${G71_TEAM}fielding_stats_cus.csv`]: [null, 'team', 'hitters', 'primary'],
+  [`${G71_TEAM}fielding_ratings_cus.csv`]: [null, 'team', 'hitters', 'primary'],
+  [`${G71_LEAGUE}batting_stats_c.csv`]: [null, 'league', 'hitters', 'primary'],
+  [`${G71_LEAGUE}batting_superstats_c.csv`]: [null, 'league', 'hitters', 'primary'],
+  [`${G71_LEAGUE}custom_bat_pot.csv`]: [null, 'league', 'hitters', 'primary'],
+  [`${G71_LEAGUE}cus_pitch_pot.csv`]: [null, 'league', 'pitchers', 'primary'],
+  [`${G71_LEAGUE}pitching_stats_c.csv`]: [null, 'league', 'pitchers', 'primary'],
+  [`${G71_LEAGUE}pitching_superstats_c.csv`]: [null, 'league', 'pitchers', 'primary'],
+  [`${G71_LEAGUE}fielding_stats_cus.csv`]: [null, 'league', null, 'primary'],
+  [`${G71_LEAGUE}fielding_ratings_cus.csv`]: [null, 'league', null, 'primary'],
 };
 
 // Game 53's files whose names carry neither OOTP prefix, so their rows give the scope.
@@ -217,8 +237,8 @@ describe('routeExport on the fixtures', () => {
     expect(bio.rows.find((row) => row.Name === 'Dong-hee Moon')).toMatchObject({ POS: 'SS' });
   });
 
-  it('stamps importer version 0.4.0, for the fielding view and TM as the short code', () => {
-    expect(IMPORTER_VERSION).toBe('0.4.0');
+  it('stamps importer version 0.5.0, for the Game 71 exports', () => {
+    expect(IMPORTER_VERSION).toBe('0.5.0');
   });
 
   it('keeps only Name, POS and DEF Pot from the hitter capture, and says so', () => {
@@ -613,5 +633,109 @@ describe('routeExport on the fielding view (Knowledge Base › Import contract �
 
   it('never dates a snapshot from the fielding games', () => {
     expect(route(HEIGHT).rows.every((row) => !('G' in row))).toBe(true);
+  });
+});
+
+describe('routeExport on the Game 71 exports (Knowledge Base › Import contract › Side and scope)', () => {
+  const g71 = Object.keys(EXPECTED).filter((path) => path.startsWith('seattle-g71/'));
+
+  it('reads all 16 files, none rejected and no column unread', () => {
+    expect(g71).toHaveLength(16);
+    for (const path of g71) {
+      const result = route(path);
+      expect(result.routing, path).toBe('primary');
+      expect(result.events, path).toEqual([]);
+    }
+  });
+
+  it('reads the team files as 12 hitters and 13 pitchers, and the league as 517 and 481', () => {
+    const players = (path: string) => route(path).rows.length;
+    for (const view of ['batting_stats_c', 'batting_superstats_c', 'custom_bat_pot']) {
+      expect(players(`${G71_TEAM}${view}.csv`), view).toBe(12);
+      expect(players(`${G71_LEAGUE}${view}.csv`), view).toBe(517);
+    }
+    for (const view of ['pitching_stats_c', 'pitching_superstats_c', 'cus_pitch_pot']) {
+      expect(players(`${G71_TEAM}${view}.csv`), view).toBe(13);
+      expect(players(`${G71_LEAGUE}${view}.csv`), view).toBe(481);
+    }
+  });
+
+  it('places both league fielding files’ rows by POS: 511 hitters and 476 pitchers', () => {
+    for (const view of ['fielding_stats_cus', 'fielding_ratings_cus']) {
+      const result = route(`${G71_LEAGUE}${view}.csv`);
+      expect(result).toMatchObject({ scope: 'league', side: null, routing: 'primary' });
+      const sides = result.rows.map((row) => positionSide(row.POS));
+      expect(
+        sides.filter((side) => side === 'hitters'),
+        view,
+      ).toHaveLength(511);
+      expect(
+        sides.filter((side) => side === 'pitchers'),
+        view,
+      ).toHaveLength(476);
+      const team = route(`${G71_TEAM}${view}.csv`);
+      expect(team).toMatchObject({ scope: 'team', side: 'hitters', routing: 'primary' });
+      expect(team.rows).toHaveLength(12);
+    }
+  });
+
+  it('keeps the league’s pitching rows on the pitchers’ side, the 5 position players included', () => {
+    const rows = route(`${G71_LEAGUE}pitching_stats_c.csv`).rows;
+    expect(rows.filter((row) => positionSide(row.POS) === 'hitters')).toHaveLength(5);
+  });
+
+  it('reads TP as Fielding TP, GB and FB as counts, and the ratings view’s Age, DEF and DEF Pot', () => {
+    const stats = route(`${G71_TEAM}fielding_stats_cus.csv`).rows;
+    expect(stats.every((row) => typeof row['Fielding TP'] === 'number')).toBe(true);
+    expect(stats.every((row) => typeof row.HT === 'number')).toBe(true);
+    const achbar = route(`${G71_LEAGUE}pitching_stats_c.csv`).rows.find(
+      (row) => row.Name === 'Bob Achbar',
+    );
+    expect(achbar).toMatchObject({ TM: 'TOR', GB: 69, FB: 88, 'GO%': 0.44 });
+    const ratings = route(`${G71_TEAM}fielding_ratings_cus.csv`).rows;
+    for (const row of ratings) {
+      expect(typeof row.Age, playerKey(row)).toBe('number');
+      expect(typeof row.DEF, playerKey(row)).toBe('number');
+      expect(typeof row['DEF Pot'], playerKey(row)).toBe('number');
+    }
+  });
+
+  it('marks no side by TM, BAR or HHi, so a pitching file with them reads as pitchers', () => {
+    const result = routeExport(
+      'f.csv',
+      'POS,Name,TM,IP,BAR,HHi\r\nSP,Ann Lee,SEA,10.0,3,12\r\nRP,Bo Kim,SEA,5.0,1,4',
+    );
+    expect(result).toMatchObject({ routing: 'primary', scope: 'team', side: 'pitchers' });
+    const markerless = routeExport('f.csv', 'POS,Name,TM,BAR,HHi\r\nSS,Ann Lee,SEA,3,12');
+    expect(markerless).toMatchObject({ routing: 'primary', side: 'hitters' });
+  });
+
+  it('reads a file with fielding components and DEF Pot as a fielding file, by POS on both scopes', () => {
+    const header = 'POS,Name,TM,Age,IF RNG,OF ARM,DEF,DEF Pot';
+    const team = routeExport(
+      'f.csv',
+      `${header}\r\nSS,Ann Lee,SEA,25,7,3,7,8\r\nSP,Bo Kim,SEA,30,2,1,2,3`,
+    );
+    expect(team).toMatchObject({ routing: 'primary', scope: 'team', side: null });
+    expect(team.rows).toHaveLength(2);
+    const league = routeExport(
+      'f.csv',
+      `${header}\r\nSS,Ann Lee,SEA,25,7,3,7,8\r\nSP,Bo Kim,BOS,30,2,1,2,3`,
+    );
+    expect(league).toMatchObject({ routing: 'primary', scope: 'league', side: null });
+    expect(league.rows.find((row) => row.Name === 'Bo Kim')).toMatchObject({
+      POS: 'SP',
+      Age: 30,
+      DEF: 2,
+      'DEF Pot': 3,
+    });
+  });
+
+  it('keeps a file with fielding components but no DEF Pot, or DEF Pot alone, as before', () => {
+    const ratings = routeExport('f.csv', 'POS,Name,IF RNG,DEF\r\nSS,Ann Lee,7,7\r\nSP,Bo Kim,2,2');
+    expect(ratings).toMatchObject({ routing: 'primary', side: 'hitters' });
+    expect(ratings.rows.map((row) => row.Name)).toEqual(['Ann Lee']);
+    const potential = routeExport('f.csv', 'POS,Name,STU P,DEF Pot\r\nSP,Bo Kim,5,3');
+    expect(potential).toMatchObject({ routing: 'primary', side: 'pitchers' });
   });
 });

@@ -1,0 +1,482 @@
+POS,Name,TM,Age,T,WE,INT,STU P,MOV P,HRA P,PBABIP P,CON P,VELO,STM,VT,Slot,PT,G/F,HLD,DEF Pot,Risk
+SP,Bob Achbar,TOR,27,R,High,Normal,7,4,4,6,5,95-97 Mph,8,95-97 Mph,3/4,Power Pitcher,FB,3,6,Low
+SP,Bobby Alkire,YK,27,L,Normal,Normal,5,6,5,6,5,96-98 Mph,4,96-98 Mph,OTT,Power Pitcher,GB,8,4,Very Low
+SP,Irakly Alvarez,SD,33,L,Normal,Normal,5,4,3,6,4,94-96 Mph,7,94-96 Mph,3/4,Normal,FB,9,4,Very Low
+SP,Pablo Alvarez,WAS,35,R,Normal,Normal,6,5,5,7,4,93-95 Mph,4,93-95 Mph,3/4,Groundballer,GB,7,2,Very Low
+SP,Tony Anaya,SD,24,R,Normal,Normal,6,5,5,6,6,94-96 Mph,4,94-96 Mph,OTT,Normal,NEU,7,3,Low
+SP,Jose Andrades,SB,22,R,Normal,Normal,7,7,8,6,3,94-96 Mph,7,94-96 Mph,3/4,Normal,NEU,4,4,Medium
+SP,Andres Anguiano,STL,43,L,Normal,Normal,3,5,4,6,8,88-90 Mph,4,88-90 Mph,3/4,Normal,NEU,10,1,Very Low
+SP,Larry Arsenault,SD,24,R,Normal,Normal,7,7,7,6,4,95-97 Mph,8,95-97 Mph,3/4,Power Pitcher,EX GB,1,3,Medium
+SP,Antonio Avellaneda,TOR,40,R,Low,Low,4,5,5,6,8,92-94 Mph,7,92-94 Mph,OTT,Groundballer,GB,3,1,Very Low
+SP,Ted Ayres,HOU,26,R,Low,Normal,5,4,3,7,5,93-95 Mph,4,93-95 Mph,3/4,Normal,EX FB,6,6,Low
+SP,Gary Banks,SD,31,R,Normal,Normal,4,4,4,6,5,94-96 Mph,9,94-96 Mph,3/4,Normal,FB,3,5,Very Low
+SP,Jay Barrientos,PHX,26,R,Low,Normal,7,6,6,6,6,94-96 Mph,8,94-96 Mph,3/4,Normal,NEU,5,4,Very Low
+SP,Luis Basurto,MTL,36,R,Low,Normal,5,5,5,6,7,93-95 Mph,5,93-95 Mph,3/4,Normal,NEU,10,1,Very Low
+SP,Hector Bazaldua,LA,26,R,High,Normal,7,6,6,6,3,94-96 Mph,6,94-96 Mph,OTT,Groundballer,GB,4,1,Low
+SP,Linus Beausoleil,NYT,22,L,Normal,Normal,7,6,6,7,7,96-98 Mph,4,96-98 Mph,3/4,Power Pitcher,FB,10,5,Medium
+SP,Jarrod Beckman,MIN,29,R,Normal,Normal,6,5,5,6,5,95-97 Mph,6,95-97 Mph,3/4,Power Pitcher,NEU,5,5,Low
+SP,Jack Bertrand,MIA,26,R,Normal,Normal,5,4,4,6,5,94-96 Mph,6,94-96 Mph,3/4,Normal,EX FB,2,6,Very Low
+SP,Jimmy Biair,SAN,26,R,High,High,6,8,8,7,8,94-96 Mph,7,94-96 Mph,3/4,Groundballer,EX GB,4,6,Low
+SP,Mike Blain,YK,29,R,High,Normal,4,8,9,6,5,94-96 Mph,6,94-96 Mph,3/4,Groundballer,EX GB,3,6,Low
+SP,Keaton Bozek,SD,31,L,Normal,Normal,6,5,5,7,6,94-96 Mph,4,94-96 Mph,3/4,Normal,NEU,4,4,Very Low
+SP,Kingsley Bozek,LA,26,L,High,High,6,5,5,6,6,93-95 Mph,6,93-95 Mph,3/4,Groundballer,GB,10,10,Low
+SP,Josh Breaux,BUF,34,R,High,Normal,5,4,4,6,6,93-95 Mph,6,93-95 Mph,3/4,Normal,NEU,8,5,Very Low
+SP,Slider Brooks,ME,36,L,Normal,Normal,7,4,4,7,6,91-93 Mph,4,91-93 Mph,OTT,Normal,FB,9,5,Very Low
+SP,Huggy Bruce,DEN,41,L,Normal,Normal,3,5,5,6,8,87-89 Mph,6,87-89 Mph,OTT,Groundballer,GB,9,1,Very Low
+SP,Mark Bursey,HAV,26,L,High,Normal,5,6,6,5,5,92-94 Mph,5,92-94 Mph,SIDE,Normal,NEU,5,8,Low
+SP,Jimmy Cain,LV,28,L,Normal,Low,5,5,5,5,5,91-93 Mph,6,91-93 Mph,OTT,Groundballer,GB,10,1,Low
+SP,Roger Calzada,KC,33,R,Low,Low,6,4,3,6,5,93-95 Mph,3,93-95 Mph,OTT,Normal,NEU,4,5,Very Low
+SP,Joyee Cameron,HAV,26,L,High,Normal,8,6,5,7,7,94-96 Mph,3,94-96 Mph,OTT,Normal,NEU,7,1,Low
+SP,Wil Campos,MTL,31,L,Normal,Normal,5,4,4,6,8,91-93 Mph,7,91-93 Mph,3/4,Normal,NEU,6,2,Very Low
+SP,Tadeu Carneira,DEN,28,R,Normal,Normal,10,5,5,8,6,97-99 Mph,7,97-99 Mph,3/4,Power Pitcher,FB,9,5,Low
+SP,Julio Carpinteyro,PHX,31,R,High,High,6,5,4,7,7,94-96 Mph,6,94-96 Mph,3/4,Normal,EX FB,5,7,Very Low
+SP,Luis Casillas,HAV,26,R,Normal,Normal,6,4,3,6,6,94-96 Mph,8,94-96 Mph,3/4,Normal,FB,2,4,Very Low
+SP,Alvaro Castanon,KC,24,L,Normal,Normal,4,5,5,4,6,93-95 Mph,9,94-96 Mph,OTT,Groundballer,GB,10,6,Very Low
+SP,Salvatore Castellon,NYT,26,L,High,Normal,10,5,5,6,2,94-96 Mph,4,94-96 Mph,3/4,Normal,NEU,8,2,Very Low
+SP,Bob Castillo,SD,27,R,Normal,High,5,6,6,6,4,93-95 Mph,5,93-95 Mph,3/4,Groundballer,GB,8,7,Very Low
+SP,Ji-an Chan,STL,23,R,Normal,Normal,6,8,9,6,7,95-97 Mph,6,96-98 Mph,OTT,Power Pitcher,GB,4,5,Medium
+SP,Chris Chavarria,WIC,27,R,Normal,Normal,6,4,3,6,4,94-96 Mph,6,94-96 Mph,3/4,Normal,EX FB,7,3,Low
+SP,Dylan Cisar,CHI,32,L,Normal,Low,5,5,5,6,4,94-96 Mph,7,94-96 Mph,OTT,Normal,FB,10,1,Very Low
+SP,Kyle Cordle,ARL,24,R,High,Normal,6,5,4,6,6,96-98 Mph,10,96-98 Mph,3/4,Power Pitcher,NEU,6,3,Low
+SP,Benito Cossutta,HAV,26,R,High,Normal,1,7,8,7,6,95-97 Mph,7,95-97 Mph,3/4,Power Pitcher,NEU,6,6,Very Low
+SP,Walter Coutts,TUC,24,R,High,High,7,4,4,7,4,95-97 Mph,6,95-97 Mph,3/4,Power Pitcher,EX FB,10,5,Medium
+SP,Arturo Covarrubias,BOS,32,R,Normal,Normal,4,4,3,6,7,92-94 Mph,10,92-94 Mph,3/4,Normal,NEU,5,5,Very Low
+SP,Phil Cromsie,HOU,28,R,Normal,Normal,6,3,3,6,4,95-97 Mph,6,95-97 Mph,3/4,Power Pitcher,EX FB,7,4,Low
+SP,Relly Crousse,LV,22,R,Normal,Normal,9,7,7,8,7,96-98 Mph,6,97-99 Mph,OTT,Power Pitcher,GB,10,5,Low
+SP,Michael Daubner,ME,26,R,Normal,Normal,5,6,6,6,4,96-98 Mph,8,96-98 Mph,3/4,Power Pitcher,NEU,10,4,Very Low
+SP,Roberto Davila,LA,31,R,Normal,Normal,7,5,5,7,4,93-95 Mph,7,93-95 Mph,3/4,Normal,FB,6,1,Very Low
+SP,Tom Dobie,GUA,31,R,Low,High,4,5,4,6,9,91-93 Mph,4,91-93 Mph,SIDE,Groundballer,GB,1,1,Very Low
+SP,Rogelio Domínguez,ANC,26,R,High,Normal,6,5,5,6,4,96-98 Mph,7,96-98 Mph,3/4,Power Pitcher,NEU,6,6,Low
+SP,Alexis Donini,CHI,26,L,High,High,5,5,5,5,4,93-95 Mph,8,93-95 Mph,SIDE,Normal,NEU,7,1,Very Low
+SP,Warren Dooks,PHI,23,R,Normal,Normal,3,7,7,5,7,96-98 Mph,6,96-98 Mph,OTT,Power Pitcher,NEU,4,4,Low
+SP,Savino Dore,BAL,36,R,High,Low,4,5,5,6,8,89-91 Mph,8,89-91 Mph,3/4,Normal,FB,4,1,Very Low
+SP,Gil Eckenroth,NYT,24,L,High,Normal,6,6,6,6,5,96-98 Mph,4,96-98 Mph,3/4,Power Pitcher,GB,10,3,Very Low
+SP,Beau Eschmann,SAN,29,R,High,High,9,8,8,9,10,95-97 Mph,6,95-97 Mph,OTT,Power Pitcher,GB,6,5,Low
+SP,Rafael Escobar,NYT,35,R,High,Normal,10,6,6,8,7,92-94 Mph,9,92-94 Mph,3/4,Normal,NEU,3,1,Very Low
+SP,Ruben Escobar,CIN,23,R,High,Normal,6,7,7,7,5,96-98 Mph,5,97-99 Mph,OTT,Power Pitcher,NEU,7,3,Medium
+SP,Henry Escobedo,CV,27,R,High,Normal,4,5,4,6,5,97-99 Mph,8,97-99 Mph,3/4,Power Pitcher,NEU,8,2,Very Low
+SP,Luis Espiricueta,HAV,29,R,High,High,5,5,5,6,5,95-97 Mph,6,95-97 Mph,OTT,Power Pitcher,NEU,10,5,Very Low
+SP,Alex Esquibel,KC,30,L,Normal,Normal,5,7,7,7,1,94-96 Mph,5,94-96 Mph,3/4,Groundballer,EX GB,10,2,Very Low
+SP,Joshua Eyres,LV,23,R,Normal,Normal,7,6,6,6,9,96-98 Mph,6,97-99 Mph,OTT,Power Pitcher,FB,6,4,Medium
+SP,Miguel Fajardo,WAS,25,R,Normal,Normal,10,5,5,7,2,94-96 Mph,6,94-96 Mph,3/4,Normal,NEU,7,4,Medium
+SP,Nestor Fajardo,MIA,26,R,Normal,Normal,4,5,5,5,4,96-98 Mph,10,96-98 Mph,OTT,Power Pitcher,NEU,8,5,Very Low
+SP,Vismay Falcon,CHI,38,L,Normal,Normal,4,6,6,6,10,89-91 Mph,6,89-91 Mph,3/4,Groundballer,EX GB,7,1,Very Low
+SP,Robby Fatone,ME,22,R,Normal,Normal,4,5,5,5,6,95-97 Mph,7,96-98 Mph,3/4,Groundballer,GB,2,6,Low
+SP,Elza Ficquelmont,PHX,34,R,Normal,Normal,4,4,3,6,7,92-94 Mph,6,92-94 Mph,OTT,Normal,EX FB,8,3,Very Low
+SP,Dave Fife,SF,27,R,Normal,Normal,9,6,6,6,5,96-98 Mph,6,96-98 Mph,3/4,Normal,NEU,5,1,Medium
+SP,Jeremy Fitch,MIA,27,L,Low,Normal,7,5,4,6,4,95-97 Mph,8,95-97 Mph,3/4,Power Pitcher,FB,7,6,Low
+SP,Danny Fivecoats,PHI,22,L,Normal,Normal,6,5,5,6,6,96-98 Mph,10,96-98 Mph,3/4,Power Pitcher,NEU,10,3,Medium
+SP,Jon Florentino,KC,25,R,Normal,Normal,6,4,4,6,4,96-98 Mph,9,96-98 Mph,3/4,Power Pitcher,GB,8,5,Low
+SP,Heriberto Flores,BUF,27,L,Normal,Normal,5,6,5,6,5,94-96 Mph,10,94-96 Mph,OTT,Normal,FB,10,4,Low
+SP,Moises Flores,HOU,29,R,Low,High,9,4,3,6,2,94-96 Mph,3,94-96 Mph,3/4,Normal,NEU,7,5,Very Low
+SP,Juan Fonseca,LA,23,R,Low,High,8,9,10,8,8,96-98 Mph,9,97-99 Mph,OTT,Power Pitcher,EX GB,6,5,Low
+SP,Taju Fuhuoh,MIA,23,L,Normal,High,4,5,5,6,7,95-97 Mph,5,95-97 Mph,3/4,Power Pitcher,GB,8,5,Low
+SP,Erik Garcia,MIN,23,L,High,High,8,5,5,6,5,96-98 Mph,9,97-99 Mph,3/4,Power Pitcher,NEU,8,6,Low
+SP,Raul Garibaldi,TUC,31,R,Normal,Normal,5,5,5,6,5,92-94 Mph,8,92-94 Mph,3/4,Normal,NEU,5,4,Very Low
+SP,Tony Garica,MTL,25,R,Normal,Normal,9,5,4,7,4,96-98 Mph,7,96-98 Mph,3/4,Power Pitcher,EX GB,7,4,Low
+SP,Wilbert Garlobo,CIN,24,L,Normal,Low,6,5,5,5,3,94-96 Mph,7,94-96 Mph,OTT,Groundballer,EX GB,9,1,Medium
+SP,Ron Gelsomino,HOU,26,L,High,Normal,7,5,5,6,4,96-98 Mph,10,96-98 Mph,OTT,Power Pitcher,FB,7,2,Low
+SP,Cody Gibbs,ME,27,R,Low,Normal,4,4,4,5,5,94-96 Mph,9,94-96 Mph,SIDE,Normal,NEU,2,5,Very Low
+SP,Joey Gigstead,KC,24,L,Normal,Normal,6,5,5,6,4,95-97 Mph,4,96-98 Mph,OTT,Power Pitcher,NEU,7,3,Low
+SP,Ruben Gonzalez,MTL,28,L,Normal,Normal,8,3,2,6,3,95-97 Mph,4,95-97 Mph,OTT,Power Pitcher,EX FB,7,4,Low
+SP,Ricardo Guajardo,GUA,26,R,Normal,High,6,4,4,6,5,94-96 Mph,8,94-96 Mph,OTT,Normal,NEU,6,3,Low
+SP,John Guzik,PHI,24,R,High,High,7,6,6,7,4,94-96 Mph,6,94-96 Mph,3/4,Normal,NEU,7,5,Low
+SP,Joe Gwin,PHX,23,R,Normal,Normal,9,6,6,7,4,94-96 Mph,6,94-96 Mph,3/4,Normal,NEU,7,7,Medium
+SP,Toby Harrison,WAS,26,R,Normal,High,4,5,5,6,7,92-94 Mph,6,92-94 Mph,3/4,Normal,NEU,3,6,Very Low
+SP,Monte Haworth,WAS,25,R,Normal,Normal,4,5,5,6,6,92-94 Mph,6,92-94 Mph,3/4,Normal,FB,1,6,Low
+SP,Josh Hebrank,TOR,33,R,Low,Low,5,5,5,6,5,93-95 Mph,4,93-95 Mph,3/4,Groundballer,GB,5,1,Very Low
+SP,Chris Herdegen,VAN,27,L,High,Normal,5,5,5,6,6,95-97 Mph,3,95-97 Mph,3/4,Power Pitcher,NEU,7,5,Low
+SP,Tony Hernandez,CIN,25,R,Normal,High,7,6,6,7,6,94-96 Mph,6,94-96 Mph,3/4,Normal,NEU,2,5,Low
+SP,Ray Hibler,CIN,25,R,Normal,Normal,8,4,3,6,3,96-98 Mph,9,96-98 Mph,OTT,Power Pitcher,EX FB,9,8,Low
+SP,Ben Hicks,MIA,24,R,Low,Normal,9,4,4,6,5,97-99 Mph,6,97-99 Mph,3/4,Normal,FB,4,5,Medium
+SP,Li-hong Ho,VAN,24,R,Normal,Normal,7,5,5,7,5,95-97 Mph,9,95-97 Mph,3/4,Power Pitcher,GB,2,5,Medium
+SP,Dominic Hogg,VAN,30,R,Normal,Normal,4,5,5,6,6,93-95 Mph,4,93-95 Mph,3/4,Groundballer,GB,2,3,Very Low
+SP,Eikki Hostikka,ME,26,L,Low,Normal,10,4,3,7,4,94-96 Mph,6,94-96 Mph,3/4,Normal,EX FB,9,5,Low
+SP,Frank Hubert,BUF,32,R,High,Normal,3,4,4,6,10,93-95 Mph,6,93-95 Mph,3/4,Groundballer,EX GB,8,1,Very Low
+SP,Lanzo Huitron,POR,34,R,High,Normal,4,4,4,6,8,90-92 Mph,7,90-92 Mph,OTT,Groundballer,EX GB,4,2,Very Low
+SP,Bernie Iglesias,SF,25,L,Normal,High,10,5,5,7,5,96-98 Mph,7,96-98 Mph,OTT,Power Pitcher,NEU,7,4,Low
+SP,John Intriago,PHX,42,R,Normal,Normal,2,4,3,5,8,89-91 Mph,6,89-91 Mph,3/4,Normal,NEU,2,1,Very Low
+SP,Hajime Ito,SEA,25,R,High,Normal,8,4,3,7,5,96-98 Mph,10,96-98 Mph,3/4,Power Pitcher,FB,6,10,Medium
+SP,Dong-u Jee,BUF,36,R,Normal,High,4,3,3,6,10,91-93 Mph,7,91-93 Mph,3/4,Groundballer,GB,4,1,Very Low
+SP,Steve Jennifer,PHI,25,L,Normal,High,5,5,5,6,5,94-96 Mph,9,94-96 Mph,OTT,Normal,NEU,7,5,Low
+SP,Kai-xi Jia,WAS,24,R,Normal,Normal,10,6,6,6,9,96-98 Mph,9,96-98 Mph,OTT,Power Pitcher,NEU,1,4,Very Low
+SP,Chris Johnston,BOS,24,R,High,Normal,6,6,6,6,7,96-98 Mph,4,96-98 Mph,3/4,Normal,NEU,3,4,Low
+SP,Al Joly,VAN,25,R,Normal,Normal,6,5,5,6,5,95-97 Mph,6,95-97 Mph,OTT,Power Pitcher,EX GB,3,6,Low
+SP,Benjamin Jones,MIN,25,R,Normal,Normal,6,7,7,7,5,93-95 Mph,8,93-95 Mph,3/4,Normal,NEU,5,3,Medium
+SP,Tsunesaburo Kai,SD,34,R,Normal,High,5,5,5,5,1,90-92 Mph,9,90-92 Mph,3/4,Normal,NEU,8,1,Very Low
+SP,Tetsukazu Kaneda,CHI,40,L,Low,Normal,3,5,5,6,5,88-90 Mph,5,88-90 Mph,OTT,Groundballer,GB,9,1,Very Low
+SP,Yahya Kanoro,POR,26,L,Normal,Normal,5,5,5,6,8,94-96 Mph,8,94-96 Mph,OTT,Normal,NEU,8,3,Very Low
+SP,Yasuhiro Katayama,SEA,28,L,Normal,Normal,5,5,5,5,5,93-95 Mph,7,93-95 Mph,3/4,Groundballer,GB,7,4,Low
+SP,Chae-pong Kim,PHI,25,R,Normal,Normal,8,5,4,7,5,94-96 Mph,4,94-96 Mph,3/4,Normal,NEU,3,5,Low
+SP,Kazune Kimoto,MIA,27,R,Normal,Normal,4,7,7,6,4,94-96 Mph,10,94-96 Mph,3/4,Groundballer,EX GB,6,3,Very Low
+SP,Aaron Kopta,MTL,37,R,Low,Normal,4,5,4,6,7,92-94 Mph,8,92-94 Mph,3/4,Normal,NEU,9,3,Very Low
+SP,Craig Kruppenbacher,CHI,35,R,High,Normal,4,7,7,6,6,93-95 Mph,7,93-95 Mph,3/4,Groundballer,GB,4,1,Very Low
+SP,Akashi Kurosawa,SAN,23,L,High,High,7,7,8,7,3,96-98 Mph,6,96-98 Mph,3/4,Power Pitcher,GB,9,4,Medium
+SP,James L'Hommedieu,PHX,34,R,Normal,Normal,4,7,7,6,5,93-95 Mph,3,93-95 Mph,3/4,Groundballer,EX GB,8,1,Very Low
+SP,Brent Lannin,SD,29,R,Normal,High,7,5,5,6,4,94-96 Mph,7,94-96 Mph,3/4,Normal,FB,6,6,Low
+SP,Alex Laso,PHI,29,L,High,High,5,5,5,6,5,93-95 Mph,6,93-95 Mph,3/4,Normal,NEU,10,2,Very Low
+SP,Grant Latour,STL,24,R,High,Normal,4,7,7,6,7,94-96 Mph,9,94-96 Mph,OTT,Normal,NEU,8,4,Low
+SP,Trevor Laverick,MTL,26,L,Normal,Normal,5,5,4,6,4,94-96 Mph,5,94-96 Mph,OTT,Normal,EX FB,10,4,Low
+SP,Jim Lawrence,PHX,27,L,High,Normal,10,6,5,7,4,94-96 Mph,6,94-96 Mph,3/4,Normal,NEU,7,6,Very Low
+SP,Jeong Lee,SEA,31,R,High,Normal,6,6,6,6,7,94-96 Mph,6,94-96 Mph,3/4,Normal,NEU,8,4,Very Low
+SP,John Liberty,JOL,31,R,Low,Normal,5,4,4,6,5,94-96 Mph,4,94-96 Mph,OTT,Normal,NEU,4,1,Very Low
+SP,Jonathan Linebaugh,TUC,26,L,High,Normal,4,5,4,5,6,90-92 Mph,3,90-92 Mph,OTT,Normal,NEU,6,4,Very Low
+SP,Andretti Lipka,CIN,31,R,High,Low,1,4,4,5,5,93-95 Mph,4,93-95 Mph,3/4,Normal,NEU,1,4,Very Low
+SP,Layne Liston,WAS,21,R,Normal,Normal,7,6,6,6,4,95-97 Mph,9,95-97 Mph,3/4,Power Pitcher,NEU,6,3,Extreme
+SP,Ryan Lloyd,BOS,30,R,High,Normal,7,4,3,7,7,94-96 Mph,7,94-96 Mph,OTT,Normal,FB,5,4,Very Low
+SP,Fisko Loera,TOR,45,R,Normal,Normal,4,4,3,6,8,91-93 Mph,8,91-93 Mph,3/4,Normal,NEU,6,1,Very Low
+SP,Billy Lorsung,BUF,27,L,High,Normal,6,5,5,6,6,94-96 Mph,6,94-96 Mph,3/4,Normal,NEU,10,5,Very Low
+SP,Jon Loza,PHI,21,R,High,Normal,1,4,4,4,1,91-93 Mph,6,91-93 Mph,3/4,Normal,EX FB,6,5,Low
+SP,Chih Lum,HAV,26,R,High,Normal,6,5,5,7,5,93-95 Mph,4,93-95 Mph,OTT,Normal,EX FB,1,3,Very Low
+SP,Lao Lum,NYT,24,L,High,Normal,6,5,4,6,5,95-97 Mph,6,95-97 Mph,OTT,Power Pitcher,NEU,10,4,Medium
+SP,Frank Macias,MIN,28,R,Normal,Normal,5,5,4,6,3,93-95 Mph,6,93-95 Mph,OTT,Normal,EX FB,10,4,Low
+SP,Tony Madena,PHI,28,R,High,Normal,5,5,5,5,5,91-93 Mph,3,91-93 Mph,OTT,Groundballer,GB,4,5,Very Low
+SP,Jose Madrid,MIN,30,R,Normal,Low,6,5,5,7,8,93-95 Mph,5,93-95 Mph,3/4,Normal,FB,4,3,Very Low
+SP,Damian Mares,POR,26,L,High,Normal,7,4,4,6,5,94-96 Mph,4,94-96 Mph,3/4,Normal,FB,9,3,Low
+SP,Rajam Masrani,WAS,25,R,Normal,Normal,7,6,6,7,7,95-97 Mph,6,95-97 Mph,3/4,Power Pitcher,GB,4,5,Low
+SP,Tony Masso,TUC,30,R,High,Normal,4,5,5,6,7,94-96 Mph,7,94-96 Mph,OTT,Normal,NEU,6,5,Very Low
+SP,Juzo Matsumoto,CHI,34,L,Low,Normal,5,6,6,5,4,92-94 Mph,4,92-94 Mph,OTT,Groundballer,EX GB,10,5,Very Low
+SP,Chris Maxwell,SB,30,L,Low,High,4,5,4,6,5,94-96 Mph,6,94-96 Mph,OTT,Normal,NEU,8,2,Very Low
+SP,Alex Mayorga,VAN,37,R,High,Normal,4,5,4,6,9,93-95 Mph,6,93-95 Mph,OTT,Normal,NEU,6,5,Very Low
+SP,John McFadyen,HAV,24,L,Normal,Normal,7,5,4,6,5,92-94 Mph,8,92-94 Mph,SIDE,Normal,NEU,7,8,Low
+SP,Bill McMillan,KC,27,R,Low,High,7,5,5,6,3,95-97 Mph,10,95-97 Mph,3/4,Power Pitcher,NEU,8,5,Low
+SP,Matt McMillan,KC,25,R,High,Normal,6,5,5,7,5,94-96 Mph,7,94-96 Mph,3/4,Normal,EX FB,10,5,Low
+SP,Jared Mejia,WAS,24,R,Normal,Normal,6,4,3,6,7,95-97 Mph,7,95-97 Mph,3/4,Power Pitcher,FB,9,4,Low
+SP,R.J. Mendenhall,BOS,33,R,Normal,Normal,6,7,6,8,6,91-93 Mph,4,91-93 Mph,OTT,Normal,NEU,7,1,Very Low
+SP,Axel Mendiola,ME,27,R,Normal,Normal,7,4,3,7,6,94-96 Mph,7,94-96 Mph,OTT,Normal,EX FB,4,5,Medium
+SP,Edwin Mendoza,BOS,23,R,Normal,Normal,6,6,6,6,4,95-97 Mph,9,96-98 Mph,3/4,Groundballer,GB,10,5,Low
+SP,Oscar Mercado,POR,26,R,Low,Normal,8,7,7,6,3,93-95 Mph,6,93-95 Mph,3/4,Groundballer,GB,7,10,Low
+SP,Mike Merdinger,MTL,31,R,High,Normal,6,8,8,8,9,93-95 Mph,7,93-95 Mph,3/4,Groundballer,EX GB,8,5,Very Low
+SP,Julius Miller,BUF,29,R,Normal,Normal,6,8,9,7,7,95-97 Mph,8,95-97 Mph,3/4,Power Pitcher,EX GB,6,1,Low
+SP,Yeniet Miranda,BRK,28,R,High,Normal,5,6,6,7,10,94-96 Mph,5,94-96 Mph,OTT,Normal,NEU,3,1,Very Low
+SP,Miguel Moquete,TUC,30,R,Normal,High,8,6,6,7,10,94-96 Mph,6,94-96 Mph,SIDE,Groundballer,GB,2,4,Very Low
+SP,Edwin Munoz,DEN,28,R,Normal,Normal,7,7,7,7,3,94-96 Mph,6,94-96 Mph,3/4,Normal,NEU,5,6,Low
+SP,Luis Muratalla,DEN,25,R,High,Normal,8,7,7,6,6,94-96 Mph,5,94-96 Mph,3/4,Normal,NEU,8,6,Medium
+SP,Kunimatsu Myaji,BAL,24,R,Normal,Low,9,5,5,7,4,96-98 Mph,6,97-99 Mph,3/4,Power Pitcher,NEU,8,5,Medium
+SP,Keiyo Nagao,NYT,27,R,Normal,Normal,6,7,8,7,4,94-96 Mph,7,94-96 Mph,OTT,Normal,NEU,10,6,Very Low
+SP,Kwang-sik Nho,AKR,28,R,Normal,Low,2,6,6,6,5,91-93 Mph,5,92-94 Mph,SIDE,Normal,NEU,7,4,Very Low
+SP,Su-shun Nie,SEA,35,L,Normal,High,2,7,8,7,8,91-93 Mph,9,91-93 Mph,OTT,Groundballer,EX GB,6,1,Very Low
+SP,Bokkai Nikaido,JC,25,R,Normal,Normal,6,4,4,6,4,94-96 Mph,6,94-96 Mph,OTT,Normal,NEU,8,4,Low
+SP,Kyohei Nishimoto,BAL,24,L,Normal,Normal,7,5,4,6,5,94-96 Mph,5,94-96 Mph,OTT,Normal,NEU,9,6,Low
+SP,Chua chay Niu,SEA,24,R,High,Normal,9,6,6,6,6,95-97 Mph,6,95-97 Mph,3/4,Power Pitcher,NEU,5,5,Medium
+SP,Keishi Okamoto,KC,25,R,Normal,Normal,4,5,5,5,4,95-97 Mph,5,95-97 Mph,3/4,Power Pitcher,GB,5,5,Low
+SP,Jake Orthman,CHI,24,R,Normal,High,7,7,7,7,8,96-98 Mph,10,96-98 Mph,OTT,Power Pitcher,NEU,5,3,Low
+SP,Brendan Ough,TUC,26,R,Low,Normal,5,4,3,6,4,94-96 Mph,10,94-96 Mph,3/4,Normal,EX FB,7,5,Low
+SP,Jimmy Oyola,BUF,29,R,Low,Normal,5,7,7,8,3,90-92 Mph,10,90-92 Mph,OTT,Groundballer,GB,1,3,Low
+SP,Gustavo Palacios,MV,26,R,Low,Normal,6,5,4,6,5,96-98 Mph,8,96-98 Mph,OTT,Power Pitcher,NEU,8,6,Very Low
+SP,Neil Parker,OXN,28,R,Normal,Normal,6,3,3,6,3,94-96 Mph,6,94-96 Mph,3/4,Normal,NEU,6,5,Low
+SP,Phil Payne,GUA,31,R,Normal,Low,7,6,6,6,3,94-96 Mph,3,94-96 Mph,SIDE,Groundballer,GB,5,6,Very Low
+SP,Alex Perez,PHI,24,R,Normal,Normal,5,6,6,5,4,93-95 Mph,6,93-95 Mph,3/4,Normal,NEU,9,4,Low
+SP,Dave Perez,VAN,23,L,High,Normal,7,6,6,5,5,97-99 Mph,8,97-99 Mph,OTT,Power Pitcher,NEU,7,5,Low
+SP,Charlie Petipas,POR,27,R,Normal,Normal,6,9,9,7,4,94-96 Mph,6,94-96 Mph,3/4,Groundballer,EX GB,6,5,Low
+SP,Juan Pinon,MIN,30,L,High,Normal,6,5,5,6,4,94-96 Mph,6,94-96 Mph,3/4,Groundballer,GB,9,4,Very Low
+SP,Steve Pohlman,STL,23,L,Normal,Normal,5,6,6,6,6,93-95 Mph,6,93-95 Mph,OTT,Normal,NEU,7,5,Very Low
+SP,Matt Pontius,BRK,32,L,High,Normal,4,5,5,6,9,92-94 Mph,3,92-94 Mph,3/4,Groundballer,EX GB,9,2,Very Low
+SP,Rocco Porcaro,BAL,27,R,Normal,High,6,6,7,6,5,94-96 Mph,6,94-96 Mph,3/4,Groundballer,GB,8,5,Low
+SP,Adrian Portuondo,CHI,34,L,Normal,Normal,4,5,5,6,7,93-95 Mph,3,93-95 Mph,3/4,Normal,NEU,7,1,Very Low
+SP,David Prentice,CIN,27,R,Normal,Normal,7,3,3,7,3,94-96 Mph,7,94-96 Mph,3/4,Normal,EX FB,10,4,Low
+SP,Dave Quintero,MTL,30,R,Low,Normal,5,5,4,6,4,94-96 Mph,8,94-96 Mph,3/4,Normal,NEU,3,3,Very Low
+SP,Ed Rice,MIA,29,R,Normal,Normal,6,4,4,6,4,94-96 Mph,5,94-96 Mph,3/4,Normal,NEU,8,8,Very Low
+SP,Yuniesky Rios,PHI,22,R,High,Low,2,6,6,5,7,94-96 Mph,7,94-96 Mph,3/4,Normal,NEU,3,4,Low
+SP,Ramon Rod,SF,24,L,Normal,Normal,5,5,5,5,5,92-94 Mph,6,92-94 Mph,3/4,Groundballer,GB,6,3,Low
+SP,Carl Rodda,TOR,35,R,High,Normal,4,7,7,6,7,90-92 Mph,6,90-92 Mph,3/4,Normal,NEU,4,1,Very Low
+SP,Bobby Rodriguez,KC,26,L,Low,Normal,6,4,3,5,4,96-98 Mph,7,96-98 Mph,3/4,Power Pitcher,NEU,8,6,Low
+SP,Jon Rodriguez,PHI,25,R,High,Normal,7,5,5,6,5,95-97 Mph,8,95-97 Mph,SIDE,Power Pitcher,NEU,9,4,Low
+SP,Chris Romer,KC,27,R,High,Normal,5,5,5,6,5,94-96 Mph,7,94-96 Mph,3/4,Normal,NEU,6,3,Very Low
+SP,Salvador Romero,SAN,25,L,High,Low,9,5,4,6,4,96-98 Mph,6,96-98 Mph,3/4,Power Pitcher,EX FB,10,5,Low
+SP,Manel Romosinho,MIA,25,L,Normal,Normal,5,5,5,6,6,95-97 Mph,9,95-97 Mph,OTT,Groundballer,GB,9,2,Very Low
+SP,Bruce Roque,PHI,25,R,High,Normal,9,6,6,7,4,95-97 Mph,3,95-97 Mph,3/4,Power Pitcher,NEU,4,8,Very Low
+SP,George Roscoe,SF,24,L,Normal,Normal,7,7,7,7,10,92-94 Mph,6,92-94 Mph,3/4,Normal,FB,7,4,Low
+SP,Roberto Rueda,VAN,27,L,Normal,Normal,10,7,7,8,4,96-98 Mph,6,96-98 Mph,3/4,Power Pitcher,NEU,10,1,Medium
+SP,Rodolfo Ruiz,WAS,32,R,Normal,Normal,4,4,4,6,7,93-95 Mph,8,93-95 Mph,OTT,Groundballer,GB,3,1,Very Low
+SP,Taxi Sabala,TUC,36,R,High,High,5,5,5,7,9,92-94 Mph,9,92-94 Mph,SIDE,Normal,FB,1,2,Very Low
+SP,Yadisniel Saez,VAN,28,R,High,Normal,6,7,7,7,4,95-97 Mph,7,95-97 Mph,3/4,Power Pitcher,GB,9,6,Low
+SP,Alex Saldivar,KC,26,L,Low,Normal,7,5,5,6,4,95-97 Mph,5,95-97 Mph,3/4,Power Pitcher,NEU,6,5,Low
+SP,Sergio Saldivar,NYT,27,R,Normal,Normal,6,5,5,6,4,95-97 Mph,7,95-97 Mph,OTT,Power Pitcher,NEU,4,4,Low
+SP,Roberto Sanchez,KC,25,R,High,High,3,6,6,6,8,90-92 Mph,4,90-92 Mph,3/4,Normal,NEU,2,6,Very Low
+SP,Korey Sanders,BAL,27,L,High,Normal,4,6,6,6,3,93-95 Mph,8,93-95 Mph,3/4,Normal,NEU,7,2,Low
+SP,Chris Sayler,HOU,23,R,Normal,Low,6,5,5,5,6,94-96 Mph,7,94-96 Mph,3/4,Normal,NEU,9,4,Very Low
+SP,Ryan Schwartz,KC,23,R,High,Normal,10,4,4,7,5,96-98 Mph,7,96-98 Mph,OTT,Power Pitcher,FB,8,4,Very High
+SP,Danny Segura,BAL,24,R,Normal,Normal,5,5,5,6,5,94-96 Mph,6,94-96 Mph,3/4,Normal,NEU,4,1,Very Low
+SP,Danny Serrano,LA,29,R,Normal,Normal,7,5,5,7,4,93-95 Mph,7,93-95 Mph,OTT,Normal,FB,5,2,Low
+SP,Tae-sang Shinn,LV,28,R,Normal,Normal,7,5,5,6,4,97-99 Mph,6,97-99 Mph,3/4,Power Pitcher,GB,9,6,Very Low
+SP,Feng Shuai,TUC,25,L,High,Normal,6,5,5,6,6,96-98 Mph,8,96-98 Mph,3/4,Power Pitcher,NEU,7,7,Very Low
+SP,Salomé Sieuve,LV,28,L,Normal,High,7,6,6,7,5,94-96 Mph,7,94-96 Mph,3/4,Normal,FB,8,4,Medium
+SP,Cameron Smith,PHI,19,R,Normal,Normal,5,2,1,3,1,89-91 Mph,6,92-94 Mph,3/4,Normal,NEU,3,4,Medium
+SP,Diego Solis,STL,24,R,High,Low,5,6,7,5,6,93-95 Mph,4,93-95 Mph,3/4,Groundballer,GB,2,7,Low
+SP,Will Spangenberg,YK,30,R,Normal,Normal,4,7,7,6,3,92-94 Mph,9,92-94 Mph,3/4,Groundballer,GB,5,5,Very Low
+SP,Matt Staat,WAS,24,R,Normal,Normal,6,4,4,6,5,95-97 Mph,7,95-97 Mph,3/4,Power Pitcher,NEU,5,2,Low
+SP,Danny Stanger,CIN,22,L,Normal,Normal,5,6,7,4,3,95-97 Mph,7,96-98 Mph,OTT,Power Pitcher,GB,7,4,Low
+SP,Joseph Stark,MIN,26,L,Normal,Normal,5,5,4,6,5,94-96 Mph,7,94-96 Mph,3/4,Normal,EX FB,6,4,Very Low
+SP,Brent Starr,STL,23,L,Normal,Normal,6,6,7,4,10,90-92 Mph,6,91-93 Mph,3/4,Finesse Pitcher,NEU,8,4,Extreme
+SP,Earl Starr,PHX,30,R,Normal,Normal,5,9,9,7,6,95-97 Mph,5,95-97 Mph,3/4,Power Pitcher,GB,4,7,Very Low
+SP,Ryan Surette,CIN,26,L,Normal,Normal,7,4,3,7,7,94-96 Mph,10,94-96 Mph,3/4,Normal,EX FB,9,4,Low
+SP,Omezo Suyama,LV,25,L,Normal,Normal,10,8,8,8,3,97-99 Mph,8,97-99 Mph,3/4,Power Pitcher,NEU,8,4,Very Low
+SP,Bryan Szabo,CIN,25,R,Normal,High,6,7,7,7,6,95-97 Mph,7,95-97 Mph,3/4,Power Pitcher,GB,7,10,Low
+SP,Lio Taglialatela,MIA,22,R,Normal,Normal,8,5,5,6,7,96-98 Mph,7,97-99 Mph,3/4,Power Pitcher,NEU,6,5,Medium
+SP,Motoaki Tajiri,BAL,23,R,High,Normal,6,8,8,7,5,95-97 Mph,6,96-98 Mph,OTT,Groundballer,EX GB,5,6,Very Low
+SP,Takuma Takahashi,POR,27,L,High,Normal,5,5,5,6,5,92-94 Mph,3,92-94 Mph,OTT,Normal,NEU,10,3,Very Low
+SP,Felix Talamantez,LA,33,R,High,Normal,6,6,5,8,5,93-95 Mph,5,93-95 Mph,3/4,Normal,FB,4,1,Very Low
+SP,Nick Tamulevich,NYT,37,L,High,Normal,3,5,5,6,8,88-90 Mph,4,88-90 Mph,3/4,Normal,NEU,10,1,Very Low
+SP,Raul Tanis,VAN,21,R,Normal,Normal,9,6,6,6,9,96-98 Mph,7,97-99 Mph,3/4,Power Pitcher,NEU,7,5,Extreme
+SP,Gerald Tanton,BOS,29,R,Normal,Normal,5,6,7,6,7,94-96 Mph,8,94-96 Mph,3/4,Groundballer,EX GB,6,1,Low
+SP,Daniel Taylor,TOR,31,R,Normal,Normal,6,4,4,6,5,94-96 Mph,4,94-96 Mph,3/4,Groundballer,GB,4,3,Very Low
+SP,Miguel Tejeda,LA,24,R,High,Normal,8,4,4,6,5,94-96 Mph,6,95-97 Mph,3/4,Normal,FB,2,5,Medium
+SP,Ed Terra,ROC,24,R,Normal,Normal,6,6,6,6,4,97-99 Mph,4,97-99 Mph,3/4,Power Pitcher,NEU,7,4,Low
+SP,B.J. Terriquez,YK,27,R,High,High,8,5,5,7,4,94-96 Mph,9,94-96 Mph,3/4,Normal,FB,6,3,Very Low
+SP,Ricardo Then,SF,21,R,High,Normal,4,6,6,5,7,95-97 Mph,5,95-97 Mph,OTT,Power Pitcher,GB,1,6,Low
+SP,Allan Tinter,SD,30,R,Normal,High,6,5,5,6,4,93-95 Mph,8,93-95 Mph,3/4,Groundballer,GB,5,4,Very Low
+SP,Quinn Topp,YK,26,R,Normal,Normal,3,9,9,7,4,89-91 Mph,7,89-91 Mph,OTT,Groundballer,EX GB,6,6,Low
+SP,Vince Tozier,BRK,25,R,Normal,High,5,7,7,6,5,94-96 Mph,10,94-96 Mph,OTT,Groundballer,GB,8,5,Very Low
+SP,Ron Trevathan,GAR,36,R,Low,Low,4,5,5,5,4,90-92 Mph,5,90-92 Mph,3/4,Groundballer,EX GB,3,1,Very Low
+SP,Hwui-ning Tsou,HOU,30,R,High,High,5,4,4,5,3,94-96 Mph,8,94-96 Mph,3/4,Normal,NEU,4,2,Very Low
+SP,Pat Tumlin,TUC,22,L,Normal,Normal,7,6,6,5,5,95-97 Mph,7,97-99 Mph,SIDE,Power Pitcher,NEU,10,4,Medium
+SP,Alex Urbano,POR,23,R,Normal,Normal,5,5,5,5,5,93-95 Mph,6,93-95 Mph,OTT,Groundballer,GB,8,4,Low
+SP,Uno Urquidez,BUF,30,R,Normal,Normal,4,5,5,5,4,93-95 Mph,5,93-95 Mph,3/4,Groundballer,GB,6,1,Very Low
+SP,Mario Valenzuela,POR,23,R,Normal,Normal,6,6,7,5,5,94-96 Mph,4,94-96 Mph,3/4,Groundballer,GB,9,5,High
+SP,Yeral Varela,PHI,22,L,High,Normal,4,6,7,5,10,94-96 Mph,6,96-98 Mph,OTT,Normal,NEU,8,6,High
+SP,Alberto Vasquez,BRK,26,L,Normal,Normal,9,7,7,7,6,96-98 Mph,8,96-98 Mph,3/4,Power Pitcher,GB,7,1,Low
+SP,Sergio Vega,HOU,27,R,High,Normal,4,4,4,6,6,90-92 Mph,7,90-92 Mph,3/4,Normal,FB,2,7,Low
+SP,Tony Velazquez,BAL,23,R,Normal,Normal,7,4,4,4,4,93-95 Mph,7,93-95 Mph,3/4,Normal,NEU,7,5,Medium
+SP,Michel Verde,BRK,25,L,Low,High,8,5,4,6,5,94-96 Mph,6,94-96 Mph,3/4,Normal,EX FB,10,4,Medium
+SP,Buddy Verveer,VAN,34,R,Normal,Normal,4,6,6,5,4,91-93 Mph,6,91-93 Mph,SIDE,Groundballer,EX GB,5,4,Very Low
+SP,Yandri Vido,POR,25,R,Normal,Normal,10,7,7,8,8,97-99 Mph,9,97-99 Mph,3/4,Power Pitcher,GB,8,6,Medium
+SP,Kevin Voda,SF,24,R,Normal,Normal,6,7,7,6,5,94-96 Mph,4,94-96 Mph,3/4,Groundballer,GB,3,5,Low
+SP,Bryan Walker,SD,40,R,Normal,Normal,3,5,4,5,7,87-89 Mph,4,87-89 Mph,3/4,Groundballer,GB,5,1,Very Low
+SP,Ken Wellon,CIN,25,L,Normal,Low,6,4,4,6,4,94-96 Mph,7,94-96 Mph,3/4,Normal,FB,7,5,Medium
+SP,Kevin Welsch,DEN,23,R,Normal,Low,3,7,8,6,6,89-91 Mph,6,89-91 Mph,3/4,Groundballer,EX GB,8,5,Medium
+SP,James Wilkinson,HOU,24,L,Normal,Normal,7,4,4,6,6,96-98 Mph,4,96-98 Mph,3/4,Power Pitcher,NEU,10,5,Low
+SP,Taisei Yamamoto,YK,25,R,High,High,7,5,5,7,7,95-97 Mph,6,95-97 Mph,3/4,Power Pitcher,FB,7,5,Low
+SP,Kohji Yoshihara,NYT,25,R,High,High,6,4,4,6,5,98-100 Mph,6,98-100 Mph,OTT,Power Pitcher,NEU,3,6,Very Low
+SP,Billy Zaffuto,LV,29,R,Normal,Normal,5,6,6,6,4,94-96 Mph,6,94-96 Mph,3/4,Groundballer,GB,7,1,Low
+SP,Alex Zapien,HAV,24,R,Normal,High,5,6,7,6,6,95-97 Mph,7,95-97 Mph,OTT,Power Pitcher,GB,4,5,Very Low
+SP,Jonathan Zelina,KC,23,R,Normal,Normal,7,5,5,5,5,95-97 Mph,7,96-98 Mph,OTT,Groundballer,EX GB,5,3,Low
+SP,Ricky Zika,LA,37,R,High,High,6,5,4,7,7,94-96 Mph,8,94-96 Mph,3/4,Normal,FB,2,1,Very Low
+RP,Kevin Adkins,BOS,24,R,High,Normal,7,7,7,7,6,96-98 Mph,6,96-98 Mph,3/4,Power Pitcher,NEU,4,4,Low
+RP,Nico Aguilar,BAL,24,L,Normal,Normal,6,6,6,6,4,96-98 Mph,3,96-98 Mph,3/4,Power Pitcher,GB,7,1,Very Low
+RP,Yolber Ajete,LV,26,L,Normal,Low,9,5,5,6,5,97-99 Mph,8,97-99 Mph,OTT,Power Pitcher,FB,8,4,Low
+RP,Ricardo Alas,LA,32,L,Normal,High,6,8,9,6,3,93-95 Mph,2,93-95 Mph,3/4,Groundballer,EX GB,9,2,Very Low
+RP,Raul Alcaraz,TUC,28,R,Normal,Low,10,4,4,6,5,93-95 Mph,3,93-95 Mph,3/4,Normal,FB,5,5,Medium
+RP,Javy Alejo,BOS,27,R,High,Normal,10,4,3,7,5,96-98 Mph,7,96-98 Mph,3/4,Power Pitcher,EX FB,3,6,Low
+RP,Mike Alfonso,OXN,28,R,High,Normal,8,6,6,6,1,93-95 Mph,1,93-95 Mph,OTT,Normal,NEU,7,5,Medium
+RP,Divino Aljeroz,SAN,25,R,High,Normal,7,7,7,7,6,95-97 Mph,6,95-97 Mph,3/4,Power Pitcher,GB,8,5,Very Low
+RP,Jose Alonzo,SF,28,R,Normal,Normal,9,5,4,6,5,94-96 Mph,2,94-96 Mph,3/4,Normal,NEU,8,5,Low
+RP,Kelvin Alvarado,KC,27,R,Normal,Low,8,3,3,6,3,95-97 Mph,6,95-97 Mph,3/4,Power Pitcher,NEU,8,3,Low
+RP,Jeff Amendola,TUK,29,L,Normal,Normal,10,7,8,7,1,97-99 Mph,1,98-100 Mph,OTT,Power Pitcher,EX GB,8,6,Low
+RP,Akorakor Andongwisye,HAV,26,R,Normal,Normal,8,4,4,6,5,94-96 Mph,7,94-96 Mph,OTT,Normal,NEU,5,4,Low
+RP,Manny Arango,HOU,35,R,Normal,Normal,5,5,5,6,5,92-94 Mph,2,92-94 Mph,SIDE,Normal,FB,5,1,Very Low
+RP,Eric Arellano,YK,26,L,High,High,4,5,5,5,6,90-92 Mph,7,90-92 Mph,OTT,Groundballer,GB,7,3,Low
+RP,Oscar Bara,WAS,24,R,High,Normal,10,6,7,6,2,97-99 Mph,2,97-99 Mph,SIDE,Power Pitcher,NEU,9,4,Very Low
+RP,Jose Barragan,HOU,27,R,Low,Normal,10,4,4,6,2,94-96 Mph,8,94-96 Mph,3/4,Normal,EX FB,5,3,Medium
+RP,Alan Batten,TUK,26,R,Normal,High,5,6,7,6,4,93-95 Mph,6,93-95 Mph,3/4,Normal,NEU,6,3,Medium
+RP,Olaf Bax,ARL,26,R,High,Normal,8,5,5,6,4,98-100 Mph,4,98-100 Mph,OTT,Power Pitcher,FB,3,6,Very Low
+RP,Juneau Beauchamp,YK,27,R,Normal,High,10,6,6,6,6,94-96 Mph,3,94-96 Mph,OTT,Groundballer,EX GB,8,2,Low
+RP,Mario Bejarano,BR,24,R,Normal,Normal,8,5,5,6,3,95-97 Mph,5,95-97 Mph,3/4,Power Pitcher,NEU,8,4,Medium
+RP,Chris Bender,HOU,28,R,Normal,Normal,6,6,6,5,3,94-96 Mph,3,94-96 Mph,3/4,Normal,NEU,2,5,Very Low
+RP,Hsin Bian,LIN,25,R,Normal,High,6,4,3,6,3,94-96 Mph,6,94-96 Mph,3/4,Normal,FB,5,6,Very Low
+RP,Edwin Bonomi,TOR,30,R,Normal,Normal,6,5,4,6,3,94-96 Mph,7,94-96 Mph,OTT,Normal,NEU,8,5,Very Low
+RP,Norman Bos,BRK,27,R,Normal,Low,6,5,4,6,4,93-95 Mph,6,93-95 Mph,3/4,Normal,NEU,6,3,Very Low
+RP,Edgar Bosma,TOR,25,R,Normal,Normal,10,6,6,6,7,96-98 Mph,2,96-98 Mph,3/4,Power Pitcher,NEU,2,3,Low
+RP,Kurt Bozek,SD,35,L,Normal,High,5,6,6,6,8,92-94 Mph,6,92-94 Mph,3/4,Groundballer,EX GB,8,4,Very Low
+RP,Joel Breault,WAS,24,R,Normal,High,10,3,2,6,3,94-96 Mph,8,94-96 Mph,3/4,Normal,EX FB,5,6,High
+RP,Mike Buckwalter,KC,26,R,Normal,Normal,10,4,3,5,3,94-96 Mph,2,94-96 Mph,3/4,Normal,EX FB,8,6,High
+RP,Jose Bustamante,LA,27,R,High,Normal,9,4,4,6,4,94-96 Mph,8,94-96 Mph,3/4,Normal,NEU,6,6,Low
+RP,Jimmy Camacho,BRK,26,R,Normal,Normal,7,4,3,6,6,94-96 Mph,7,94-96 Mph,OTT,Normal,EX FB,3,3,Very Low
+RP,Jordan Camacho,BUF,26,R,Normal,Normal,7,4,4,6,4,96-98 Mph,7,96-98 Mph,3/4,Power Pitcher,NEU,10,4,Very Low
+RP,Nick Campbell,VAN,28,R,Normal,Normal,8,4,3,6,6,99-101 Mph,1,99-101 Mph,3/4,Power Pitcher,NEU,3,6,Medium
+RP,Armelio Cantalapiedra,HAM,25,R,Normal,Normal,10,5,5,7,5,95-97 Mph,6,95-97 Mph,3/4,Power Pitcher,FB,7,5,Low
+RP,Nestor Cantu,DEN,30,R,High,Normal,5,4,4,6,5,95-97 Mph,7,95-97 Mph,OTT,Power Pitcher,FB,2,2,Very Low
+RP,Mario Carrisalez,MV,24,R,Normal,Normal,5,5,5,6,5,96-98 Mph,8,96-98 Mph,3/4,Power Pitcher,GB,6,1,Very Low
+RP,Edwin Castaneda,TUC,28,R,High,High,8,4,4,6,4,93-95 Mph,6,93-95 Mph,OTT,Normal,EX FB,7,7,Very Low
+RP,Luis Castillo,LA,25,L,Normal,Normal,10,5,5,6,4,96-98 Mph,2,96-98 Mph,OTT,Power Pitcher,NEU,10,5,Low
+RP,Ricky Ceniceros,SF,23,R,Normal,Normal,5,6,7,5,3,96-98 Mph,8,96-98 Mph,3/4,Power Pitcher,EX GB,9,7,Low
+RP,Art Christenbury,CV,26,R,High,Normal,9,4,3,6,2,94-96 Mph,1,94-96 Mph,3/4,Normal,EX FB,3,1,Medium
+RP,Hwi-gon Chun,JC,27,R,Low,Low,6,4,4,6,6,94-96 Mph,6,94-96 Mph,3/4,Normal,FB,5,5,Low
+RP,Juan Colleano,BAL,29,R,High,Normal,5,6,5,7,4,92-94 Mph,1,92-94 Mph,OTT,Groundballer,GB,3,5,Very Low
+RP,John Colon,MTL,35,L,High,Normal,5,7,7,6,3,93-95 Mph,1,93-95 Mph,OTT,Groundballer,GB,6,4,Very Low
+RP,Carter Commiskey,STL,24,R,Normal,Normal,10,7,7,7,3,95-97 Mph,9,96-98 Mph,3/4,Power Pitcher,NEU,4,10,High
+RP,Cheng-en Cong,DEN,21,L,High,Normal,4,5,6,5,5,96-98 Mph,7,96-98 Mph,OTT,Power Pitcher,NEU,10,3,Low
+RP,Jose Contreras,POR,29,R,Low,Normal,9,4,4,6,2,94-96 Mph,6,94-96 Mph,3/4,Normal,FB,8,3,Low
+RP,Gustavo Corral,MTL,25,L,Normal,High,6,4,4,6,4,96-98 Mph,8,96-98 Mph,SIDE,Power Pitcher,FB,10,5,Low
+RP,Joe Cox,ARL,23,R,Normal,Low,7,6,6,6,4,97-99 Mph,2,97-99 Mph,SIDE,Power Pitcher,GB,6,5,Low
+RP,David Cruz,HOU,27,R,Normal,High,6,5,5,6,4,95-97 Mph,6,95-97 Mph,3/4,Power Pitcher,EX FB,5,4,Low
+RP,Jaime Cucci,BR,27,R,Normal,Normal,8,5,5,6,4,96-98 Mph,3,96-98 Mph,3/4,Power Pitcher,NEU,1,5,Very Low
+RP,Gigi Cuzzocrea,ME,33,L,Normal,Normal,5,4,4,4,6,91-93 Mph,3,91-93 Mph,OTT,Groundballer,EX GB,10,1,Very Low
+RP,Andino D'Elia,DEN,28,R,Normal,Normal,6,7,8,6,3,94-96 Mph,9,94-96 Mph,SIDE,Groundballer,EX GB,4,6,Low
+RP,Lesley Deakin,MIN,28,R,High,Normal,10,6,6,7,1,97-99 Mph,1,97-99 Mph,3/4,Power Pitcher,GB,9,6,Very Low
+RP,Yoan Del Rio,STL,25,R,Normal,Normal,10,4,3,6,4,93-95 Mph,2,93-95 Mph,SIDE,Normal,FB,9,3,Very Low
+RP,CURSIVE DEMARCO,SD,34,R,High,Normal,2,4,3,5,6,93-95 Mph,6,93-95 Mph,3/4,Normal,NEU,7,5,Very Low
+RP,Marc Diamond,CHI,40,R,Normal,Low,4,6,6,6,5,91-93 Mph,3,91-93 Mph,3/4,Groundballer,GB,9,1,Very Low
+RP,Felipe Diaz,RIV,27,R,High,Normal,6,5,5,6,4,92-94 Mph,7,92-94 Mph,3/4,Normal,NEU,10,3,Low
+RP,Jorge Diaz,DEN,23,L,Low,Normal,5,6,6,6,10,96-98 Mph,3,96-98 Mph,3/4,Power Pitcher,NEU,10,5,Medium
+RP,Abel Downey,ME,37,L,Normal,Normal,4,5,4,5,4,91-93 Mph,3,91-93 Mph,OTT,Groundballer,GB,9,1,Very Low
+RP,Joe Drum,LV,33,R,Normal,Normal,6,6,7,6,4,94-96 Mph,2,94-96 Mph,3/4,Groundballer,EX GB,1,8,Very Low
+RP,Nestor Duque,BOS,27,R,Normal,Normal,8,4,4,7,4,95-97 Mph,7,95-97 Mph,3/4,Power Pitcher,EX FB,7,3,Low
+RP,Tien-kai Ec,ME,26,R,Low,Normal,8,4,3,6,4,96-98 Mph,6,96-98 Mph,3/4,Power Pitcher,FB,3,5,Very Low
+RP,Santiago Escobar,BUF,24,R,Low,Normal,8,4,4,6,3,95-97 Mph,7,95-97 Mph,3/4,Power Pitcher,GB,10,6,Low
+RP,Fabian Estrada,TOR,30,R,Normal,Normal,5,4,4,6,5,94-96 Mph,2,94-96 Mph,OTT,Normal,NEU,5,6,Very Low
+RP,Bruce Feyereisen,SF,25,L,High,Normal,9,6,6,7,7,91-93 Mph,4,91-93 Mph,3/4,Normal,FB,9,5,Medium
+RP,Ruben Filpo,VAN,26,R,Normal,Normal,4,5,5,6,6,91-93 Mph,2,91-93 Mph,3/4,Groundballer,GB,8,4,Very Low
+RP,Mike Flores,KC,26,R,Normal,Normal,5,4,4,6,4,96-98 Mph,6,96-98 Mph,3/4,Power Pitcher,NEU,9,3,Very Low
+RP,Ben Ford,ANA,28,L,Normal,Normal,4,5,4,6,7,94-96 Mph,6,94-96 Mph,3/4,Normal,EX FB,9,1,Low
+RP,Lou Foster,WAS,27,R,High,Normal,10,3,3,7,4,94-96 Mph,4,94-96 Mph,3/4,Normal,EX FB,3,3,Medium
+RP,Victor Franco,BAL,25,R,Normal,Normal,5,5,5,6,6,96-98 Mph,7,96-98 Mph,3/4,Power Pitcher,FB,8,6,Very Low
+RP,John Frye,PHI,27,L,Normal,Normal,5,4,3,5,5,94-96 Mph,9,94-96 Mph,OTT,Normal,FB,9,5,Low
+RP,Akira Fukumoto,MIA,24,R,Low,Low,10,5,5,6,5,97-99 Mph,2,97-99 Mph,3/4,Power Pitcher,NEU,3,4,Medium
+RP,Jorge Gamez,BRK,25,L,Normal,Normal,10,5,4,6,3,96-98 Mph,2,96-98 Mph,3/4,Power Pitcher,FB,8,5,Medium
+RP,Al Garay,NYT,35,R,Normal,Normal,6,4,4,5,5,94-96 Mph,7,94-96 Mph,3/4,Groundballer,GB,5,4,Very Low
+RP,Russ Gillespie,HOU,26,L,High,Normal,8,4,4,6,4,94-96 Mph,7,94-96 Mph,OTT,Normal,NEU,9,4,Very Low
+RP,Cody Goings,LA,24,R,Low,Normal,8,5,5,6,6,99-101 Mph,2,99-101 Mph,3/4,Power Pitcher,FB,3,5,Very Low
+RP,Tse-peng Gong,SEA,25,R,High,Normal,7,4,3,6,4,94-96 Mph,6,94-96 Mph,3/4,Normal,FB,6,6,Low
+RP,Francisco Gonzales,PHX,21,R,High,Normal,9,5,6,4,5,96-98 Mph,3,96-98 Mph,OTT,Power Pitcher,NEU,8,5,Extreme
+RP,Ivan Gonzalez,MIN,29,R,Normal,Normal,6,4,4,5,5,94-96 Mph,7,94-96 Mph,3/4,Normal,NEU,8,4,Very Low
+RP,Ruben Gonzalez,LA,24,L,High,Normal,10,4,3,6,3,95-97 Mph,10,95-97 Mph,3/4,Power Pitcher,FB,8,3,Medium
+RP,Zounes Habyarimana,OXN,23,R,Normal,Normal,8,5,4,6,4,96-98 Mph,1,96-98 Mph,OTT,Power Pitcher,GB,8,1,Medium
+RP,Miko Hakala,BOS,23,R,Normal,High,9,7,8,6,6,96-98 Mph,2,96-98 Mph,3/4,Power Pitcher,GB,9,7,Low
+RP,Norihiro Hamamoto,BOS,28,R,Normal,Normal,10,5,4,7,4,95-97 Mph,1,95-97 Mph,3/4,Power Pitcher,NEU,9,6,Low
+RP,Alan Hand,-,28,L,High,Normal,7,4,4,6,2,93-95 Mph,1,93-95 Mph,OTT,Normal,EX FB,9,4,Very Low
+RP,Hawk Hartshorn,MTL,30,R,Normal,Normal,5,7,7,6,3,94-96 Mph,2,94-96 Mph,OTT,Groundballer,GB,7,7,Very Low
+RP,J.D. Haynes,YK,31,R,Normal,High,8,5,4,6,4,94-96 Mph,7,94-96 Mph,3/4,Normal,NEU,7,3,Very Low
+RP,Raudel Hernandez,STL,27,R,Normal,Normal,8,5,5,6,5,94-96 Mph,1,94-96 Mph,3/4,Normal,NEU,7,4,Very Low
+RP,Chris Hoglund,ME,25,R,Normal,Normal,4,3,3,6,8,94-96 Mph,6,94-96 Mph,3/4,Normal,FB,10,4,Low
+RP,Marc Hoyles,HAV,23,R,Normal,Normal,10,6,6,6,6,96-98 Mph,1,97-99 Mph,SIDE,Normal,NEU,5,3,High
+RP,Jimmy Hsia,SEA,41,R,Low,Low,6,7,6,8,9,92-94 Mph,1,92-94 Mph,3/4,Groundballer,GB,2,1,Very Low
+RP,Ian Huycke,WAS,26,R,High,Normal,7,4,3,6,6,94-96 Mph,7,94-96 Mph,3/4,Normal,EX FB,8,3,Low
+RP,Atsuya Ishii,CIN,24,R,Normal,Normal,6,5,5,5,5,94-96 Mph,8,94-96 Mph,3/4,Normal,NEU,2,2,Low
+RP,Bobby Jaramillo,SAN,33,R,Normal,Normal,5,7,7,5,4,92-94 Mph,2,92-94 Mph,OTT,Groundballer,EX GB,8,6,Very Low
+RP,Bobby Jess,MTL,24,R,Normal,High,5,6,7,5,4,93-95 Mph,3,93-95 Mph,OTT,Normal,NEU,2,5,Medium
+RP,Yukichi Jimbo,JC,26,L,Normal,High,5,4,3,5,4,95-97 Mph,6,95-97 Mph,3/4,Power Pitcher,GB,10,5,Low
+RP,Chris Jimenez,BRK,28,L,Normal,Normal,9,5,5,7,3,95-97 Mph,3,95-97 Mph,3/4,Power Pitcher,EX FB,8,5,Very Low
+RP,Hyun-koo Ka,SEA,26,R,Low,Normal,3,6,6,6,4,92-94 Mph,9,92-94 Mph,3/4,Groundballer,GB,7,4,Very Low
+RP,Rikio Kaneko,SD,25,R,Normal,Normal,10,8,9,8,7,95-97 Mph,2,95-97 Mph,SIDE,Power Pitcher,NEU,6,6,Very High
+RP,Kiyohiro Kaneshiro,SEA,26,L,Normal,Normal,8,4,4,5,4,95-97 Mph,6,95-97 Mph,OTT,Power Pitcher,GB,8,4,Low
+RP,Arif Kartini,CIN,24,L,Normal,Normal,8,7,8,6,3,94-96 Mph,6,94-96 Mph,OTT,Normal,NEU,10,4,Low
+RP,Stephen Keane,NYT,24,L,High,Normal,10,4,4,5,4,97-99 Mph,1,97-99 Mph,SIDE,Power Pitcher,FB,7,4,Medium
+RP,Chase Kessler,LA,27,R,Normal,Normal,10,5,5,7,4,95-97 Mph,1,95-97 Mph,3/4,Power Pitcher,NEU,8,4,Low
+RP,Xiang-ling Khoo,YK,26,R,Normal,Normal,7,6,6,6,4,94-96 Mph,3,94-96 Mph,SIDE,Normal,NEU,10,4,Low
+RP,Lyndon Kidd,SA,26,R,Normal,Normal,6,4,4,6,6,96-98 Mph,7,96-98 Mph,3/4,Power Pitcher,EX FB,5,4,Very Low
+RP,Seung-woo Kim,JC,27,L,Normal,Normal,6,4,4,6,3,95-97 Mph,4,95-97 Mph,3/4,Power Pitcher,NEU,7,5,Low
+RP,Chris Kingsbeer,TUC,23,L,Normal,Normal,7,9,10,7,5,91-93 Mph,3,91-93 Mph,3/4,Normal,NEU,9,5,Medium
+RP,David Klontz,BUF,29,L,Normal,Normal,9,5,5,6,2,94-96 Mph,4,94-96 Mph,3/4,Groundballer,GB,7,4,Low
+RP,Matt Kloser,-,27,L,High,Low,5,5,5,5,3,91-93 Mph,2,91-93 Mph,OTT,Normal,NEU,10,3,Low
+RP,Sumiki Kono,PHX,29,R,Normal,Normal,8,7,7,6,2,96-98 Mph,2,96-98 Mph,3/4,Power Pitcher,NEU,7,3,Low
+RP,Mike Kostin,SD,25,L,Normal,Normal,2,8,8,7,3,95-97 Mph,7,95-97 Mph,3/4,Power Pitcher,NEU,7,2,Very Low
+RP,Touta Kubo,LA,33,R,Normal,Normal,8,5,4,6,3,91-93 Mph,2,91-93 Mph,OTT,Groundballer,GB,4,3,Very Low
+RP,Gaige Kunkle,MTL,25,R,High,Normal,8,5,5,6,4,96-98 Mph,2,97-99 Mph,OTT,Power Pitcher,NEU,7,4,Medium
+RP,Tae-cho Kwack,MTL,27,R,Normal,Normal,7,4,4,6,3,95-97 Mph,7,95-97 Mph,3/4,Power Pitcher,FB,7,3,Low
+RP,Lan-fang Lai,SEA,29,R,High,High,4,5,5,6,4,95-97 Mph,7,95-97 Mph,3/4,Power Pitcher,FB,3,4,Very Low
+RP,Ryan Lane,MTL,23,L,Normal,Low,5,4,4,5,5,97-99 Mph,3,97-99 Mph,SIDE,Power Pitcher,FB,10,1,Low
+RP,Jeremy Lanham,DEN,34,R,Normal,Normal,4,7,8,6,4,91-93 Mph,1,91-93 Mph,3/4,Groundballer,GB,1,4,Very Low
+RP,Zhi-jan Law,PHX,24,R,Normal,High,7,6,7,5,6,90-92 Mph,2,90-92 Mph,3/4,Normal,NEU,5,6,Low
+RP,Bill Lawson,CAL,32,R,High,Normal,5,5,5,5,3,92-94 Mph,2,92-94 Mph,3/4,Groundballer,EX GB,5,4,Very Low
+RP,Justin Lea,SD,24,L,Low,Low,6,7,7,7,5,96-98 Mph,2,96-98 Mph,3/4,Power Pitcher,GB,9,4,Very Low
+RP,Raiko Leon,LA,27,R,Normal,High,10,5,5,6,3,97-99 Mph,2,97-99 Mph,3/4,Power Pitcher,NEU,6,4,Very Low
+RP,Fei-hsien Li,CHI,25,L,High,Normal,5,4,4,5,5,93-95 Mph,7,93-95 Mph,3/4,Normal,NEU,8,6,Very Low
+RP,Ronny Liebermeister,SD,24,R,Normal,Normal,6,8,8,6,5,95-97 Mph,3,95-97 Mph,SIDE,Power Pitcher,FB,10,3,High
+RP,Xiong Loh,SEA,29,R,High,Normal,6,5,5,5,4,94-96 Mph,8,94-96 Mph,3/4,Groundballer,EX GB,8,6,Very Low
+RP,Jesus Loyola,FRE,26,R,High,Normal,3,5,5,5,6,92-94 Mph,1,92-94 Mph,3/4,Groundballer,GB,4,6,Very Low
+RP,Raul Madera,HOU,28,R,Low,Normal,10,5,4,7,3,96-98 Mph,7,96-98 Mph,3/4,Power Pitcher,NEU,8,5,Medium
+RP,Edwin Maes,SB,26,L,Normal,Normal,10,7,7,6,1,94-96 Mph,1,94-96 Mph,3/4,Normal,NEU,8,4,High
+RP,Tso-i Mak,CHI,33,R,Low,Normal,7,6,6,7,4,91-93 Mph,1,91-93 Mph,SIDE,Groundballer,EX GB,9,1,Very Low
+RP,Danny Mathews,YK,33,R,Normal,Normal,5,5,5,6,5,93-95 Mph,6,93-95 Mph,3/4,Normal,NEU,7,6,Very Low
+RP,Chris Mayea,SF,24,R,Normal,Normal,8,8,9,6,6,92-94 Mph,2,92-94 Mph,3/4,Groundballer,GB,6,6,Medium
+RP,Chris McHargue,WAS,21,L,High,Low,10,6,7,4,4,92-94 Mph,9,93-95 Mph,3/4,Groundballer,GB,8,6,Extreme
+RP,Mark Mehringer,BOS,24,L,Normal,Normal,10,6,6,6,6,97-99 Mph,2,97-99 Mph,3/4,Groundballer,GB,10,7,Medium
+RP,Sal Mejia,SF,25,R,High,Normal,8,4,4,6,5,94-96 Mph,6,94-96 Mph,3/4,Normal,NEU,6,4,Very Low
+RP,Mark Melnyk,SAN,23,L,High,High,5,6,6,4,8,92-94 Mph,2,92-94 Mph,3/4,Normal,NEU,7,5,Extreme
+RP,Ryan Mena,POR,29,L,Normal,Normal,4,6,7,6,4,91-93 Mph,8,91-93 Mph,3/4,Groundballer,GB,10,3,Low
+RP,Alex Mendez,BOS,26,L,Normal,High,8,5,5,6,3,95-97 Mph,6,95-97 Mph,3/4,Power Pitcher,FB,10,1,Very Low
+RP,Juan Mendoza,HB,25,L,Normal,Normal,7,4,3,6,5,92-94 Mph,8,92-94 Mph,OTT,Normal,NEU,6,4,Low
+RP,Macario Mendoza,CIN,29,R,Low,Normal,6,5,5,6,4,94-96 Mph,6,94-96 Mph,3/4,Normal,NEU,9,5,Low
+RP,Andy Miao,TUC,33,R,High,Normal,5,5,4,6,7,94-96 Mph,6,94-96 Mph,OTT,Normal,FB,9,5,Very Low
+RP,Justin Miller,DEN,25,L,Normal,Normal,9,5,5,6,4,96-98 Mph,6,96-98 Mph,3/4,Power Pitcher,NEU,9,3,Medium
+RP,Adam Mimnaugh,CHI,34,L,Normal,Normal,7,8,8,8,7,94-96 Mph,1,94-96 Mph,OTT,Normal,NEU,8,7,Very Low
+RP,Ricky Minjarez,BR,43,L,Low,Low,4,5,5,6,9,91-93 Mph,2,91-93 Mph,3/4,Finesse Pitcher,NEU,10,1,Very Low
+RP,Danny Monroy,POR,25,R,Normal,Low,9,4,3,6,5,96-98 Mph,6,96-98 Mph,3/4,Power Pitcher,NEU,9,4,Low
+RP,David Morales,HAV,27,R,Low,Normal,6,4,3,6,4,95-97 Mph,3,95-97 Mph,OTT,Power Pitcher,FB,7,4,Low
+RP,Ko Morita,PHX,27,L,Normal,Normal,8,4,3,6,4,94-96 Mph,6,94-96 Mph,3/4,Normal,EX FB,8,6,Low
+RP,Midori Murakami,SEA,25,L,Normal,Low,8,5,6,5,6,91-93 Mph,3,91-93 Mph,SIDE,Normal,NEU,7,7,Low
+RP,Albin Muscetta,TOR,28,L,Normal,Normal,9,5,4,6,4,96-98 Mph,8,96-98 Mph,OTT,Power Pitcher,NEU,10,3,Medium
+RP,Katsuo Nozawa,MIN,25,R,Normal,Normal,8,5,5,6,5,95-97 Mph,6,95-97 Mph,3/4,Power Pitcher,NEU,8,5,Low
+RP,Olympio Odescalchi,BRK,26,R,High,Low,9,5,5,6,3,94-96 Mph,6,94-96 Mph,SIDE,Normal,NEU,3,4,Low
+RP,Kazushige Ogino,SAN,23,R,Normal,Normal,10,6,6,6,6,96-98 Mph,3,97-99 Mph,3/4,Power Pitcher,EX FB,3,4,Low
+RP,Kazuhisa Okabe,POR,23,L,Normal,Normal,5,6,6,6,4,91-93 Mph,4,91-93 Mph,3/4,Groundballer,GB,6,7,Low
+RP,Julio Olivo,VAN,42,L,Normal,High,4,5,5,6,5,91-93 Mph,6,91-93 Mph,3/4,Finesse Pitcher,NEU,10,1,Very Low
+RP,Raul Ontiveros,PHI,28,L,Normal,Normal,7,4,3,5,3,94-96 Mph,6,94-96 Mph,3/4,Normal,NEU,10,1,Low
+RP,Francis Ortega,CIN,24,L,Normal,Normal,8,4,4,6,4,97-99 Mph,2,97-99 Mph,3/4,Power Pitcher,NEU,8,4,Low
+RP,Orosmani Ottamendi,JOL,26,L,Normal,High,6,4,3,6,3,94-96 Mph,7,94-96 Mph,3/4,Normal,EX FB,6,5,Low
+RP,Yue-jiu Pai,LA,30,R,Normal,High,5,5,5,6,2,90-92 Mph,1,90-92 Mph,3/4,Normal,NEU,5,7,Very Low
+RP,Carlos Palafox,NYT,28,L,Normal,Normal,9,5,5,7,3,93-95 Mph,6,93-95 Mph,3/4,Groundballer,GB,9,7,Low
+RP,Phil Palgani,STL,27,R,Normal,Low,9,4,4,7,8,94-96 Mph,3,94-96 Mph,3/4,Normal,NEU,7,5,Low
+RP,Tom Parmenter,TOR,31,R,Normal,Normal,5,4,4,5,5,93-95 Mph,8,93-95 Mph,OTT,Normal,NEU,4,1,Very Low
+RP,Bradley Parsons,CIN,25,R,Low,Normal,8,4,4,6,2,94-96 Mph,7,94-96 Mph,3/4,Normal,NEU,1,4,Low
+RP,Jesus Pedroso,AKR,23,R,High,Normal,7,7,7,6,7,94-96 Mph,2,94-96 Mph,3/4,Normal,NEU,7,4,Medium
+RP,Vito Pels,YK,27,L,Normal,Normal,5,4,4,6,5,92-94 Mph,6,92-94 Mph,OTT,Normal,NEU,10,1,Very Low
+RP,Jason Petruska,LV,31,R,High,Normal,7,7,7,6,4,95-97 Mph,1,95-97 Mph,3/4,Power Pitcher,NEU,2,1,Very Low
+RP,Dudley Pick,BAL,26,R,Normal,Normal,5,4,4,6,3,94-96 Mph,7,94-96 Mph,3/4,Normal,FB,4,1,Very Low
+RP,Salvatore Pino,SF,26,R,Normal,Normal,8,5,4,6,5,96-98 Mph,8,96-98 Mph,3/4,Power Pitcher,NEU,6,4,Very Low
+RP,Cruz Ponce,LV,31,R,Normal,Normal,7,8,8,8,9,94-96 Mph,2,94-96 Mph,OTT,Groundballer,GB,5,7,Very Low
+RP,Mauricio Ponce,DEN,26,R,Normal,Normal,7,4,4,6,4,95-97 Mph,8,95-97 Mph,3/4,Power Pitcher,NEU,9,5,Very Low
+RP,Pierre Prent,NYT,32,L,High,Normal,8,3,3,7,5,90-92 Mph,2,90-92 Mph,3/4,Normal,FB,10,5,Very Low
+RP,Raudelin Proenza,ME,29,L,Normal,High,8,4,3,6,4,93-95 Mph,4,93-95 Mph,OTT,Normal,NEU,2,5,Low
+RP,Aaron Ranks,SAN,26,L,High,High,8,6,6,6,3,91-93 Mph,5,91-93 Mph,3/4,Normal,NEU,6,3,Medium
+RP,Shane Reid,HOU,28,R,Normal,High,7,5,5,6,2,94-96 Mph,4,94-96 Mph,OTT,Normal,FB,2,4,Low
+RP,Danny Reyes,PHX,27,R,High,Normal,4,4,3,6,7,96-98 Mph,6,96-98 Mph,3/4,Power Pitcher,NEU,3,6,Very Low
+RP,Dainier Rivalta,TOR,25,R,Normal,Normal,8,6,7,6,5,95-97 Mph,2,95-97 Mph,3/4,Power Pitcher,NEU,8,3,Low
+RP,Ivan Rivas,SAN,26,R,Normal,Low,5,5,5,6,9,91-93 Mph,1,91-93 Mph,3/4,Normal,NEU,5,6,Low
+RP,Ricardo Riveron,LV,30,L,High,Normal,7,6,6,6,6,94-96 Mph,2,94-96 Mph,SIDE,Groundballer,EX GB,10,5,Very Low
+RP,Victor Romero,HOU,26,L,High,Normal,6,4,3,6,5,95-97 Mph,9,95-97 Mph,3/4,Power Pitcher,NEU,10,3,Low
+RP,Earl Roop,MIA,23,L,Normal,Normal,7,5,5,5,5,96-98 Mph,2,97-99 Mph,SIDE,Normal,NEU,8,4,Low
+RP,Robert Rosas,MIA,23,L,Low,Normal,10,5,4,6,7,94-96 Mph,2,94-96 Mph,3/4,Normal,NEU,6,4,High
+RP,Hector Roybal,STL,27,L,Low,Normal,7,4,4,5,4,95-97 Mph,6,95-97 Mph,3/4,Power Pitcher,NEU,6,4,Low
+RP,Derich Rucker,MTL,23,R,Normal,Normal,9,5,6,4,4,96-98 Mph,3,97-99 Mph,3/4,Power Pitcher,EX FB,3,5,Medium
+RP,Chris Sacks,CIN,23,L,Normal,Normal,3,4,4,5,9,93-95 Mph,8,93-95 Mph,3/4,Normal,FB,8,3,Very Low
+RP,Greg Sams,TUC,27,R,Normal,High,8,4,3,6,4,95-97 Mph,4,95-97 Mph,3/4,Power Pitcher,NEU,10,5,Low
+RP,Lupe Sandoval,BUF,27,R,High,Normal,9,9,10,7,7,93-95 Mph,1,93-95 Mph,3/4,Groundballer,EX GB,2,4,Low
+RP,Willie Santiago,MIA,23,R,Normal,High,8,6,6,6,5,94-96 Mph,2,95-97 Mph,OTT,Groundballer,GB,7,5,Medium
+RP,Ricky Sauri,SF,27,L,Normal,Normal,9,7,7,7,2,94-96 Mph,8,94-96 Mph,OTT,Groundballer,GB,7,7,Medium
+RP,Jimmy Scott,HAV,27,L,Normal,Normal,6,4,3,6,6,94-96 Mph,3,94-96 Mph,3/4,Normal,EX FB,10,5,Very Low
+RP,Shane Shackelford,DEN,26,L,Low,Low,7,7,7,7,3,95-97 Mph,6,95-97 Mph,3/4,Power Pitcher,NEU,10,1,Low
+RP,Alejandro Silva,NYT,28,R,High,Normal,9,4,3,7,5,94-96 Mph,3,94-96 Mph,3/4,Normal,EX FB,7,8,Very Low
+RP,Avery Slade,HAV,26,L,Normal,Normal,10,5,4,8,8,96-98 Mph,1,96-98 Mph,3/4,Power Pitcher,FB,10,4,Very Low
+RP,Angelo Somoza,BRK,27,R,High,High,5,4,4,6,4,94-96 Mph,7,94-96 Mph,OTT,Normal,NEU,4,1,Low
+RP,Cody Sosnowski,TUC,29,R,Low,Low,9,5,5,6,6,93-95 Mph,4,93-95 Mph,3/4,Normal,FB,7,6,Low
+RP,Chris Sposato,SP,28,R,Low,Normal,4,5,5,5,4,94-96 Mph,7,94-96 Mph,3/4,Groundballer,EX GB,8,6,Very Low
+RP,Satoru Sugimoto,SAN,27,R,Low,Normal,7,5,4,6,5,95-97 Mph,9,95-97 Mph,OTT,Power Pitcher,NEU,6,4,Low
+RP,Wan-fu Sun,PHI,24,R,Normal,High,6,2,1,5,2,95-97 Mph,6,95-97 Mph,OTT,Power Pitcher,EX FB,4,6,Low
+RP,Baden Tamblyn,BRK,25,R,Low,Normal,10,7,7,7,2,97-99 Mph,3,97-99 Mph,3/4,Power Pitcher,NEU,2,5,Very Low
+RP,Earl Tessier,SF,27,L,Normal,Normal,10,5,5,6,3,94-96 Mph,4,94-96 Mph,OTT,Normal,NEU,10,5,Low
+RP,Luke Torres,POR,26,R,Normal,High,9,5,4,7,4,94-96 Mph,6,95-97 Mph,3/4,Normal,EX FB,6,4,Medium
+RP,Frank Ulloa,BOS,25,L,High,Low,10,5,4,6,5,95-97 Mph,8,95-97 Mph,3/4,Power Pitcher,NEU,6,3,Medium
+RP,Vinny Valdez,MTL,26,R,High,Normal,8,4,4,6,3,96-98 Mph,8,96-98 Mph,3/4,Power Pitcher,EX FB,8,4,Low
+RP,Raul Valido,DEN,22,R,High,Normal,8,6,6,6,4,97-99 Mph,4,97-99 Mph,3/4,Power Pitcher,NEU,4,5,Medium
+RP,Etienne van Dijk,AKR,25,R,Normal,Normal,7,4,4,6,1,95-97 Mph,7,95-97 Mph,3/4,Power Pitcher,NEU,5,5,Very Low
+RP,Edwin Vazquez,CIN,26,R,Normal,High,6,6,5,6,6,94-96 Mph,4,94-96 Mph,OTT,Normal,NEU,7,3,Low
+RP,Alex Villalobos,VAN,33,R,Normal,Normal,4,5,5,6,7,93-95 Mph,2,93-95 Mph,3/4,Normal,NEU,6,3,Very Low
+RP,Jim Wahl,MIA,23,L,Normal,High,8,5,5,5,6,96-98 Mph,3,97-99 Mph,3/4,Power Pitcher,NEU,10,6,Medium
+RP,She Wang,BUF,24,L,Normal,Normal,8,6,6,5,4,96-98 Mph,5,97-99 Mph,3/4,Groundballer,GB,10,6,Medium
+RP,Terry Waters,ROC,29,R,Normal,High,5,4,4,5,5,93-95 Mph,7,93-95 Mph,3/4,Normal,NEU,6,3,Low
+RP,Jimmy Witmer,POR,29,R,Normal,Normal,5,4,3,6,4,93-95 Mph,7,93-95 Mph,OTT,Normal,FB,6,10,Very Low
+RP,Lewis Wyman,SB,27,R,Normal,Normal,10,5,5,7,3,95-97 Mph,7,95-97 Mph,OTT,Power Pitcher,NEU,9,4,Medium
+RP,Nate Yakovlev,BRK,25,L,Normal,Normal,10,4,4,6,5,95-97 Mph,4,95-97 Mph,3/4,Power Pitcher,NEU,10,3,Very High
+RP,Hsui-chen Yang,CAL,23,R,Normal,Normal,2,6,6,6,4,96-98 Mph,6,96-98 Mph,3/4,Power Pitcher,NEU,3,5,Very Low
+RP,Alcides Zaldivar,BUF,28,R,Normal,Normal,6,5,5,6,5,94-96 Mph,4,94-96 Mph,3/4,Groundballer,GB,5,5,Low
+RP,Martin Zambello,BOS,27,R,Normal,Normal,7,6,6,7,5,95-97 Mph,3,95-97 Mph,OTT,Power Pitcher,NEU,8,5,Low
+RP,Bill Zamora,YK,27,R,Normal,Normal,6,6,6,6,6,94-96 Mph,8,94-96 Mph,3/4,Normal,FB,4,3,Low
+RP,Angelo Zelada,MIN,28,R,High,High,9,5,4,6,5,100+ Mph,1,100+ Mph,OTT,Power Pitcher,GB,9,3,Low
+RP,Jordan Zuniga,MIN,25,R,Normal,Normal,10,7,7,6,6,93-95 Mph,2,93-95 Mph,SIDE,Groundballer,EX GB,6,2,Medium
+CL,Kyle Burch,BRK,26,R,High,Normal,10,4,4,6,6,97-99 Mph,2,97-99 Mph,3/4,Power Pitcher,EX FB,9,1,Medium
+CL,Phillip Dalley,SAN,25,R,Normal,Normal,10,8,8,7,7,96-98 Mph,3,96-98 Mph,3/4,Power Pitcher,NEU,6,7,Low
+CL,Yoichibei Inouye,SEA,24,R,Normal,Low,10,4,4,6,5,95-97 Mph,3,96-98 Mph,SIDE,Power Pitcher,EX FB,9,1,Medium
+CL,Zee-loo Kim,MIN,27,R,Normal,Normal,10,9,9,7,4,97-99 Mph,2,97-99 Mph,3/4,Power Pitcher,GB,4,7,Very Low
+CL,Ocean Mendoza,WAS,31,R,Normal,Normal,10,7,6,8,7,93-95 Mph,1,93-95 Mph,OTT,Normal,EX FB,4,1,Very Low
+CL,Fumihiro Mochizuki,QUA,26,R,Low,Normal,8,3,3,6,3,94-96 Mph,6,94-96 Mph,OTT,Normal,FB,8,2,Very Low
+CL,Armando Montoya,ME,27,L,Normal,Normal,10,4,4,7,5,95-97 Mph,3,95-97 Mph,3/4,Power Pitcher,EX FB,8,2,Medium
+CL,Ignacio Noriega,TOR,36,R,Low,High,4,7,7,7,6,93-95 Mph,7,93-95 Mph,3/4,Groundballer,EX GB,3,9,Very Low
+CL,Arturo Panameno,BAL,25,L,Normal,High,7,5,5,6,6,94-96 Mph,4,94-96 Mph,3/4,Normal,NEU,10,4,Very Low
+CL,Josh Trejo,BUF,28,L,High,Normal,8,4,4,7,9,96-98 Mph,3,96-98 Mph,OTT,Power Pitcher,GB,8,5,Very Low
+C,Lyalya Markosiants,SF,32,R,High,High,5,6,6,5,5,92-94 Mph,8,92-94 Mph,OTT,Groundballer,EX GB,9,8,Very Low
+2B,Elvin Perfecto,CIN,24,R,Normal,Normal,5,4,4,5,3,94-96 Mph,7,94-96 Mph,OTT,Groundballer,GB,5,9,Low
+LF,Trevor Augustine,KC,26,R,High,Normal,5,4,4,6,7,91-93 Mph,10,91-93 Mph,3/4,Normal,FB,8,6,Very Low
+LF,Kuan Wang,BAL,27,R,Low,High,5,4,3,6,3,93-95 Mph,9,93-95 Mph,3/4,Normal,FB,10,5,Very Low
+RF,Xavier Santa,PHI,23,R,Normal,High,5,4,4,6,4,92-94 Mph,8,92-94 Mph,OTT,Normal,NEU,3,6,Low

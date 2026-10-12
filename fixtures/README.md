@@ -1,10 +1,11 @@
 # Fixtures
 
-Real Out of the Park Baseball exports for the Seattle Arrows of the RSL, from three points in one season:
+Real Out of the Park Baseball exports for the Seattle Arrows of the RSL, from four points in one season:
 
 - `seattle-g42/`, the Game 42 save: the most games any hitter has played is 42, and the team's record is 25–19.
 - `seattle-g53/`, the Game 53 save.
 - `seattle-g70/`, the fielding view at about game 70.
+- `seattle-g71/`, the owner's current custom views for the team and the whole league at Game 71.
 
 They are the golden test data for the importer and the models. Every file is stored byte for byte as exported (`.gitattributes` keeps their CRLF line endings), so never edit one by hand. Keep the file names: the importer records the name for provenance. They are the names OOTP gave each export, with two exceptions:
 
@@ -124,6 +125,56 @@ The importer rejects both today as `both-sides`: the fielding components read as
 - Every row of `rsl-team-fielding.csv` matches the owner's first export of the view, without TM, on every shared column.
 - At the played position, the position-potential column equals DEF Pot for all 490 fielders with one.
 - The position potentials fit the fielding components with R² .91 at first base (with height) and .94 to .97 elsewhere (Knowledge Base › Defensive model).
+
+## seattle-g71/
+
+One snapshot: the owner's eight current custom views, each exported for the team and for the whole league, 16 files. The most games any team hitter has played is 71. Every file uses CRLF on every line, with no byte-order mark and no quotes. Every view carries TM as the team's short code (SEA). The league files list every player, not qualified ones only.
+
+### Team files (`seattle_arrows_lineups_-_overview_…`)
+
+| View | Side | Rows × columns | Carries |
+| --- | --- | --- | --- |
+| `batting_stats_c` | Hitters | 12 × 48 | Game 53's custom batting stats with TM. Its G dates the snapshot |
+| `batting_superstats_c` | Hitters | 12 × 56 | Game 53's custom batting superstats with TM |
+| `custom_bat_pot` | Hitters | 12 × 34 | The batting potentials, fielding components, DEF and Risk, now with TM |
+| `fielding_stats_cus` | Hitters | 12 × 43 | The Game 70 view's fielding stats, with HT, B, T and TP (triple plays). Its ratings are in `fielding_ratings_cus`, and the position potentials (P Pot to RF Pot) in neither |
+| `fielding_ratings_cus` | Hitters | 12 × 18 | New: Age, T, the ten fielding components, DEF, DEF Pot and SctAcc. No per-position ratings (P Pot to RF Pot) |
+| `cus_pitch_pot` | Pitchers | 13 × 21 | The pitching ratings, now with TM |
+| `pitching_stats_c` | Pitchers | 13 × 67 | Game 53's custom pitching stats with TM and without `#`, plus PI, GB and FB (ground-ball and fly-ball counts), GO%, SB and CS |
+| `pitching_superstats_c` | Pitchers | 13 × 45 | Game 53's custom pitching superstats with TM, BAR and HHi, and without PI, SW, WH and OSW |
+
+POS in the team files is the roster listing: Shinn LF and Geng 2B. The two fielding files list the 12 hitters only.
+
+### League files (`rsl_statistics_player_statistics_-_sortable_stats_…`)
+
+| View | Rows × columns | Notes |
+| --- | --- | --- |
+| `batting_stats_c` | 517 × 48 | Every hitter, 57 TM codes. 10 have no plate appearances: PA 0, G blank (one G 1), and all zeros in the superstats |
+| `batting_superstats_c` | 517 × 56 | The same hitters |
+| `custom_bat_pot` | 517 × 34 | The same hitters |
+| `fielding_stats_cus` | 987 × 43 | Every player with fielding time: 511 hitters (12 of them DH only) and 476 pitchers, by POS. 59 TM codes and `-` |
+| `fielding_ratings_cus` | 987 × 18 | The same players |
+| `cus_pitch_pot` | 481 × 21 | Every pitcher listed, the 5 position players who pitched included. Angelo Zelada (MIN) reads `100+ Mph` in VELO and VT |
+| `pitching_stats_c` | 481 × 67 | The same pitchers. 26 have G = 0. 55 TM codes and `-`. GB and FB are counts: Bob Achbar's (TOR) GB 69 and FB 88 give his GO% .44 |
+| `pitching_superstats_c` | 481 × 45 | The same pitchers |
+
+POS in the league files is the position each player plays now (Shinn 1B, Geng CF), the same in the batting and the fielding files. Two pitchers, Alan Hand and Matt Kloser, show TM `-`, no team, in all five pitching and fielding files that list them. Two different pitchers are named Ruben Gonzalez: an SP for MTL and an RP for LA.
+
+### What importer 0.4.0 made of them
+
+- It rejected 8 files as `both-sides`: the six pitching files, where TM (and in the superstats BAR and HHi) read as hitters' markers beside the pitching columns, and both fielding ratings files, where the fielding components and DEF read as hitters' markers and DEF Pot as a pitchers' one. The snapshot had no team pitchers.
+- It listed TP and GB and FB as not read.
+- It raised 20 identity events, all on the 10 league hitters without plate appearances, and one `duplicate-name`, since league pitchers joined on name and Ruben Gonzalez is two pitchers.
+
+Importer 0.5.0 reads all 16 as primary (Knowledge Base › Import contract, and the owner's decisions of 12 October 2026 on VELO `100+ Mph`, TM `-` and the pitcher key).
+
+### Checks already run on seattle-g71/
+
+- The 16 files have the same names and SHA-256 as the owner's exports.
+- Game 71 assembles 12 team hitters and 13 team pitchers, 517 league hitters (team plus name, over the batting views and the fielding rows with a hitter's POS) and 481 league pitchers on team plus name, of which the 26 with G = 0 drop, leaving 455. The two Ruben Gonzalez rows stay two pitchers, and the two pitchers with TM `-` key on `-` plus name.
+- Seattle's 12 batting rows and 13 pitching rows in the league files equal the team files on every column but POS.
+- GO% = GB ÷ (GB + FB) holds within 0.006 on all 453 league pitching rows with GB + FB > 0, and CTC% = 100 − WH% on every pitching row with G > 0. The identities hold on every other row with appearances, with one exception: Ryan Lloyd (BOS) has BIP 219 against BF − K − BB − HBP = 221.
+- Every team hitter has HT (from the fielding stats) and Age (from the fielding ratings); every team pitcher has Age (from `cus_pitch_pot`).
 
 ## legacy/
 

@@ -448,4 +448,137 @@ describe('assembleSnapshot on the Game 70 fielding files (Knowledge Base › Imp
     const together = assembleSnapshot([...G53_TOP.map(routeFixture), ...files], { scale: '1-10' });
     expect(together.gameNumber).toBe(53);
   });
+
+  it('keeps Game 53’s 426 league pitchers when the fielding view comes with it, keyed on name', () => {
+    // Game 53's pitching files carry no TM, so the fielding view's TM doesn't key pitchers on
+    // team plus name (the owner, 12 October 2026). The events are main's, at importer 0.4.0.
+    const together = assembleSnapshot([...G53_TOP.map(routeFixture), ...files], { scale: '1-10' });
+    expect(together.league.pitchers).toHaveLength(426);
+    const merged = together.league.pitchers.filter((row) => 'TC' in row && 'xERA' in row);
+    expect(merged.map(playerKey).sort()).toEqual(
+      [
+        'LA|Kingsley Bozek',
+        'POR|Yahya Kanoro',
+        'MIA|Ed Rice',
+        'LA|Danny Serrano',
+        'LA|Ricky Zika',
+      ].sort(),
+    );
+    const height = 'seattle-height.csv';
+    const ratings = 'seattle_arrows_lineups_-_overview_custom_bat_pot.csv';
+    expect(together.events.map((event) => [event.code, event.scope, event.details])).toEqual([
+      [
+        'value-replaced',
+        'team',
+        {
+          name: 'Yasuhiro Tsumoto',
+          column: 'IF ERR',
+          earlier: 3,
+          later: 2,
+          earlierFile: ratings,
+          laterFile: height,
+        },
+      ],
+      [
+        'value-replaced',
+        'team',
+        {
+          name: 'Hideji Yamanaka',
+          column: 'IF ERR',
+          earlier: 2,
+          later: 1,
+          earlierFile: ratings,
+          laterFile: height,
+        },
+      ],
+      [
+        'value-replaced',
+        'team',
+        {
+          name: 'Tomofumi Kamimura',
+          column: 'IF RNG',
+          earlier: 7,
+          later: 8,
+          earlierFile: ratings,
+          laterFile: height,
+        },
+      ],
+      ['dropped-no-appearances', 'league', { count: 32 }],
+    ]);
+  });
+});
+
+describe('assembleSnapshot on the Game 71 files (task Context)', () => {
+  const G71 = fixtureFiles('seattle-g71/');
+  const files = G71.map(routeFixture);
+  const snapshot = assembleSnapshot(files, { scale: '1-10' });
+
+  it('reads all 16 files as primary into a Game 71 snapshot', () => {
+    expect(G71).toHaveLength(16);
+    expect(snapshot.files.map((file) => file.routing)).toEqual(Array(16).fill('primary'));
+    expect(snapshot.label).toBe('Game 71');
+    expect(snapshot.gameNumber).toBe(71);
+  });
+
+  it('has 12 team hitters and 13 team pitchers, and 517 and 455 in the league', () => {
+    expect(snapshot.hitters).toHaveLength(12);
+    expect(snapshot.pitchers).toHaveLength(13);
+    expect(snapshot.league.hitters).toHaveLength(517);
+    expect(snapshot.league.pitchers).toHaveLength(455);
+  });
+
+  it('gives every team hitter HT and Age, and every team pitcher Age', () => {
+    for (const row of snapshot.hitters) {
+      expect(typeof row.HT, playerKey(row)).toBe('number');
+      expect(typeof row.Age, playerKey(row)).toBe('number');
+      expect(row, playerKey(row)).toHaveProperty('Fielding TP');
+    }
+    for (const row of snapshot.pitchers) {
+      expect(typeof row.Age, playerKey(row)).toBe('number');
+      for (const column of ['IP', 'GB', 'FB', 'xERA', 'BAR', 'HHi', 'STU P']) {
+        expect(row, `${playerKey(row)} ${column}`).toHaveProperty(column);
+      }
+    }
+  });
+
+  it('keeps the two Ruben Gonzalez pitchers in the league as two', () => {
+    expect(
+      snapshot.league.pitchers
+        .filter((row) => row.Name === 'Ruben Gonzalez')
+        .map((row) => row.TM)
+        .sort(),
+    ).toEqual(['LA', 'MTL']);
+  });
+
+  it('finds Seattle’s league rows equal to its team rows, and exactly one identity miss', () => {
+    expect(snapshot.events.map((event) => event.code)).toEqual([
+      'dropped-no-appearances',
+      'identity',
+    ]);
+    expect(snapshot.events).toContainEqual(
+      expect.objectContaining({
+        code: 'identity',
+        scope: 'league',
+        details: expect.objectContaining({
+          name: 'Ryan Lloyd',
+          identity: 'BIP = BF − K − BB − HBP',
+        }) as unknown,
+      }),
+    );
+    for (const side of ['hitters', 'pitchers'] as const) {
+      const seattle = snapshot.league[side].filter((row) => row.TM === 'SEA');
+      expect(seattle.map((row) => row.Name).sort(), side).toEqual(
+        snapshot[side].map((row) => row.Name).sort(),
+      );
+    }
+  });
+
+  it('reads the same tables whatever order the files come in', () => {
+    const other = assembleSnapshot([...files].reverse(), { scale: '1-10' });
+    expect(byPlayer(other.hitters)).toEqual(byPlayer(snapshot.hitters));
+    expect(byPlayer(other.pitchers)).toEqual(byPlayer(snapshot.pitchers));
+    expect(byPlayer(other.league.hitters)).toEqual(byPlayer(snapshot.league.hitters));
+    expect(byPlayer(other.league.pitchers)).toEqual(byPlayer(snapshot.league.pitchers));
+    expect(other.events.map((event) => event.code)).toEqual(['dropped-no-appearances', 'identity']);
+  });
 });

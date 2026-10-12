@@ -138,6 +138,20 @@ const CONTRACT_STATUSES: Record<string, ContractStatus> = {
  */
 export const TEAM_ALIASES: Readonly<Record<string, string>> = { Seattle: 'SEA' };
 
+/**
+ * TM "-" is a value of its own, no team: Game 71's unattached pitchers show it, and they key
+ * on "-" plus name. Source: the owner's decision of 12 October 2026. In every other column
+ * "-" is blank.
+ */
+const NO_TEAM = '-';
+
+/**
+ * OOTP's velocity ranges step by 1 mph and span 2 ("99-101 Mph"); the top one reads
+ * "100+ Mph", taken as the next step: low 100, high 102. Source: the owner's decision of
+ * 12 October 2026.
+ */
+const VELOCITY_SPAN = 2;
+
 const ok = (value: CellValue): CellResult => ({ ok: true, value });
 const fail = (column: string, raw: string): CellResult => ({
   ok: false,
@@ -158,6 +172,9 @@ function toNumber(text: string): number | undefined {
 /** Parses one cell by its column's rule. */
 export function parseCell(column: string, raw: string): CellResult {
   const text = raw.trim();
+  if (column === 'TM' && text === NO_TEAM) {
+    return ok(NO_TEAM);
+  }
   if (DROPPED_COLUMNS.has(column) || text === '' || text === '-') {
     return ok(null);
   }
@@ -207,6 +224,11 @@ export function parseCell(column: string, raw: string): CellResult {
     }
     case 'VELO':
     case 'VT': {
+      const top = /^(\d+)\+\s*Mph$/i.exec(text);
+      if (top) {
+        const low = Number(top[1]);
+        return ok({ low, high: low + VELOCITY_SPAN, mid: low + VELOCITY_SPAN / 2 });
+      }
       const match = /^(\d+)-(\d+)\s*Mph$/i.exec(text);
       if (!match) {
         return fail(column, raw);

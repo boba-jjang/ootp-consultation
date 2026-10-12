@@ -2,7 +2,14 @@ import { readdirSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { importLeague, routeExport, type RoutedExport, type ViewId } from '../index.ts';
+import {
+  importLeague,
+  positionSide,
+  routeExport,
+  type ExportRow,
+  type RoutedExport,
+  type ViewId,
+} from '../index.ts';
 import {
   FIXTURES,
   fixtureFiles,
@@ -280,6 +287,17 @@ describe('importLeague with the fielding view (Knowledge Base › Import contrac
     });
   });
 
+  it('keys its 6 pitchers on name, since no pitching file carries TM, with the same rows', () => {
+    expect(league.pitchers.map(playerKey)).toEqual([
+      'LA|Kingsley Bozek',
+      'POR|Yahya Kanoro',
+      'MIA|Ed Rice',
+      'LA|Danny Serrano',
+      'LA|Ricky Zika',
+      'MIN|Angelo Zelada',
+    ]);
+  });
+
   it('does not take the team file’s TM-less rows into the league tables', () => {
     expect(league.hitters.filter((row) => row.Name === 'Yoshitsugu Ishida')).toHaveLength(1);
   });
@@ -343,5 +361,200 @@ describe('importLeague with the fielding view (Knowledge Base › Import contrac
     expect(result.hitters.filter((row) => row.Name === 'Cy Day')).toEqual([
       expect.objectContaining({ TM: 'SEA', PA: 90, TC: 20 }),
     ]);
+  });
+});
+
+describe('importLeague keys pitchers on team plus name when they carry TM (Knowledge Base › Import contract › Joins and snapshots)', () => {
+  const LEAGUE = 'rsl_statistics_player_statistics_-_sortable_stats_';
+  const pitching = (name: string, text: string) => routeExport(`${LEAGUE}${name}.csv`, text);
+  const keys = (rows: readonly ExportRow[]) => rows.map(playerKey).sort();
+
+  it('keeps two pitchers of one name on two teams as two, with no duplicate flag', () => {
+    const league = importLeague([
+      pitching('a', 'POS,Name,TM,G,IP\r\nSP,Ann Lee,Aces,2,10.0\r\nRP,Ann Lee,Bees,22,30.1'),
+    ]);
+    expect(keys(league.pitchers)).toEqual(['Aces|Ann Lee', 'Bees|Ann Lee']);
+    expect(league.events).toEqual([]);
+  });
+
+  it('merges a pitcher’s files on team plus name', () => {
+    const league = importLeague([
+      pitching('a', 'POS,Name,TM,G,IP\r\nSP,Ann Lee,Aces,2,10.0\r\nRP,Ann Lee,Bees,22,30.1'),
+      pitching('b', 'POS,Name,TM,G,xERA\r\nRP,Ann Lee,Bees,22,3.10\r\nSP,Ann Lee,Aces,2,4.50'),
+    ]);
+    expect(league.pitchers).toEqual([
+      { POS: 'SP', Name: 'Ann Lee', TM: 'Aces', G: 2, IP: 30, xERA: 4.5 },
+      { POS: 'RP', Name: 'Ann Lee', TM: 'Bees', G: 22, IP: 91, xERA: 3.1 },
+    ]);
+  });
+
+  it('gives a TM-less pitching row the team of the one TM-bearing row with its name', () => {
+    const league = importLeague([
+      pitching('a', 'POS,Name,G,xERA\r\nSP,Bo Kim,9,3.50'),
+      pitching('b', 'POS,Name,TM,G,IP\r\nSP,Bo Kim,Aces,9,50.0\r\nRP,Dee Fox,Bees,4,8.0'),
+    ]);
+    expect(keys(league.pitchers)).toEqual(['Aces|Bo Kim', 'Bees|Dee Fox']);
+    expect(league.pitchers.find((row) => row.Name === 'Bo Kim')).toEqual({
+      POS: 'SP',
+      Name: 'Bo Kim',
+      G: 9,
+      xERA: 3.5,
+      TM: 'Aces',
+      IP: 150,
+    });
+    expect(league.events).toEqual([]);
+  });
+
+  it('flags a TM-less pitching row whose name is on two teams, or on none, and leaves it out', () => {
+    const league = importLeague([
+      pitching('a', 'POS,Name,TM,G,IP\r\nSP,Ann Lee,Aces,2,10.0\r\nRP,Ann Lee,Bees,22,30.1'),
+      pitching('b', 'POS,Name,G,xERA\r\nSP,Ann Lee,2,4.50\r\nRP,Cy Day,5,2.00'),
+    ]);
+    expect(keys(league.pitchers)).toEqual(['Aces|Ann Lee', 'Bees|Ann Lee']);
+    expect(league.pitchers.some((row) => 'xERA' in row)).toBe(false);
+    expect(league.events).toEqual([
+      expect.objectContaining({
+        level: 'warning',
+        code: 'ambiguous-team',
+        details: { name: 'Ann Lee', teams: ['Aces', 'Bees'] },
+        file: `${LEAGUE}b.csv`,
+        scope: 'league',
+      }),
+      expect.objectContaining({
+        level: 'warning',
+        code: 'ambiguous-team',
+        details: { name: 'Cy Day', teams: [] },
+      }),
+    ]);
+  });
+
+  it('takes a TM-less pitching row’s team only from non-fielding league files', () => {
+    const fielding = routeExport('f.csv', 'POS,Name,TM,TC\r\nSP,Bo Kim,BOS,3\r\nSS,Cy Day,SEA,20');
+    const league = importLeague([
+      pitching('a', 'POS,Name,G,xERA\r\nSP,Bo Kim,9,3.50'),
+      pitching('b', 'POS,Name,TM,G,IP\r\nSP,Dee Fox,Aces,4,8.0\r\nRP,Eve Ng,Bees,6,9.1'),
+      fielding,
+    ]);
+    expect(keys(league.pitchers)).toEqual(['Aces|Dee Fox', 'BOS|Bo Kim', 'Bees|Eve Ng']);
+    expect(league.pitchers.find((row) => row.Name === 'Bo Kim')).not.toHaveProperty('xERA');
+    expect(league.events).toEqual([
+      expect.objectContaining({ code: 'ambiguous-team', details: { name: 'Bo Kim', teams: [] } }),
+    ]);
+  });
+
+  it('keys pitchers on name when only fielding rows carry TM, as on Game 70 (the owner, 12 October 2026)', () => {
+    const fielding = routeExport('f.csv', 'POS,Name,TM,TC\r\nSP,Bo Kim,BOS,3\r\nSS,Cy Day,SEA,20');
+    const league = importLeague([pitching('a', 'POS,Name,G,xERA\r\nSP,Bo Kim,9,3.50'), fielding]);
+    expect(league.pitchers).toEqual([
+      { POS: 'SP', Name: 'Bo Kim', G: 9, xERA: 3.5, TM: 'BOS', TC: 3 },
+    ]);
+    expect(league.events).toEqual([]);
+    // On name, two pitchers of one name in one fielding file can't be told apart.
+    const twins = routeExport(
+      'f.csv',
+      'POS,Name,TM,TC\r\nSP,Ann Lee,BOS,3\r\nRP,Ann Lee,SEA,2\r\nSS,Cy Day,SEA,20',
+    );
+    expect(importLeague([twins]).events).toEqual([
+      expect.objectContaining({ code: 'duplicate-name', details: { name: 'Ann Lee' } }),
+    ]);
+  });
+
+  it('keys a pitcher whose TM is "-", no team, on "-" plus name, with no flag', () => {
+    const league = importLeague([
+      pitching('a', 'POS,Name,TM,G,IP\r\nRP,Al Hand,-,4,3.1\r\nSP,Bo Kim,Aces,9,50.0'),
+      pitching('b', 'POS,Name,TM,G,xERA\r\nRP,Al Hand,-,4,9.00\r\nSP,Bo Kim,Aces,9,3.50'),
+    ]);
+    expect(keys(league.pitchers)).toEqual(['-|Al Hand', 'Aces|Bo Kim']);
+    expect(league.pitchers.find((row) => row.Name === 'Al Hand')).toMatchObject({
+      IP: 10,
+      xERA: 9,
+    });
+    expect(league.events).toEqual([]);
+  });
+
+  it('still keys pitchers on name when no league pitching row carries TM', () => {
+    const league = importLeague([
+      pitching('a', 'POS,Name,G,IP\r\nSP,Bo Kim,9,50.0'),
+      pitching('b', 'POS,Name,G,xERA\r\nSP,Bo Kim,9,3.50'),
+    ]);
+    expect(league.pitchers).toEqual([{ POS: 'SP', Name: 'Bo Kim', G: 9, IP: 150, xERA: 3.5 }]);
+    expect(league.events).toEqual([]);
+  });
+
+  it('still flags a team-plus-name key listed twice in one file, and leaves it out', () => {
+    const league = importLeague([
+      pitching(
+        'a',
+        'POS,Name,TM,G,IP\r\nSP,Ann Lee,Aces,2,10.0\r\nRP,Ann Lee,Aces,22,30.1\r\nRP,Bo Kim,Bees,4,8.0',
+      ),
+    ]);
+    expect(keys(league.pitchers)).toEqual(['Bees|Bo Kim']);
+    expect(league.events).toEqual([
+      expect.objectContaining({ code: 'duplicate-name', details: { name: 'Ann Lee' } }),
+    ]);
+  });
+});
+
+describe('importLeague on the Game 71 league files (task Context)', () => {
+  const files = fixtureFiles('seattle-g71/').map(routeFixture);
+  const league = importLeague(files);
+
+  it('joins 517 hitters on team plus name, over the batting views and the fielding rows', () => {
+    expect(league.hitters).toHaveLength(517);
+    for (const row of league.hitters) {
+      expect(typeof row.TM, playerKey(row)).toBe('string');
+    }
+    expect(league.hitters.filter((row) => row.TM === 'SEA')).toHaveLength(12);
+  });
+
+  it('joins 481 pitchers on team plus name and drops the 26 with G = 0, leaving 455', () => {
+    expect(league.pitchers).toHaveLength(455);
+    expect(league.pitchers.some((row) => row.G === 0)).toBe(false);
+    expect(league.pitchers.filter((row) => row.TM === 'SEA')).toHaveLength(13);
+    expect(league.events).toEqual([
+      expect.objectContaining({ code: 'dropped-no-appearances', details: { count: 26 } }),
+    ]);
+  });
+
+  it('keys the two pitchers with TM "-" on "-" plus name: Alan Hand and Matt Kloser', () => {
+    expect(
+      league.pitchers
+        .filter((row) => row.TM === '-')
+        .map(playerKey)
+        .sort(),
+    ).toEqual(['-|Alan Hand', '-|Matt Kloser']);
+  });
+
+  it('keeps the two Ruben Gonzalez pitchers apart: an SP for MTL and an RP for LA', () => {
+    const named = league.pitchers.filter((row) => row.Name === 'Ruben Gonzalez');
+    expect(named).toHaveLength(2);
+    expect(named.find((row) => row.TM === 'MTL')).toMatchObject({ POS: 'SP', G: 2, BIP: 32 });
+    expect(named.find((row) => row.TM === 'LA')).toMatchObject({ POS: 'RP', G: 22, BIP: 71 });
+  });
+
+  it('keeps the 5 position players who pitched on the pitchers’ side', () => {
+    const pitched = league.pitchers.filter((row) => positionSide(row.POS) === 'hitters');
+    expect(pitched.map(playerKey).sort()).toEqual(
+      [
+        'SF|Lyalya Markosiants',
+        'CIN|Elvin Perfecto',
+        'KC|Trevor Augustine',
+        'BAL|Kuan Wang',
+        'PHI|Xavier Santa',
+      ].sort(),
+    );
+  });
+
+  it('gives each pitcher the pitching stats, superstats and ratings, and the fielding rows', () => {
+    for (const row of league.pitchers) {
+      for (const column of ['IP', 'xERA', 'STU P', 'DEF Pot', 'Age']) {
+        expect(row, `${playerKey(row)} ${column}`).toHaveProperty(column);
+      }
+      // A position player who pitched has his fielding rows on the hitters' side.
+      if (positionSide(row.POS) === 'pitchers') {
+        expect(row, playerKey(row)).toHaveProperty('Fielding TP');
+        expect(row, playerKey(row)).toHaveProperty('C ABI');
+      }
+    }
   });
 });

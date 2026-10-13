@@ -555,7 +555,11 @@ describe.each(CONTEXT)('battingOrder at $label (task Open questions 4 to 7)', (c
   });
 });
 
-describe('battingOrder’s nine', () => {
+// The batting model and the simulations below take seconds under CI's coverage, past
+// Vitest's 5 s default.
+const SLOW = { timeout: 30_000 };
+
+describe('battingOrder’s nine', SLOW, () => {
   const g71Nine = fullNames(CONTEXT[0]?.nine ?? '');
 
   it('gives the same orders whatever order the nine come in', () => {
@@ -665,7 +669,7 @@ describe('bookOrder (task Open questions 4; Knowledge Base › Heuristic fallbac
   });
 });
 
-describe('optimizeOrder’s gain rule on hand-built nines (task Open questions 6)', () => {
+describe('optimizeOrder’s gain rule on hand-built nines (task Open questions 6)', SLOW, () => {
   // The Book leads off with the best hitter by OBP and buries the two walkers; the search bats
   // them first and second, 36.7 runs a season better at 152 games.
   const NINE = [
@@ -759,7 +763,7 @@ describe('optimizeOrder’s gain rule on hand-built nines (task Open questions 6
   });
 });
 
-describe('simulateGames (task Open questions 6)', () => {
+describe('simulateGames (task Open questions 6)', SLOW, () => {
   it('gives the same games for the same seed, and others for another', () => {
     const lineup = nine(rates({ uBB: 0.1, '1B': 0.15, HR: 0.03, K: 0.2 }));
     const once = simulateGames(lineup, 0.14, 1000, 7);

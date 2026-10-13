@@ -1,9 +1,12 @@
+import { canonicalColumn, canonicalName } from './dictionary.ts';
 import { VIEW_MANIFESTS, type ViewId } from './manifest.ts';
 
 /**
  * How ambiguous or cleaned headers were read, for the Clubhouse's "How columns were read":
  * Knowledge Base › Import contract › Columns that need special handling, and the synonyms
- * in values.ts. A note without views applies wherever its columns appear.
+ * in values.ts. A note without views applies wherever its columns appear. A note with views
+ * applies to those views and, in any other file, to a column the dictionary reads there as
+ * it does in one of them.
  */
 export interface ColumnNote {
   columns: readonly string[];
@@ -111,6 +114,34 @@ export function columnNotesFor(view: ViewId): { columns: string[]; note: string 
       return [];
     }
     const columns = entry.columns.filter((column) => header.has(column));
+    return columns.length > 0 ? [{ columns, note: entry.note }] : [];
+  });
+}
+
+/**
+ * The notes that apply to a file with this header, each with the header's columns it covers,
+ * in COLUMN_NOTES order: Knowledge Base › Import contract › Column dictionary, where a
+ * column's name can depend on the file's other columns. A note without views applies to
+ * every column of it the header has. A note with views applies to a column when the
+ * dictionary reads it in this header as it reads it in one of those views. On each of OOTP's
+ * views' latest headers this gives exactly columnNotesFor.
+ */
+export function columnNotesForHeader(
+  header: readonly string[],
+): { columns: string[]; note: string }[] {
+  const given = new Set(header);
+  const applies = (entry: ColumnNote, column: string) => {
+    if (!given.has(column)) {
+      return false;
+    }
+    if (!entry.views) {
+      return true;
+    }
+    const name = canonicalName(column, header);
+    return name !== null && entry.views.some((view) => canonicalColumn(view, column) === name);
+  };
+  return COLUMN_NOTES.flatMap((entry) => {
+    const columns = entry.columns.filter((column) => applies(entry, column));
     return columns.length > 0 ? [{ columns, note: entry.note }] : [];
   });
 }

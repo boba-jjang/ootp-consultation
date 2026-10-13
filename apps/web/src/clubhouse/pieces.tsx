@@ -1,8 +1,6 @@
 import {
   DATA_SETS,
   LAYERS,
-  VIEW_MANIFESTS,
-  columnNotesFor,
   type Coverage,
   type ImportedFile,
   type Layer,
@@ -18,7 +16,7 @@ import { FileButton } from '../setup/pieces.tsx';
 import { CheckIcon, InfoIcon } from '../ui/icons.tsx';
 import { Button, Chip, MatrixCell, Panel, Timeline } from '../ui/primitives.tsx';
 import styles from './Clubhouse.module.css';
-import { matrixHeadings, nextCards, timelineLabel } from './copy.ts';
+import { columnNotesList, matrixHeadings, nextCards, timelineLabel } from './copy.ts';
 import { outcomeOf, routeOf } from './results.ts';
 
 /**
@@ -343,7 +341,10 @@ export function UploadResults({
   );
 }
 
-/** How a view's ambiguous or cleaned headers were read, one view at a time. */
+/**
+ * How a team view's or custom team file's ambiguous or cleaned headers were read, one at a
+ * time, as columnNotesList lists them.
+ */
 export function ColumnNotes({
   views,
   files,
@@ -352,47 +353,44 @@ export function ColumnNotes({
   views: readonly ViewId[];
   files: readonly ImportedFile[];
 }) {
-  const [chosen, setChosen] = useState<ViewId | null>(null);
-  const first = views.includes('pitching_stats_2') ? 'pitching_stats_2' : views[0];
-  const view = chosen && views.includes(chosen) ? chosen : first;
-  if (!view) {
+  const [chosen, setChosen] = useState<string | null>(null);
+  const { entries, initial } = columnNotesList(views, files);
+  const entry =
+    entries.find((candidate) => candidate.key === chosen) ??
+    entries.find((candidate) => candidate.key === initial);
+  if (!entry) {
     return (
       <Panel title="How columns were read" className={styles.notes}>
         <p className={styles.muted}>Nothing to show until a team view is on file.</p>
       </Panel>
     );
   }
-  const header = VIEW_MANIFESTS[view].versions.at(-1) ?? [];
-  const file = files.find(
-    (candidate) => candidate.view === view && candidate.routing === 'primary',
-  );
-  const notes = columnNotesFor(view);
   return (
     <Panel
       title="How columns were read"
-      meta={<span className={styles.logFile}>{file?.name ?? view}</span>}
+      meta={<span className={styles.logFile}>{entry.file}</span>}
       className={styles.notes}
     >
       <label className={styles.select}>
         View
         <select
-          value={view}
+          value={entry.key}
           onChange={(event) => {
-            setChosen(event.target.value as ViewId);
+            setChosen(event.target.value);
           }}
         >
-          {views.map((option) => (
-            <option key={option} value={option}>
-              {option}
+          {entries.map((option) => (
+            <option key={option.key} value={option.key}>
+              {option.label}
             </option>
           ))}
         </select>
       </label>
-      {notes.length === 0 ? (
+      {entry.notes.length === 0 ? (
         <p className={styles.muted}>Every column of this view is read as it comes.</p>
       ) : (
         <dl className={styles.noteList}>
-          {notes.map((note) => (
+          {entry.notes.map((note) => (
             <div key={note.columns.join('/')} className={styles.note}>
               <dt className={styles.noteColumn}>{note.columns.join(' / ')}</dt>
               <dd className={styles.noteText}>{note.note}</dd>
@@ -401,10 +399,10 @@ export function ColumnNotes({
         </dl>
       )}
       <details className={styles.allColumns}>
-        <summary>All {header.length} columns</summary>
+        <summary>All {entry.columns.length} columns</summary>
         <div className={styles.chips}>
-          {header.map((column) => (
-            <Chip key={column}>{column}</Chip>
+          {entry.columns.map((column, index) => (
+            <Chip key={`${String(index)}:${column}`}>{column}</Chip>
           ))}
         </div>
       </details>

@@ -78,7 +78,12 @@ export {
   type SplitTables,
 } from './importer/snapshot.ts';
 export { describeExports, type ExportSummary } from './importer/describe.ts';
-export { COLUMN_NOTES, columnNotesFor, type ColumnNote } from './importer/columns.ts';
+export {
+  COLUMN_NOTES,
+  columnNotesFor,
+  columnNotesForHeader,
+  type ColumnNote,
+} from './importer/columns.ts';
 export {
   DATA_SETS,
   DATA_SET_INFO,

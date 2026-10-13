@@ -40,6 +40,11 @@ export interface RoutedExport {
   /** The split the file name gives (splitOf); null for a season file. */
   split: Split | null;
   routing: Routing;
+  /**
+   * The file's header row as readHeader reads it, each cell trimmed and in order; empty when
+   * the file has none. A rejected file keeps it too.
+   */
+  header: string[];
   /** Empty for a rejected file. */
   rows: ExportRow[];
   events: ImportEvent[];
@@ -167,6 +172,8 @@ export function routeExport(
 
 function routeRows(fileName: string, text: string, settings: RoutingSettings): RoutedExport {
   const events: ImportEvent[] = [];
+  const [header = [], ...records] = parseCsv(text);
+  const columns = header.map((column) => column.trim());
   const result: RoutedExport = {
     name: fileName,
     view: null,
@@ -175,6 +182,7 @@ function routeRows(fileName: string, text: string, settings: RoutingSettings): R
     side: null,
     split: splitOf(fileName),
     routing: 'rejected',
+    header: columns,
     rows: [],
     events,
     importerVersion: IMPORTER_VERSION,
@@ -187,7 +195,6 @@ function routeRows(fileName: string, text: string, settings: RoutingSettings): R
   const info = (code: string, message: string, details?: Record<string, unknown>) =>
     events.push({ level: 'info', code, message, ...(details ? { details } : {}) });
 
-  const [header = [], ...records] = parseCsv(text);
   const detection = detectView(header);
   if (!detection.ok && (detection.reason === 'empty' || detection.reason === 'duplicate-columns')) {
     const details = Object.fromEntries(
@@ -212,7 +219,6 @@ function routeRows(fileName: string, text: string, settings: RoutingSettings): R
     }
   }
 
-  const columns = header.map((column) => column.trim());
   const missing = ['Name', 'POS'].filter((column) => !columns.includes(column));
   if (missing.length > 0) {
     return reject(

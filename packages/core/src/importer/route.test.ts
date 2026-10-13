@@ -6,6 +6,7 @@ import {
   IMPORTER_VERSION,
   parseCsv,
   positionSide,
+  readHeader,
   routeExport,
   type Side,
   type ViewId,
@@ -224,6 +225,16 @@ describe('routeExport on the fixtures', () => {
       expect(route(path).importerVersion).toBe(IMPORTER_VERSION);
     }
     expect(routeExport('export.csv', '').importerVersion).toBe(IMPORTER_VERSION);
+  });
+
+  it('keeps every file’s header row as readHeader reads it, a rejected file’s too', () => {
+    for (const path of Object.keys(EXPECTED)) {
+      expect(route(path).header, path).toEqual(readHeader(readFixtureText(path)));
+    }
+    const rejected = routeExport('notes.csv', ' Player , Notes \r\nAnn,hi');
+    expect(rejected.routing).toBe('rejected');
+    expect(rejected.header).toEqual(['Player', 'Notes']);
+    expect(routeExport('export.csv', '').header).toEqual([]);
   });
 
   it('warns once about each older header version, and only those', () => {

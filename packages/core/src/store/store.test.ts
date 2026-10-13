@@ -7,6 +7,7 @@ import {
   assembleSnapshot,
   importUpload,
   loadSnapshot,
+  replacementProblem,
   routeExport,
   type Upload,
 } from '../index.ts';
@@ -274,5 +275,172 @@ describe('importUpload with split exports (Knowledge Base › Import contract �
     const result = await importUpload(store, TEAM, uploadsOf(SPLITS), options);
     expect(result).toMatchObject({ ok: false, reason: 'no-game-number' });
     expect(files.size).toBe(0);
+  });
+});
+
+describe('the split windows (Knowledge Base › Import contract › Split exports)', () => {
+  const SPLITS = fixtureFiles('seattle-g71/splits/');
+  const fileName = (path: string) => path.split('/').at(-1) ?? path;
+  /** A split fixture as OOTP names the export: without the _vsl or _vsr the fixtures add. */
+  const unrenamed = (path: string) => fileName(path).replace(/_vs[lr]\.csv$/, '.csv');
+  /** One hand's split fixtures, dropped unrenamed in that hand's window. */
+  const windowUploads = (split: 'L' | 'R'): Upload[] =>
+    SPLITS.filter((path) => path.endsWith(split === 'L' ? '_vsl.csv' : '_vsr.csv')).map((path) => ({
+      name: unrenamed(path),
+      text: readFixtureText(path),
+      split,
+    }));
+  const TEAM_BATTING_L =
+    'seattle-g71/splits/seattle_arrows_lineups_-_overview_batting_stats_c_vsl.csv';
+
+  /** A store holding Game 71's season files, and that snapshot's id. */
+  async function game71() {
+    const memory = memoryStore();
+    const first = await importUpload(
+      memory.store,
+      TEAM,
+      uploadsOf(fixtureFiles('seattle-g71/')),
+      options,
+    );
+    if (!first.ok) {
+      throw new Error(first.message);
+    }
+    return { ...memory, into: first.snapshot.id };
+  }
+
+  it('stores each file dropped in a window with that split, under OOTP’s own name', async () => {
+    const { store, files, into } = await game71();
+    const result = await importUpload(store, TEAM, [...windowUploads('L'), ...windowUploads('R')], {
+      ...options,
+      into,
+    });
+    expect(result).toMatchObject({ ok: true, created: false, snapshot: { id: into } });
+    expect(result.ok && result.files.map((file) => [file.split, file.outcome])).toEqual([
+      ...Array<unknown>(8).fill(['L', 'added']),
+      ...Array<unknown>(8).fill(['R', 'added']),
+    ]);
+    const stored = [...files.values()];
+    expect(stored).toHaveLength(32);
+    expect(stored.filter((file) => file.split === null)).toHaveLength(16);
+    for (const split of ['L', 'R'] as const) {
+      const ofHand = stored.filter((file) => file.split === split);
+      expect(ofHand.map((file) => file.originalFilename).sort()).toEqual(
+        SPLITS.filter((path) => path.endsWith(split === 'L' ? '_vsl.csv' : '_vsr.csv'))
+          .map(unrenamed)
+          .sort(),
+      );
+    }
+  });
+
+  it('reloads them into the split tables the _vsl and _vsr fixtures give, the season as it was', async () => {
+    const windows = await game71();
+    await importUpload(windows.store, TEAM, [...windowUploads('L'), ...windowUploads('R')], {
+      ...options,
+      into: windows.into,
+    });
+    const named = await game71();
+    await importUpload(named.store, TEAM, uploadsOf(SPLITS), { ...options, into: named.into });
+    const [fromWindows, fromNames] = await Promise.all([
+      loadSnapshot(windows.store, windows.into, '1-10'),
+      loadSnapshot(named.store, named.into, '1-10'),
+    ]);
+    expect(fromWindows.splits).toEqual(fromNames.splits);
+    expect(fromWindows.splits?.L.hitters).toHaveLength(12);
+    expect(fromWindows.hitters).toEqual(fromNames.hitters);
+    expect(fromWindows.pitchers).toEqual(fromNames.pitchers);
+    expect(fromWindows.league).toEqual(fromNames.league);
+    expect(fromWindows.coverage).toEqual(fromNames.coverage);
+    expect(fromWindows.label).toBe('Game 71');
+    expect(fromWindows.events).toEqual(fromNames.events);
+  });
+
+  it('keeps the split through a reload, the log saying the window set it', async () => {
+    const { store, into } = await game71();
+    await importUpload(store, TEAM, windowUploads('L'), { ...options, into });
+    const loaded = await loadSnapshot(store, into, '1-10');
+    const dropped = loaded.files.filter((file) => file.split !== null);
+    expect(dropped).toHaveLength(8);
+    expect(dropped.every((file) => file.split === 'L')).toBe(true);
+    const batting = dropped.find(
+      (file) => file.name === unrenamed(TEAM_BATTING_L) && file.side === 'hitters',
+    );
+    expect(batting?.events.find((event) => event.code === 'split')?.message).toBe(
+      'Split vs LHP: dropped in the vs-left window, so the rows stay apart from the season tables.',
+    );
+  });
+
+  it('stores the split a file name gives, and none for a season file', async () => {
+    const { store, files, into } = await game71();
+    await importUpload(store, TEAM, uploadsOf(SPLITS), { ...options, into });
+    for (const file of files.values()) {
+      const named = file.originalFilename.endsWith('_vsl.csv')
+        ? 'L'
+        : file.originalFilename.endsWith('_vsr.csv')
+          ? 'R'
+          : null;
+      expect(file.split, file.originalFilename).toBe(named);
+    }
+  });
+
+  it('re-reads a row stored without a split by its name, as rows from before the split column do', async () => {
+    const { store, files, into } = await game71();
+    await importUpload(store, TEAM, uploadsOf(SPLITS), { ...options, into });
+    const before = await loadSnapshot(store, into, '1-10');
+    for (const [id, file] of files) {
+      files.set(id, { ...file, split: null });
+    }
+    expect(await loadSnapshot(store, into, '1-10')).toEqual(before);
+  });
+
+  it('keeps the split when an unrenamed re-export replaces a file dropped in a window', async () => {
+    const { store, files, into } = await game71();
+    await importUpload(store, TEAM, windowUploads('L'), { ...options, into });
+    const loaded = await loadSnapshot(store, into, '1-10');
+    const original = loaded.files.find(
+      (file) =>
+        file.split === 'L' && file.name === unrenamed(TEAM_BATTING_L) && file.side === 'hitters',
+    );
+    if (!original) {
+      throw new Error('the dropped batting split is not on file');
+    }
+    // The import log's Replace routes the chosen file with the stored file's split.
+    const chosen: Upload = {
+      name: unrenamed(TEAM_BATTING_L),
+      text: editCell(readFixtureText(TEAM_BATTING_L), 'Yoshitsugu Ishida', 'G', '27'),
+      split: original.split,
+    };
+    expect(
+      replacementProblem(original, 71, routeExport(chosen.name, chosen.text, chosen.split)),
+    ).toBeNull();
+    const result = await importUpload(store, TEAM, [chosen], { ...options, into });
+    expect(result.ok && result.files.map((file) => [file.split, file.outcome])).toEqual([
+      ['L', 'added'],
+    ]);
+    expect([...files.values()].filter((file) => file.split === 'L')).toHaveLength(9);
+    const after = await loadSnapshot(store, into, '1-10');
+    expect(after.splits?.L.hitters.find((row) => row.Name === 'Yoshitsugu Ishida')?.G).toBe(27);
+    expect(after.hitters).toEqual(loaded.hitters);
+  });
+
+  it('flags a season file dropped in a split window through the check', async () => {
+    const { store, into } = await game71();
+    const season = 'seattle-g71/seattle_arrows_lineups_-_overview_batting_stats_c.csv';
+    const right = windowUploads('R').filter((upload) => upload.name === fileName(season));
+    // A later export of the season view: a copy byte for byte would be skipped as on file.
+    const later = editCell(readFixtureText(season), 'Yoshitsugu Ishida', 'UBR', '0.1');
+    const result = await importUpload(
+      store,
+      TEAM,
+      [{ name: fileName(season), text: later, split: 'L' }, ...right],
+      { ...options, into },
+    );
+    expect(result.ok && result.files.map((file) => [file.split, file.outcome])).toEqual([
+      ['L', 'added'],
+      ['R', 'added'],
+    ]);
+    const loaded = await loadSnapshot(store, into, '1-10');
+    expect(loaded.events).toContainEqual(
+      expect.objectContaining({ level: 'warning', code: 'split-mismatch', scope: 'team' }),
+    );
   });
 });

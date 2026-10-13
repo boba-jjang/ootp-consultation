@@ -15,6 +15,7 @@ import {
 
 import {
   ADD_DATA,
+  SPLIT_WINDOWS,
   columnNotesList,
   matrixHeadings,
   nextCards,
@@ -118,6 +119,23 @@ describe('Add data', () => {
       title: 'Drop any OOTP export here',
       text: "Hitters or pitchers, stats or ratings, one file or a whole folder. A re-export merges with what's on file: a later value wins and a blank never replaces one. Exports from a later game open that game's snapshot.",
     });
+  });
+});
+
+describe('the split windows', () => {
+  it('name the hand each side faces, and say the window decides the split', () => {
+    expect(SPLIT_WINDOWS).toEqual([
+      {
+        split: 'L',
+        title: 'Split vs left',
+        text: 'Batting views vs left-handed pitchers, pitching views vs left-handed batters. Stored as the vs-left split, whatever the file is called.',
+      },
+      {
+        split: 'R',
+        title: 'Split vs right',
+        text: 'Batting views vs right-handed pitchers, pitching views vs right-handed batters. Stored as the vs-right split, whatever the file is called.',
+      },
+    ]);
   });
 });
 

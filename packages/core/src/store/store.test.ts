@@ -279,7 +279,11 @@ describe('importUpload with split exports (Knowledge Base › Import contract �
 });
 
 describe('the split windows (Knowledge Base › Import contract › Split exports)', () => {
-  const SPLITS = fixtureFiles('seattle-g71/splits/');
+  // Game 71's team files only: the league's take most of an assembly's time, and the route
+  // tests read every league split through a window.
+  const teamFiles = (folder: string) =>
+    fixtureFiles(folder).filter((path) => path.includes('_lineups_'));
+  const SPLITS = teamFiles('seattle-g71/splits/');
   const fileName = (path: string) => path.split('/').at(-1) ?? path;
   /** A split fixture as OOTP names the export: without the _vsl or _vsr the fixtures add. */
   const unrenamed = (path: string) => fileName(path).replace(/_vs[lr]\.csv$/, '.csv');
@@ -293,13 +297,13 @@ describe('the split windows (Knowledge Base › Import contract › Split export
   const TEAM_BATTING_L =
     'seattle-g71/splits/seattle_arrows_lineups_-_overview_batting_stats_c_vsl.csv';
 
-  /** A store holding Game 71's season files, and that snapshot's id. */
+  /** A store holding Game 71's team season files, and that snapshot's id. */
   async function game71() {
     const memory = memoryStore();
     const first = await importUpload(
       memory.store,
       TEAM,
-      uploadsOf(fixtureFiles('seattle-g71/')),
+      uploadsOf(teamFiles('seattle-g71/')),
       options,
     );
     if (!first.ok) {
@@ -316,12 +320,12 @@ describe('the split windows (Knowledge Base › Import contract › Split export
     });
     expect(result).toMatchObject({ ok: true, created: false, snapshot: { id: into } });
     expect(result.ok && result.files.map((file) => [file.split, file.outcome])).toEqual([
-      ...Array<unknown>(8).fill(['L', 'added']),
-      ...Array<unknown>(8).fill(['R', 'added']),
+      ...Array<unknown>(4).fill(['L', 'added']),
+      ...Array<unknown>(4).fill(['R', 'added']),
     ]);
     const stored = [...files.values()];
-    expect(stored).toHaveLength(32);
-    expect(stored.filter((file) => file.split === null)).toHaveLength(16);
+    expect(stored).toHaveLength(16);
+    expect(stored.filter((file) => file.split === null)).toHaveLength(8);
     for (const split of ['L', 'R'] as const) {
       const ofHand = stored.filter((file) => file.split === split);
       expect(ofHand.map((file) => file.originalFilename).sort()).toEqual(
@@ -359,7 +363,7 @@ describe('the split windows (Knowledge Base › Import contract › Split export
     await importUpload(store, TEAM, windowUploads('L'), { ...options, into });
     const loaded = await loadSnapshot(store, into, '1-10');
     const dropped = loaded.files.filter((file) => file.split !== null);
-    expect(dropped).toHaveLength(8);
+    expect(dropped).toHaveLength(4);
     expect(dropped.every((file) => file.split === 'L')).toBe(true);
     const batting = dropped.find(
       (file) => file.name === unrenamed(TEAM_BATTING_L) && file.side === 'hitters',
@@ -416,7 +420,7 @@ describe('the split windows (Knowledge Base › Import contract › Split export
     expect(result.ok && result.files.map((file) => [file.split, file.outcome])).toEqual([
       ['L', 'added'],
     ]);
-    expect([...files.values()].filter((file) => file.split === 'L')).toHaveLength(9);
+    expect([...files.values()].filter((file) => file.split === 'L')).toHaveLength(5);
     const after = await loadSnapshot(store, into, '1-10');
     expect(after.splits?.L.hitters.find((row) => row.Name === 'Yoshitsugu Ishida')?.G).toBe(27);
     expect(after.hitters).toEqual(loaded.hitters);

@@ -127,9 +127,12 @@ describe('exportTeam and restoreTeam', () => {
 describe('Export team keeps each file’s split (Knowledge Base › Import contract › Split exports)', () => {
   const fileName = (path: string) => path.split('/').at(-1) ?? path;
   const options = { scale: TEAM.rating_scale, hash: sha256 };
-  const SPLITS = fixtureFiles('seattle-g71/splits/');
+  // Game 71's team files only: the league's take most of an assembly's time.
+  const teamFiles = (folder: string) =>
+    fixtureFiles(folder).filter((path) => path.includes('_lineups_'));
+  const SPLITS = teamFiles('seattle-g71/splits/');
   const season = (): Upload[] =>
-    fixtureFiles('seattle-g71/').map((path) => ({
+    teamFiles('seattle-g71/').map((path) => ({
       name: fileName(path),
       text: readFixtureText(path),
     }));
@@ -141,7 +144,7 @@ describe('Export team keeps each file’s split (Knowledge Base › Import contr
       split: path.endsWith('_vsl.csv') ? 'L' : 'R',
     }));
 
-  /** A store with Game 71's season files and the given splits added to that snapshot. */
+  /** A store with Game 71's team season files and the given splits added to that snapshot. */
   async function game71(splits: Upload[]) {
     const memory = memoryStore();
     const first = await importUpload(memory.store, 'team-1', season(), options);
@@ -173,10 +176,10 @@ describe('Export team keeps each file’s split (Knowledge Base › Import contr
     };
     expect(manifest.format).toBe(2);
     const files = manifest.snapshots[0]?.files ?? [];
-    expect(files).toHaveLength(32);
-    expect(files.filter((file) => file.split === null)).toHaveLength(16);
-    expect(files.filter((file) => file.split === 'L')).toHaveLength(8);
-    expect(files.filter((file) => file.split === 'R')).toHaveLength(8);
+    expect(files).toHaveLength(16);
+    expect(files.filter((file) => file.split === null)).toHaveLength(8);
+    expect(files.filter((file) => file.split === 'L')).toHaveLength(4);
+    expect(files.filter((file) => file.split === 'R')).toHaveLength(4);
     for (const file of files) {
       expect(entries[file.path], file.path).toBeDefined();
     }

@@ -76,6 +76,30 @@ test.describe('updating exports, on the sheet', () => {
   });
 });
 
+test.describe('How columns were read, on the sheet', () => {
+  test('offers the custom team file after the views, with its own notes', async ({ page }) => {
+    await page.goto('/sheet');
+    const panel = page
+      .locator('section', {
+        has: page.getByRole('heading', { name: 'How columns were read', exact: true }),
+      })
+      .last();
+    const custom = 'seattle_arrows_lineups_-_overview_batting_stats_1_cust.csv';
+    const select = panel.getByRole('combobox', { name: 'View' });
+    await expect(select.getByRole('option')).toHaveCount(10);
+    await expect(select.getByRole('option').last()).toHaveText(custom);
+    await expect(panel.getByText('Relief appearances, not runs allowed')).toBeVisible();
+
+    await select.selectOption({ label: custom });
+    await expect(panel.locator('p', { hasText: custom })).toBeVisible();
+    await expect(panel.getByText('Rates sent without a leading zero (.174)')).toBeVisible();
+    await expect(panel.getByText('Relief appearances, not runs allowed')).toHaveCount(0);
+    await expect(panel.getByText('All 30 columns')).toBeVisible();
+    await expectAccessible(page);
+    await expectTargets(page);
+  });
+});
+
 test.describe('sign-in', () => {
   test('is where a visitor without a session lands', async ({ page }) => {
     await page.goto('/');

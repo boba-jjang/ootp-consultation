@@ -63,6 +63,12 @@ describe('assembleSnapshot on the Seattle game-42 files (the Phase 2 gate)', () 
     expect(capture?.name).toContain('hitter_capture');
   });
 
+  it('logs each file’s header row, as routing read it', () => {
+    const files = routed();
+    expect(snapshot.files.map((file) => file.header)).toEqual(files.map((file) => file.header));
+    expect(snapshot.files.every((file) => file.header.length > 0)).toBe(true);
+  });
+
   it('measures High coverage', () => {
     expect(snapshot.coverage.level).toBe('high');
     expect(snapshot.coverage.views.onFile).toHaveLength(11);

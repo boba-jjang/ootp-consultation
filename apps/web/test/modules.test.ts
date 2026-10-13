@@ -31,6 +31,7 @@ const carrying = (side: Side, set: DataSet, keys = DATA_SET_INFO[set].keys[side]
     side,
     split: null,
     routing: 'primary',
+    header: ['Name', 'POS', ...keys],
     rows: [
       {
         Name: side === 'hitters' ? 'Ann' : 'Bea',

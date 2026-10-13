@@ -196,6 +196,17 @@ test.describe('Create a Team from the fixtures', () => {
     await expect(page.getByRole('link', { name: /Data coverage.*High/ })).toBeVisible();
     await expect(page.getByText('12 players, 5 of 5 data sets')).toBeVisible();
     await expect(page.getByText('13 players, 5 of 5 data sets')).toBeVisible();
+
+    // How columns were read lists the custom team files after the views, each with its notes.
+    const notes = page
+      .locator('section', {
+        has: page.getByRole('heading', { name: 'How columns were read', exact: true }),
+      })
+      .last();
+    await notes
+      .getByRole('combobox', { name: 'View' })
+      .selectOption({ label: 'seattle_arrows_pitching_pitching_stats_1.csv' });
+    await expect(notes.getByText('Holds, the relief stat')).toBeVisible();
     await expectAccessible(page);
     await expectTargets(page);
     await expectNoSideScroll(page);

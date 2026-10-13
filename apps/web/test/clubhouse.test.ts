@@ -2,10 +2,20 @@ import { readFileSync, readdirSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { assembleSnapshot, measureCoverage, routeExport } from '@ootp/core';
+import {
+  VIEW_MANIFESTS,
+  assembleSnapshot,
+  columnNotesFor,
+  columnNotesForHeader,
+  measureCoverage,
+  routeExport,
+  type ImportedFile,
+  type ViewId,
+} from '@ootp/core';
 
 import {
   ADD_DATA,
+  columnNotesList,
   matrixHeadings,
   nextCards,
   timelineLabel,
@@ -167,5 +177,122 @@ describe('the import log line', () => {
     expect(line(`${LEAGUE}pitching_superstats_c_vsr.csv`)).toBe(
       'League file: unknown view, vs RHB (not read: it repeats the season’s columns)',
     );
+  });
+});
+
+describe('How columns were read', () => {
+  const TEAM = 'seattle_arrows_lineups_-_overview_';
+  /** What the panel lists for a snapshot of these files. */
+  const listFor = (files: ReturnType<typeof routed>) => {
+    const snapshot = assembleSnapshot(files, { scale: '1-10' });
+    return { snapshot, list: columnNotesList(snapshot.coverage.views.onFile, snapshot.files) };
+  };
+  const labels = ({ list }: ReturnType<typeof listFor>) => list.entries.map((entry) => entry.label);
+  /** A custom team file the importer read from the season files: what the panel adds. */
+  const isCustomTeamFile = (file: ImportedFile) =>
+    file.view === null &&
+    file.scope === 'team' &&
+    file.routing === 'primary' &&
+    file.split === null;
+  /** The import log's files the panel lists by name. */
+  const listedFiles = ({ snapshot, list }: ReturnType<typeof listFor>) =>
+    snapshot.files.filter((file) => list.entries.some((entry) => entry.label === file.name));
+
+  it('lists Game 42’s 11 views, as before, and no file, with pitching_stats_2 first', () => {
+    const g42 = listFor(routed('seattle-g42'));
+    expect(labels(g42)).toEqual(Object.keys(VIEW_MANIFESTS));
+    expect(g42.list.initial).toBe('pitching_stats_2');
+    for (const entry of g42.list.entries) {
+      const view = entry.label as ViewId;
+      expect(entry.key).toBe(view);
+      expect(entry.notes).toEqual(columnNotesFor(view));
+      expect(entry.columns).toEqual(VIEW_MANIFESTS[view].versions.at(-1));
+      expect(entry.file).toBe(`${TEAM}${view}.csv`);
+    }
+  });
+
+  it('lists Game 53’s 3 views, then its 4 custom team files, with default first', () => {
+    const g53 = listFor(routed('seattle-g53'));
+    expect(labels(g53)).toEqual([
+      'default',
+      'custom_bat_pot',
+      'cus_pitch_pot',
+      `${TEAM}batting_stats_1_cust.csv`,
+      `${TEAM}batting_superstats_1.csv`,
+      'seattle_arrows_pitching_pitching_stats_1.csv',
+      'seattle_arrows_pitching_pitching_superstat_1.csv',
+    ]);
+    expect(g53.list.initial).toBe('default');
+    const pitching = g53.list.entries.find(
+      (entry) => entry.label === 'seattle_arrows_pitching_pitching_stats_1.csv',
+    );
+    const file = g53.snapshot.files.find((candidate) => candidate.name === pitching?.label);
+    expect(pitching?.file).toBe('seattle_arrows_pitching_pitching_stats_1.csv');
+    expect(pitching?.columns).toEqual(file?.header);
+    expect(pitching?.columns).toHaveLength(61);
+    expect(pitching?.notes).toEqual(columnNotesForHeader(file?.header ?? []));
+    expect(pitching?.notes.find((note) => note.columns.includes('HLD'))?.note).toBe(
+      'Holds, the relief stat',
+    );
+  });
+
+  it('lists Game 71’s 8 custom team files instead of the empty state, the first one first', () => {
+    const g71 = listFor(routed('seattle-g71'));
+    expect(labels(g71)).toEqual(
+      [
+        'batting_stats_c',
+        'batting_superstats_c',
+        'cus_pitch_pot',
+        'custom_bat_pot',
+        'fielding_ratings_cus',
+        'fielding_stats_cus',
+        'pitching_stats_c',
+        'pitching_superstats_c',
+      ].map((view) => `${TEAM}${view}.csv`),
+    );
+    expect(g71.list.initial).toBe(g71.list.entries[0]?.key);
+    for (const entry of g71.list.entries) {
+      const file = g71.snapshot.files.find((candidate) => candidate.name === entry.label);
+      expect(entry.file).toBe(entry.label);
+      expect(entry.columns).toEqual(file?.header);
+      expect(entry.notes).toEqual(columnNotesForHeader(file?.header ?? []));
+    }
+  });
+
+  it('lists the same 8 files at Game 71 with its splits, and none of the 16 splits', () => {
+    const alone = listFor(routed('seattle-g71'));
+    const withSplits = listFor([...routed('seattle-g71'), ...routed('seattle-g71/splits')]);
+    expect(withSplits.list).toEqual(alone.list);
+  });
+
+  it('lists Game 70’s height file and not its league fielding file', () => {
+    const g70 = listFor(routed('seattle-g70'));
+    expect(labels(g70)).toEqual(['seattle-height.csv']);
+    expect(g70.list.initial).toBe(g70.list.entries[0]?.key);
+    expect(g70.list.entries[0]?.notes.map((note) => note.columns.join(' / '))).toEqual([
+      'IP',
+      'HT',
+      'T',
+    ]);
+  });
+
+  it('never lists a league, supplemental, rejected or split file', () => {
+    const rejected = routeExport('notes.csv', 'Player,Notes\r\nAnn,hi');
+    expect(rejected.routing).toBe('rejected');
+    for (const files of [
+      routed('seattle-g42'),
+      routed('seattle-g53'),
+      [...routed('seattle-g70'), rejected],
+      [...routed('seattle-g71'), ...routed('seattle-g71/splits')],
+    ]) {
+      const panel = listFor(files);
+      expect(listedFiles(panel)).toEqual(panel.snapshot.files.filter(isCustomTeamFile));
+    }
+  });
+
+  it('lists nothing when neither a view nor a custom team file is on file', () => {
+    expect(columnNotesList([], [])).toEqual({ entries: [], initial: undefined });
+    const league = listFor(routed('seattle-g70').filter((file) => file.scope === 'league'));
+    expect(league.list).toEqual({ entries: [], initial: undefined });
   });
 });

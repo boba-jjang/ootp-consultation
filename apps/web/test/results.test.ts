@@ -1,6 +1,8 @@
+import { readFileSync } from 'node:fs';
+
 import { describe, expect, it } from 'vitest';
 
-import type { UploadedFile } from '@ootp/core';
+import { routeExport, type UploadedFile } from '@ootp/core';
 
 import { outcomeOf, resultsHeading, type Uploaded } from '../src/clubhouse/results.ts';
 
@@ -40,6 +42,47 @@ describe('outcomeOf', () => {
       events: [{ level: 'error', code: 'unknown-view', message: 'No view has these columns.' }],
     });
     expect(outcomeOf(rejected)).toBe('not used: No view has these columns.');
+  });
+});
+
+describe('outcomeOf on split exports', () => {
+  const SPLITS = new URL('../../../fixtures/seattle-g71/splits/', import.meta.url);
+  /** A Game 71 split, summarized as importUpload summarizes it. */
+  const uploaded = (name: string): UploadedFile => {
+    const routed = routeExport(name, readFileSync(new URL(name, SPLITS), 'utf8'));
+    return {
+      name,
+      view: routed.view,
+      scope: routed.scope,
+      side: routed.side,
+      split: routed.split,
+      routing: routed.routing,
+      outcome: 'added',
+      events: routed.events,
+    };
+  };
+
+  it('names the split: vs LHP or vs RHP for hitters, vs LHB or vs RHB for pitchers', () => {
+    expect(outcomeOf(uploaded('seattle_arrows_lineups_-_overview_batting_stats_c_vsl.csv'))).toBe(
+      'added as a custom hitters view vs LHP',
+    );
+    expect(
+      outcomeOf(
+        uploaded('rsl_statistics_player_statistics_-_sortable_stats_pitching_stats_c_vsr.csv'),
+      ),
+    ).toBe('added as the league’s custom pitchers view vs RHB');
+    expect(outcomeOf(file({ view: null, side: 'pitchers', split: 'L' }))).toBe(
+      'added as a custom pitchers view vs LHB',
+    );
+    expect(outcomeOf(file({ side: 'hitters', split: 'R' }))).toBe(
+      'added as batting_stats_1 vs RHP',
+    );
+  });
+
+  it('says a split that fills no table isn’t read', () => {
+    expect(
+      outcomeOf(uploaded('seattle_arrows_lineups_-_overview_batting_superstats_c_vsr.csv')),
+    ).toBe('added as a custom hitters view vs RHP (not read: it repeats the season’s columns)');
   });
 });
 

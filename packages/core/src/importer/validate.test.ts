@@ -5,18 +5,24 @@ import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_IDENTITY_TOLERANCES,
   DEFAULT_VALIDATION_SETTINGS,
+  assembleSnapshot,
   checkIdentities,
+  checkSplits,
   mergeTables,
   routeExport,
   validateSnapshot,
+  type ExportRow,
   type RoutedExport,
+  type SnapshotTables,
   type ValidationSettings,
   type ViewId,
 } from '../index.ts';
 import {
   FIXTURES,
+  editCell,
   fixtureFiles,
   playerKey,
+  rawCell,
   readFixture,
   readFixtureText,
   routeFixture,
@@ -315,5 +321,164 @@ describe('checkIdentities on every fixture row', () => {
     expect(checkIdentities({ G: 1, RV: 1, 'RV-FB': 0, 'RV-BR': 0, 'RV-OFF': 0 })).toEqual([
       { identity: 'RV = RV-FB + RV-BR + RV-OFF', expected: 0, found: 1 },
     ]);
+  });
+});
+
+describe('checkSplits (Knowledge Base › Import contract › Split exports)', () => {
+  const tables = (
+    rows: Partial<Record<'hitters' | 'pitchers' | 'leagueHitters' | 'leaguePitchers', ExportRow[]>>,
+  ): SnapshotTables => ({
+    hitters: rows.hitters ?? [],
+    pitchers: rows.pitchers ?? [],
+    league: { hitters: rows.leagueHitters ?? [], pitchers: rows.leaguePitchers ?? [] },
+  });
+  const none = tables({});
+
+  it('adds vs left and vs right up, a missing row counting 0, on the columns both carry', () => {
+    const season = tables({ hitters: [{ Name: 'Ann', POS: 'SS', PA: 10, AB: 9, SF: 1 }] });
+    const left = tables({ hitters: [{ Name: 'Ann', POS: 'SS', PA: 10, AB: 9 }] });
+    expect(checkSplits(season, { L: left, R: none })).toEqual([]);
+    const right = tables({ hitters: [{ Name: 'Ann', POS: 'SS', PA: 1, AB: 1, SF: 0 }] });
+    expect(checkSplits(season, { L: left, R: right })).toEqual([
+      expect.objectContaining({
+        level: 'warning',
+        code: 'split-mismatch',
+        scope: 'team',
+        view: null,
+        details: { name: 'Ann', side: 'hitters', columns: ['PA', 'AB', 'SF'] },
+      }),
+    ]);
+  });
+
+  it('checks every listed count for hitters, and none of the others', () => {
+    const counts = ['PA', 'AB', 'H', '1B', '2B', '3B', 'HR', 'BB', 'IBB', 'HP', 'SF', 'K'];
+    const row = (value: number) => ({
+      Name: 'Ann',
+      ...Object.fromEntries([...counts, 'G', 'GS', 'R', 'RBI'].map((column) => [column, value])),
+    });
+    const events = checkSplits(tables({ hitters: [row(2)] }), {
+      L: tables({ hitters: [row(1)] }),
+      R: tables({ hitters: [row(0)] }),
+    });
+    expect(events.map((event) => event.details?.columns)).toEqual([counts]);
+  });
+
+  it('reads pitchers’ IP as outs, with BF, HA, HR, BB, K and HP, but not G, GS, W, L, SV or HLD', () => {
+    const season = tables({
+      pitchers: [{ Name: 'Bea', IP: 34, BF: 49, HA: 8, HR: 1, BB: 5, K: 9, HP: 1, G: 9, W: 1 }],
+    });
+    const left = tables({
+      pitchers: [{ Name: 'Bea', IP: 10, BF: 14, HA: 2, HR: 0, BB: 2, K: 3, HP: 0, G: 6, W: 0 }],
+    });
+    const right = (outs: number) =>
+      tables({
+        pitchers: [{ Name: 'Bea', IP: outs, BF: 35, HA: 6, HR: 1, BB: 3, K: 6, HP: 1, G: 9, W: 0 }],
+      });
+    expect(checkSplits(season, { L: left, R: right(24) })).toEqual([]);
+    expect(checkSplits(season, { L: left, R: right(23) })).toEqual([
+      expect.objectContaining({
+        level: 'warning',
+        code: 'split-mismatch',
+        details: { name: 'Bea', side: 'pitchers', columns: ['IP'] },
+      }),
+    ]);
+  });
+
+  it('pairs a league row by team and name, or by name alone when one season row has it', () => {
+    const season = tables({
+      leagueHitters: [{ Name: 'Cy', TM: 'JC', PA: 5 }],
+      leaguePitchers: [
+        { Name: 'Ruben Gonzalez', TM: 'LA', IP: 30 },
+        { Name: 'Ruben Gonzalez', TM: 'MTL', IP: 60 },
+      ],
+    });
+    const left = tables({
+      leagueHitters: [{ Name: 'Cy', TM: 'SEA', PA: 2 }],
+      leaguePitchers: [{ Name: 'Ruben Gonzalez', TM: 'LA', IP: 10 }],
+    });
+    const right = tables({
+      leagueHitters: [{ Name: 'Cy', TM: 'SEA', PA: 3 }],
+      leaguePitchers: [{ Name: 'Ruben Gonzalez', TM: 'LA', IP: 20 }],
+    });
+    expect(checkSplits(season, { L: left, R: right })).toEqual([]);
+    // Two season rows have the name, so a row from another team pairs with neither.
+    const moved = tables({ leaguePitchers: [{ Name: 'Ruben Gonzalez', TM: 'SEA', IP: 10 }] });
+    expect(checkSplits(season, { L: left, R: moved })).toEqual([
+      expect.objectContaining({
+        level: 'info',
+        code: 'split-unmatched',
+        scope: 'league',
+        details: { name: 'Ruben Gonzalez', side: 'pitchers' },
+      }),
+      expect.objectContaining({ level: 'warning', code: 'split-mismatch', scope: 'league' }),
+    ]);
+  });
+
+  it('notes a player with split rows but no season row once, naming the player', () => {
+    const split = tables({ hitters: [{ Name: 'Dee', PA: 4 }] });
+    const events = checkSplits(none, { L: split, R: split });
+    expect(events).toEqual([
+      expect.objectContaining({
+        level: 'info',
+        code: 'split-unmatched',
+        scope: 'team',
+        view: null,
+        details: { name: 'Dee', side: 'hitters' },
+      }),
+    ]);
+    expect(events[0]?.message).toContain('Dee');
+  });
+
+  it('finds Game 71’s splits adding up, Jimbo and Nakamoto having no season row', () => {
+    const files = [...fixtureFiles('seattle-g71/'), ...fixtureFiles('seattle-g71/splits/')].map(
+      routeFixture,
+    );
+    const snapshot = assembleSnapshot(files, { scale: '1-10' });
+    const splits = snapshot.splits;
+    expect(splits).not.toBeNull();
+    const events = splits ? checkSplits(snapshot, splits) : [];
+    expect(events.filter((event) => event.level === 'warning')).toEqual([]);
+    expect(events).toEqual([
+      expect.objectContaining({
+        level: 'info',
+        code: 'split-unmatched',
+        scope: 'team',
+        details: { name: 'Yukichi Jimbo', side: 'pitchers' },
+      }),
+      expect.objectContaining({
+        level: 'info',
+        code: 'split-unmatched',
+        scope: 'league',
+        details: { name: 'Hisafumi Nakamoto', side: 'hitters' },
+      }),
+    ]);
+  });
+
+  it('warns when a split has one PA changed, naming the player and the column', () => {
+    const path = 'seattle-g71/splits/seattle_arrows_lineups_-_overview_batting_stats_c_vsl.csv';
+    expect(rawCell(path, 'Yoshitsugu Ishida', 'PA')).toBe('34');
+    const edited = routeExport(
+      path.split('/').at(-1) ?? path,
+      editCell(readFixtureText(path), 'Yoshitsugu Ishida', 'PA', '35'),
+    );
+    const files = [
+      ...fixtureFiles('seattle-g71/').map(routeFixture),
+      ...fixtureFiles('seattle-g71/splits/')
+        .filter((split) => split !== path)
+        .map(routeFixture),
+      edited,
+    ];
+    const warnings = assembleSnapshot(files, { scale: '1-10' }).events.filter(
+      (event) => event.level === 'warning',
+    );
+    expect(warnings).toEqual([
+      expect.objectContaining({
+        code: 'split-mismatch',
+        scope: 'team',
+        details: { name: 'Yoshitsugu Ishida', side: 'hitters', columns: ['PA'] },
+      }),
+    ]);
+    expect(warnings[0]?.message).toContain('Yoshitsugu Ishida');
+    expect(warnings[0]?.message).toContain('PA');
   });
 });

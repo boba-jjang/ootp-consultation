@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { measureCoverage, routeExport } from '@ootp/core';
+import { assembleSnapshot, measureCoverage, routeExport } from '@ootp/core';
 
 import {
   ADD_DATA,
@@ -11,6 +11,7 @@ import {
   timelineLabel,
   usedFileCounts,
 } from '../src/clubhouse/copy.ts';
+import { routeOf } from '../src/clubhouse/results.ts';
 
 /** Every file of a fixture folder, routed as the importer stores them, sorted by name. */
 const routed = (name: string) => {
@@ -131,5 +132,40 @@ describe('the timeline label', () => {
     expect(timelineLabel('Game 42', 1)).toBe('Game 42, 1 file');
     expect(timelineLabel('Game 42', 16)).toBe('Game 42, 16 files');
     expect(timelineLabel('Game 42', undefined)).toBe('Game 42');
+  });
+});
+
+describe('the import log line', () => {
+  const snapshot = assembleSnapshot([...routed('seattle-g71'), ...routed('seattle-g71/splits')], {
+    scale: '1-10',
+  });
+  const TEAM = 'seattle_arrows_lineups_-_overview_';
+  const LEAGUE = 'rsl_statistics_player_statistics_-_sortable_stats_';
+  const line = (name: string) => {
+    const file = snapshot.files.find((candidate) => candidate.name === name);
+    return file ? routeOf(file) : `no file ${name}`;
+  };
+
+  it('says where a season file went, as before', () => {
+    expect(line(`${TEAM}batting_stats_c.csv`)).toBe('Routed to unknown view, hitters');
+    expect(line(`${LEAGUE}pitching_stats_c.csv`)).toBe('League file: unknown view');
+  });
+
+  it('names each split: vs LHP or vs RHP for hitters, vs LHB or vs RHB for pitchers', () => {
+    expect(line(`${TEAM}batting_stats_c_vsl.csv`)).toBe('Routed to unknown view, hitters, vs LHP');
+    expect(line(`${TEAM}pitching_stats_c_vsr.csv`)).toBe(
+      'Routed to unknown view, pitchers, vs RHB',
+    );
+    expect(line(`${LEAGUE}batting_stats_c_vsr.csv`)).toBe('League file: unknown view, vs RHP');
+    expect(line(`${LEAGUE}pitching_stats_c_vsl.csv`)).toBe('League file: unknown view, vs LHB');
+  });
+
+  it('says a split that fills no table isn’t read', () => {
+    expect(line(`${TEAM}batting_superstats_c_vsl.csv`)).toBe(
+      'Routed to unknown view, hitters, vs LHP (not read: it repeats the season’s columns)',
+    );
+    expect(line(`${LEAGUE}pitching_superstats_c_vsr.csv`)).toBe(
+      'League file: unknown view, vs RHB (not read: it repeats the season’s columns)',
+    );
   });
 });

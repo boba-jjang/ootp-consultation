@@ -221,3 +221,58 @@ describe('loadSnapshot', () => {
     expect(snapshot.files.every((file) => typeof file.id === 'string')).toBe(true);
   });
 });
+
+describe('importUpload with split exports (Knowledge Base › Import contract › Split exports)', () => {
+  const SPLITS = fixtureFiles('seattle-g71/splits/');
+
+  it('dates Game 71 with its splits as Game 71, each file’s split in its summary', async () => {
+    const { store } = memoryStore();
+    const result = await importUpload(
+      store,
+      TEAM,
+      uploadsOf([...fixtureFiles('seattle-g71/'), ...SPLITS]),
+      options,
+    );
+    expect(result).toMatchObject({ ok: true, created: true, snapshot: { label: 'Game 71' } });
+    if (!result.ok) {
+      return;
+    }
+    expect(result.files.map((file) => file.outcome)).toEqual(Array(32).fill('added'));
+    for (const file of result.files) {
+      const expected = file.name.endsWith('_vsl.csv')
+        ? 'L'
+        : file.name.endsWith('_vsr.csv')
+          ? 'R'
+          : null;
+      expect(file.split, file.name).toBe(expected);
+    }
+  });
+
+  it('adds split files uploaded alone into the snapshot it’s given, leaving its season alone', async () => {
+    const { store, files } = memoryStore();
+    const first = await importUpload(store, TEAM, uploadsOf(fixtureFiles('seattle-g71/')), options);
+    const into = first.ok ? first.snapshot.id : '';
+    const before = await loadSnapshot(store, into, '1-10');
+    const result = await importUpload(store, TEAM, uploadsOf(SPLITS), { ...options, into });
+    expect(result).toMatchObject({ ok: true, created: false, snapshot: { id: into } });
+    expect(result.ok && result.files.map((file) => file.outcome)).toEqual(Array(16).fill('added'));
+    expect(files.size).toBe(32);
+    expect(await store.listSnapshots(TEAM)).toHaveLength(1);
+    const after = await loadSnapshot(store, into, '1-10');
+    expect(after.label).toBe('Game 71');
+    expect(after.hitters).toEqual(before.hitters);
+    expect(after.pitchers).toEqual(before.pitchers);
+    expect(after.league).toEqual(before.league);
+    expect(after.coverage).toEqual(before.coverage);
+    expect(after.splits?.L.hitters).toHaveLength(12);
+    expect(after.splits?.R.league.pitchers).toHaveLength(455);
+    expect(before.splits).toBeNull();
+  });
+
+  it('refuses split files uploaded alone without a snapshot to add to, since they date nothing', async () => {
+    const { store, files } = memoryStore();
+    const result = await importUpload(store, TEAM, uploadsOf(SPLITS), options);
+    expect(result).toMatchObject({ ok: false, reason: 'no-game-number' });
+    expect(files.size).toBe(0);
+  });
+});

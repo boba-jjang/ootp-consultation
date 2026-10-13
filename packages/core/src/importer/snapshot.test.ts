@@ -582,3 +582,145 @@ describe('assembleSnapshot on the Game 71 files (task Context)', () => {
     expect(other.events.map((event) => event.code)).toEqual(['dropped-no-appearances', 'identity']);
   });
 });
+
+describe('assembleSnapshot on Game 71 with its splits (Knowledge Base › Import contract › Split exports)', () => {
+  const G71 = fixtureFiles('seattle-g71/').map(routeFixture);
+  const SPLITS = fixtureFiles('seattle-g71/splits/').map(routeFixture);
+  const alone = assembleSnapshot(G71, { scale: '1-10' });
+  const snapshot = assembleSnapshot([...G71, ...SPLITS], { scale: '1-10' });
+  const json = (value: unknown) => JSON.stringify(value);
+
+  it('keeps Game 71’s season tables, label and coverage, as JSON', () => {
+    expect(SPLITS).toHaveLength(16);
+    expect(snapshot.label).toBe('Game 71');
+    expect(snapshot.gameNumber).toBe(71);
+    expect(json(snapshot.hitters)).toBe(json(alone.hitters));
+    expect(json(snapshot.pitchers)).toBe(json(alone.pitchers));
+    expect(json(snapshot.league)).toBe(json(alone.league));
+    expect(json(snapshot.coverage)).toBe(json(alone.coverage));
+  });
+
+  it('keeps Game 71’s season events, and adds the splits’ after them', () => {
+    expect(json(snapshot.events.slice(0, alone.events.length))).toBe(json(alone.events));
+    for (const event of snapshot.events.slice(alone.events.length)) {
+      expect(event.split !== undefined || event.code.startsWith('split-'), event.code).toBe(true);
+    }
+  });
+
+  it('keeps them whatever order the files come in, splits first included', () => {
+    const other = assembleSnapshot([...SPLITS].reverse().concat([...G71].reverse()), {
+      scale: '1-10',
+    });
+    expect(other.label).toBe('Game 71');
+    expect(byPlayer(other.hitters)).toEqual(byPlayer(alone.hitters));
+    expect(byPlayer(other.pitchers)).toEqual(byPlayer(alone.pitchers));
+    expect(byPlayer(other.league.hitters)).toEqual(byPlayer(alone.league.hitters));
+    expect(byPlayer(other.league.pitchers)).toEqual(byPlayer(alone.league.pitchers));
+    expect(json(other.coverage)).toBe(json(alone.coverage));
+    for (const split of ['L', 'R'] as const) {
+      const tables = other.splits?.[split];
+      expect(byPlayer(tables?.hitters ?? [])).toEqual(
+        byPlayer(snapshot.splits?.[split].hitters ?? []),
+      );
+      expect(byPlayer(tables?.league.pitchers ?? [])).toEqual(
+        byPlayer(snapshot.splits?.[split].league.pitchers ?? []),
+      );
+    }
+  });
+
+  it('builds a vs-left and a vs-right set of the four tables with the Context’s sizes', () => {
+    const sizes = (split: 'L' | 'R') => {
+      const tables = snapshot.splits?.[split];
+      return [
+        tables?.hitters.length,
+        tables?.pitchers.length,
+        tables?.league.hitters.length,
+        tables?.league.pitchers.length,
+      ];
+    };
+    expect(sizes('L')).toEqual([12, 13, 518, 453]);
+    expect(sizes('R')).toEqual([12, 13, 518, 455]);
+    const noPlateAppearances = (split: 'L' | 'R') =>
+      snapshot.splits?.[split].league.hitters.filter((row) => row.PA === 0).length;
+    expect([noPlateAppearances('L'), noPlateAppearances('R')]).toEqual([14, 13]);
+  });
+
+  it('gives Ishida 34 PA vs left, 175 vs right and 209 in the season', () => {
+    const pa = (rows: readonly ExportRow[] | undefined) =>
+      rows?.find((row) => row.Name === 'Yoshitsugu Ishida')?.PA;
+    expect(pa(snapshot.splits?.L.hitters)).toBe(34);
+    expect(pa(snapshot.splits?.R.hitters)).toBe(175);
+    expect(pa(snapshot.hitters)).toBe(209);
+    expect(pa(alone.hitters)).toBe(209);
+  });
+
+  it('fills the split tables from the stats splits only: the superstats splits fill none', () => {
+    const columns = new Set(
+      (['L', 'R'] as const).flatMap((split) => {
+        const tables = snapshot.splits?.[split];
+        return [
+          ...(tables?.hitters ?? []),
+          ...(tables?.pitchers ?? []),
+          ...(tables?.league.hitters ?? []),
+          ...(tables?.league.pitchers ?? []),
+        ].flatMap((row) => Object.keys(row));
+      }),
+    );
+    // Columns only the superstats views carry.
+    for (const column of ['BIP', 'xwOBA', 'xERA', 'EV', 'BatR']) {
+      expect(columns.has(column), column).toBe(false);
+    }
+    expect(columns.has('PA')).toBe(true);
+    expect(columns.has('BF')).toBe(true);
+  });
+
+  it('logs every file with its split, the season files with none', () => {
+    expect(snapshot.files).toHaveLength(32);
+    for (const file of snapshot.files) {
+      const expected = file.name.endsWith('_vsl.csv')
+        ? 'L'
+        : file.name.endsWith('_vsr.csv')
+          ? 'R'
+          : null;
+      expect(file.split, file.name).toBe(expected);
+      expect(file.routing, file.name).toBe('primary');
+    }
+    expect(alone.files.every((file) => file.split === null)).toBe(true);
+  });
+
+  it('builds each hand like the season: league pitchers with G = 0 dropped, and logged by hand', () => {
+    const dropped = snapshot.events.filter((event) => event.code === 'dropped-no-appearances');
+    expect(dropped.map((event) => [event.split, event.details])).toEqual([
+      [undefined, { count: 26 }],
+      ['L', { count: 28 }],
+      ['R', { count: 26 }],
+    ]);
+  });
+
+  it('checks the splits against the season: no warning, and two players without a season row', () => {
+    const checked = snapshot.events.filter((event) => event.code.startsWith('split-'));
+    expect(checked.filter((event) => event.level !== 'info')).toEqual([]);
+    expect(checked.map((event) => [event.scope, event.details?.name, event.details?.side])).toEqual(
+      [
+        ['team', 'Yukichi Jimbo', 'pitchers'],
+        ['league', 'Hisafumi Nakamoto', 'hitters'],
+      ],
+    );
+  });
+
+  it('has no splits without split files', () => {
+    expect(alone.splits).toBeNull();
+    expect(assembleSnapshot(routed(), { scale: '1-10' }).splits).toBeNull();
+  });
+
+  it('never dates a snapshot or counts toward coverage from split files', () => {
+    expect(gameNumberOf([...G71, ...SPLITS])).toBe(71);
+    expect(gameNumberOf(SPLITS)).toBeNull();
+    const splitsAlone = assembleSnapshot(SPLITS, { scale: '1-10' });
+    expect(splitsAlone.label).toBeNull();
+    expect(splitsAlone.hitters).toEqual([]);
+    expect(splitsAlone.league).toEqual({ hitters: [], pitchers: [] });
+    expect(json(splitsAlone.coverage)).toBe(json(assembleSnapshot([], { scale: '1-10' }).coverage));
+    expect(splitsAlone.splits?.L.hitters).toHaveLength(12);
+  });
+});

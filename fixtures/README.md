@@ -5,7 +5,7 @@ Real Out of the Park Baseball exports for the Seattle Arrows of the RSL, from fo
 - `seattle-g42/`, the Game 42 save: the most games any hitter has played is 42, and the team's record is 25–19.
 - `seattle-g53/`, the Game 53 save.
 - `seattle-g70/`, the fielding view at about game 70.
-- `seattle-g71/`, the owner's current custom views for the team and the whole league at Game 71.
+- `seattle-g71/`, the owner's current custom views for the team and the whole league at Game 71. Its `splits/` holds the four stats views split vs left and vs right.
 
 They are the golden test data for the importer and the models. Every file is stored byte for byte as exported (`.gitattributes` keeps their CRLF line endings), so never edit one by hand. Keep the file names: the importer records the name for provenance. They are the names OOTP gave each export, with two exceptions:
 
@@ -175,6 +175,39 @@ Importer 0.5.0 reads all 16 as primary (Knowledge Base › Import contract, and 
 - Seattle's 12 batting rows and 13 pitching rows in the league files equal the team files on every column but POS.
 - GO% = GB ÷ (GB + FB) holds within 0.006 on all 453 league pitching rows with GB + FB > 0, and CTC% = 100 − WH% on every pitching row with G > 0. The identities hold on every other row with appearances, with one exception: Ryan Lloyd (BOS) has BIP 219 against BF − K − BB − HBP = 221.
 - Every team hitter has HT (from the fielding stats) and Age (from the fielding ratings); every team pitcher has Age (from `cus_pitch_pot`).
+
+## seattle-g71/splits/
+
+Game 71's four stats views exported split vs left and vs right, for the team and the whole league: 16 files. The owner exported them after the Game 71 season files, and after four call-ups from JC: Bitgaram Mangjeol (a hitter) and Yukichi Jimbo, Bokkai Nikaido and Seung-woo Kim (pitchers). Each file has its season view's name with `_vsl` (vs left) or `_vsr` (vs right) before `.csv`, and exactly its season view's header. A hitter's row counts his plate appearances against left- or right-handed pitchers; a pitcher's counts the batters he faced who hit left or right. Every file uses CRLF on every line, with no byte-order mark and no quotes.
+
+| View (`…_vsl.csv` and `…_vsr.csv`) | Scope | Rows × columns | Fills |
+| --- | --- | --- | --- |
+| `seattle_arrows_lineups_-_overview_batting_stats_c` | Team | 12 × 48 | The team hitters' split tables |
+| `seattle_arrows_lineups_-_overview_batting_superstats_c` | Team | 12 × 56 | No table |
+| `seattle_arrows_lineups_-_overview_pitching_stats_c` | Team | 13 × 67 | The team pitchers' split tables |
+| `seattle_arrows_lineups_-_overview_pitching_superstats_c` | Team | 13 × 45 | No table |
+| `rsl_statistics_player_statistics_-_sortable_stats_batting_stats_c` | League | 518 × 48 | The league hitters' split tables |
+| `rsl_statistics_player_statistics_-_sortable_stats_batting_superstats_c` | League | 518 × 56 | No table |
+| `rsl_statistics_player_statistics_-_sortable_stats_pitching_stats_c` | League | 481 × 67 | The league pitchers' split tables |
+| `rsl_statistics_player_statistics_-_sortable_stats_pitching_superstats_c` | League | 481 × 45 | No table |
+
+Since importer 0.6.0 they fill split tables apart from the season's (Knowledge Base › Import contract › Split exports), and they never date a snapshot or count toward coverage:
+
+| Table | vs left | vs right |
+| --- | --- | --- |
+| Team hitters | 12 | 12 |
+| Team pitchers | 13 | 13 |
+| League hitters (14 and 13 of them with PA 0) | 518 | 518 |
+| League pitchers with G other than 0, of 481 rows | 453 | 455 |
+
+The superstats splits fill no table: they repeat the season's batted-ball and swing columns, and only G, GS, BatR, BsR and the expected stats (xBA, xSLG, xwOBA, and xERA for pitchers) differ from the season's.
+
+### Checks already run on seattle-g71/splits/
+
+- The 16 files have the same names and SHA-256 as the owner's exports.
+- vs left plus vs right equals Game 71's season on every team and league hitter in PA, AB, H, 1B, 2B, 3B, HR, BB, IBB, HP, SF and K, and on every pitcher in IP (as outs), BF, HA, HR, BB, K and HP. Yoshitsugu Ishida has 34 PA vs left, 175 vs right and 209 in the season.
+- The call-ups read SEA in the league splits, where Game 71 reads JC; paired by name, each adds up. Hisafumi Nakamoto (SEA, 0 PA) has no Game 71 row. The team pitching splits list Jimbo, who has no Game 71 team row, and not Lan-fang Lai.
+- GS isn't part of the check. A hitter's GS splits by the opposing starter's hand: it adds up for the 12 team hitters, and 11 league hitters are one start short. A pitcher's W, L, SV, HLD and GS aren't split.
 
 ## legacy/
 

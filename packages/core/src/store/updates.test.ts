@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   collectUploads,
   describeFile,
+  gameNumberOf,
   replacementKey,
   replacementProblem,
   routeExport,
@@ -220,6 +221,88 @@ describe('replacementProblem', () => {
     expect(g53('seattle_arrows_lineups_-_overview_default.csv')).toBe('default');
     expect(describeFile({ view: null, scope: 'team', side: null, routing: 'primary' })).toBe(
       'a custom view',
+    );
+  });
+});
+
+describe('split exports in replacement and descriptions (Knowledge Base › Import contract › Split exports)', () => {
+  const G71 = 'seattle-g71/';
+  const SPLIT = 'seattle-g71/splits/';
+  const TEAM_FILE = 'seattle_arrows_lineups_-_overview_';
+  const LEAGUE_FILE = 'rsl_statistics_player_statistics_-_sortable_stats_';
+  const split = (view: string, hand: 'vsl' | 'vsr', file = TEAM_FILE) =>
+    routeFixture(`${SPLIT}${file}${view}_${hand}.csv`);
+  const season = (view: string, file = TEAM_FILE) => routeFixture(`${G71}${file}${view}.csv`);
+
+  /** A split export as a re-export would bring it: the same name, one cell different. */
+  const reexported = (view: string, hand: 'vsl' | 'vsr') => {
+    const path = `${SPLIT}${TEAM_FILE}${view}_${hand}.csv`;
+    return routeExport(
+      path.split('/').at(-1) ?? path,
+      editCell(readFixtureText(path), 'Yoshitsugu Ishida', 'G', '68'),
+    );
+  };
+
+  it('puts the split in the replacement key, and leaves a season file’s key as it was', () => {
+    const left = split('batting_stats_c', 'vsl');
+    const right = split('batting_stats_c', 'vsr');
+    expect(replacementKey(left, left)).toBe('hitters|team|primary|L');
+    expect(replacementKey(right, left)).toBe('hitters|team|primary|R');
+    expect(replacementKey(season('batting_stats_c'), left)).toBe('hitters|team|primary');
+    expect(replacementKey(split('pitching_stats_c', 'vsr', LEAGUE_FILE), left)).toBe(
+      'pitchers|league|primary|R',
+    );
+  });
+
+  it('lets a split replace only the same view’s same split', () => {
+    const left = split('batting_stats_c', 'vsl');
+    expect(replacementProblem(left, 71, reexported('batting_stats_c', 'vsl'))).toBeNull();
+    expect(replacementProblem(left, 71, split('batting_stats_c', 'vsr'))).toBe(
+      'This file is a custom hitters view vs RHP, not a custom hitters view vs LHP.',
+    );
+    expect(replacementProblem(left, 71, season('batting_stats_c'))).toBe(
+      'This file is a custom hitters view, not a custom hitters view vs LHP.',
+    );
+    expect(replacementProblem(season('batting_stats_c'), 71, left)).toBe(
+      'This file is a custom hitters view vs LHP, not a custom hitters view.',
+    );
+  });
+
+  it('never refuses a split for its game, which its G can’t give', () => {
+    const left = split('batting_stats_c', 'vsl');
+    const candidate = reexported('batting_stats_c', 'vsl');
+    expect(gameNumberOf([candidate])).toBeNull();
+    expect(replacementProblem(left, 71, candidate)).toBeNull();
+    expect(replacementProblem(left, 99, candidate)).toBeNull();
+    expect(
+      replacementProblem(split('batting_stats_c', 'vsr'), 99, split('batting_stats_c', 'vsr')),
+    ).toBeNull();
+  });
+
+  it('names the split: vs LHP or vs RHP for hitters, vs LHB or vs RHB for pitchers, vs left or vs right for both', () => {
+    expect(describeFile(split('batting_stats_c', 'vsl'))).toBe('a custom hitters view vs LHP');
+    expect(describeFile(split('batting_stats_c', 'vsr', LEAGUE_FILE))).toBe(
+      'the league’s custom hitters view vs RHP',
+    );
+    expect(describeFile(split('pitching_stats_c', 'vsl'))).toBe('a custom pitchers view vs LHB');
+    expect(describeFile(split('pitching_stats_c', 'vsr', LEAGUE_FILE))).toBe(
+      'the league’s custom pitchers view vs RHB',
+    );
+    expect(
+      describeFile({ view: null, scope: 'team', side: null, split: 'L', routing: 'primary' }),
+    ).toBe('a custom view vs left');
+    expect(
+      describeFile({ view: 'default', scope: 'team', side: null, split: 'R', routing: 'primary' }),
+    ).toBe('default vs right');
+    expect(describeFile(season('batting_stats_c'))).toBe('a custom hitters view');
+  });
+
+  it('says a split that fills no table isn’t read', () => {
+    expect(describeFile(split('batting_superstats_c', 'vsl'))).toBe(
+      'a custom hitters view vs LHP (not read: it repeats the season’s columns)',
+    );
+    expect(describeFile(split('pitching_superstats_c', 'vsr', LEAGUE_FILE))).toBe(
+      'the league’s custom pitchers view vs RHB (not read: it repeats the season’s columns)',
     );
   });
 });

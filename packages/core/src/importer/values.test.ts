@@ -436,11 +436,13 @@ describe('parseCell on every fixture', () => {
 
   const fielding = files.filter((file) => file.startsWith('seattle-g70/'));
 
-  it('walks every folder of fixtures/, Game 53 and its overlap and Game 71 included', () => {
+  it('walks every folder of fixtures/, Game 53 and its overlap and Game 71 and its splits included', () => {
     expect(files.filter((file) => file.startsWith('seattle-g53/'))).toHaveLength(19);
     expect(fielding).toHaveLength(2);
-    expect(files.filter((file) => file.startsWith('seattle-g71/'))).toHaveLength(16);
-    expect(files).toHaveLength(56);
+    const splits = files.filter((file) => file.startsWith('seattle-g71/splits/'));
+    expect(files.filter((file) => file.startsWith('seattle-g71/'))).toHaveLength(32);
+    expect(splits).toHaveLength(16);
+    expect(files).toHaveLength(72);
   });
 
   it.each(files)('parses every cell of %s through the dictionary', (path) => {

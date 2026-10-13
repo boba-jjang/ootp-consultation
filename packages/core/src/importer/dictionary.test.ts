@@ -442,7 +442,9 @@ describe('the Game 71 columns (Knowledge Base › Import contract › Column dic
   });
 
   it('reads every column of the 16 Game 71 files, the fielding files marking no side', () => {
-    const files = fixturePaths().filter((path) => path.startsWith('seattle-g71/'));
+    const files = fixturePaths().filter(
+      (path) => path.startsWith('seattle-g71/') && !path.startsWith('seattle-g71/splits/'),
+    );
     expect(files).toHaveLength(16);
     for (const path of files) {
       const reading = readColumns(headerOf(path));
@@ -452,6 +454,16 @@ describe('the Game 71 columns (Knowledge Base › Import contract › Column dic
       } else {
         expect(reading.markers.hitters.length * reading.markers.pitchers.length, path).toBe(0);
       }
+    }
+  });
+
+  it('reads each of Game 71’s 16 splits exactly as its season view', () => {
+    const splits = fixturePaths().filter((path) => path.startsWith('seattle-g71/splits/'));
+    expect(splits).toHaveLength(16);
+    for (const path of splits) {
+      const season = path.replace('splits/', '').replace(/_vs[lr]\.csv$/, '.csv');
+      expect(headerOf(path), path).toEqual(headerOf(season));
+      expect(readColumns(headerOf(path)), path).toEqual(readColumns(headerOf(season)));
     }
   });
 });

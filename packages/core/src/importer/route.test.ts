@@ -22,6 +22,8 @@ const G53_TEAM = `${G53}seattle_arrows_lineups_-_overview_`;
 const G53_LEAGUE = `${G53}rsl_statistics_player_statistics_-_sortable_stats_`;
 const G71_TEAM = 'seattle-g71/seattle_arrows_lineups_-_overview_';
 const G71_LEAGUE = 'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_';
+const G71_TEAM_SPLIT = 'seattle-g71/splits/seattle_arrows_lineups_-_overview_';
+const G71_LEAGUE_SPLIT = 'seattle-g71/splits/rsl_statistics_player_statistics_-_sortable_stats_';
 
 // Every fixture and how it must route: the known view its header matches exactly (null for a
 // custom view), scope, the side its rows list (null when they list both), routing.
@@ -130,7 +132,34 @@ const EXPECTED: Record<string, Expected> = {
   [`${G71_LEAGUE}pitching_superstats_c.csv`]: [null, 'league', 'pitchers', 'primary'],
   [`${G71_LEAGUE}fielding_stats_cus.csv`]: [null, 'league', null, 'primary'],
   [`${G71_LEAGUE}fielding_ratings_cus.csv`]: [null, 'league', null, 'primary'],
+  // Game 71's splits (Knowledge Base › Import contract › Split exports): each routes as its
+  // season view does, vs left (_vsl) or vs right (_vsr).
+  [`${G71_TEAM_SPLIT}batting_stats_c_vsl.csv`]: [null, 'team', 'hitters', 'primary'],
+  [`${G71_TEAM_SPLIT}batting_stats_c_vsr.csv`]: [null, 'team', 'hitters', 'primary'],
+  [`${G71_TEAM_SPLIT}batting_superstats_c_vsl.csv`]: [null, 'team', 'hitters', 'primary'],
+  [`${G71_TEAM_SPLIT}batting_superstats_c_vsr.csv`]: [null, 'team', 'hitters', 'primary'],
+  [`${G71_TEAM_SPLIT}pitching_stats_c_vsl.csv`]: [null, 'team', 'pitchers', 'primary'],
+  [`${G71_TEAM_SPLIT}pitching_stats_c_vsr.csv`]: [null, 'team', 'pitchers', 'primary'],
+  [`${G71_TEAM_SPLIT}pitching_superstats_c_vsl.csv`]: [null, 'team', 'pitchers', 'primary'],
+  [`${G71_TEAM_SPLIT}pitching_superstats_c_vsr.csv`]: [null, 'team', 'pitchers', 'primary'],
+  [`${G71_LEAGUE_SPLIT}batting_stats_c_vsl.csv`]: [null, 'league', 'hitters', 'primary'],
+  [`${G71_LEAGUE_SPLIT}batting_stats_c_vsr.csv`]: [null, 'league', 'hitters', 'primary'],
+  [`${G71_LEAGUE_SPLIT}batting_superstats_c_vsl.csv`]: [null, 'league', 'hitters', 'primary'],
+  [`${G71_LEAGUE_SPLIT}batting_superstats_c_vsr.csv`]: [null, 'league', 'hitters', 'primary'],
+  [`${G71_LEAGUE_SPLIT}pitching_stats_c_vsl.csv`]: [null, 'league', 'pitchers', 'primary'],
+  [`${G71_LEAGUE_SPLIT}pitching_stats_c_vsr.csv`]: [null, 'league', 'pitchers', 'primary'],
+  [`${G71_LEAGUE_SPLIT}pitching_superstats_c_vsl.csv`]: [null, 'league', 'pitchers', 'primary'],
+  [`${G71_LEAGUE_SPLIT}pitching_superstats_c_vsr.csv`]: [null, 'league', 'pitchers', 'primary'],
 };
+
+const SPLITS = Object.keys(EXPECTED).filter((path) => path.startsWith('seattle-g71/splits/'));
+
+/** The split a fixture's name gives: L for _vsl, R for _vsr, null for a season file. */
+const splitOfPath = (path: string) =>
+  path.endsWith('_vsl.csv') ? 'L' : path.endsWith('_vsr.csv') ? 'R' : null;
+
+/** The superstats splits, which repeat the season's columns and fill no table. */
+const SPLIT_SUPERSTATS = SPLITS.filter((path) => path.includes('_superstats_'));
 
 // Game 53's files whose names carry neither OOTP prefix, so their rows give the scope.
 const SCOPE_FROM_ROWS = [
@@ -206,7 +235,7 @@ describe('routeExport on the fixtures', () => {
     }
   });
 
-  it('logs exactly today’s events for Game 42 and the legacy files, and only the scope for Game 53', () => {
+  it('logs exactly today’s events for Game 42 and the legacy files, only the scope for Game 53, and the split for Game 71’s splits', () => {
     for (const path of Object.keys(EXPECTED)) {
       const expected = OLDER.includes(path)
         ? ['older-version']
@@ -214,7 +243,11 @@ describe('routeExport on the fixtures', () => {
           ? ['supplemental-capture']
           : SCOPE_FROM_ROWS.includes(path)
             ? ['scope-from-rows']
-            : [];
+            : SPLIT_SUPERSTATS.includes(path)
+              ? ['split', 'split-no-table']
+              : SPLITS.includes(path)
+                ? ['split']
+                : [];
       expect(
         route(path).events.map((event) => event.code),
         path,
@@ -237,8 +270,8 @@ describe('routeExport on the fixtures', () => {
     expect(bio.rows.find((row) => row.Name === 'Dong-hee Moon')).toMatchObject({ POS: 'SS' });
   });
 
-  it('stamps importer version 0.5.0, for the Game 71 exports', () => {
-    expect(IMPORTER_VERSION).toBe('0.5.0');
+  it('stamps importer version 0.6.0, for the split exports', () => {
+    expect(IMPORTER_VERSION).toBe('0.6.0');
   });
 
   it('keeps only Name, POS and DEF Pot from the hitter capture, and says so', () => {
@@ -264,6 +297,69 @@ describe('routeExport on the fixtures', () => {
     const bio = route(teamView('default')).rows[0] ?? {};
     expect(bio).not.toHaveProperty('OVR');
     expect(bio).not.toHaveProperty('Inf');
+  });
+});
+
+describe('routeExport on split exports (Knowledge Base › Import contract › Split exports)', () => {
+  it('gives each of Game 71’s sixteen splits its split, and every other fixture none', () => {
+    expect(SPLITS).toHaveLength(16);
+    for (const path of Object.keys(EXPECTED)) {
+      expect(route(path).split, path).toBe(splitOfPath(path));
+    }
+    expect(SPLITS.filter((path) => route(path).split === 'L')).toHaveLength(8);
+    expect(SPLITS.filter((path) => route(path).split === 'R')).toHaveLength(8);
+  });
+
+  it('reads _vsl or _vsr before .csv in any case, and nowhere else in the name', () => {
+    const text = readFixtureText(`${G71_TEAM}batting_stats_c.csv`);
+    expect(routeExport('X_VSL.CSV', text).split).toBe('L');
+    expect(routeExport('x_VsR.csv', text).split).toBe('R');
+    expect(routeExport('vsl_batting_stats.csv', text).split).toBeNull();
+    expect(routeExport('batting_vsr_stats.csv', text).split).toBeNull();
+    expect(routeExport('batting_stats_vsl.txt', text).split).toBeNull();
+    expect(routeExport('batting_statsvsl.csv', text).split).toBeNull();
+  });
+
+  it('reads each split as its season view: the same routing, columns and players', () => {
+    for (const path of SPLITS) {
+      const season = route(path.replace('splits/', '').replace(/_vs[lr]\.csv$/, '.csv'));
+      const split = route(path);
+      expect(split, path).toMatchObject({
+        view: season.view,
+        scope: season.scope,
+        side: season.side,
+        routing: season.routing,
+      });
+      expect(Object.keys(split.rows[0] ?? {}), path).toEqual(Object.keys(season.rows[0] ?? {}));
+    }
+  });
+
+  it('names the split in an info event: vs LHP or vs RHP for hitters, vs LHB or vs RHB for pitchers', () => {
+    const named = (path: string) => route(path).events.find((event) => event.code === 'split');
+    expect(named(`${G71_TEAM_SPLIT}batting_stats_c_vsl.csv`)).toMatchObject({
+      level: 'info',
+      details: { split: 'L' },
+    });
+    expect(named(`${G71_TEAM_SPLIT}batting_stats_c_vsl.csv`)?.message).toContain('vs LHP');
+    expect(named(`${G71_LEAGUE_SPLIT}batting_stats_c_vsr.csv`)?.message).toContain('vs RHP');
+    expect(named(`${G71_TEAM_SPLIT}pitching_stats_c_vsl.csv`)?.message).toContain('vs LHB');
+    expect(named(`${G71_LEAGUE_SPLIT}pitching_superstats_c_vsr.csv`)?.message).toContain('vs RHB');
+  });
+
+  it('says the superstats splits fill no table, since they carry neither PA nor BF', () => {
+    for (const path of SPLITS) {
+      const event = route(path).events.find((candidate) => candidate.code === 'split-no-table');
+      if (SPLIT_SUPERSTATS.includes(path)) {
+        expect(event, path).toEqual({
+          level: 'info',
+          code: 'split-no-table',
+          message:
+            "Split superstats repeat the season's batted-ball and swing columns, so this file fills no table.",
+        });
+      } else {
+        expect(event, path).toBeUndefined();
+      }
+    }
   });
 });
 

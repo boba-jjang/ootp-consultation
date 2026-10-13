@@ -419,13 +419,14 @@ function riskOf(
  * pool's mean and population SD, signed so that higher is better. The |link|-weighted mean
  * of the z's is re-standardized over the pool rows carrying every counted stat, then mapped
  * to 50 + 10 z and held to 20–80. Null when no stat counts or the pool can't standardize.
+ * It reads no potential, so it scores any row, a league row without ratings included.
  */
-function evidenceOf(
+export function evidenceOf(
   player: ExportRow,
   pool: PeerPool,
   rows: readonly ExportRow[],
   stats: readonly EvidenceStat[],
-  settings: EstimatorSettings,
+  settings: EstimatorSettings = DEFAULT_ESTIMATOR_SETTINGS,
 ): Evidence | null {
   const counted = stats.flatMap((stat) => {
     const value = statOf(player, stat.stat);

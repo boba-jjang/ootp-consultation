@@ -265,6 +265,7 @@ These acceptance criteria differ from the canvas or from the Basis as written; t
 - [x] Build the talent estimator v0: priors from potentials and development risk, league-standardized evidence weighted by sample size, estimates with bands and flags (Knowledge Base › Ratings model › Talent estimator).
 - [x] Build the defensive model and eligibility matrix: position ratings from the fielding view, the fitted component formula where it's absent, one step off away from the played position, and fielding runs per season (Knowledge Base › Defensive model).
 - [x] Build lineup selection with the assignment model: batting runs from the talent estimates, fielding runs from the eligibility matrix, a catcher share with a backup catcher, and the best nine by exact assignment (Knowledge Base › Lineup optimization › Selection).
+- [x] Build event rates and batting runs: the hitters' pool floored at 3.1 PA per team game, event-rate lines refit per snapshot on the league's hitters, the league's wOBA weights recovered from its own wOBA and wRAA, and each hitter's projected wOBA and batting runs with a band (Knowledge Base › Lineup optimization › Ordering and › Selection).
 
 ## Frontend foundation
 

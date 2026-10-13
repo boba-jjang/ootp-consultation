@@ -95,13 +95,13 @@ isOneToOne: false
                   ]
                 },"view_files": {
                   Row: {
-                    "content": string,"created_at": string,"detected_view": string | null,"id": string,"importer_version": string,"original_filename": string,"owner_id": string,"routing": string,"scope": string | null,"sha256": string,"side": string | null,"snapshot_id": string
+                    "content": string,"created_at": string,"detected_view": string | null,"id": string,"importer_version": string,"original_filename": string,"owner_id": string,"routing": string,"scope": string | null,"sha256": string,"side": string | null,"snapshot_id": string,"split": string | null
                   }
                   Insert: {
-                    "content": string,"created_at"?: string,"detected_view"?: string | null,"id"?: string,"importer_version": string,"original_filename": string,"owner_id"?: string,"routing": string,"scope"?: string | null,"sha256": string,"side"?: string | null,"snapshot_id": string
+                    "content": string,"created_at"?: string,"detected_view"?: string | null,"id"?: string,"importer_version": string,"original_filename": string,"owner_id"?: string,"routing": string,"scope"?: string | null,"sha256": string,"side"?: string | null,"snapshot_id": string,"split"?: string | null
                   }
                   Update: {
-                    "content"?: string,"created_at"?: string,"detected_view"?: string | null,"id"?: string,"importer_version"?: string,"original_filename"?: string,"owner_id"?: string,"routing"?: string,"scope"?: string | null,"sha256"?: string,"side"?: string | null,"snapshot_id"?: string
+                    "content"?: string,"created_at"?: string,"detected_view"?: string | null,"id"?: string,"importer_version"?: string,"original_filename"?: string,"owner_id"?: string,"routing"?: string,"scope"?: string | null,"sha256"?: string,"side"?: string | null,"snapshot_id"?: string,"split"?: string | null
                   }
                   Relationships: [
                     {

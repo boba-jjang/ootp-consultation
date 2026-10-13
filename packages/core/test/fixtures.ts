@@ -35,9 +35,12 @@ export const fixtureFiles = (folder: string): string[] =>
 export const routeFixture = (path: string): RoutedExport =>
   routeExport(path.split('/').at(-1) ?? path, readFixtureText(path));
 
-/** A fixture folder, such as 'seattle-g70/', assembled into a snapshot on the 1–10 scale. */
-export const fixtureSnapshot = (folder: string): Snapshot =>
-  assembleSnapshot(fixtureFiles(folder).map(routeFixture), { scale: '1-10' });
+/**
+ * One or more fixture folders, such as 'seattle-g70/', assembled into one snapshot on the
+ * 1–10 scale.
+ */
+export const fixtureSnapshot = (...folders: string[]): Snapshot =>
+  assembleSnapshot(folders.flatMap(fixtureFiles).map(routeFixture), { scale: '1-10' });
 
 const text = (value: unknown) => (typeof value === 'string' ? value : '');
 

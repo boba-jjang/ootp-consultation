@@ -4,17 +4,20 @@ import {
   DEFAULT_ESTIMATOR_SETTINGS,
   DEFAULT_PERCENTILE_SETTINGS,
   assembleSnapshot,
+  evidenceOf,
+  percentilePools,
   roleOf,
   teamEstimates,
   toTwentyEighty,
   type ComponentEstimate,
   type ComponentId,
+  type ComponentSettings,
   type EstimatorSettings,
   type ExportRow,
   type PlayerEstimates,
   type Snapshot,
 } from '../index.ts';
-import { fixtureFiles, routeFixture } from '../../test/fixtures.ts';
+import { fixtureFiles, fixtureSnapshot, routeFixture } from '../../test/fixtures.ts';
 
 /** One 1–10 step on 20–80: 60 ÷ (10 − 1). */
 const STEP = 60 / 9;
@@ -795,4 +798,102 @@ describe('teamEstimates on hand-built snapshots', () => {
     // High risk: two steps of one point each below 60.
     expect(componentOf(player, 'avoidKs').prior).toBe(58);
   });
+});
+
+describe('evidenceOf, the evidence step for any row (Knowledge Base › Talent estimator, step 2)', () => {
+  const settings = DEFAULT_ESTIMATOR_SETTINGS;
+
+  it.each(['seattle-g42/', 'seattle-g53/', 'seattle-g71/'])(
+    'gives the evidence the estimator reports for every team player on %s',
+    (folder) => {
+      const snapshot = fixtureSnapshot(folder);
+      const pools = percentilePools(snapshot, settings.pools);
+      const results = teamEstimates(snapshot);
+      let compared = 0;
+      for (const side of ['hitters', 'pitchers'] as const) {
+        const rows = snapshot[side].filter((row) => typeof row.Name === 'string');
+        const players = results.filter((player) => player.side === side);
+        expect(players).toHaveLength(rows.length);
+        players.forEach((player, i) => {
+          const row = rows[i] ?? {};
+          expect(row.Name).toBe(player.name);
+          for (const [id, component] of Object.entries(player.components)) {
+            const configs: Record<string, ComponentSettings> = settings.components[side];
+            const stats = configs[id]?.evidence ?? [];
+            const evidence =
+              player.pool === null
+                ? null
+                : evidenceOf(row, player.pool, pools[player.pool], stats, settings);
+            expect(evidence, `${player.name} ${id}`).toEqual(component.evidence);
+            compared += evidence === null ? 0 : 1;
+          }
+        });
+      }
+      expect(compared).toBeGreaterThan(0);
+    },
+  );
+
+  it('scores Game 53’s league hitters, whose rows carry no potentials, on all five components', () => {
+    const g53 = fixtureSnapshot('seattle-g53/');
+    const pool = percentilePools(g53, settings.pools).hitters;
+    expect(g53.league.hitters).toHaveLength(199);
+    for (const [i, row] of g53.league.hitters.entries()) {
+      expect(row).not.toHaveProperty('K P');
+      expect(row).not.toHaveProperty('POW P');
+      for (const [id, config] of Object.entries(settings.components.hitters)) {
+        const evidence = evidenceOf(row, 'hitters', pool, config.evidence);
+        expect(evidence, `row ${String(i)} ${id}`).not.toBeNull();
+        expect(evidence?.pool).toBe('hitters');
+      }
+    }
+  });
+
+  it('scores a row without ratings as it scores the same stats with them', () => {
+    const pool: ExportRow[] = [
+      { Name: 'Lou', 'K%': 0.1, 'WH%': 0.2 },
+      { Name: 'Lee', 'K%': 0.2, 'WH%': 0.2 },
+      { Name: 'Lin', 'K%': 0.3, 'WH%': 0.5 },
+    ];
+    const stats = settings.components.hitters.avoidKs.evidence;
+    const bare: ExportRow = { Name: 'Ann', 'K%': 0.15, 'WH%': 0.25 };
+    const rated: ExportRow = { ...bare, 'K P': 50, 'Contact P': 50, Risk: 2 };
+    const evidence = evidenceOf(bare, 'hitters', pool, stats);
+    expect(evidence).not.toBeNull();
+    expect(evidence).toEqual(evidenceOf(rated, 'hitters', pool, stats, settings));
+    expect(evidence?.n).toBe(3);
+    // And the estimator reports the same for a hitter with a potential.
+    const [player] = teamEstimates({
+      label: null,
+      scale: '1-10',
+      hitters: [{ POS: 'CF', TM: 'Here', PA: 100, ...rated }],
+      pitchers: [],
+      league: { hitters: pool, pitchers: [] },
+    });
+    expect(player?.components.avoidKs?.evidence).toEqual(evidence);
+  });
+
+  it('gives null where no stat counts', () => {
+    const stats = settings.components.hitters.power.evidence;
+    expect(evidenceOf({ Name: 'Ann', 'K%': 0.2 }, 'hitters', [], stats)).toBeNull();
+  });
+
+  it('standardizes Game 71’s evidence over the 199 qualified hitters', () => {
+    const g71 = fixtureSnapshot('seattle-g71/');
+    const shinn = playerOf(teamEstimates(g71), 'Jin-soo Shinn');
+    expect(componentOf(shinn, 'avoidKs').evidence?.n).toBe(199);
+    expect(componentOf(shinn, 'power').evidence?.n).toBe(199);
+  });
+
+  it.each([['seattle-g42/'], ['seattle-g53/'], ['seattle-g70/']])(
+    'estimates %s exactly as with every league hitter in the pool, as before',
+    (folder) => {
+      const snapshot = fixtureSnapshot(folder);
+      const everyone = {
+        ...settings,
+        pools: { ...settings.pools, hitterPaPerGame: 0 },
+      };
+      expect(percentilePools(snapshot, everyone.pools).hitters).toEqual(snapshot.league.hitters);
+      expect(teamEstimates(snapshot)).toEqual(teamEstimates(snapshot, everyone));
+    },
+  );
 });

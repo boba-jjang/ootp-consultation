@@ -306,3 +306,34 @@ describe('split exports in replacement and descriptions (Knowledge Base › Impo
     );
   });
 });
+
+describe('replacing a file dropped in a split window (Knowledge Base › Import contract › Split exports)', () => {
+  const LEFT = 'seattle-g71/splits/seattle_arrows_lineups_-_overview_batting_stats_c_vsl.csv';
+  const RIGHT = 'seattle-g71/splits/seattle_arrows_lineups_-_overview_batting_stats_c_vsr.csv';
+  /** OOTP's own name for the export, without the _vsl or _vsr the fixtures add. */
+  const OOTP_NAME = 'seattle_arrows_lineups_-_overview_batting_stats_c.csv';
+  /** The vs-left batting split as the vs-left window stored it. */
+  const stored = routeExport(OOTP_NAME, readFixtureText(LEFT), 'L');
+  /** A re-export of it, still unrenamed. */
+  const reexport = editCell(readFixtureText(LEFT), 'Yoshitsugu Ishida', 'G', '27');
+
+  it('takes an unrenamed re-export routed with the stored file’s split', () => {
+    expect(stored).toMatchObject({ split: 'L', routing: 'primary' });
+    expect(
+      replacementProblem(stored, 71, routeExport(OOTP_NAME, reexport, stored.split)),
+    ).toBeNull();
+  });
+
+  it('would refuse it routed by its name alone, which says season', () => {
+    expect(replacementProblem(stored, 71, routeExport(OOTP_NAME, reexport))).toBe(
+      'This file is a custom hitters view, not a custom hitters view vs LHP.',
+    );
+  });
+
+  it('refuses a file whose name says the other split', () => {
+    const named = RIGHT.split('/').at(-1) ?? RIGHT;
+    expect(
+      replacementProblem(stored, 71, routeExport(named, readFixtureText(RIGHT), stored.split)),
+    ).toBe("This file's name says vs right, but it was dropped in vs left.");
+  });
+});

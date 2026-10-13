@@ -78,6 +78,19 @@
   font-weight: var(--weight-semibold);
 }
 
+/* The split windows: side by side under the main drop zone, one under the other when narrow. */
+.splitZones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.splitZones > * {
+  display: grid;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
 .subtitle {
   font-size: var(--text-14);
   font-weight: var(--weight-semibold);

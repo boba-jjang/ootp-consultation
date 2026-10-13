@@ -254,6 +254,7 @@ These acceptance criteria differ from the canvas or from the Basis as written; t
 - [x] Import the fielding view: its columns in the column dictionary, fielding counts kept apart from batting and pitching, rows placed by POS on both scopes, and TM read as the team's short code (Knowledge Base › Import contract).
 - [x] Read the owner's Game 71 exports: pitching views with TM, the fielding ratings view, GB, FB and TP, and pitchers keyed on team plus name (Knowledge Base › Import contract).
 - [x] Import split exports apart from the season tables: files ending `_vsl` or `_vsr`, a vs-left and a vs-right table per side and scope, checked against the season; they never date a snapshot or count toward coverage (Knowledge Base › Import contract › Split exports).
+- [x] Upload split exports through vs-left and vs-right windows in the Clubhouse; each stored file keeps its split through reloads, replacement, Export team and restore (Knowledge Base › Import contract › Split exports).
 - [x] Detect each export's view and header version from its header row, with every version in the header manifest (Knowledge Base › Import contract › Header manifest).
 - [x] Route each export: read the CSV and file name, and route it as primary, supplemental or rejected, with its scope, side and import events (Knowledge Base › Import contract).
 - [x] Validate a snapshot across its files: names and positions, repeated columns, identities, the rating scale and league rows (Knowledge Base › Import contract › Invariants).

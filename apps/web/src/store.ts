@@ -4,6 +4,7 @@ import type {
   Scope,
   Side,
   SnapshotStore,
+  Split,
   StoredSnapshot,
   StoredViewFile,
   ViewId,
@@ -19,7 +20,7 @@ export async function sha256(text: string): Promise<string> {
 }
 
 const FILE_COLUMNS =
-  'id, original_filename, content, sha256, detected_view, side, scope, routing, importer_version';
+  'id, original_filename, content, sha256, detected_view, side, scope, split, routing, importer_version';
 
 /**
  * The team store on Supabase: snapshots, view_files and import_events, limited to the signed-in
@@ -76,6 +77,7 @@ export function supabaseStore(client: Client): SnapshotStore {
         detectedView: row.detected_view as ViewId | null,
         side: row.side as Side | null,
         scope: row.scope as Scope | null,
+        split: row.split as Split | null,
         routing: row.routing as Routing,
         importerVersion: row.importer_version,
       }));
@@ -92,6 +94,7 @@ export function supabaseStore(client: Client): SnapshotStore {
           detected_view: file.detectedView,
           side: file.side,
           scope: file.scope,
+          split: file.split,
           routing: file.routing,
           importer_version: file.importerVersion,
         })

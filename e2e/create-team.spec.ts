@@ -1,7 +1,7 @@
-import { readdirSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type FileChooser, type Locator, type Page } from '@playwright/test';
 
 import { deleteStaleTeams, deleteTeamNamed, signIn, withSession, type Session } from './auth.ts';
 import { expectAccessible, expectNoSideScroll, expectTargets } from './checks.ts';
@@ -19,6 +19,7 @@ const required = () => {
 };
 const FIXTURES = fileURLToPath(new URL('../fixtures/seattle-g42/', import.meta.url));
 const GAME_53 = fileURLToPath(new URL('../fixtures/seattle-g53/', import.meta.url));
+const SPLITS = fileURLToPath(new URL('../fixtures/seattle-g71/splits/', import.meta.url));
 const PREFIX = 'E2E Seattle Arrows';
 /** One team per run and project: the desktop and phone projects run at the same time. */
 const teamName = () =>
@@ -36,12 +37,18 @@ const csvFiles = (folder: string) =>
 const allFiles = () => csvFiles(FIXTURES);
 
 const STAFF_RATINGS = 'seattle_arrows_lineups_-_overview_cus_pitch_pot.csv';
+/** OOTP's own name for Game 71's batting view, which a split export of it keeps too. */
+const G71_BATTING = 'seattle_arrows_lineups_-_overview_batting_stats_c.csv';
 
-/** Opens the file picker from a button and chooses files in it. */
-async function chooseFiles(page: Page, button: Locator, paths: string[]) {
+/** Opens the file picker from a button and chooses files in it, as paths or as payloads. */
+async function chooseFiles(
+  page: Page,
+  button: Locator,
+  files: Parameters<FileChooser['setFiles']>[0],
+) {
   const chooser = page.waitForEvent('filechooser');
   await button.click();
-  await (await chooser).setFiles(paths);
+  await (await chooser).setFiles(files);
 }
 
 /**
@@ -210,6 +217,61 @@ test.describe('Create a Team from the fixtures', () => {
     await expectAccessible(page);
     await expectTargets(page);
     await expectNoSideScroll(page);
+  });
+
+  test('keeps a split dropped in the vs-left window as vs left through a reload', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    if (!session || !clubhouse) {
+      throw new Error('the first test did not create the team');
+    }
+    await withSession(page, required().env, session);
+    await page.goto(clubhouse);
+    await expect(page.getByRole('heading', { level: 1, name: 'The Clubhouse' })).toBeVisible();
+    const left = page.getByRole('group', { name: 'Split vs left' });
+    await expect(
+      left.getByText('Stored as the vs-left split, whatever the file is called.'),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole('group', { name: 'Split vs right' })
+        .getByText('Split vs right', { exact: true }),
+    ).toBeVisible();
+
+    // The batting split under OOTP's own name, without the fixture's _vsl: the window says it.
+    await chooseFiles(page, left.getByRole('button', { name: 'Add more files' }), [
+      {
+        name: G71_BATTING,
+        mimeType: 'text/csv',
+        buffer: readFileSync(`${SPLITS}${G71_BATTING.replace(/\.csv$/, '_vsl.csv')}`),
+      },
+    ]);
+    await expect(
+      page.getByText('added as a custom hitters view vs LHP', { exact: true }),
+    ).toBeVisible({ timeout: 30_000 });
+    const log = page
+      .locator('section', {
+        has: page.getByRole('heading', { name: 'Import log', exact: true }),
+      })
+      .last();
+    const row = log.getByRole('listitem').filter({ hasText: G71_BATTING });
+    await expect(
+      row.getByText('Routed to unknown view, hitters, vs LHP', { exact: true }),
+    ).toBeVisible();
+    await expectAccessible(page);
+    await expectTargets(page);
+    await expectNoSideScroll(page);
+
+    // After a reload the stored split still reads it as vs left, not as a season file.
+    await page.reload();
+    await expect(page.getByRole('heading', { level: 1, name: 'The Clubhouse' })).toBeVisible();
+    await expect(
+      row.getByText('Routed to unknown view, hitters, vs LHP', { exact: true }),
+    ).toBeVisible({
+      timeout: 30_000,
+    });
+    await expect(row).toHaveCount(1);
   });
 
   test('takes the first exports of a team set up without files', async ({ page }) => {

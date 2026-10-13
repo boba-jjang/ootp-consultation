@@ -92,7 +92,10 @@ export const COLUMN_NOTES: readonly ColumnNote[] = [
   { columns: ['HLD'], views: ['pitching_stats_1'], note: 'Holds, the relief stat' },
   { columns: ['HLD'], views: ['cus_pitch_pot'], note: 'The hold-runners rating, not holds' },
   { columns: ['ERA+'], note: 'Capped at 999 by OOTP' },
-  { columns: ['VELO'], note: 'A range such as 96-98, stored as low, high and mid' },
+  {
+    columns: ['VELO'],
+    note: 'A range such as 96-98, stored as low, high and mid; the top grade, 100+, reads as 100 to 102',
+  },
   {
     columns: ['WE', 'INT', 'Risk'],
     note: 'Ordinals (Low, Normal, High; risk from Very Low to Extreme), kept in order',

@@ -378,7 +378,11 @@ export function selectLineup(
     };
   };
 
-  /** The total's drop with the chosen hitter barred from the position. */
+  /**
+   * The total's drop with the chosen hitter barred from the position. At C, where barring him
+   * empties the backup slot today's lineup fills, the backup's value leaves the base total too,
+   * so the cost measures the change at catcher alone (Knowledge Base › Selection, Output).
+   */
   const alternativeCost = (slot: LineupSlot, hitter: number): number | null => {
     if (!feasible) {
       return null;
@@ -388,7 +392,12 @@ export function selectLineup(
     if ((alternative.short?.length ?? 0) > 0 || alternative.columns[index] === null) {
       return null;
     }
-    return base.total - alternative.total;
+    const backupIndex = slots.indexOf('C2');
+    const backup = base.columns[backupIndex];
+    const emptied =
+      slot === 'C' && backup !== null && backup !== undefined && alternative.backupEmpty;
+    const backupValue = emptied ? (values[backup]?.[backupIndex]?.value ?? 0) : 0;
+    return base.total - backupValue - alternative.total;
   };
 
   const starters: SlotEntry[] = [];

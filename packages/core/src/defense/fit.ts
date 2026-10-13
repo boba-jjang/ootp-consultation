@@ -1,4 +1,5 @@
 import type { ExportRow } from '../importer/route.ts';
+import type { Snapshot } from '../importer/snapshot.ts';
 import { RATING_COLUMNS } from '../ratings/columns.ts';
 import {
   fromTwentyEighty,
@@ -6,12 +7,15 @@ import {
   toTwentyEighty,
   type RatingScale,
 } from '../ratings/scale.ts';
+import type { DefenseSettings } from './defense.ts';
 
 /**
- * The formula fit behind the defensive model: Knowledge Base › Defensive model › What drives
- * each position. Each position's rating from the game is regressed, by ordinary least squares
- * with an intercept, on the fielding components, all on 20–80 (height in inches), over every
- * league row that carries the rating.
+ * The fits behind the defensive model: Knowledge Base › Defensive model. The formula fit (What
+ * drives each position) regresses each position's rating from the game, by ordinary least
+ * squares with an intercept, on the fielding components, all on 20–80 (height in inches), over
+ * every league row that carries the rating. The fielding fit (Eligibility matrix) gives each
+ * position's line of zone rating plus arm runs against the rating, and k, the innings at which a
+ * fielder's own runs weigh as much as the line.
  */
 
 export const FIELD_POSITIONS = ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF'] as const;
@@ -60,6 +64,8 @@ export interface DefenseFit {
 
 const MAX_RATING = 80;
 const MIN_RATING = 20;
+/** Innings in a game: a rate per `rateGames` games is per this many times as many innings. */
+const INNINGS_PER_GAME = 9;
 
 /** A formula's value on 20–80: unrounded and not held to the scale. Null where a component is missing. */
 export function applyFormula(formula: PositionFormula, row: ExportRow): number | null {
@@ -223,4 +229,115 @@ function solve(a: readonly (readonly number[])[], b: readonly number[]): number[
   return x;
 }
 
-export { MAX_RATING, MIN_RATING };
+/** A position's fielding runs per `rateGames` games at a rating on 20–80: intercept + slope × rating. */
+export interface FieldingLine {
+  intercept: number;
+  slope: number;
+}
+
+export interface FieldingLineFit {
+  /** League fielders at the position with a DEF and the innings floor. */
+  count: number;
+  /** Null when those fielders don't span two ratings. */
+  line: FieldingLine | null;
+}
+
+export interface FieldingFit {
+  positions: Readonly<Record<FieldPosition, FieldingLineFit>>;
+  /** The variance of fielders' true runs per `rateGames` games about their line; null when the fit can't run. */
+  trueVariance: number | null;
+  /** The variance `rateGames` games of a fielder's runs add on top of it; null when the fit can't run. */
+  noise: number | null;
+  /** k: noise ÷ true variance × the innings in `rateGames` games; null unless both are positive. */
+  blendInnings: number | null;
+}
+
+const numberOr = (value: unknown, fallback: number) =>
+  typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+
+/**
+ * The fielding lines and k: Knowledge Base › Defensive model › Eligibility matrix. Each position
+ * takes the league rows with its POS, a DEF and at least `fitInnings` innings (Fielding IP outs ÷
+ * 3). Its line is the innings-weighted least squares of zone rating plus arm runs per `rateGames`
+ * games (a missing one counts 0) on DEF converted to 20–80 from the snapshot's scale. k comes from
+ * one unweighted least-squares fit, over every position's rows, of the squared residual from its
+ * line on 1 and the innings in `rateGames` games ÷ innings: the constant is the true variance and
+ * the other coefficient the noise. The model reads the settings; this reproduces them.
+ */
+export function fitFielding(
+  snapshot: Pick<Snapshot, 'league' | 'scale'>,
+  settings: Pick<DefenseSettings, 'fitInnings' | 'rateGames'>,
+): FieldingFit {
+  const rateInnings = settings.rateGames * INNINGS_PER_GAME;
+  const rows = [...snapshot.league.hitters, ...snapshot.league.pitchers];
+  const positions = {} as Record<FieldPosition, FieldingLineFit>;
+  const residuals: { scale: number; squared: number }[] = [];
+  for (const position of FIELD_POSITIONS) {
+    const used = rows.flatMap((row) => {
+      const outs = row['Fielding IP'];
+      const def = row.DEF;
+      if (row.POS !== position || typeof outs !== 'number' || typeof def !== 'number') {
+        return [];
+      }
+      const innings = outs / 3;
+      if (innings <= 0 || innings < settings.fitInnings) {
+        return [];
+      }
+      const runs = ((numberOr(row.ZR, 0) + numberOr(row.ARM, 0)) / innings) * rateInnings;
+      return [{ innings, runs, rating: toTwentyEighty(def, snapshot.scale) }];
+    });
+    const line = weightedLine(used);
+    positions[position] = { count: used.length, line };
+    if (line !== null) {
+      for (const { innings, runs, rating } of used) {
+        const residual = runs - (line.intercept + line.slope * rating);
+        residuals.push({ scale: rateInnings / innings, squared: residual ** 2 });
+      }
+    }
+  }
+  const variance =
+    residuals.length < 2
+      ? null
+      : solve(
+          [
+            [residuals.length, sum(residuals.map((row) => row.scale))],
+            [sum(residuals.map((row) => row.scale)), sum(residuals.map((row) => row.scale ** 2))],
+          ],
+          [
+            sum(residuals.map((row) => row.squared)),
+            sum(residuals.map((row) => row.scale * row.squared)),
+          ],
+        );
+  const [trueVariance = null, noise = null] = variance ?? [];
+  return {
+    positions,
+    trueVariance,
+    noise,
+    blendInnings:
+      trueVariance !== null && noise !== null && trueVariance > 0 && noise > 0
+        ? (noise / trueVariance) * rateInnings
+        : null,
+  };
+}
+
+/** Weighted least squares of runs on rating, weighted by innings; null without two ratings. */
+function weightedLine(
+  rows: readonly { innings: number; runs: number; rating: number }[],
+): FieldingLine | null {
+  const weight = sum(rows.map((row) => row.innings));
+  if (weight <= 0) {
+    return null;
+  }
+  const meanRating = sum(rows.map((row) => row.innings * row.rating)) / weight;
+  const meanRuns = sum(rows.map((row) => row.innings * row.runs)) / weight;
+  const spread = sum(rows.map((row) => row.innings * (row.rating - meanRating) ** 2));
+  if (spread <= 0) {
+    return null;
+  }
+  const slope =
+    sum(rows.map((row) => row.innings * (row.rating - meanRating) * (row.runs - meanRuns))) /
+    spread;
+  return { intercept: meanRuns - slope * meanRating, slope };
+}
+
+export { INNINGS_PER_GAME, MAX_RATING, MIN_RATING };

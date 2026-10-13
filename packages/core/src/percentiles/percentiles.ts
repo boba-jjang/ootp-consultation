@@ -131,17 +131,16 @@ export function roleOf(
 }
 
 /**
- * The qualified hitters: Knowledge Base › League percentiles › Peer pools. A league hitter
- * qualifies with PA of at least hitterPaPerGame × his team's games, the most G among the
- * league hitter rows with his TM that carry PA. A team with fewer such rows than
- * hitterTeamRows, or none with a G, takes the most G of any league hitter row with PA. A row
- * without PA is below the floor; when no row carries PA, every row qualifies.
+ * A league hitter's team games, as the hitters' floor counts them: Knowledge Base › League
+ * percentiles › Peer pools. They are the most G among the league hitter rows with his TM that
+ * carry PA. A team with fewer such rows than hitterTeamRows, or none with a G, and a row without
+ * TM take the most G of any league hitter row with PA, which is 0 when none has one.
  */
-function qualifiedHitters(rows: readonly ExportRow[], settings: PercentileSettings): ExportRow[] {
+export function teamGames(
+  rows: readonly ExportRow[],
+  settings: PercentileSettings = DEFAULT_PERCENTILE_SETTINGS,
+): (row: ExportRow) => number {
   const withPa = rows.filter((row) => numberOf(row.PA) !== null);
-  if (withPa.length === 0) {
-    return [...rows];
-  }
   const teams = new Map<string, { rows: number; games: number | null }>();
   let leagueGames = 0;
   for (const row of withPa) {
@@ -160,11 +159,23 @@ function qualifiedHitters(rows: readonly ExportRow[], settings: PercentileSettin
     teams.set(row.TM, team);
   }
   // A row without TM has no team of its own, so it takes the league's games.
-  const gamesOf = (row: ExportRow) => {
+  return (row: ExportRow) => {
     const team = typeof row.TM === 'string' ? teams.get(row.TM) : undefined;
     const own = team !== undefined && team.rows >= settings.hitterTeamRows ? team.games : null;
     return own ?? leagueGames;
   };
+}
+
+/**
+ * The qualified hitters: Knowledge Base › League percentiles › Peer pools. A league hitter
+ * qualifies with PA of at least hitterPaPerGame × his team's games, as `teamGames` counts them.
+ * A row without PA is below the floor; when no row carries PA, every row qualifies.
+ */
+function qualifiedHitters(rows: readonly ExportRow[], settings: PercentileSettings): ExportRow[] {
+  if (!rows.some((row) => numberOf(row.PA) !== null)) {
+    return [...rows];
+  }
+  const gamesOf = teamGames(rows, settings);
   return rows.filter((row) => {
     const pa = numberOf(row.PA);
     return pa !== null && pa >= settings.hitterPaPerGame * gamesOf(row);

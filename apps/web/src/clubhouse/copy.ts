@@ -1,9 +1,13 @@
 import {
   DATA_SETS,
   DATA_SET_INFO,
+  VIEW_MANIFESTS,
+  columnNotesFor,
+  columnNotesForHeader,
   dataSetName,
   type Coverage,
   type DataSet,
+  type ImportedFile,
   type Side,
   type ViewId,
 } from '@ootp/core';
@@ -12,8 +16,8 @@ import { upperFirst } from '../setup/exports.ts';
 
 /**
  * The Clubhouse's copy, as pure functions of the coverage and the counts, so the screen only
- * renders it: the cards of what to upload next, the matrix headings, the Add data drop zone
- * and the timeline's labels.
+ * renders it: the cards of what to upload next, the matrix headings, the Add data drop zone,
+ * the timeline's labels and what "How columns were read" lists.
  */
 
 /** The Add data drop zone. */
@@ -82,4 +86,56 @@ export function usedFileCounts(
 /** "Game 53, 13 files": a snapshot on the timeline, the game alone until its files are counted. */
 export function timelineLabel(label: string, files: number | undefined): string {
   return files === undefined ? label : `${label}, ${files} ${files === 1 ? 'file' : 'files'}`;
+}
+
+/** One choice of "How columns were read": one of OOTP's team views, or a custom team file. */
+export interface ColumnNotesEntry {
+  /** The selector's value: the view, or the file's place in the import log with its name. */
+  key: string;
+  /** What the selector shows: the view's name, or the file's. */
+  label: string;
+  notes: { columns: string[]; note: string }[];
+  /** The header the notes come from, for "All N columns". */
+  columns: readonly string[];
+  /** The file's name, for the panel's meta. */
+  file: string;
+}
+
+/**
+ * What "How columns were read" lists: OOTP's own team views on file first, in manifest order,
+ * each with its notes, its manifest header and its primary file's name. Then every custom
+ * team file read from the season files (no view, team scope, primary, no split), by name in
+ * import-log order, with the notes its own header earns. League, supplemental, rejected and
+ * split files stay out. pitching_stats_2 shows first when it's on file, otherwise the first
+ * entry; with neither kind on file there's nothing to list.
+ */
+export function columnNotesList(
+  views: readonly ViewId[],
+  files: readonly ImportedFile[],
+): { entries: ColumnNotesEntry[]; initial: string | undefined } {
+  const ootp = views.map((view): ColumnNotesEntry => ({
+    key: view,
+    label: view,
+    notes: columnNotesFor(view),
+    columns: VIEW_MANIFESTS[view].versions.at(-1) ?? [],
+    file: files.find((file) => file.view === view && file.routing === 'primary')?.name ?? view,
+  }));
+  const custom = files.flatMap((file, index): ColumnNotesEntry[] =>
+    file.view === null && file.scope === 'team' && file.routing === 'primary' && file.split === null
+      ? [
+          {
+            key: `${String(index)}:${file.name}`,
+            label: file.name,
+            notes: columnNotesForHeader(file.header),
+            columns: file.header,
+            file: file.name,
+          },
+        ]
+      : [],
+  );
+  const entries = [...ootp, ...custom];
+  return {
+    entries,
+    initial: views.includes('pitching_stats_2') ? 'pitching_stats_2' : entries[0]?.key,
+  };
 }

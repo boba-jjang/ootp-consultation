@@ -54,6 +54,7 @@ const teamFile = (view: ViewId): RoutedExport => ({
   side: VIEW_MANIFESTS[view].side,
   split: null,
   routing: 'primary',
+  header: [...(VIEW_MANIFESTS[view].versions.at(-1) ?? [])],
   rows: (VIEW_MANIFESTS[view].side === 'hitters' ? HITTERS : PITCHERS).map((player) => ({
     ...blankColumns(view),
     ...player,
@@ -93,6 +94,7 @@ export const SHEET_FILES: RoutedExport[] = [
     side: null,
     split: null,
     routing: 'rejected',
+    header: ['Player', 'Notes'],
     rows: [],
     events: [{ level: 'error', code: 'unknown-view', message: 'No view has these columns.' }],
     importerVersion: 'sheet',
@@ -109,6 +111,7 @@ export const SHEET_LOG: ImportedFile[] = SHEET_FILES.map((file, index) => ({
   scope: file.scope,
   split: file.split,
   routing: file.routing,
+  header: file.header,
   players: file.rows.length,
   events: file.events,
 }));

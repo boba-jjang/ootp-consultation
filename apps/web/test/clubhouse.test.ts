@@ -207,8 +207,16 @@ describe('How columns were read', () => {
       expect(entry.key).toBe(view);
       expect(entry.notes).toEqual(columnNotesFor(view));
       expect(entry.columns).toEqual(VIEW_MANIFESTS[view].versions.at(-1));
-      expect(entry.file).toBe(`${TEAM}${view}.csv`);
+      // The meta names the view's first primary file in the import log, as before: in name
+      // order the league's superstats files come before the team's.
+      const first = g42.snapshot.files.find(
+        (file) => file.view === view && file.routing === 'primary',
+      );
+      expect(entry.file).toBe(first?.name);
     }
+    expect(g42.list.entries.find((entry) => entry.key === 'pitching_stats_2')?.file).toBe(
+      `${TEAM}pitching_stats_2.csv`,
+    );
   });
 
   it('lists Game 53’s 3 views, then its 4 custom team files, with default first', () => {

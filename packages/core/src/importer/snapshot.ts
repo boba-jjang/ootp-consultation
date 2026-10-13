@@ -32,6 +32,8 @@ export interface ImportedFile {
   /** vs left or vs right for a split export; null for a season file. */
   split: Split | null;
   routing: Routing;
+  /** The file's header row, as routing read it (RoutedExport.header). */
+  header: string[];
   /** Players the file listed; none for a rejected file. */
   players: number;
   events: ImportEvent[];
@@ -179,6 +181,7 @@ export function assembleSnapshot(
       scope: file.scope,
       split: file.split,
       routing: file.routing,
+      header: file.header,
       players: file.rows.length,
       events: file.events,
     })),

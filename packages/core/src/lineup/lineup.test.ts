@@ -161,7 +161,10 @@ interface ContextFigures {
   total: number;
   /** 1B to DH, in slot order. */
   alternatives: number[];
-  /** Today's definition at C: the Context lists none (see the test). */
+  /**
+   * The cost at C, like for like: barring the starter from catching empties the backup slot,
+   * so the backup's value leaves the base total too.
+   */
   catcherAlternative: number;
   bench: string[];
   order: string[];
@@ -192,7 +195,7 @@ const CONTEXT: Record<string, [Snapshot, ContextFigures]> = {
       },
       total: 36.04,
       alternatives: [3.24, 10.37, 18.47, 9.65, 3.24, 7.93, 7.93, 3.24],
-      catcherAlternative: -1.2,
+      catcherAlternative: 0.4275,
       bench: ['Ling-lai Li', 'Daniel Wang'],
       order: [
         'Hideji Yamanaka',
@@ -231,7 +234,7 @@ const CONTEXT: Record<string, [Snapshot, ContextFigures]> = {
       },
       total: 42.12,
       alternatives: [3.83, 4.15, 15.55, 4.15, 3.83, 9.05, 9.05, 4.64],
-      catcherAlternative: 2.24,
+      catcherAlternative: 5.2292,
       bench: ['Ling-lai Li', 'Dong-hee Moon'],
       order: [
         'Hideji Yamanaka',
@@ -270,7 +273,7 @@ const CONTEXT: Record<string, [Snapshot, ContextFigures]> = {
       },
       total: 21.75,
       alternatives: [0.06, 3.81, 19.63, 4.09, 2.99, 0.9, 0.9, 0.06],
-      catcherAlternative: -0.13,
+      catcherAlternative: 2.9389,
       bench: ['Ling-lai Li', 'Daniel Wang'],
       order: [
         'Hideji Yamanaka',
@@ -359,10 +362,13 @@ describe.each(Object.entries(CONTEXT))('the %s selection (req-selection)', (labe
     }
     // No third catcher: barred from catching, the backup has nobody behind him.
     expect(at(lineup, 'C2').alternativeCost).toBeNull();
-    // The Context lists no cost at C. Open questions 5 keeps today's definition: barring the
-    // starter from catching moves the backup up and leaves the backup slot empty, and the cost
-    // is the total's drop, which falls below 0 where the backup's value is below 0.
-    within(at(lineup, 'C').alternativeCost, figures.catcherAlternative);
+  });
+
+  it('costs the catcher like for like, leaving the backup out of the base total, within 0.0001', () => {
+    // Barring the starter from catching moves the backup up and leaves the backup slot empty,
+    // so the backup's value leaves today's total before the comparison: the cost measures the
+    // change at catcher alone.
+    within(at(lineup, 'C').alternativeCost, figures.catcherAlternative, 'C', 0.0001);
   });
 
   it('benches the Context’s two, with their batting runs and best slots', () => {
@@ -863,6 +869,7 @@ describe('hand-built rosters (Open questions 5 and 6)', () => {
 
     it('bars a catcher from catching at all: at C he can still DH, and the others move up', () => {
       // Without Starter C catching: Second C catches, Third C backs up and Starter C DHs for Bat Only.
+      // The backup slot stays filled, so the cost at C is the total's drop, backup included.
       const share = FALLBACK_SHARE;
       const drop =
         value('Starter C', share) -
@@ -879,6 +886,55 @@ describe('hand-built rosters (Open questions 5 and 6)', () => {
       for (const slot of NINE) {
         expect(at(alone, slot).alternativeCost, slot).toBeNull();
       }
+    });
+  });
+
+  describe('the cost of the best alternative, with two catchers', () => {
+    // Starter C (60 potentials) and Second C (50) catch alike; Bat Only (55) DHs. Barring Starter C
+    // from catching moves Second C up and leaves the backup slot empty.
+    const roster = [
+      ...nine.filter((row) => row.POS !== 'DH'),
+      player('Second C', 'C', 50),
+      player('Bat Only', 'DH', 55),
+    ];
+    const lineup = selectLineup(handBuilt(roster), team);
+    const catching = lineRuns('C', 60);
+    const value = (name: string, share: number) =>
+      share * (battingOf(lineup, name).runs + catching);
+
+    it('starts Starter C and backs up with Second C, whose cost is null with nobody behind him', () => {
+      expect(nameAt(lineup, 'C')).toBe('Starter C');
+      expect(nameAt(lineup, 'C2')).toBe('Second C');
+      expect(nameAt(lineup, 'DH')).toBe('Bat Only');
+      expect(lineup.bench).toEqual([]);
+      expect(at(lineup, 'C2').alternativeCost).toBeNull();
+    });
+
+    it('costs the catcher like for like: the backup’s value leaves the base total too', () => {
+      // Without Starter C catching: Second C catches, the backup slot is empty and Starter C DHs
+      // for Bat Only. Today's comparison would also count Second C's backup value as lost.
+      const share = FALLBACK_SHARE;
+      const backup = value('Second C', 1 - share);
+      expect(backup).not.toBeCloseTo(0, 3);
+      const cost =
+        value('Starter C', share) -
+        value('Second C', share) -
+        (battingOf(lineup, 'Starter C').runs - battingOf(lineup, 'Bat Only').runs);
+      expect(at(lineup, 'C').alternativeCost).toBeCloseTo(cost, 9);
+      expect(lineup.total).toBeCloseTo(
+        lineup.starters.reduce((sum, entry) => sum + entry.value, 0) + backup,
+        9,
+      );
+    });
+
+    it('keeps the DH’s cost as the total’s drop, though barring him empties the backup slot too', () => {
+      // Without Bat Only at DH, nine hitters are left for ten slots: Second C catches, Starter C
+      // DHs and the backup slot is empty, the alternative the catcher's cost compares against.
+      // The rule is the catcher's alone, so the DH's cost still counts the backup as lost.
+      expect(at(lineup, 'DH').alternativeCost).toBeCloseTo(
+        (at(lineup, 'C').alternativeCost ?? Number.NaN) + value('Second C', 1 - FALLBACK_SHARE),
+        9,
+      );
     });
   });
 });

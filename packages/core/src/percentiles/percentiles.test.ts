@@ -10,6 +10,7 @@ import {
   percentilePools,
   roleOf,
   routeExport,
+  teamGames,
   teamPercentiles,
   type ExportRow,
   type MetricDirection,
@@ -22,6 +23,7 @@ import {
   FIXTURES,
   fixtureFiles,
   fixtureSnapshot,
+  playerKey,
   readFixtureText,
   routeFixture,
 } from '../../test/fixtures.ts';
@@ -632,6 +634,50 @@ describe('the hitters’ pool floor on hand-built rows (task Open questions 1)',
   it('keeps every row, as before, when no row carries PA', () => {
     const rows = [row('Ann', 'A', null, 40), row('Bea', 'B', undefined, null)];
     expect(poolOf(rows)).toEqual(['Ann', 'Bea']);
+  });
+});
+
+describe('teamGames, the floor’s count of a team’s games (Knowledge Base › Peer pools)', () => {
+  const row = (name: string, team: string | undefined, pa: number | null, games: number | null) =>
+    ({ POS: 'C', Name: name, TM: team, PA: pa, G: games }) as ExportRow;
+  const five = (code: string, games: number) =>
+    [1, 2, 3, 4, 5].map((i) => row(`${code}${String(i)}`, code, 100, i === 1 ? games : 1));
+
+  it('takes the most G among a team’s rows with PA, from 5 such rows', () => {
+    const rows = [...five('A', 40), row('Ida', 'A', null, 90), ...five('B', 77)];
+    const gamesOf = teamGames(rows);
+    expect(gamesOf(row('Ann', 'A', 10, 30))).toBe(40);
+    expect(gamesOf(row('Bea', 'B', 10, 30))).toBe(77);
+  });
+
+  it('gives the league’s most to a team under 5 rows, a team without G and a row without TM', () => {
+    const rows = [
+      ...five('A', 40),
+      row('B1', 'B', 100, 10),
+      ...[1, 2, 3, 4, 5].map((i) => row(`C${String(i)}`, 'C', 100, null)),
+    ];
+    const gamesOf = teamGames(rows);
+    expect(gamesOf(row('B1', 'B', 100, 10))).toBe(40);
+    expect(gamesOf(row('C1', 'C', 100, null))).toBe(40);
+    expect(gamesOf(row('Nan', undefined, 100, 10))).toBe(40);
+    expect(
+      teamGames(rows, { ...DEFAULT_PERCENTILE_SETTINGS, hitterTeamRows: 1 })(row('B1', 'B', 1, 1)),
+    ).toBe(10);
+  });
+
+  it('is 0 when no row with PA has a G', () => {
+    expect(teamGames([row('Ann', 'A', 100, null)])(row('Ann', 'A', 100, null))).toBe(0);
+  });
+
+  it('is the count behind the hitters’ pool at Game 71', () => {
+    const g71 = fixtureSnapshot('seattle-g71/');
+    const gamesOf = teamGames(g71.league.hitters);
+    const pool = new Set(percentilePools(g71).hitters);
+    for (const member of g71.league.hitters) {
+      const pa = typeof member.PA === 'number' ? member.PA : null;
+      expect(pool.has(member), playerKey(member)).toBe(pa !== null && pa >= 3.1 * gamesOf(member));
+    }
+    expect(gamesOf(g71.league.hitters.find((member) => member.TM === 'SEA') ?? {})).toBe(71);
   });
 });
 

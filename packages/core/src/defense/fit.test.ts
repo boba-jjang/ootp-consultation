@@ -4,8 +4,10 @@ import {
   DEFAULT_DEFENSE_SETTINGS,
   FIELD_POSITIONS,
   fitDefense,
+  fitFielding,
   type ExportRow,
   type FieldPosition,
+  type Snapshot,
 } from '../index.ts';
 import { fixtureSnapshot } from '../../test/fixtures.ts';
 
@@ -174,5 +176,150 @@ describe('fitDefense on small inputs', () => {
     expect(positions.RF.count).toBe(0);
     expect(positions.RF.r2).toBeNull();
     expect(positions.RF.formula).toBeNull();
+  });
+});
+
+describe('fitFielding on Game 71’s league fielding rows (req-fielding, Open questions 2)', () => {
+  const fielding = fitFielding(fixtureSnapshot('seattle-g71/'), DEFAULT_DEFENSE_SETTINGS);
+  // The task's Context: intercept per 1,350 innings, slope per point on 20–80, fielders fitted.
+  const CONTEXT: Record<FieldPosition, [number, number, number]> = {
+    C: [-4.429, 0.07912, 65],
+    '1B': [-11.932, 0.20002, 47],
+    '2B': [-46.818, 0.75804, 71],
+    '3B': [-37.087, 0.68222, 61],
+    SS: [-53.91, 0.9321, 50],
+    LF: [-21.278, 0.34307, 56],
+    CF: [-46.08, 0.87909, 62],
+    RF: [-31.737, 0.59458, 42],
+  };
+
+  it('fits each position over its fielders with 50 or more innings: 42 to 71', () => {
+    const counts = Object.fromEntries(
+      FIELD_POSITIONS.map((position) => [position, fielding.positions[position].count]),
+    );
+    expect(counts).toEqual(
+      Object.fromEntries(FIELD_POSITIONS.map((position) => [position, CONTEXT[position][2]])),
+    );
+  });
+
+  it.each(FIELD_POSITIONS)(
+    '%s: reproduces the line, the intercept within 0.001 and the slope within 0.00001',
+    (position) => {
+      const line = fielding.positions[position].line;
+      const [intercept, slope] = CONTEXT[position];
+      expect(Math.abs((line?.intercept ?? Number.NaN) - intercept)).toBeLessThanOrEqual(0.001);
+      expect(Math.abs((line?.slope ?? Number.NaN) - slope)).toBeLessThanOrEqual(0.00001);
+    },
+  );
+
+  it('reproduces k within 1 of 2,486 innings, with a true spread of about ±2.8 runs', () => {
+    expect(Math.abs((fielding.blendInnings ?? Number.NaN) - 2486)).toBeLessThanOrEqual(1);
+    expect(Math.sqrt(fielding.trueVariance ?? 0)).toBeCloseTo(2.8, 1);
+    expect(fielding.blendInnings).toBeCloseTo(
+      ((fielding.noise ?? 0) / (fielding.trueVariance ?? 1)) * 1350,
+      9,
+    );
+  });
+
+  it('keeps the Game 71 fit as the defaults', () => {
+    expect(DEFAULT_DEFENSE_SETTINGS.blendInnings).toBe(2486);
+    for (const position of FIELD_POSITIONS) {
+      const [intercept, slope] = CONTEXT[position];
+      expect(DEFAULT_DEFENSE_SETTINGS.lines[position]).toEqual({ intercept, slope });
+    }
+  });
+});
+
+describe('fitFielding on small inputs (Open questions 2)', () => {
+  const settings = { fitInnings: 50, rateGames: 150 };
+  const snapshot = (rows: ExportRow[]): Pick<Snapshot, 'league' | 'scale'> => ({
+    scale: '20-80',
+    league: { hitters: rows, pitchers: [] },
+  });
+  /** A fielder whose zone rating per 1,350 innings is `runs`, over `innings` innings. */
+  const fielder = (pos: string, def: number, innings: number, runs: number): ExportRow => ({
+    POS: pos,
+    DEF: def,
+    'Fielding IP': innings * 3,
+    ZR: (runs * innings) / 1350,
+  });
+  /** The line every test draws on: −30 + 0.6 × rating. */
+  const onLine = (rating: number) => -30 + 0.6 * rating;
+
+  it('recovers an exact line, and leaves k empty where nobody strays from it', () => {
+    const rows = [40, 50, 60, 70].map((def, i) => fielder('SS', def, 100 + i * 50, onLine(def)));
+    const fit = fitFielding(snapshot(rows), settings);
+    expect(fit.positions.SS.count).toBe(4);
+    expect(fit.positions.SS.line?.intercept).toBeCloseTo(-30, 9);
+    expect(fit.positions.SS.line?.slope).toBeCloseTo(0.6, 9);
+    expect(fit.blendInnings).toBeNull();
+  });
+
+  it('splits the squared residuals into the true variance and the noise: k = noise ÷ variance × 1,350', () => {
+    // True variance 4 and noise 9 per 1,350 innings: residuals of ±√(4 + 9 × 1,350 ÷ innings).
+    const rows = [40, 60].flatMap((def) =>
+      [135, 1350].flatMap((innings) => {
+        const residual = Math.sqrt(4 + (9 * 1350) / innings);
+        return [
+          fielder('2B', def, innings, onLine(def) + residual),
+          fielder('2B', def, innings, onLine(def) - residual),
+        ];
+      }),
+    );
+    const fit = fitFielding(snapshot(rows), settings);
+    expect(fit.positions['2B'].line?.slope).toBeCloseTo(0.6, 9);
+    expect(fit.trueVariance).toBeCloseTo(4, 9);
+    expect(fit.noise).toBeCloseTo(9, 9);
+    expect(fit.blendInnings).toBeCloseTo((9 / 4) * 1350, 6);
+  });
+
+  it('weights the line by innings and counts a missing zone rating as 0 beside arm runs', () => {
+    const rows = [
+      fielder('CF', 40, 300, onLine(40)),
+      { POS: 'CF', DEF: 60, 'Fielding IP': 900, ARM: (onLine(60) * 300) / 1350 },
+      fielder('CF', 80, 100, onLine(80) + 30),
+    ];
+    const fit = fitFielding(snapshot(rows), settings);
+    // Innings 300, 300 and 100, the last 30 runs above the line: by innings the slope rises
+    // 77,142.9 ÷ 137,142.9 = 0.5625, where unweighted it would rise 0.75.
+    expect(fit.positions.CF.count).toBe(3);
+    expect(fit.positions.CF.line?.slope).toBeCloseTo(0.6 + 0.5625, 9);
+  });
+
+  it('skips rows under the innings floor, without DEF or innings, or at another POS', () => {
+    const rows = [
+      fielder('LF', 40, 200, onLine(40)),
+      fielder('LF', 60, 200, onLine(60)),
+      fielder('LF', 80, 49, 50),
+      { ...fielder('LF', 70, 200, 50), DEF: null },
+      { ...fielder('LF', 70, 200, 50), 'Fielding IP': null },
+      fielder('DH', 70, 200, 50),
+      fielder('P', 70, 200, 50),
+    ];
+    const fit = fitFielding(snapshot(rows), settings);
+    expect(fit.positions.LF.count).toBe(2);
+    expect(fit.positions.LF.line?.slope).toBeCloseTo(0.6, 9);
+    expect(fitFielding(snapshot(rows), { ...settings, fitInnings: 40 }).positions.LF.count).toBe(3);
+  });
+
+  it('converts DEF to 20–80 from the snapshot’s scale', () => {
+    // 1–10: 3 is 33.33 and 6 is 53.33 on 20–80.
+    const rows = [
+      { ...fielder('RF', 3, 200, onLine(20 + 60 * (2 / 9))) },
+      { ...fielder('RF', 6, 200, onLine(20 + 60 * (5 / 9))) },
+    ];
+    const fit = fitFielding({ scale: '1-10', league: { hitters: rows, pitchers: [] } }, settings);
+    expect(fit.positions.RF.line?.slope).toBeCloseTo(0.6, 9);
+  });
+
+  it('leaves a position without two ratings, and k without residuals, empty', () => {
+    const fit = fitFielding(
+      snapshot([fielder('C', 50, 200, 3), fielder('C', 50, 300, 1)]),
+      settings,
+    );
+    expect(fit.positions.C.count).toBe(2);
+    expect(fit.positions.C.line).toBeNull();
+    expect(fit.positions.RF).toEqual({ count: 0, line: null });
+    expect(fit).toMatchObject({ trueVariance: null, noise: null, blendInnings: null });
   });
 });

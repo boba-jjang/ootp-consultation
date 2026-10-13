@@ -23,12 +23,25 @@ export interface PercentileSettings {
    * Source: Knowledge Base § 8 Peer pools; § 14 Assumptions, Pitcher sample floors.
    */
   relieverFloorBip: number;
+  /**
+   * Fewest plate appearances per team game for a hitter to join the hitters' pool.
+   * Source: Knowledge Base › League percentiles › Peer pools (OOTP's qualifying rate).
+   */
+  hitterPaPerGame: number;
+  /**
+   * A team with fewer league hitters with PA than this (an affiliate) takes the league's most
+   * games for the hitters' floor.
+   * Source: Knowledge Base › League percentiles › Peer pools.
+   */
+  hitterTeamRows: number;
 }
 
 export const DEFAULT_PERCENTILE_SETTINGS: PercentileSettings = {
   starterShare: 0.5,
   starterFloorBip: 60,
   relieverFloorBip: 30,
+  hitterPaPerGame: 3.1,
+  hitterTeamRows: 5,
 };
 
 /** Which way is better for the player. A style metric has no better, only a position. */
@@ -118,17 +131,58 @@ export function roleOf(
 }
 
 /**
+ * The qualified hitters: Knowledge Base › League percentiles › Peer pools. A league hitter
+ * qualifies with PA of at least hitterPaPerGame × his team's games, the most G among the
+ * league hitter rows with his TM that carry PA. A team with fewer such rows than
+ * hitterTeamRows, or none with a G, takes the most G of any league hitter row with PA. A row
+ * without PA is below the floor; when no row carries PA, every row qualifies.
+ */
+function qualifiedHitters(rows: readonly ExportRow[], settings: PercentileSettings): ExportRow[] {
+  const withPa = rows.filter((row) => numberOf(row.PA) !== null);
+  if (withPa.length === 0) {
+    return [...rows];
+  }
+  const teams = new Map<string, { rows: number; games: number | null }>();
+  let leagueGames = 0;
+  for (const row of withPa) {
+    const games = numberOf(row.G);
+    if (games !== null) {
+      leagueGames = Math.max(leagueGames, games);
+    }
+    if (typeof row.TM !== 'string') {
+      continue;
+    }
+    const team = teams.get(row.TM) ?? { rows: 0, games: null };
+    team.rows += 1;
+    if (games !== null) {
+      team.games = Math.max(team.games ?? games, games);
+    }
+    teams.set(row.TM, team);
+  }
+  // A row without TM has no team of its own, so it takes the league's games.
+  const gamesOf = (row: ExportRow) => {
+    const team = typeof row.TM === 'string' ? teams.get(row.TM) : undefined;
+    const own = team !== undefined && team.rows >= settings.hitterTeamRows ? team.games : null;
+    return own ?? leagueGames;
+  };
+  return rows.filter((row) => {
+    const pa = numberOf(row.PA);
+    return pa !== null && pa >= settings.hitterPaPerGame * gamesOf(row);
+  });
+}
+
+/**
  * The three peer pools of a snapshot: Knowledge Base › League percentiles › Peer pools.
- * Hitters are every league hitter row, already qualified by plate appearances. Pitchers
- * split by usage, and join their pool at or above its floor in balls in play; position
- * players who pitched and rows with no appearances join none.
+ * Hitters are the league hitters at or above the plate-appearance floor. Pitchers split by
+ * usage, and join their pool at or above its floor in balls in play; position players who
+ * pitched and rows with no appearances join none.
  */
 export function percentilePools(
   snapshot: Pick<Snapshot, 'league'>,
   settings: PercentileSettings = DEFAULT_PERCENTILE_SETTINGS,
 ): Record<PeerPool, ExportRow[]> {
   const pools: Record<PeerPool, ExportRow[]> = {
-    hitters: [...snapshot.league.hitters],
+    hitters: qualifiedHitters(snapshot.league.hitters, settings),
     starters: [],
     relievers: [],
   };

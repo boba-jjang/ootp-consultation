@@ -18,7 +18,13 @@ import {
   type RoutedExport,
   type Snapshot,
 } from '../index.ts';
-import { FIXTURES, fixtureFiles, readFixtureText, routeFixture } from '../../test/fixtures.ts';
+import {
+  FIXTURES,
+  fixtureFiles,
+  fixtureSnapshot,
+  readFixtureText,
+  routeFixture,
+} from '../../test/fixtures.ts';
 
 const routed = (): RoutedExport[] =>
   readdirSync(new URL('seattle-g42/', FIXTURES), { encoding: 'utf8' })
@@ -97,12 +103,14 @@ describe('midRankPercentile (Knowledge Base › League percentiles › Computati
   });
 });
 
-describe('DEFAULT_PERCENTILE_SETTINGS (Knowledge Base § 14 › Assumptions)', () => {
-  it('starts with half the games as starts, and floors of 60 and 30 balls in play', () => {
+describe('DEFAULT_PERCENTILE_SETTINGS (Knowledge Base § 14 › Assumptions; › Peer pools)', () => {
+  it('starts with half the games as starts, floors of 60 and 30 balls in play, and 3.1 PA per team game', () => {
     expect(DEFAULT_PERCENTILE_SETTINGS).toEqual({
       starterShare: 0.5,
       starterFloorBip: 60,
       relieverFloorBip: 30,
+      hitterPaPerGame: 3.1,
+      hitterTeamRows: 5,
     });
   });
 });
@@ -440,6 +448,190 @@ describe('percentile pools on the Seattle game-53 files (task Context: the model
     expect(g53.pitchers.find((row) => row.Name === 'Midori Murakami')?.BIP).toBe(25);
     expect(namesOf(unfloored.relievers)).toContain('Midori Murakami');
     expect(namesOf(pools.relievers)).not.toContain('Midori Murakami');
+  });
+});
+
+describe('the hitters’ pool floor on the fixtures (Knowledge Base › Peer pools; task Open questions 1)', () => {
+  const g71 = fixtureSnapshot('seattle-g71/');
+  const pools = percentilePools(g71);
+
+  it('keeps 199 of Game 71’s 517 league hitters', () => {
+    expect(g71.league.hitters).toHaveLength(517);
+    expect(pools.hitters).toHaveLength(199);
+  });
+
+  it('floors Seattle at 3.1 × its 71 games, 220.1 PA: Yamanaka’s 257 joins, Ishida’s 209 does not', () => {
+    const seattle = (name: string) =>
+      g71.league.hitters.find((row) => row.TM === 'SEA' && row.Name === name);
+    expect(seattle('Manichiro Kawasaki')?.G).toBe(71);
+    expect(seattle('Hideji Yamanaka')?.PA).toBe(257);
+    expect(seattle('Yoshitsugu Ishida')?.PA).toBe(209);
+    const pooled = pools.hitters.filter((row) => row.TM === 'SEA');
+    expect(namesOf(pooled)).toEqual(
+      expect.arrayContaining([
+        'Jin-soo Shinn',
+        'Han-lee Choi',
+        'Manichiro Kawasaki',
+        'Hideji Yamanaka',
+        'Zhong-shan Geng',
+        'Etsuji Obata',
+      ]),
+    );
+    expect(pooled).toHaveLength(6);
+    for (const row of pooled) {
+      expect(Number(row.PA)).toBeGreaterThanOrEqual(3.1 * 71);
+    }
+  });
+
+  it('ranks Game 71’s Seattle hitters against the 199, members only above the floor', () => {
+    const hitters = teamPercentiles(g71).filter((result) => result.side === 'hitters');
+    expect(hitters.filter((result) => !result.smallSample).map((result) => result.name)).toEqual([
+      'Jin-soo Shinn',
+      'Han-lee Choi',
+      'Manichiro Kawasaki',
+      'Hideji Yamanaka',
+      'Zhong-shan Geng',
+      'Etsuji Obata',
+    ]);
+    for (const result of hitters) {
+      expect(result.metrics.EV?.n, result.name).toBe(199);
+    }
+  });
+
+  it('leaves out the 10 hitters with no plate appearances', () => {
+    const none = g71.league.hitters.filter((row) => row.PA === 0);
+    expect(none).toHaveLength(10);
+    for (const row of none) {
+      expect(pools.hitters).not.toContain(row);
+    }
+  });
+
+  it('gives the 26 teams with fewer than 5 hitters the league’s 77 games', () => {
+    const rows = new Map<unknown, number>();
+    for (const row of g71.league.hitters) {
+      rows.set(row.TM, (rows.get(row.TM) ?? 0) + 1);
+    }
+    const affiliates = [...rows].filter(([, count]) => count < 5).map(([team]) => team);
+    expect(affiliates).toHaveLength(26);
+    expect(Math.max(...g71.league.hitters.map((row) => Number(row.G) || 0))).toBe(77);
+    for (const row of pools.hitters.filter((member) => affiliates.includes(member.TM))) {
+      expect(Number(row.PA)).toBeGreaterThanOrEqual(3.1 * 77);
+    }
+    // One league-wide floor of 3.1 × 77 would keep 183.
+    const leagueWide = { ...DEFAULT_PERCENTILE_SETTINGS, hitterTeamRows: Infinity };
+    expect(percentilePools(g71, leagueWide).hitters).toHaveLength(183);
+  });
+
+  it('reads the floor from the settings: at 0 PA per game every hitter with PA joins', () => {
+    const open = { ...DEFAULT_PERCENTILE_SETTINGS, hitterPaPerGame: 0 };
+    expect(percentilePools(g71, open).hitters).toEqual(g71.league.hitters);
+  });
+
+  it('leaves the pitchers’ pools as they were: 150 starters and 252 relievers at Game 71', () => {
+    const open = percentilePools(g71, { ...DEFAULT_PERCENTILE_SETTINGS, hitterPaPerGame: 0 });
+    expect(pools.starters).toHaveLength(150);
+    expect(pools.relievers).toHaveLength(252);
+    expect(pools.starters).toEqual(open.starters);
+    expect(pools.relievers).toEqual(open.relievers);
+  });
+
+  it.each([
+    ['Game 53', ['seattle-g53/'], 199],
+    ['Game 42', ['seattle-g42/'], 214],
+    ['Game 70’s fielding view', ['seattle-g70/'], 502],
+  ])('keeps every league hitter at %s, as before', (_label, folders, size) => {
+    const snapshot = fixtureSnapshot(...folders);
+    const hitters = percentilePools(snapshot).hitters;
+    expect(hitters).toHaveLength(size);
+    expect(hitters).toEqual(snapshot.league.hitters);
+  });
+
+  it.each([
+    ['Game 53', 'seattle-g53/', 698],
+    ['Game 71', 'seattle-g71/', 554],
+  ])(
+    'keeps 199 when %s is combined with Game 70’s fielding view, whose own rows carry no PA',
+    (_label, folder, listed) => {
+      const snapshot = fixtureSnapshot(folder, 'seattle-g70/');
+      expect(snapshot.league.hitters).toHaveLength(listed);
+      const hitters = percentilePools(snapshot).hitters;
+      expect(hitters).toHaveLength(199);
+      expect(hitters.every((row) => typeof row.PA === 'number')).toBe(true);
+    },
+  );
+});
+
+describe('the hitters’ pool floor on hand-built rows (task Open questions 1)', () => {
+  const row = (name: string, team: unknown, pa: unknown, games: unknown): ExportRow => ({
+    POS: 'CF',
+    Name: name,
+    TM: team as ExportRow['TM'],
+    PA: pa as ExportRow['PA'],
+    G: games as ExportRow['G'],
+  });
+  const poolOf = (rows: ExportRow[], settings = DEFAULT_PERCENTILE_SETTINGS) =>
+    namesOf(percentilePools({ league: { hitters: rows, pitchers: [] } }, settings).hitters);
+
+  /** Five hitters for a team whose most games is `games`, all well above any floor. */
+  const team = (code: string, games: number): ExportRow[] =>
+    [1, 2, 3, 4, 5].map((i) => row(`${code}${String(i)}`, code, 1000, i === 1 ? games : 1));
+
+  it('floors a hitter at 3.1 × his team’s most games among its rows with PA', () => {
+    const rows = [...team('A', 40), row('Ann', 'A', 124, 30), row('Abe', 'A', 123.9, 40)];
+    expect(poolOf(rows)).toEqual(['A1', 'A2', 'A3', 'A4', 'A5', 'Ann']);
+  });
+
+  it('gives a team with fewer than 5 hitters with PA the league’s most games', () => {
+    // B lists four hitters, so its floor is 3.1 × A's 40, not 3.1 × 10.
+    const rows = [
+      ...team('A', 40),
+      row('B1', 'B', 124, 10),
+      row('B2', 'B', 123, 10),
+      row('B3', 'B', 31, 10),
+      row('B4', 'B', 31, 10),
+    ];
+    expect(poolOf(rows)).toEqual(['A1', 'A2', 'A3', 'A4', 'A5', 'B1']);
+    // At 4 hitters a team, B's own 10 games count.
+    expect(poolOf(rows, { ...DEFAULT_PERCENTILE_SETTINGS, hitterTeamRows: 4 })).toEqual([
+      'A1',
+      'A2',
+      'A3',
+      'A4',
+      'A5',
+      'B1',
+      'B2',
+      'B3',
+      'B4',
+    ]);
+  });
+
+  it('gives a team with no G among its rows with PA the league’s most games', () => {
+    const rows = [
+      ...team('A', 40),
+      ...[1, 2, 3, 4, 5].map((i) => row(`C${String(i)}`, 'C', 100 + i * 10, null)),
+    ];
+    expect(poolOf(rows)).toEqual(['A1', 'A2', 'A3', 'A4', 'A5', 'C3', 'C4', 'C5']);
+  });
+
+  it('ignores the games of rows without PA when it sets a team’s games', () => {
+    // A's row without PA lists 90 games; A's games stay 40.
+    const rows = [...team('A', 40), row('Ann', 'A', 124, 30), row('Ida', 'A', null, 90)];
+    expect(poolOf(rows)).toEqual(['A1', 'A2', 'A3', 'A4', 'A5', 'Ann']);
+  });
+
+  it('puts a row without PA below the floor, and a row without TM on the league’s games', () => {
+    const rows = [
+      ...team('A', 40),
+      row('Ida', 'A', null, 40),
+      row('Nan', undefined, 124, 1),
+      row('Ned', undefined, 123, 1),
+    ];
+    expect(poolOf(rows)).toEqual(['A1', 'A2', 'A3', 'A4', 'A5', 'Nan']);
+  });
+
+  it('keeps every row, as before, when no row carries PA', () => {
+    const rows = [row('Ann', 'A', null, 40), row('Bea', 'B', undefined, null)];
+    expect(poolOf(rows)).toEqual(['Ann', 'Bea']);
   });
 });
 

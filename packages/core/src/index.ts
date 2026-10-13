@@ -154,6 +154,7 @@ export {
 } from './percentiles/percentiles.ts';
 export {
   DEFAULT_ESTIMATOR_SETTINGS,
+  evidenceOf,
   teamEstimates,
   type ComponentEstimate,
   type ComponentId,
@@ -221,3 +222,25 @@ export {
   type LineupSnapshot,
   type SlotEntry,
 } from './lineup/lineup.ts';
+export {
+  DEFAULT_BATTING_SETTINGS,
+  FITTED_EVENTS,
+  WOBA_EVENTS,
+  battingModel,
+  teamBatting,
+  type BattingEvent,
+  type BattingFlag,
+  type BattingModel,
+  type BattingProjection,
+  type BattingSettings,
+  type BattingSnapshot,
+  type EventLine,
+  type EventRates,
+  type FittedEvent,
+  type LeagueEvent,
+  type ModelSource,
+  type RunScale,
+  type TeamBatting,
+  type WobaEvent,
+  type WobaWeights,
+} from './batting/batting.ts';

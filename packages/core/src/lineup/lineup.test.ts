@@ -393,7 +393,8 @@ describe('batting runs from the batting model (req-selection, Open questions 3)'
     },
   );
 
-  const longer = selectLineup(g71, { ...team, games_per_season: 162 });
+  // These tests don't read the exchange loop, so they skip it: without the DH it doesn't run.
+  const longer = selectLineup(g71, { ...team, games_per_season: 162, dh_enabled: false });
 
   it('scales the flat PA and the runs with games per season', () => {
     const lineup = selectionOf('Game 71');
@@ -496,8 +497,9 @@ describe('the flat PA and the catcher share on hand-built pools (Open questions 
     fallbackPaPerGame: 4,
     fallbackCatcherShare: 0.6,
   };
-  const shared = selectLineup(g42, team, settings);
-  const fitted = selectLineup(g71, team, settings);
+  // These tests don't read the exchange loop, so they skip it: without the DH it doesn't run.
+  const shared = selectLineup(g42, { ...team, dh_enabled: false }, settings);
+  const fitted = selectLineup(g71, { ...team, dh_enabled: false }, settings);
 
   it('reads the fallbacks from the settings: both catcher slots take the share', () => {
     expect(shared.pa).toBeCloseTo(4 * 152, 9);

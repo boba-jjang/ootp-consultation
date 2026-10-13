@@ -79,7 +79,7 @@ The app is a persistent franchise assistant for Out of the Park Baseball (OOTP 2
 
 - OOTP database-dump imports (full league tables keyed by player ID).
 - Trade and contract valuation.
-- Opponent-specific advice, which needs opponent exports, and rules that need handedness splits (platoons and pinch-hitting).
+- Opponent-specific advice, which needs opponent exports, and pinch-hitting rules by the pitcher's hand; the lineups by the starter's hand are in (section 11).
 
 ### Constraints
 
@@ -104,7 +104,7 @@ Exports pass validation into the team store. The store feeds metrics, percentile
 | Percentiles | League tables, player tables | A percentile per metric within each peer pool |
 | Talent estimator | Potentials, development risk, age, metrics | Current-rating estimates with confidence bands |
 | Defensive model | Fielding ratings, DEF, DEF Pot | Player × position eligibility and fielding-run estimates |
-| Lineup optimizer | Estimates, eligibility, league settings | Starting nine with positions and batting order |
+| Lineup optimizer | Estimates, eligibility, league settings | Starting nine with positions and batting order, and the lineups against right- and left-handed starters |
 | Strategy rules | Estimates, fielding and running ratings, staff ratings | Slider settings by situation, plus per-player overrides |
 | Development planner | Potentials, risk, work ethic, IQ, age | Development priorities and suggested levers |
 | Consultation output | Every module's results | Recommendations, each with evidence and confidence |
@@ -163,14 +163,14 @@ The user exports these from the league's player statistics screen, in any view, 
   - Game 42 (`fixtures/seattle-g42/`): 12 hitters, 13 pitchers, 11 team views in OOTP's own layouts, and four league files.
   - Game 53 (`fixtures/seattle-g53/`): 12 hitters (two of them new) and the same 13 pitchers, in the owner's custom views, with league standard stats and a bio view that lists both sides.
   - About game 70 (`fixtures/seattle-g70/`): the team's 12 hitters and the league's 508 fielders in the owner's custom fielding view, with heights and team codes (section 9). No batting view came with it, so that snapshot carries no game label.
-  - About game 71 (`fixtures/seattle-g71/`): the owner's latest custom views for the team and the whole league: batting stats and superstats, hitters' and pitchers' ratings (custom\_bat\_pot and cus\_pitch\_pot), fielding stats (with heights), fielding ratings (the fielding components, DEF, DEF Pot and age), and pitching stats and superstats. Every view carries TM, and the league files list every player, 517 hitters and 481 pitchers, not qualified ones only.
+  - About game 71 (`fixtures/seattle-g71/`): the owner's latest custom views for the team and the whole league: batting stats and superstats, hitters' and pitchers' ratings (custom\_bat\_pot and cus\_pitch\_pot), fielding stats (with heights), fielding ratings (the fielding components, DEF, DEF Pot and age), and pitching stats and superstats. Every view carries TM, and the league files list every player, 517 hitters and 481 pitchers, not qualified ones only. Its splits, in a splits folder beside it, are the batting and pitching stats and superstats for the team and the league, each exported vs left and vs right after a few call-ups (section 5, Split exports).
 - The league files come from the same snapshot as the team's, and the team's rows match the team views, apart from one league position at Game 53.
 - The league rates players on a 1–10 scale and hides current batting and pitching ratings.
 
 ### Not yet used
 
 - OOTP database dumps: full league tables keyed by player ID, including ratings (later, per section 2).
-- Opponent rosters, handedness splits, league totals over every player (the league batting files list qualified hitters only), park factors and injury proneness. None has been provided, so the app treats them as unavailable (section 14). Per-position ratings, once on this list, arrived with the fielding view (section 9).
+- Opponent rosters, league totals over every player (the league batting files list qualified hitters only), park factors and injury proneness. None has been provided, so the app treats them as unavailable (section 14). Per-position ratings, once on this list, arrived with the fielding view (section 9).
 
 ## Import contract
 
@@ -302,7 +302,7 @@ The league sortable files reuse these headers: at Game 42 the league batting\_su
 - Parts combine: a filtered export (starters, relievers or qualified players only) adds its rows, and a row repeated in two files merges into one.
 - A name can appear on both sides when a position player pitches or a pitcher bats; each side keeps its own record.
 - Age comes from the bio view or the fielding ratings view, and a pitcher's also from cus\_pitch\_pot; height from the bio view or either fielding view.
-- Every upload is stored as uploaded and stamped with team, snapshot date and importer version. Uploading never removes another file: an exact copy is skipped, and a later file's differing values replace earlier ones cell by cell, which the import log names; a blank cell never replaces a value. A later date adds a snapshot and keeps history; files from different dates are never merged into one snapshot.
+- Every upload is stored as uploaded and stamped with team, snapshot date and importer version. Uploading never removes another file: an exact copy is skipped, and a later file's differing values replace earlier ones cell by cell, which the import log names; a blank cell never replaces a value. A later date adds a snapshot and keeps history; files from different dates are never merged into one snapshot. Split exports never merge into the four tables (Split exports, below).
 
 ### Data coverage
 
@@ -318,6 +318,17 @@ Coverage counts data, not views. Each data set has key columns: a player's set i
 
 - The badge is Low until stats and both superstats sets are on for both sides, Moderate then, and High with ratings as well. Bio counts toward no level.
 - What to upload next names the missing sets and the views that carry them, as hints.
+
+### Split exports
+
+OOTP exports a stats view split vs left or vs right: a hitter's row counts his plate appearances against left- or right-handed pitchers, a pitcher's the batters he faced who hit left or right. The header is the season view's, so the file name tells a split apart: a name ending `_vsl` or `_vsr` before `.csv`, as the owner names them. The ratings views can't be split.
+
+- Split files never merge into the four season tables. A snapshot keeps their rows in split tables, a vs-left and a vs-right table for each of team hitters, team pitchers, league hitters and league pitchers, keyed like the season tables, with zero-appearance rows dropped as usual.
+- A split file never dates the snapshot: its G and GS count games against one hand, so the label comes from the season files. A pitcher's W, L, SV, HLD and GS aren't split.
+- The batting and pitching stats splits are read. The superstats splits repeat the season's batted-ball and swing columns, splitting only BatR, BsR and the expected stats, so they're stored and logged but fill no table.
+- Check: for each player in a split table and the season table, vs left plus vs right equals the season in PA, AB, H, 1B, 2B, 3B, HR, BB, IBB, HP, SF and K for hitters, and in outs, BF, H, HR, BB, K and HP for pitchers. A split row pairs with its season row by key, or by name alone when his team changed and one season row has the name; a row without a season row is noted in the log, and a mismatch warns that the splits come from another game. Game 71's splits came after call-ups from JC (Mangjeol, Jimbo, Nikaido and Kim), and every player in both adds up.
+- A split file replaces only the same view's same split. The import log names the split: vs LHP or vs RHP for hitters' rows, vs LHB or vs RHB for pitchers'.
+- Data coverage counts no split. The lineups by the starter's hand (section 11) need the team's batting stats split both ways; the league's sets the league effect, with the settings, Game 71's values, standing in.
 
 ## Metrics and league context
 
@@ -603,7 +614,7 @@ Every gate is a research claim without supporting data, so each is a setting val
 | Hold runners | Catcher arm, pitcher hold | 8–10 behind a weak arm (about 35); costs some stuff and control | Arm 3 or lower; 4 borderline |
 | Infield shift | Middle-infield range; opposing hitters' pull tendency | 10 only with 65+ middle-infield range | Range 8+ |
 | Guard lines | SS and 2B range | High only with 70+ at both | Range 9+ at both |
-| Pinch hitting and platoons | Handedness splits, which aren't available | Player-level rules by pitcher hand | Not stated |
+| Pinch hitting and platoons | Handedness splits: on file from Game 71 and used so far for the lineups by the starter's hand (section 11) | Player-level rules by pitcher hand | Not stated |
 
 In the sample, a shortstop at range 8 cleared the shift gate while all three second basemen sat at a borderline 7, so the rule produced a moderate shift.
 
@@ -661,7 +672,27 @@ E is expected runs from each state, b the runs scored on each transition, and F 
 
 The app builds The Book's order from projected per-PA OBP, wOBA and home-run rate. It ranks the nine by wOBA. Of the top three, the highest OBP leads off, the one with more homers bats 4th and the other 2nd. Ranks 4 and 5 bat 3rd (more homers) and 5th. Of the rest, the highest OBP bats 6th, the best wOBA of the other three bats 7th, and of the last two the higher OBP bats 9th. Ties go by snapshot order; speed isn't used yet.
 
-Platoon decisions need handedness splits and the opposing starter's hand, and neither is available yet; the owner can export splits vs left and vs right, a planned task.
+### Lineups by the starter's hand
+
+The season evaluation never reads the splits: estimates, batting runs, the season lineup and its order stay as above. The splits shape two more lineups, one against right-handed starters and one against left-handed (the owner, 13 October 2026).
+
+- League ratios: from the league's batting stats split both ways (section 5, Split exports), for each batting hand (left, right, switch) and each of unintentional walks, singles, doubles, homers and strikeouts, the rate per PA against a pitcher hand over the hand's rate against both. Intentional walks, HBP and triples keep their season rates, too rare or strategic to split. Without the league splits the settings, Game 71's ratios, stand in.
+- A hitter's rates against a hand are his projected rates (Ordering) times his batting hand's ratios, with other outs taking the rest.
+- His own split counts by how much real spread the league shows for his hand. The gap is wOBA against right-handers minus against left-handers, with the snapshot's weights. T is the population variance of the gap over the league hitters of his hand with 20 PA or more against each hand, less their mean sampling variance, never below 0. N is his own gap's sampling variance, v × (1 ÷ PA vs LHP + 1 ÷ PA vs RHP), where v is the per-PA variance of his wOBA numerator over both splits. His gap becomes the league gap for his hand plus T ÷ (T + N) × (his gap − the league gap); a hitter without PA against both hands keeps the league gap. His unintentional walks, HBP, singles, doubles, triples and homers scale by one factor per hand to reach that gap, keeping his wOBA over his hand's league mix of pitcher hands at his season wOBA.
+- Each hand's lineup is the selection, batting order and exchange loop above, run on those rates: batting runs and the chain take the hand's rates, while the flat PA, catcher share, fielding and the chain's calibration are the season's. It replaces the season lineup against that hand only when it beats the season nine in their season order, scored on the hand's rates, by 3 runs per 152 games or more, the batting order's least gain; otherwise the season lineup stands.
+- Output: each hand's nine, backup catcher and order, its gain, and what changed from the season lineup; each hitter's wOBA against each hand with his own split's weight; and the share of the team's starts against left-handed starters, from the team splits' GS (26.1% at Game 71).
+
+| Game 71 | Left-handed hitters | Right-handed | Switch |
+| --- | --- | --- | --- |
+| League wOBA vs LHP / vs RHP | .313 / .350 | .336 / .316 | .312 / .327 |
+| Share of PA vs LHP | .2997 | .3365 | .3200 |
+| Ratios vs LHP: uBB, 1B, 2B, HR, K | 0.8705, 1.0221, 0.8888, 0.7814, 1.1257 | 1.0887, 0.9968, 1.0434, 1.0973, 0.9519 | 0.9431, 0.9815, 1.0285, 0.9000, 1.0605 |
+| Ratios vs RHP: uBB, 1B, 2B, HR, K | 1.0554, 0.9905, 1.0476, 1.0935, 0.9462 | 0.9550, 1.0016, 0.9780, 0.9507, 1.0244 | 1.0268, 1.0087, 0.9866, 1.0471, 0.9715 |
+| T | .0015 (95 hitters) | 0 (281) | 0 (40) |
+
+- Own-split weights at Game 71: Kamimura .098, Li .130, Obata .154 and Geng .207; the right-handed and switch hitters 0.
+- Against right-handers: Ishida catches and Tsumoto backs up, the rest as the season lineup, in the order Yamanaka, Obata, Kawasaki, Kamimura, Shinn, Ishida, Geng, Moon, Choi. Chain runs plus fielding come to 774.02 per 152 games against the season lineup's 769.03 on the same rates: +4.99.
+- Against left-handers: the season nine in the order Tsumoto, Yamanaka, Kawasaki, Shinn, Choi, Obata, Kamimura, Geng, Moon: 768.31 against 764.72, +3.59. Wang doesn't take left field from Kamimura: his wOBA vs LHP is .318 to Kamimura's .323, and Kamimura fields 0.43 runs better.
 
 ## Development planner
 
@@ -772,6 +803,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 | Talent estimator | Prior from the potential and development risk; evidence as league z-scores at 50 + 10 points per SD, weighted n ÷ (n + k) with k = 0.43 × the stabilization point × the risk and stance multipliers; flagged past half a step (8 October 2026) |
 | Defensive model | Position ratings read from the fielding view where it's on file, else a component formula fitted to the league's fielding export; runs per 10 rating points per 150 games fitted on zone rating by position; one step off at an unlisted position; the catcher's runs a placeholder (11 October 2026); since 12 October, zone rating plus arm runs against the rating, moved by the player's own at the played position |
 | Lineup v2 | Batting runs from the league's own wOBA weights, scale and average, recovered from each export; event rates refit per snapshot; fielding runs from the league line moved by the player's own zone rating and arm runs; PA by batting spot from the Markov chain, with an exchange loop over the nine; the hitters' pool floored at 3.1 PA per team game (the owner, 12 October 2026) |
+| Platoon lineups | The splits complement the season models: the season evaluation never reads them, and they shape only the lineups against right- and left-handed starters, where a bench player may start; league ratios by batting hand, each hitter's own split weighted by the league's spread, and a change only for 3 runs per 152 games (the owner, 13 October 2026) |
 
 ### Assumptions
 
@@ -796,7 +828,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 - [x] Hosting split: GitHub Pages, Vercel, or both with a defined role for each? Answered: Vercel hosts the app and the advisor function; GitHub holds the source and runs CI (implementation plan).
 - [x] Which scout's view do the exports use, the head scout or OSA? Development risk can differ between them. Answered: OSA. The scouting staff is disabled, so every export shows the same OSA view.
 - [ ] Does the league merge stats into scouting reports? If so, the estimator weights stats less.
-- [x] Does the view editor offer per-position ratings and handedness splits? Answered: per-position potential ratings come in the fielding view (section 9), since 11 October 2026; handedness splits still haven't been provided and stay unavailable (sections 10–11).
+- [x] Does the view editor offer per-position ratings and handedness splits? Answered: per-position potential ratings come in the fielding view (section 9), since 11 October 2026; handedness splits came on 13 October 2026, the team's and the league's stats views exported vs left and vs right, while the ratings views can't be split (section 5, Split exports; section 11).
 - [x] Re-export the pitching ratings view with the staff listed, to get pitchers' work ethic, IQ and risk. Done: the staff cus\_pitch\_pot, the latest upload of that view, carries work ethic, IQ and risk for all 13 pitchers and is treated as part of the same snapshot.
 - [x] Can league standard stats and totals be exported, for wRC+, xFIP, luck baselines and standard-stat percentiles? Answered: from Game 53 the owner exports them through custom league views (qualified hitters, every pitcher), with wRC+ and wRAA. League totals over every player and park factors stay unavailable, and xFIP takes league HR/FB from the league pitching file.
 - [ ] The catcher's run scale: zone rating barely moves with a catcher's rating, and framing runs are near zero at this point of the season. The 8 runs per 10 points is a placeholder to re-check at season end.
@@ -826,6 +858,7 @@ Phase gates close in order. Inside a phase, modules follow the Depends on column
 | Column-dictionary import: four tables per snapshot, parts and re-exports merged cell by cell, coverage by data set | 4, 5 | 4 | Fixtures | Game 42 and Game 53 assemble from their files in any combination; the overlap files change nothing; coverage is High for both |
 | Fielding-view import: its columns in the dictionary, fielding counts kept apart from batting and pitching, rows placed by POS | 4, 5 | 4 | Column-dictionary import | The fielding fixtures read completely, 12 team and 508 league rows; Game 42 and Game 53 unchanged but for Seattle's TM, which reads SEA |
 | The owner's Game 71 exports: pitching views with TM, the fielding ratings view, pitchers keyed on team plus name | 4, 5 | 4 | Fielding-view import | All 16 Game 71 files read, none rejected: 12 team hitters and 13 team pitchers, 517 league hitters and 455 league pitchers; Game 42, 53 and 70 read as before, also Game 53 with Game 70's fielding view added |
+| Split exports: files ending \_vsl or \_vsr kept apart from the season tables and checked against them | 4, 5 | 4 | Game 71 exports | Game 71's 16 split files read, none rejected; every hitter and pitcher in both a split table and the season adds up to the season; the season tables, the Game 71 label and every model's output unchanged with the splits on file |
 | Metrics: pass-through, BACON, luck gaps against each pair's baseline | 6 | 4 | Team store | Fixture BACON and each pair's baseline match section 6 |
 | Percentiles: usage-based pools, floors, directions, mid-rank formula | 8 | 4 | League file import | Pools of 214, 151 and 260; 144 starters and 218 relievers after floors |
 | Talent estimator v0 | 7 | 4 | Metrics, scale conversion | Every fixture player gets an estimate and band; disagreements over one step are flagged |
@@ -835,6 +868,7 @@ Phase gates close in order. Inside a phase, modules follow the Depends on column
 | Event rates and batting runs: the league's wOBA weights recovered per snapshot, event rates refit per snapshot, the hitters' pool floor | 8, 11 | 4 | Game 71 exports, talent estimator | On Game 71 the recovered weights give the export's wOBA within .0006 and its wRAA within 0.17 runs, the pool keeps 199 of 517 hitters, and the event-rate slopes are section 11's |
 | Batting order: Markov model with The Book fallback | 11 | 4 | Lineup selection, event rates and batting runs | Run expectancy matches hand-computed toy lineups (homer-or-strikeout gives 3h ÷ (1 − h) runs per inning); Game 71's order is Yamanaka, Obata, Kawasaki, Shinn, Kamimura, Geng, Moon, Tsumoto, Choi, the best of all 9! orders, with 732 PA at #1 to 598 at #9 |
 | Lineup v2: selection on the league-wOBA batting runs, the defensive blend, the catcher share and the exchange loop | 9, 11 | 4 | Event rates and batting runs, batting order | On Game 71: C Tsumoto (backup Ishida), 1B Shinn, 2B Choi, 3B Kawasaki, SS Moon, LF Kamimura, CF Geng, RF Obata, DH Yamanaka |
+| Lineups by the starter's hand: league platoon ratios, each hitter's own split weighted by the league's spread, the lineup v2 search per hand | 11 | 4 | Split exports, lineup v2 | On Game 71 the ratios, weights and both lineups are section 11's: against right-handers Ishida catches, +4.99 runs per 152 games; against left-handers the season nine in a new order, +3.59; the season lineup unchanged |
 | Development planner | 12 | 4 | Talent estimator, defensive model | Selection rules from section 12 reproduce the sample example |
 | Consultation output | 3 | 4–5 | Strategy rules, lineup and batting order, development planner | Every recommendation shows its evidence and confidence |
 | Backtest across snapshots | 2 | 6 | Team store, talent estimator | Adding a second snapshot reports estimator error per player |

@@ -1,6 +1,12 @@
 import { assembleSnapshot, type Snapshot } from '../importer/snapshot.ts';
 import type { Side, ViewId } from '../importer/manifest.ts';
-import { routeExport, type ImportEvent, type Routing, type Scope } from '../importer/route.ts';
+import {
+  routeExport,
+  type ImportEvent,
+  type Routing,
+  type Scope,
+  type Split,
+} from '../importer/route.ts';
 import type { RatingScale } from '../ratings/scale.ts';
 
 /**
@@ -74,6 +80,11 @@ export interface UploadedFile {
    * sets it; it is optional so results built before it existed still type-check.
    */
   side?: Side | null;
+  /**
+   * vs left or vs right for a split export, null for a season file. importUpload always sets
+   * it; it is optional like side.
+   */
+  split?: Split | null;
   routing: Routing;
   /**
    * Added, or already stored byte for byte. Uploading never removes a stored file, so the
@@ -89,9 +100,10 @@ export type UploadResult =
   | { ok: false; reason: 'no-game-number' | 'unknown-snapshot'; message: string };
 
 /**
- * Stores an upload. Its game number (the most games any hitter has played) dates it: the
- * team's snapshot for that game receives it, or a new one is created, so a later game adds
- * history. Within a snapshot, a file already stored byte for byte is left alone and every
+ * Stores an upload. Its game number (the most games any hitter has played in its season
+ * files) dates it: the team's snapshot for that game receives it, or a new one is created, so
+ * a later game adds history. Split exports never date an upload, so uploaded alone they join
+ * the snapshot given as into. Within a snapshot, a file already stored byte for byte is left alone and every
  * other file is added: uploading never removes a stored file (Knowledge Base › Joins and
  * snapshots). Rejected files are kept so the import log can show why.
  */
@@ -146,6 +158,7 @@ export async function importUpload(
       view: result.view,
       scope: result.scope,
       side: result.side,
+      split: result.split,
       routing: result.routing,
       events: result.events,
     };

@@ -22,6 +22,12 @@ export interface ImportEvent {
 /** One player's values, keyed by canonical column name. */
 export type ExportRow = Record<string, CellValue>;
 
+/**
+ * A split export's hand: L is vs left-handed pitchers in a hitters' row and vs left-handed
+ * batters in a pitchers' row, R the same vs right.
+ */
+export type Split = 'L' | 'R';
+
 export interface RoutedExport {
   /** The file name the export came in with, kept to show where data came from. */
   name: string;
@@ -31,6 +37,8 @@ export interface RoutedExport {
   scope: Scope | null;
   /** The side the rows list; null for a team file with rows on both sides, placed by POS. */
   side: Side | null;
+  /** The split the file name gives (splitOf); null for a season file. */
+  split: Split | null;
   routing: Routing;
   /** Empty for a rejected file. */
   rows: ExportRow[];
@@ -85,18 +93,79 @@ const LEAGUE_FILE = '_player_statistics_-_sortable_stats_';
 const nameOf = (row: ExportRow) => (typeof row.Name === 'string' ? row.Name : '');
 
 /**
+ * A split export's hand, from its file name: Knowledge Base › Import contract › Split exports.
+ * A name ending _vsl or _vsr just before .csv, in any case, is split vs left or vs right; any
+ * other name is a season file.
+ */
+export function splitOf(fileName: string): Split | null {
+  const match = /_vs([lr])\.csv$/i.exec(fileName);
+  return match ? (match[1]?.toLowerCase() === 'l' ? 'L' : 'R') : null;
+}
+
+/** The season files: every file but the split exports (Knowledge Base › Split exports). */
+export const seasonFiles = (files: readonly RoutedExport[]) =>
+  files.filter((file) => file.split === null);
+
+/**
+ * A split as the import log says it: vs LHP or vs RHP for hitters' rows (the pitcher's hand),
+ * vs LHB or vs RHB for pitchers' rows (the batter's), and vs left or vs right for a file
+ * listing both sides.
+ */
+export function splitWords(split: Split, side: Side | null | undefined): string {
+  if (side === 'hitters') {
+    return `vs ${split}HP`;
+  }
+  if (side === 'pitchers') {
+    return `vs ${split}HB`;
+  }
+  return split === 'L' ? 'vs left' : 'vs right';
+}
+
+/**
+ * Whether a file's rows carry PA or BF, as the batting and pitching stats views do. Only such
+ * split files fill the split tables: the superstats splits repeat the season's columns.
+ */
+export const carriesPlateAppearances = (file: Pick<RoutedExport, 'rows'>) =>
+  file.rows.some((row) => Object.hasOwn(row, 'PA') || Object.hasOwn(row, 'BF'));
+
+/**
  * Reads one CSV through the column dictionary and decides how the import treats it:
  * Knowledge Base › Import contract › Column dictionary and › Side and scope. Any header
  * works under any file name, as long as it has Name, POS and one more column the dictionary
  * knows. The file gets a view only when its header matches one of OOTP's exactly. Scope
  * comes from TM, else the file name, else the row count; side from the marker columns, else
- * the rows' POS. Every decision is logged as an import event. A rejected file keeps no rows.
+ * the rows' POS. A split export routes as its season view would, and an info event names its
+ * split (› Split exports). Every decision is logged as an import event. A rejected file keeps
+ * no rows.
  */
 export function routeExport(
   fileName: string,
   text: string,
   settings: RoutingSettings = DEFAULT_ROUTING_SETTINGS,
 ): RoutedExport {
+  const result = routeRows(fileName, text, settings);
+  const { split } = result;
+  if (split === null || result.routing === 'rejected') {
+    return result;
+  }
+  result.events.push({
+    level: 'info',
+    code: 'split',
+    message: `Split ${splitWords(split, result.side)}: the name ends _vs${split === 'L' ? 'l' : 'r'}, so the rows stay apart from the season tables.`,
+    details: { split },
+  });
+  if (!carriesPlateAppearances(result)) {
+    result.events.push({
+      level: 'info',
+      code: 'split-no-table',
+      message:
+        "Split superstats repeat the season's batted-ball and swing columns, so this file fills no table.",
+    });
+  }
+  return result;
+}
+
+function routeRows(fileName: string, text: string, settings: RoutingSettings): RoutedExport {
   const events: ImportEvent[] = [];
   const result: RoutedExport = {
     name: fileName,
@@ -104,6 +173,7 @@ export function routeExport(
     version: null,
     scope: null,
     side: null,
+    split: splitOf(fileName),
     routing: 'rejected',
     rows: [],
     events,

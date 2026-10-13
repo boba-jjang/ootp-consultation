@@ -105,6 +105,31 @@ const EXPECTED: Record<string, [ViewId, number] | null> = {
   'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_pitching_superstats_c.csv': null,
   'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_fielding_stats_cus.csv': null,
   'seattle-g71/rsl_statistics_player_statistics_-_sortable_stats_fielding_ratings_cus.csv': null,
+  // Game 71's splits: the season views' headers, so custom views too.
+  'seattle-g71/splits/seattle_arrows_lineups_-_overview_batting_stats_c_vsl.csv': null,
+  'seattle-g71/splits/seattle_arrows_lineups_-_overview_batting_stats_c_vsr.csv': null,
+  'seattle-g71/splits/seattle_arrows_lineups_-_overview_batting_superstats_c_vsl.csv': null,
+  'seattle-g71/splits/seattle_arrows_lineups_-_overview_batting_superstats_c_vsr.csv': null,
+  'seattle-g71/splits/seattle_arrows_lineups_-_overview_pitching_stats_c_vsl.csv': null,
+  'seattle-g71/splits/seattle_arrows_lineups_-_overview_pitching_stats_c_vsr.csv': null,
+  'seattle-g71/splits/seattle_arrows_lineups_-_overview_pitching_superstats_c_vsl.csv': null,
+  'seattle-g71/splits/seattle_arrows_lineups_-_overview_pitching_superstats_c_vsr.csv': null,
+  'seattle-g71/splits/rsl_statistics_player_statistics_-_sortable_stats_batting_stats_c_vsl.csv':
+    null,
+  'seattle-g71/splits/rsl_statistics_player_statistics_-_sortable_stats_batting_stats_c_vsr.csv':
+    null,
+  'seattle-g71/splits/rsl_statistics_player_statistics_-_sortable_stats_batting_superstats_c_vsl.csv':
+    null,
+  'seattle-g71/splits/rsl_statistics_player_statistics_-_sortable_stats_batting_superstats_c_vsr.csv':
+    null,
+  'seattle-g71/splits/rsl_statistics_player_statistics_-_sortable_stats_pitching_stats_c_vsl.csv':
+    null,
+  'seattle-g71/splits/rsl_statistics_player_statistics_-_sortable_stats_pitching_stats_c_vsr.csv':
+    null,
+  'seattle-g71/splits/rsl_statistics_player_statistics_-_sortable_stats_pitching_superstats_c_vsl.csv':
+    null,
+  'seattle-g71/splits/rsl_statistics_player_statistics_-_sortable_stats_pitching_superstats_c_vsr.csv':
+    null,
 };
 
 const KNOWN = Object.entries(EXPECTED).flatMap(([path, expected]) =>

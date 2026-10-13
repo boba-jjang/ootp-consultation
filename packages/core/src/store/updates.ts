@@ -1,6 +1,12 @@
 import { gameNumberOf } from '../importer/snapshot.ts';
 import type { Side } from '../importer/manifest.ts';
-import { routeExport, type RoutedExport } from '../importer/route.ts';
+import {
+  routeExport,
+  splitWords,
+  type ImportEvent,
+  type RoutedExport,
+  type Split,
+} from '../importer/route.ts';
 import type { Upload } from './store.ts';
 
 /**
@@ -22,20 +28,27 @@ export interface CollectedUploads {
   kept: PendingUpload[];
 }
 
-type Routed = Pick<RoutedExport, 'view' | 'scope' | 'routing'> & { side?: Side | null };
+type Routed = Pick<RoutedExport, 'view' | 'scope' | 'routing'> & {
+  side?: Side | null;
+  split?: Split | null;
+  events?: readonly ImportEvent[];
+};
 
 /**
  * A file's replacement key, measured against the file it would replace: the view, scope and
  * routing when both files have a known view, and otherwise the side, scope and routing, so a
- * custom hitters team file matches only another hitters team file. A rejected file has
- * none, so it never replaces another file and is never replaced.
+ * custom hitters team file matches only another hitters team file. A split export's key adds
+ * its split, so it replaces only the same view's same split (Knowledge Base › Import contract
+ * › Split exports). A rejected file has none, so it never replaces another file and is never
+ * replaced.
  */
 export function replacementKey(file: Routed, other: Routed): string | null {
   if (file.routing === 'rejected') {
     return null;
   }
   const kind = file.view !== null && other.view !== null ? file.view : (file.side ?? '');
-  return `${kind}|${file.scope ?? ''}|${file.routing}`;
+  const key = `${kind}|${file.scope ?? ''}|${file.routing}`;
+  return file.split ? `${key}|${file.split}` : key;
 }
 
 /**
@@ -56,13 +69,34 @@ export function collectUploads(uploads: readonly Upload[]): CollectedUploads {
 }
 
 /**
+ * A split export's split, as the import log and the upload results name it: vs LHP or vs RHP
+ * for hitters, vs LHB or vs RHB for pitchers, vs left or vs right for a file listing both
+ * sides. A split that fills no table, as the superstats splits don't, says it isn't read.
+ * Null for a season file.
+ */
+export function describeSplit(file: Routed): string | null {
+  if (!file.split) {
+    return null;
+  }
+  const words = splitWords(file.split, file.side);
+  return file.events?.some((event) => event.code === 'split-no-table')
+    ? `${words} (not read: it repeats the season’s columns)`
+    : words;
+}
+
+/**
  * What a routed file is, in the words the reasons below use: a known view by its name, any
- * other file as a custom view of its scope and side.
+ * other file as a custom view of its scope and side, with a split export's split.
  */
 export function describeFile(file: Routed): string {
   if (file.routing === 'rejected') {
     return 'a file the app can’t read';
   }
+  const split = describeSplit(file);
+  return split ? `${describeKind(file)} ${split}` : describeKind(file);
+}
+
+function describeKind(file: Routed): string {
   if (file.routing === 'supplemental') {
     return `${file.view ?? 'a custom pitchers view'} run on the hitters`;
   }
@@ -76,7 +110,8 @@ export function describeFile(file: Routed): string {
 /**
  * Whether a chosen file may replace a stored one in its snapshot: null when it may, otherwise
  * the reason. It must share the stored file's replacement key, and a file that dates itself
- * (a hitter stats view) must come from the snapshot's game.
+ * (a hitter stats view) must come from the snapshot's game. A split export never dates
+ * itself, so it is never refused for its game.
  */
 export function replacementProblem(
   stored: Routed,

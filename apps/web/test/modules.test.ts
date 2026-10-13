@@ -29,6 +29,7 @@ const carrying = (side: Side, set: DataSet, keys = DATA_SET_INFO[set].keys[side]
     version: null,
     scope: 'team',
     side,
+    split: null,
     routing: 'primary',
     rows: [
       {

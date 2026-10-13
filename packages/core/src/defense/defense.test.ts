@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   DEFAULT_DEFENSE_SETTINGS,
+  FIELD_POSITIONS,
   defenseMatrix,
   toTwentyEighty,
   type DefenseMatrix,
@@ -29,6 +30,23 @@ const team: Pick<TeamSettings, 'games_per_season' | 'dh_enabled' | 'rating_scale
 const g42 = fixtureSnapshot('seattle-g42/');
 const g53 = fixtureSnapshot('seattle-g53/');
 const g70 = fixtureSnapshot('seattle-g70/');
+const g71 = fixtureSnapshot('seattle-g71/');
+
+/** The line's runs per season at a rating on 20–80: (intercept + slope × rating) × games ÷ 150. */
+const lineRuns = (position: FieldPosition, at: number, games = 152) => {
+  const line = DEFAULT_DEFENSE_SETTINGS.lines[position];
+  return ((line.intercept + line.slope * at) * games) / 150;
+};
+
+/** Within `tolerance` of `expected`: the Context's figures are stated to 0.01. */
+const within = (
+  actual: number | null | undefined,
+  expected: number,
+  label = '',
+  tolerance = 0.01,
+) => {
+  expect(Math.abs((actual ?? Number.NaN) - expected), label).toBeLessThanOrEqual(tolerance);
+};
 
 const hitterOf = (matrix: DefenseMatrix, name: string): HitterDefense => {
   const found = matrix.hitters.find((hitter) => hitter.name === name);
@@ -129,48 +147,203 @@ describe('the matrix at Game 70, with the fielding view (req-view)', () => {
   });
 });
 
-describe('runs per season at Game 70 (req-runs)', () => {
-  const matrix = defenseMatrix(g70, team);
+describe('fielding runs at Game 71 (req-fielding, Open questions 1)', () => {
+  const matrix = defenseMatrix(g71, team);
+  const POSITIONS: FieldPosition[] = ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF'];
+  // The task's Context: runs a season at 152 games, C to RF; null is ineligible (—).
+  const TABLE: Record<string, [string, (number | null)[]]> = {
+    'Yoshitsugu Ishida': ['C', [0.37, -3.09, -32.08, -23.76, null, -13.81, null, -19.19]],
+    'Yasuhiro Tsumoto': ['C', [0.04, -7.13, null, null, null, null, null, null]],
+    'Jin-soo Shinn': ['1B', [null, 0.63, -28.99, -19.9, -35.74, -11.66, null, -17.34]],
+    'Han-lee Choi': ['2B', [null, 1.17, -1.63, -10.23, -18.26, -8.73, -28.88, -15.85]],
+    'Ling-lai Li': ['2B', [null, 1.51, -7.98, -8.17, -18.33, -4.34, -17.96, -4.08]],
+    'Manichiro Kawasaki': ['3B', [null, 1.04, -14.66, 4.99, -19.67, -12.67, null, -20.03]],
+    'Dong-hee Moon': ['SS', [null, 2.54, -1.19, 0.39, 1.9, -14.15, null, -20.11]],
+    'Hideji Yamanaka': ['LF', [null, -7.23, null, null, null, -7.82, -28.88, -10.2]],
+    'Zhong-shan Geng': ['CF', [null, -0.53, -11.31, -13.13, -22.4, 0.75, 3.2, 3.73]],
+    'Tomofumi Kamimura': ['CF', [null, 1.86, -18.59, -23.76, -35.03, -3.34, -15.3, -5.86]],
+    'Etsuji Obata': ['RF', [null, -4.35, null, -23.76, null, 1.62, -0.41, 8.06]],
+    'Daniel Wang': ['RF', [null, -5.36, null, null, null, -3.77, -17.5, -1.99]],
+  };
 
-  it('scales (rating − 50) ÷ 10 × runs per 10 points × games ÷ 150', () => {
-    expect(cellOf(hitterOf(matrix, 'Han-lee Choi'), '2B').runs).toBeCloseTo(6.688, 3);
-    expect(cellOf(hitterOf(matrix, 'Han-lee Choi'), '1B').runs).toBeCloseTo(4.0533, 4);
-    expect(cellOf(hitterOf(matrix, 'Dong-hee Moon'), 'SS').runs).toBeCloseTo(8.7147, 4);
-    expect(cellOf(hitterOf(matrix, 'Yoshitsugu Ishida'), 'C').runs).toBeCloseTo(8.1067, 4);
-    expect(cellOf(hitterOf(matrix, 'Zhong-shan Geng'), 'RF').runs).toBeCloseTo(11.9911, 4);
-    expect(cellOf(hitterOf(matrix, 'Jin-soo Shinn'), 'LF').runs).toBeLessThan(0);
+  it('lists the 12 hitters of the table', () => {
+    expect(matrix.hitters.map((hitter) => hitter.name).sort()).toEqual(Object.keys(TABLE).sort());
   });
 
-  it('adds arm runs at the played position only', () => {
-    const shinn = hitterOf(matrix, 'Jin-soo Shinn');
-    expect(shinn.check?.armRuns).toBeCloseTo(1.8621, 4);
-    expect(cellOf(shinn, '1B').runs).toBeCloseTo(2.6727, 4);
-    const geng = hitterOf(matrix, 'Zhong-shan Geng');
-    expect(geng.check?.armRuns).toBeCloseTo(-4.988, 3);
-    expect(cellOf(geng, 'CF').runs).toBeCloseTo(3.9294, 4);
-    const obata = hitterOf(matrix, 'Etsuji Obata');
-    expect(obata.check?.armRuns).toBeCloseTo(7.9368, 4);
-    expect(cellOf(obata, 'RF').runs).toBeCloseTo(19.9279, 4);
+  it.each(Object.entries(TABLE))(
+    '%s: every cell within 0.01 runs, with its eligibility',
+    (name, [played, runs]) => {
+      const hitter = hitterOf(matrix, name);
+      expect(hitter.played).toBe(played);
+      for (const [i, position] of POSITIONS.entries()) {
+        const cell = cellOf(hitter, position);
+        const expected = runs[i];
+        if (expected === null || expected === undefined) {
+          expect(cell.eligible, position).toBe(false);
+          expect(cell.runs, position).toBeNull();
+        } else {
+          expect(cell.eligible, position).toBe(true);
+          within(cell.runs, expected, position);
+        }
+      }
+    },
+  );
+
+  it('puts Yamanaka in left field at −7.82, against −3.34 for Kamimura and +1.62 for Obata', () => {
+    within(cellOf(hitterOf(matrix, 'Hideji Yamanaka'), 'LF').runs, -7.82);
+    within(cellOf(hitterOf(matrix, 'Tomofumi Kamimura'), 'LF').runs, -3.34);
+    within(cellOf(hitterOf(matrix, 'Etsuji Obata'), 'LF').runs, 1.62);
   });
 
-  it("shows the player's zone rating beside it as a check, scaled the same way", () => {
-    const ishida = hitterOf(matrix, 'Yoshitsugu Ishida');
-    expect(ishida.check?.innings).toBeCloseTo(1192 / 3, 6);
-    expect(ishida.check?.zoneRating).toBeCloseTo(0.3443, 4);
-    expect(hitterOf(matrix, 'Jin-soo Shinn').check?.innings).toBeCloseTo(1102 / 3, 6);
+  it('reads the line alone away from the played position, at the cell’s rating', () => {
+    const kamimura = cellOf(hitterOf(matrix, 'Tomofumi Kamimura'), 'LF');
+    expect(kamimura.runs).toBeCloseTo(lineRuns('LF', kamimura.rating ?? 0), 9);
+    const ishida = cellOf(hitterOf(matrix, 'Yoshitsugu Ishida'), '1B');
+    expect(ishida.runs).toBeCloseTo(lineRuns('1B', ishida.rating ?? 0), 9);
+  });
+});
+
+describe('the played position’s blend (req-fielding, Open questions 1)', () => {
+  const matrix = defenseMatrix(g71, team);
+
+  it('moves the line by w = innings ÷ (innings + 2,486) toward his own runs: Yamanaka in left', () => {
+    // Fielding IP 836 outs, ZR −3.5 and ARM 1.6: (−1.9 ÷ 278.67) × 1,350 per 150 games.
+    const yamanaka = hitterOf(matrix, 'Hideji Yamanaka');
+    const innings = 836 / 3;
+    const weight = innings / (innings + 2486);
+    const own = (-1.9 / innings) * 1350;
+    const line = lineRuns('LF', 40, 150);
+    expect(yamanaka.check?.innings).toBeCloseTo(innings, 9);
+    expect(yamanaka.check?.weight).toBeCloseTo(weight, 9);
+    expect(yamanaka.check?.weight).toBeCloseTo(0.1008, 4);
+    expect(yamanaka.check?.ownRuns).toBeCloseTo((own * 152) / 150, 9);
+    expect(yamanaka.check?.runs).toBeCloseTo(((line + weight * (own - line)) * 152) / 150, 9);
+    expect(cellOf(yamanaka, 'LF').runs).toBe(yamanaka.check?.runs);
+    within(yamanaka.check?.runs, -7.82);
   });
 
-  it('leaves arm runs and the check out under the innings floor', () => {
+  it('counts his own runs at any innings, with no floor: Moon’s 185 innings at short', () => {
     const moon = hitterOf(matrix, 'Dong-hee Moon');
-    expect(moon.check).toBeNull();
-    expect(cellOf(moon, 'SS').runs).toBeCloseTo(8.7147, 4);
+    expect(moon.check?.innings).toBeCloseTo(185, 9);
+    expect(moon.check?.weight).toBeCloseTo(185 / (185 + 2486), 9);
+    expect(moon.check?.ownRuns).toBe(0);
+  });
+
+  it('gives every Game 71 hitter a check at his played position, from his own fielding row', () => {
+    for (const hitter of matrix.hitters) {
+      const played = cellOf(hitter, hitter.played as Slot);
+      expect(hitter.check?.runs, hitter.name).toBe(played.runs);
+    }
+  });
+
+  const hand = (over: ExportRow): ExportRow => ({
+    POS: 'SS',
+    Name: 'Fielder',
+    DEF: 60,
+    'SS Pot': 60,
+    'LF Pot': 60,
+    'Fielding IP': 2486 * 3,
+    ...over,
+  });
+  const fielder = (over: ExportRow) =>
+    hitterOf(defenseMatrix(handBuilt([hand(over)]), team), 'Fielder');
+
+  it('takes a missing zone rating or arm runs as 0', () => {
+    // 2,486 innings: w = ½. ZR 18.42 over 2,486 innings is 10 runs per 1,350.
+    const zr = fielder({ ZR: (10 * 2486) / 1350 });
+    expect(zr.check?.weight).toBeCloseTo(0.5, 9);
+    expect(zr.check?.ownRuns).toBeCloseTo((10 * 152) / 150, 9);
+    expect(cellOf(zr, 'SS').runs).toBeCloseTo((lineRuns('SS', 60) + (10 * 152) / 150) / 2, 9);
+    const arm = fielder({ ARM: (10 * 2486) / 1350 });
+    expect(cellOf(arm, 'SS').runs).toBeCloseTo(cellOf(zr, 'SS').runs ?? 0, 9);
+  });
+
+  it('reads the line alone without fielding innings, or without a zone rating and arm runs', () => {
+    const rows: ExportRow[] = [{ ZR: 5, 'Fielding IP': null }, { ZR: 5, 'Fielding IP': 0 }, {}];
+    for (const over of rows) {
+      const hitter = fielder(over);
+      expect(hitter.check).toBeNull();
+      expect(cellOf(hitter, 'SS').runs).toBeCloseTo(lineRuns('SS', 60), 9);
+    }
+  });
+
+  it('leaves his own runs out of every other position', () => {
+    const hitter = fielder({ ZR: 20 });
+    expect(hitter.check).not.toBeNull();
+    expect(cellOf(hitter, 'LF').runs).toBeCloseTo(lineRuns('LF', 60 - STEP), 9);
+  });
+
+  it('has no check for a player who plays DH', () => {
+    const matrix = defenseMatrix(
+      handBuilt(
+        [hand({ POS: 'LF', ZR: 20 })],
+        [{ POS: 'DH', Name: 'Fielder', TM: 'SEA', 'Fielding G': 0 }],
+      ),
+      team,
+    );
+    const hitter = hitterOf(matrix, 'Fielder');
+    expect(hitter.played).toBe('DH');
+    expect(hitter.check).toBeNull();
+    expect(cellOf(hitter, 'SS').runs).toBeCloseTo(lineRuns('SS', 60 - STEP), 9);
+  });
+
+  it('blends at Game 70 too, where the fielding view carries the ratings', () => {
+    const m70 = defenseMatrix(g70, team);
+    for (const hitter of m70.hitters) {
+      expect(hitter.check, hitter.name).not.toBeNull();
+    }
+    const moon = hitterOf(m70, 'Dong-hee Moon');
+    expect(moon.check?.weight).toBeCloseTo(141 / (141 + 2486), 9);
+    within(cellOf(moon, 'SS').runs, 2.14);
+    within(cellOf(hitterOf(m70, 'Han-lee Choi'), '2B').runs, -1.97);
+    within(cellOf(hitterOf(m70, 'Etsuji Obata'), 'RF').runs, 8.33);
+    within(cellOf(hitterOf(m70, 'Zhong-shan Geng'), 'RF').runs, 8.01);
   });
 
   it('gives DH 0 runs, and scales every figure by games per season', () => {
     expect(cellOf(hitterOf(matrix, 'Han-lee Choi'), 'DH').runs).toBe(0);
-    const longer = defenseMatrix(g70, { ...team, games_per_season: 162 });
-    expect(cellOf(hitterOf(longer, 'Han-lee Choi'), '2B').runs).toBeCloseTo((6.688 * 162) / 152, 3);
-    expect(hitterOf(longer, 'Jin-soo Shinn').check?.armRuns).toBeCloseTo((1.8621 * 162) / 152, 3);
+    const longer = defenseMatrix(g71, { ...team, games_per_season: 162 });
+    for (const name of ['Hideji Yamanaka', 'Tomofumi Kamimura']) {
+      expect(cellOf(hitterOf(longer, name), 'LF').runs).toBeCloseTo(
+        ((cellOf(hitterOf(matrix, name), 'LF').runs ?? 0) * 162) / 152,
+        9,
+      );
+    }
+    expect(hitterOf(longer, 'Hideji Yamanaka').check?.ownRuns).toBeCloseTo(
+      ((hitterOf(matrix, 'Hideji Yamanaka').check?.ownRuns ?? 0) * 162) / 152,
+      9,
+    );
+  });
+});
+
+describe('the lines alone at Games 42 and 53 (req-fielding)', () => {
+  it.each([
+    ['Game 42', g42],
+    ['Game 53', g53],
+  ])('%s has no own stats, so every cell is the line at its rating', (_label, snapshot) => {
+    const matrix = defenseMatrix(snapshot, team);
+    for (const hitter of matrix.hitters) {
+      expect(hitter.check, hitter.name).toBeNull();
+      for (const position of FIELD_POSITIONS) {
+        const cell = cellOf(hitter, position);
+        if (cell.eligible) {
+          expect(cell.runs, `${hitter.name} ${position}`).toBeCloseTo(
+            lineRuns(position, cell.rating ?? 0),
+            9,
+          );
+        }
+      }
+    }
+  });
+
+  it('gives the Context’s figures: Tsumoto +0.32 at C and Shinn −3.02 in left at Game 53', () => {
+    const m53 = defenseMatrix(g53, team);
+    within(cellOf(hitterOf(m53, 'Yasuhiro Tsumoto'), 'C').runs, 0.32);
+    within(cellOf(hitterOf(m53, 'Jin-soo Shinn'), 'LF').runs, -3.02);
+    within(cellOf(hitterOf(m53, 'Han-lee Choi'), 'SS').runs, -18.26);
+    const m42 = defenseMatrix(g42, team);
+    within(cellOf(hitterOf(m42, 'Bitgaram Mangjeol'), 'SS').runs, 8.34);
+    within(cellOf(hitterOf(m42, 'Cheng-qian Eng'), '1B').runs, -6.69);
   });
 });
 
@@ -492,28 +665,49 @@ describe('coverage on the three snapshots (req-coverage)', () => {
   });
 });
 
-describe('DEFAULT_DEFENSE_SETTINGS (req-settings)', () => {
-  it('holds runs per 10 points from the Knowledge Base table', () => {
-    const expected: Record<FieldPosition, number> = {
-      C: 8,
-      '1B': 2.4,
-      '2B': 6.6,
-      '3B': 7.4,
-      SS: 8.6,
-      LF: 5.0,
-      CF: 8.8,
-      RF: 7.1,
-    };
-    expect(DEFAULT_DEFENSE_SETTINGS.runsPer10Points).toEqual(expected);
+describe('DEFAULT_DEFENSE_SETTINGS (req-settings-plan, Open questions 7)', () => {
+  it('holds the Game 71 lines of the task’s Context, per 1,350 innings on 20–80', () => {
+    expect(DEFAULT_DEFENSE_SETTINGS.lines).toEqual({
+      C: { intercept: -4.429, slope: 0.07912 },
+      '1B': { intercept: -11.932, slope: 0.20002 },
+      '2B': { intercept: -46.818, slope: 0.75804 },
+      '3B': { intercept: -37.087, slope: 0.68222 },
+      SS: { intercept: -53.91, slope: 0.9321 },
+      LF: { intercept: -21.278, slope: 0.34307 },
+      CF: { intercept: -46.08, slope: 0.87909 },
+      RF: { intercept: -31.737, slope: 0.59458 },
+    });
   });
 
-  it('holds the thresholds', () => {
+  it('gives runs per 10 points as the Knowledge Base table rounds them', () => {
+    const per10 = Object.fromEntries(
+      FIELD_POSITIONS.map((position) => [
+        position,
+        Math.round(DEFAULT_DEFENSE_SETTINGS.lines[position].slope * 100) / 10,
+      ]),
+    );
+    expect(per10).toEqual({
+      C: 0.8,
+      '1B': 2,
+      '2B': 7.6,
+      '3B': 6.8,
+      SS: 9.3,
+      LF: 3.4,
+      CF: 8.8,
+      RF: 5.9,
+    });
+  });
+
+  it('holds k, the fit’s innings floor and the thresholds, and retires the old runs settings', () => {
     expect(DEFAULT_DEFENSE_SETTINGS).toMatchObject({
+      blendInnings: 2486,
+      fitInnings: 50,
       inexperienceSteps: 1,
-      inningsFloor: 200,
       excludeFlagged: false,
       rateGames: 150,
     });
+    expect(DEFAULT_DEFENSE_SETTINGS).not.toHaveProperty('runsPer10Points');
+    expect(DEFAULT_DEFENSE_SETTINGS).not.toHaveProperty('inningsFloor');
     expect(DEFAULT_DEFENSE_SETTINGS.rangeFlag).toMatchObject({
       below: 60,
       components: { SS: 'IF RNG', CF: 'OF RNG' },
@@ -530,28 +724,36 @@ describe('DEFAULT_DEFENSE_SETTINGS (req-settings)', () => {
     for (const note of Object.values(notes)) {
       expect(note.description.length).toBeGreaterThan(10);
       expect(note.description).not.toContain('\n');
-      expect(note.source).toMatch(/Knowledge Base|Game 70 fit/);
+      expect(note.source).toMatch(/Knowledge Base/);
     }
+    expect(notes.lines.source).toMatch(/Game 71 fit/);
+    expect(notes.blendInnings.source).toMatch(/Game 71 fit/);
   });
 
   it('changes the figures when a setting changes, and keys nothing to a player', () => {
-    const doubled = defenseMatrix(g70, team, {
+    const steeper = defenseMatrix(g71, team, {
       ...DEFAULT_DEFENSE_SETTINGS,
-      runsPer10Points: { ...DEFAULT_DEFENSE_SETTINGS.runsPer10Points, '2B': 13.2 },
+      lines: { ...DEFAULT_DEFENSE_SETTINGS.lines, LF: { intercept: -21.278, slope: 0.5 } },
     });
-    expect(cellOf(hitterOf(doubled, 'Han-lee Choi'), '2B').runs).toBeCloseTo(13.376, 3);
+    const kamimura = cellOf(hitterOf(steeper, 'Tomofumi Kamimura'), 'LF');
+    expect(kamimura.runs).toBeCloseTo(((-21.278 + 0.5 * (kamimura.rating ?? 0)) * 152) / 150, 9);
+    // k = 0 takes his own runs whole; a vast k leaves the line.
+    const own = defenseMatrix(g71, team, { ...DEFAULT_DEFENSE_SETTINGS, blendInnings: 0 });
+    const yamanaka = hitterOf(own, 'Hideji Yamanaka');
+    expect(yamanaka.check?.weight).toBe(1);
+    expect(cellOf(yamanaka, 'LF').runs).toBeCloseTo(yamanaka.check?.ownRuns ?? 0, 9);
+    const line = defenseMatrix(g71, team, { ...DEFAULT_DEFENSE_SETTINGS, blendInnings: 1e12 });
+    expect(cellOf(hitterOf(line, 'Hideji Yamanaka'), 'LF').runs).toBeCloseTo(lineRuns('LF', 40), 6);
     const noDiscount = defenseMatrix(g70, team, {
       ...DEFAULT_DEFENSE_SETTINGS,
       inexperienceSteps: 0,
     });
     expect(ratingAt(noDiscount, 'Han-lee Choi', '1B')).toBeCloseTo(73.333, 3);
-    const noFloor = defenseMatrix(g70, team, { ...DEFAULT_DEFENSE_SETTINGS, inningsFloor: 100 });
-    expect(hitterOf(noFloor, 'Dong-hee Moon').check?.innings).toBeCloseTo(141, 6);
   });
 
   it('is unchanged by running the matrix', () => {
     const before = structuredClone(DEFAULT_DEFENSE_SETTINGS);
-    defenseMatrix(g70, team);
+    defenseMatrix(g71, team);
     defenseMatrix(g53, team);
     expect(DEFAULT_DEFENSE_SETTINGS).toEqual(before);
   });

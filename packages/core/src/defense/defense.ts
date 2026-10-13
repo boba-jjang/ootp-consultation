@@ -4,10 +4,12 @@ import { scaleBounds } from '../ratings/scale.ts';
 import type { TeamSettings } from '../team.ts';
 import {
   FIELD_POSITIONS,
+  INNINGS_PER_GAME,
   MAX_RATING,
   MIN_RATING,
   applyFormula,
   type FieldPosition,
+  type FieldingLine,
   type PositionFormula,
 } from './fit.ts';
 
@@ -17,7 +19,9 @@ import {
  * on it and his fielding runs per season. The played position reads DEF, capped by DEF Pot.
  * Every other position reads the fielding view's potential less a step for inexperience, or,
  * where the view isn't on file, the fitted formula on the fielding components less the same
- * step. Values are unrounded; screens round.
+ * step. Runs come from the league's line of zone rating plus arm runs against the rating; at the
+ * played position the player's own zone rating plus arm runs move them by innings ÷ (innings +
+ * k). Values are unrounded; screens round.
  */
 
 export type Slot = FieldPosition | 'DH';
@@ -34,9 +38,16 @@ export interface DefenseSettings {
    * Refitting over a new export is `fitDefense`; nothing refits on upload yet.
    */
   formulas: Readonly<Record<FieldPosition, PositionFormula>>;
-  /** Runs per 10 rating points above 50, per `rateGames` games, by position. */
-  runsPer10Points: Readonly<Record<FieldPosition, number>>;
-  /** The games a rate is stated per: the runs per 10 points are per this many. */
+  /**
+   * Each position's zone rating plus arm runs per `rateGames` games at a rating on 20–80, the
+   * Game 71 fit. Refitting over a new export is `fitFielding`.
+   */
+  lines: Readonly<Record<FieldPosition, FieldingLine>>;
+  /** k: a fielder's own runs at the played position weigh innings ÷ (innings + k). */
+  blendInnings: number;
+  /** Fewest innings at a position for a league fielder to join the fit of the lines and k. */
+  fitInnings: number;
+  /** The games a rate is stated per: the lines' runs are per this many. */
   rateGames: number;
   /** Steps below the potential, or the formula, at a position other than the played one. */
   inexperienceSteps: number;
@@ -46,8 +57,6 @@ export interface DefenseSettings {
   armFlag: { atMost: number; components: Readonly<Partial<Record<FieldPosition, string>>> };
   /** Whether flagged positions other than the played one are ineligible. */
   excludeFlagged: boolean;
-  /** Innings a player needs at his position before his arm runs and zone rating count. */
-  inningsFloor: number;
   notes: Readonly<Record<Exclude<keyof DefenseSettings, 'notes'>, SettingNote>>;
 }
 
@@ -74,13 +83,23 @@ export const DEFAULT_DEFENSE_SETTINGS: DefenseSettings = {
     CF: { intercept: -52.3599, weights: { 'OF RNG': 1.3263, 'OF ARM': 0.2246, 'OF ERR': 0.1515 } },
     RF: { intercept: -37.8918, weights: { 'OF RNG': 1.0021, 'OF ARM': 0.482, 'OF ERR': 0.1885 } },
   },
-  runsPer10Points: { C: 8, '1B': 2.4, '2B': 6.6, '3B': 7.4, SS: 8.6, LF: 5, CF: 8.8, RF: 7.1 },
+  lines: {
+    C: { intercept: -4.429, slope: 0.07912 },
+    '1B': { intercept: -11.932, slope: 0.20002 },
+    '2B': { intercept: -46.818, slope: 0.75804 },
+    '3B': { intercept: -37.087, slope: 0.68222 },
+    SS: { intercept: -53.91, slope: 0.9321 },
+    LF: { intercept: -21.278, slope: 0.34307 },
+    CF: { intercept: -46.08, slope: 0.87909 },
+    RF: { intercept: -31.737, slope: 0.59458 },
+  },
+  blendInnings: 2486,
+  fitInnings: 50,
   rateGames: 150,
   inexperienceSteps: 1,
   rangeFlag: { below: 60, components: { SS: 'IF RNG', CF: 'OF RNG' } },
   armFlag: { atMost: 20, components: { '2B': 'IF ARM', '3B': 'IF ARM', SS: 'IF ARM' } },
   excludeFlagged: false,
-  inningsFloor: 200,
   notes: {
     formulas: {
       description:
@@ -88,13 +107,25 @@ export const DEFAULT_DEFENSE_SETTINGS: DefenseSettings = {
       source:
         'Game 70 fit over the league fielding export; Knowledge Base › Defensive model › What drives each position',
     },
-    runsPer10Points: {
+    lines: {
       description:
-        'Runs per 10 rating points above 50, per 150 games, by position; catcher is a placeholder.',
-      source: 'Knowledge Base › Defensive model › What drives each position (zone-rating fit)',
+        "Each position's zone rating plus arm runs per 150 games as a straight line in its rating on 20–80.",
+      source:
+        "Game 71 fit: each position's league fielders with 50 or more innings, weighted by innings; Knowledge Base › Defensive model › Eligibility matrix",
+    },
+    blendInnings: {
+      description:
+        "The innings k at which a fielder's own zone rating plus arm runs weigh as much as the line.",
+      source:
+        'Game 71 fit: squared residuals on 1 and 1,350 ÷ innings over the same fielders; Knowledge Base › Defensive model › Eligibility matrix',
+    },
+    fitInnings: {
+      description:
+        'Fewest innings at a position for a league fielder to join the fit of the lines and k.',
+      source: 'Knowledge Base › Defensive model › What drives each position (50 or more innings)',
     },
     rateGames: {
-      description: 'The number of games the runs per 10 points are stated per.',
+      description: "The number of games the lines' runs are stated per.",
       source: 'Knowledge Base › Defensive model › Eligibility matrix',
     },
     inexperienceSteps: {
@@ -114,10 +145,6 @@ export const DEFAULT_DEFENSE_SETTINGS: DefenseSettings = {
     excludeFlagged: {
       description: 'Make flagged positions other than the played one ineligible.',
       source: 'Knowledge Base › Defensive model › Eligibility matrix',
-    },
-    inningsFloor: {
-      description: 'Innings at the position before arm runs and the zone-rating check count.',
-      source: 'Knowledge Base › Defensive model › Eligibility matrix (floor of the runs fit)',
     },
   },
 };
@@ -145,17 +172,23 @@ export interface PositionCell {
   flags: DefenseFlag[];
   /** Why the cell is ineligible. */
   reason: string | null;
-  /** Fielding runs per season; arm runs are added at the played position. Null if ineligible. */
+  /**
+   * Fielding runs per season: the line at the rating, blended with his own at the played
+   * position. Null if ineligible.
+   */
   runs: number | null;
 }
 
-/** The played position's own stats, scaled to a season, once he has the innings. */
+/** The played position's blend of the line and his own runs, where he has fielding innings. */
 export interface PlayedCheck {
+  /** Fielding IP outs ÷ 3. */
   innings: number;
-  /** His zone rating scaled to a season, to set beside the estimate. */
-  zoneRating: number | null;
-  /** His arm runs scaled to a season; already part of the played cell's runs. */
-  armRuns: number | null;
+  /** w = innings ÷ (innings + k): his own runs' weight against the line's. */
+  weight: number;
+  /** His zone rating plus arm runs, per season. */
+  ownRuns: number;
+  /** The blended runs per season: the played cell's runs. */
+  runs: number;
 }
 
 export interface HitterDefense {
@@ -210,13 +243,17 @@ export function defenseMatrix(
       continue;
     }
     const { played, source } = playedPosition(row, snapshot.league.hitters);
-    const check = playedCheck(row, played, team, settings);
+    const own = ownFielding(row, played, settings);
     const cells: Partial<Record<Slot, PositionCell>> = {};
+    let check: PlayedCheck | null = null;
     for (const slot of slots) {
-      cells[slot] =
-        slot === 'DH'
-          ? designatedHitter()
-          : fieldingCell(row, slot, { played, check, team, settings, step });
+      if (slot === 'DH') {
+        cells[slot] = designatedHitter();
+        continue;
+      }
+      const cell = fieldingCell(row, slot, { played, own, team, settings, step });
+      cells[slot] = cell.cell;
+      check ??= cell.check;
     }
     hitters.push({ name, team: textAt(row, 'TM'), played, playedSource: source, cells, check });
   }
@@ -249,25 +286,38 @@ function playedPosition(row: ExportRow, league: readonly ExportRow[]) {
   return { played: roster, source: roster === null ? null : ('roster' as const) };
 }
 
-function playedCheck(
+/** His own fielding at the played position: innings and zone rating plus arm runs per rateGames games. */
+interface OwnFielding {
+  innings: number;
+  runs: number;
+}
+
+/**
+ * Open questions 1: where the played position is a field position and his row has fielding
+ * innings and a zone rating or arm runs (a missing one counts 0), his own runs per `rateGames`
+ * games: (ZR + ARM) ÷ innings × the innings in `rateGames` games.
+ */
+function ownFielding(
   row: ExportRow,
   played: string | null,
-  team: DefenseTeam,
   settings: DefenseSettings,
-): PlayedCheck | null {
+): OwnFielding | null {
   const outs = numberAt(row, 'Fielding IP');
-  if (played === null || !isFieldPosition(played) || outs === null) {
+  const zoneRating = numberAt(row, 'ZR');
+  const armRuns = numberAt(row, 'ARM');
+  if (
+    played === null ||
+    !isFieldPosition(played) ||
+    outs === null ||
+    outs <= 0 ||
+    (zoneRating === null && armRuns === null)
+  ) {
     return null;
   }
   const innings = outs / 3;
-  if (innings < settings.inningsFloor || innings === 0) {
-    return null;
-  }
-  const perSeason = (value: number | null) =>
-    value === null ? null : (value / innings) * 9 * team.games_per_season;
-  const zoneRating = perSeason(numberAt(row, 'ZR'));
-  const armRuns = perSeason(numberAt(row, 'ARM'));
-  return zoneRating === null && armRuns === null ? null : { innings, zoneRating, armRuns };
+  const runs =
+    (((zoneRating ?? 0) + (armRuns ?? 0)) / innings) * settings.rateGames * INNINGS_PER_GAME;
+  return { innings, runs };
 }
 
 const isFieldPosition = (value: string): value is FieldPosition =>
@@ -286,15 +336,21 @@ const designatedHitter = (): PositionCell => ({
 
 interface CellContext {
   played: string | null;
-  check: PlayedCheck | null;
+  own: OwnFielding | null;
   team: DefenseTeam;
   settings: DefenseSettings;
   /** One display step on 20–80. */
   step: number;
 }
 
-function fieldingCell(row: ExportRow, position: FieldPosition, context: CellContext): PositionCell {
-  const { settings } = context;
+/** A cell, and at the played position the check where his own runs entered it. */
+interface CellReading {
+  cell: PositionCell;
+  check: PlayedCheck | null;
+}
+
+function fieldingCell(row: ExportRow, position: FieldPosition, context: CellContext): CellReading {
+  const { settings, team } = context;
   const isPlayed = context.played === position;
   const flags = flagsAt(row, position, settings);
   const def = numberAt(row, 'DEF');
@@ -318,25 +374,30 @@ function fieldingCell(row: ExportRow, position: FieldPosition, context: CellCont
       ? readView(row, position)
       : readFormula(row, position, settings.formulas[position]);
     if ('reason' in read) {
-      return { ...cell, reason: read.reason };
+      return { cell: { ...cell, reason: read.reason }, check: null };
     }
     const discount = settings.inexperienceSteps * context.step;
     cell.rating = Math.min(MAX_RATING, Math.max(MIN_RATING, read.rating - discount));
     cell.source = read.source;
   }
   if (settings.excludeFlagged && flags.length > 0 && !isPlayed) {
-    return { ...cell, reason: `Flagged: ${flags.map((flag) => flag.component).join(', ')}` };
+    return {
+      cell: { ...cell, reason: `Flagged: ${flags.map((flag) => flag.component).join(', ')}` },
+      check: null,
+    };
   }
-  const armRuns = isPlayed ? (context.check?.armRuns ?? 0) : 0;
+  const perSeason = (runs: number) => (runs * team.games_per_season) / settings.rateGames;
+  const line = settings.lines[position];
+  const lineRuns = line.intercept + line.slope * cell.rating;
+  const own = isPlayed ? context.own : null;
+  if (own === null) {
+    return { cell: { ...cell, eligible: true, runs: perSeason(lineRuns) }, check: null };
+  }
+  const weight = own.innings / (own.innings + settings.blendInnings);
+  const runs = perSeason(lineRuns + weight * (own.runs - lineRuns));
   return {
-    ...cell,
-    eligible: true,
-    runs:
-      (((cell.rating - 50) / 10) *
-        settings.runsPer10Points[position] *
-        context.team.games_per_season) /
-        settings.rateGames +
-      armRuns,
+    cell: { ...cell, eligible: true, runs },
+    check: { innings: own.innings, weight, ownRuns: perSeason(own.runs), runs },
   };
 }
 

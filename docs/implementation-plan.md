@@ -267,6 +267,7 @@ These acceptance criteria differ from the canvas or from the Basis as written; t
 - [x] Build lineup selection with the assignment model: batting runs from the talent estimates, fielding runs from the eligibility matrix, a catcher share with a backup catcher, and the best nine by exact assignment (Knowledge Base › Lineup optimization › Selection).
 - [x] Build event rates and batting runs: the hitters' pool floored at 3.1 PA per team game, event-rate lines refit per snapshot on the league's hitters, the league's wOBA weights recovered from its own wOBA and wRAA, and each hitter's projected wOBA and batting runs with a band (Knowledge Base › Lineup optimization › Ordering and › Selection).
 - [x] Build the batting order: a 216-state Markov chain over nine innings with the double-play share and run factor calibrated on the league, The Book's order, a search over swaps and moves for the best order, and a gain shown only past 3 runs a season and a 200,000-game simulation (Knowledge Base › Lineup optimization › Ordering).
+- [x] Build lineup v2: fielding runs from the league line of zone rating plus arm runs, blended by innings at the played position; selection on the batting model's runs over a flat PA with the catcher share refit; and an exchange loop judged by the best order's runs plus fielding runs (Knowledge Base › Lineup optimization › Selection, › Defensive model).
 
 ## Frontend foundation
 

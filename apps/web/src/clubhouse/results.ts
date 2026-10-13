@@ -1,4 +1,10 @@
-import { describeFile, type UploadResult, type UploadedFile } from '@ootp/core';
+import {
+  describeFile,
+  describeSplit,
+  type ImportedFile,
+  type UploadResult,
+  type UploadedFile,
+} from '@ootp/core';
 
 /** A successful upload's result. */
 export type Uploaded = Extract<UploadResult, { ok: true }>;
@@ -32,4 +38,20 @@ export function resultsHeading(result: Uploaded, from: string | null): string {
   return result.snapshot.id === from
     ? count
     : `${count} Added to the ${result.snapshot.label} snapshot.`;
+}
+
+/** Where the import sent a file of the snapshot, as the import log's line says it. */
+export function routeOf(file: ImportedFile): string {
+  if (file.routing === 'rejected') {
+    return `Not used: ${file.events.find((event) => event.level === 'error')?.message ?? 'the file could not be read'}`;
+  }
+  if (file.routing === 'supplemental') {
+    return 'Supplemental: DEF Pot for the hitters, from the pitching ratings view';
+  }
+  const split = describeSplit(file);
+  const route =
+    file.scope === 'league'
+      ? `League file: ${file.view ?? 'unknown view'}`
+      : `Routed to ${file.view ?? 'unknown view'}, ${file.side ?? 'either side'}`;
+  return split ? `${route}, ${split}` : route;
 }

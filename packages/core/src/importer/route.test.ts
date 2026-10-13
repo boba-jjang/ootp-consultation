@@ -733,7 +733,9 @@ describe('routeExport on the fielding view (Knowledge Base › Import contract �
 });
 
 describe('routeExport on the Game 71 exports (Knowledge Base › Import contract › Side and scope)', () => {
-  const g71 = Object.keys(EXPECTED).filter((path) => path.startsWith('seattle-g71/'));
+  const g71 = Object.keys(EXPECTED).filter(
+    (path) => path.startsWith('seattle-g71/') && !SPLITS.includes(path),
+  );
 
   it('reads all 16 files, none rejected and no column unread', () => {
     expect(g71).toHaveLength(16);

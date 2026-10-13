@@ -1,6 +1,6 @@
 import { importTeam } from './league.ts';
 import { VIEW_MANIFESTS, type Side, type ViewId } from './manifest.ts';
-import { LEAGUE_VIEWS, type ExportRow, type RoutedExport } from './route.ts';
+import { LEAGUE_VIEWS, seasonFiles, type ExportRow, type RoutedExport } from './route.ts';
 
 /**
  * Data coverage: Knowledge Base › Import contract › Data coverage. Coverage counts data, not
@@ -312,9 +312,11 @@ function summarize(level: CoverageLevel, next: readonly NextUpload[]): string {
 /**
  * Measures a snapshot's coverage from its routed files: each data set's key columns on the
  * merged team rows, as the snapshot's tables have them. The hitter capture adds only DEF Pot,
- * which no set keys on, and a rejected or league file fills no team row.
+ * which no set keys on, and a rejected or league file fills no team row. Coverage counts no
+ * split: only the season files count (Knowledge Base › Import contract › Split exports).
  */
-export function measureCoverage(files: readonly RoutedExport[]): Coverage {
+export function measureCoverage(routed: readonly RoutedExport[]): Coverage {
+  const files = seasonFiles(routed);
   const tables = importTeam(files);
   const onFile = new Set(
     files

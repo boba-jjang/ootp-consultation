@@ -19,7 +19,7 @@ import { CheckIcon, InfoIcon } from '../ui/icons.tsx';
 import { Button, Chip, MatrixCell, Panel, Timeline } from '../ui/primitives.tsx';
 import styles from './Clubhouse.module.css';
 import { matrixHeadings, nextCards, timelineLabel } from './copy.ts';
-import { outcomeOf } from './results.ts';
+import { outcomeOf, routeOf } from './results.ts';
 
 /**
  * The Clubhouse's pieces that read nothing themselves, so the sheet can show them: the
@@ -176,19 +176,6 @@ export function CoverageMatrix({ side }: { side: SideCoverage }) {
     </Panel>
   );
 }
-
-const routeOf = (file: ImportedFile) => {
-  if (file.routing === 'rejected') {
-    return `Not used: ${file.events.find((event) => event.level === 'error')?.message ?? 'the file could not be read'}`;
-  }
-  if (file.routing === 'supplemental') {
-    return 'Supplemental: DEF Pot for the hitters, from the pitching ratings view';
-  }
-  if (file.scope === 'league') {
-    return `League file: ${file.view ?? 'unknown view'}`;
-  }
-  return `Routed to ${file.view ?? 'unknown view'}, ${file.side ?? 'either side'}`;
-};
 
 /** Every file of the snapshot, where it went and how many players it matched. */
 /** What a stored file's row can do, when the screen can change the snapshot. */

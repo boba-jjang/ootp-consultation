@@ -402,7 +402,10 @@ describe('checkSplits (Knowledge Base › Import contract › Split exports)', (
     });
     expect(checkSplits(season, { L: left, R: right })).toEqual([]);
     // Two season rows have the name, so a row from another team pairs with neither.
-    const moved = tables({ leaguePitchers: [{ Name: 'Ruben Gonzalez', TM: 'SEA', IP: 10 }] });
+    const moved = tables({
+      leagueHitters: [{ Name: 'Cy', TM: 'SEA', PA: 3 }],
+      leaguePitchers: [{ Name: 'Ruben Gonzalez', TM: 'SEA', IP: 20 }],
+    });
     expect(checkSplits(season, { L: left, R: moved })).toEqual([
       expect.objectContaining({
         level: 'info',

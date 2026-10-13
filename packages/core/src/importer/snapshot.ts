@@ -3,9 +3,19 @@ import { measureCoverage, type Coverage } from './coverage.ts';
 import { scaleBounds, toTwentyEighty, type RatingScale } from '../ratings/scale.ts';
 import { importLeague, importTeam } from './league.ts';
 import type { Side, ViewId } from './manifest.ts';
-import type { ExportRow, ImportEvent, Routing, RoutedExport, Scope } from './route.ts';
+import {
+  carriesPlateAppearances,
+  seasonFiles,
+  type ExportRow,
+  type ImportEvent,
+  type Routing,
+  type RoutedExport,
+  type Scope,
+  type Split,
+} from './route.ts';
 import {
   DEFAULT_IDENTITY_TOLERANCES,
+  checkSplits,
   validateSnapshot,
   type IdentityTolerances,
   type SnapshotEvent,
@@ -19,23 +29,44 @@ export interface ImportedFile {
   view: ViewId | null;
   side: Side | null;
   scope: Scope | null;
+  /** vs left or vs right for a split export; null for a season file. */
+  split: Split | null;
   routing: Routing;
   /** Players the file listed; none for a rejected file. */
   players: number;
   events: ImportEvent[];
 }
 
-/** One snapshot of a team: its players, the league's, and what the import found. */
-export interface Snapshot {
-  /** "Game 42": the most games any hitter has played. Null when no file gives hitters' G. */
-  label: string | null;
-  gameNumber: number | null;
-  scale: RatingScale;
-  /** One row per player on each side, merged across the team files, ratings on 20–80. */
+/**
+ * One hand's split tables: Knowledge Base › Import contract › Split exports. Built like the
+ * season tables, from that hand's split files that carry PA or BF.
+ */
+export interface SplitTables {
+  /** Team rows, ratings on 20–80 like the season's. */
   hitters: ExportRow[];
   pitchers: ExportRow[];
   league: { hitters: ExportRow[]; pitchers: ExportRow[] };
-  /** The badge, the matrices and what to upload next. */
+}
+
+/** One snapshot of a team: its players, the league's, and what the import found. */
+export interface Snapshot {
+  /**
+   * "Game 42": the most games any hitter has played in the season files. Null when no season
+   * file gives hitters' G.
+   */
+  label: string | null;
+  gameNumber: number | null;
+  scale: RatingScale;
+  /**
+   * One row per player on each side, merged across the season team files, ratings on 20–80.
+   * Split files never fill these tables.
+   */
+  hitters: ExportRow[];
+  pitchers: ExportRow[];
+  league: { hitters: ExportRow[]; pitchers: ExportRow[] };
+  /** The vs-left (L) and vs-right (R) tables from the split files; null without a split file. */
+  splits: Record<Split, SplitTables> | null;
+  /** The badge, the matrices and what to upload next, from the season files. */
   coverage: Coverage;
   /** The import log: every file, used or not, in upload order. */
   files: ImportedFile[];
@@ -48,14 +79,8 @@ export interface SnapshotSettings {
   tolerances?: IdentityTolerances;
 }
 
-/**
- * A snapshot's four tables, ratings still on the league's scale: Knowledge Base › Import
- * contract › Joins and snapshots. Every file fills them in the order given, which is upload
- * order: a player's row merges every file that lists him and keeps the place where he first
- * appeared, a later differing value replaces an earlier one with a warning, and a blank
- * never replaces a value.
- */
-export function mergeTables(files: readonly RoutedExport[]) {
+/** The four tables of whichever files are given, merged in the order given. */
+function tablesOf(files: readonly RoutedExport[]) {
   const team = importTeam(files);
   const league = importLeague(files);
   return {
@@ -67,17 +92,52 @@ export function mergeTables(files: readonly RoutedExport[]) {
 }
 
 /**
- * Assembles one snapshot from its routed files: the four tables merged cell by cell, then
- * validated, ratings moved to 20–80 and coverage measured. Rejected files are left out.
+ * A snapshot's four season tables, ratings still on the league's scale: Knowledge Base ›
+ * Import contract › Joins and snapshots. Every season file fills them in the order given,
+ * which is upload order: a player's row merges every file that lists him and keeps the place
+ * where he first appeared, a later differing value replaces an earlier one with a warning,
+ * and a blank never replaces a value. Split files never merge into them.
+ */
+export function mergeTables(files: readonly RoutedExport[]) {
+  return tablesOf(seasonFiles(files));
+}
+
+/**
+ * The vs-left and vs-right tables, ratings still on the league's scale: › Split exports. Each
+ * hand's split files that carry PA or BF fill its four tables, merged as the season's are;
+ * the superstats splits fill none. Null when no file is a split. The merging's events carry
+ * their hand.
+ */
+function mergeSplitTables(files: readonly RoutedExport[]) {
+  if (!files.some((file) => file.split !== null)) {
+    return null;
+  }
+  const events: SnapshotEvent[] = [];
+  const hand = (split: Split): SplitTables => {
+    const { events: merged, ...tables } = tablesOf(
+      files.filter((file) => file.split === split && carriesPlateAppearances(file)),
+    );
+    events.push(...merged.map((event) => ({ ...event, split })));
+    return tables;
+  };
+  return { tables: { L: hand('L'), R: hand('R') }, events };
+}
+
+/**
+ * Assembles one snapshot from its routed files: the four season tables merged cell by cell,
+ * then validated, ratings moved to 20–80 and coverage measured, all from the season files.
+ * The split files fill the split tables, checked against the season. Rejected files are left
+ * out.
  */
 export function assembleSnapshot(
   files: readonly RoutedExport[],
   settings: SnapshotSettings,
 ): Snapshot {
-  const tables = mergeTables(files);
+  const season = seasonFiles(files);
+  const tables = mergeTables(season);
   const events = [
     ...tables.events,
-    ...validateSnapshot(tables, files, {
+    ...validateSnapshot(tables, season, {
       ratingScale: scaleBounds(settings.scale),
       tolerances: settings.tolerances ?? DEFAULT_IDENTITY_TOLERANCES,
     }),
@@ -94,6 +154,15 @@ export function assembleSnapshot(
       scope: 'team',
     });
   }
+  const splits = mergeSplitTables(files);
+  if (splits) {
+    events.push(...splits.events, ...checkSplits(tables, splits.tables));
+  }
+  const storedSplit = (split: SplitTables): SplitTables => ({
+    hitters: stored(split.hitters),
+    pitchers: stored(split.pitchers),
+    league: split.league,
+  });
   return {
     label: gameNumber === null ? null : `Game ${gameNumber}`,
     gameNumber,
@@ -101,12 +170,14 @@ export function assembleSnapshot(
     hitters: stored(tables.hitters),
     pitchers: stored(tables.pitchers),
     league: tables.league,
-    coverage: measureCoverage(files),
+    splits: splits && { L: storedSplit(splits.tables.L), R: storedSplit(splits.tables.R) },
+    coverage: measureCoverage(season),
     files: files.map((file) => ({
       name: file.name,
       view: file.view,
       side: file.side,
       scope: file.scope,
+      split: file.split,
       routing: file.routing,
       players: file.rows.length,
       events: file.events,
@@ -115,9 +186,12 @@ export function assembleSnapshot(
   };
 }
 
-/** The most games any team hitter has played: the game number that dates a snapshot. */
+/**
+ * The most games any team hitter has played in the season files: the game number that dates
+ * a snapshot. A split file's G counts games against one hand, so it never dates one.
+ */
 export function gameNumberOf(files: readonly RoutedExport[]): number | null {
-  return mostGames(importTeam(files).hitters);
+  return mostGames(importTeam(seasonFiles(files)).hitters);
 }
 
 function mostGames(hitters: readonly ExportRow[]): number | null {

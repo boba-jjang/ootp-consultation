@@ -37,17 +37,22 @@ export {
   LEAGUE_VIEWS,
   positionSide,
   routeExport,
+  splitOf,
+  splitWords,
   type ExportRow,
   type ImportEvent,
   type RoutedExport,
   type Routing,
   type RoutingSettings,
   type Scope,
+  type Split,
 } from './importer/route.ts';
 export {
   DEFAULT_IDENTITY_TOLERANCES,
   DEFAULT_VALIDATION_SETTINGS,
+  SPLIT_COUNTS,
   checkIdentities,
+  checkSplits,
   validateSnapshot,
   type IdentityFailure,
   type IdentityTolerances,
@@ -70,6 +75,7 @@ export {
   type ImportedFile,
   type Snapshot,
   type SnapshotSettings,
+  type SplitTables,
 } from './importer/snapshot.ts';
 export { describeExports, type ExportSummary } from './importer/describe.ts';
 export { COLUMN_NOTES, columnNotesFor, type ColumnNote } from './importer/columns.ts';
@@ -206,6 +212,7 @@ export {
 export {
   collectUploads,
   describeFile,
+  describeSplit,
   replacementKey,
   replacementProblem,
   type CollectedUploads,

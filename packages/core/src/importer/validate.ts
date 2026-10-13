@@ -1,6 +1,6 @@
 import { sameValue, show } from './league.ts';
 import type { Side, ViewId } from './manifest.ts';
-import type { ExportRow, ImportEvent, RoutedExport, Scope } from './route.ts';
+import type { ExportRow, ImportEvent, RoutedExport, Scope, Split } from './route.ts';
 import type { CellValue } from './values.ts';
 import { RATING_COLUMNS } from '../ratings/columns.ts';
 
@@ -62,6 +62,8 @@ export interface SnapshotEvent extends ImportEvent {
   /** That file's known view; null for any other file, or for an event about merged rows. */
   view: ViewId | null;
   scope: Scope;
+  /** The hand of the split tables the event is about; absent for the season's. */
+  split?: Split;
 }
 
 /** A snapshot's four tables, merged from its files, ratings still on the league's scale. */
@@ -254,6 +256,95 @@ export function validateSnapshot(
             { name: nameOf(row), column, league: value, team: own[column] },
           );
         }
+      }
+    }
+  }
+  return events;
+}
+
+/**
+ * The counts vs left plus vs right must give the season: Knowledge Base › Import contract ›
+ * Split exports. A pitcher's IP is in outs. G and GS count games against one hand, and a
+ * pitcher's W, L, SV and HLD aren't split.
+ */
+export const SPLIT_COUNTS: Record<Side, readonly string[]> = {
+  hitters: ['PA', 'AB', 'H', '1B', '2B', '3B', 'HR', 'BB', 'IBB', 'HP', 'SF', 'K'],
+  pitchers: ['IP', 'BF', 'HA', 'HR', 'BB', 'K', 'HP'],
+};
+
+/** The four tables a snapshot keeps for the season and for each split, by scope and side. */
+const KINDS = [
+  { scope: 'team', side: 'hitters', rows: (tables: SnapshotTables) => tables.hitters },
+  { scope: 'team', side: 'pitchers', rows: (tables: SnapshotTables) => tables.pitchers },
+  { scope: 'league', side: 'hitters', rows: (tables: SnapshotTables) => tables.league.hitters },
+  { scope: 'league', side: 'pitchers', rows: (tables: SnapshotTables) => tables.league.pitchers },
+] as const;
+
+/**
+ * Checks the split tables against the season's: Knowledge Base › Import contract › Split
+ * exports. Each player with a row in either hand's table and a season row of the same kind
+ * must have vs left plus vs right equal to the season in SPLIT_COUNTS, wherever the season
+ * row and a split row carry the column; a missing row or cell counts 0. A split row pairs
+ * with its season row by key (the name on the team, team plus name in the league), or else
+ * by name alone when exactly one season row has the name, as when a player changed teams. A
+ * player with split rows but no season row is noted once; a mismatch warns, naming the player
+ * and the columns.
+ */
+export function checkSplits(
+  season: SnapshotTables,
+  splits: Readonly<Record<Split, SnapshotTables>>,
+): SnapshotEvent[] {
+  const events: SnapshotEvent[] = [];
+  for (const { scope, side, rows } of KINDS) {
+    const keyOf = (row: ExportRow) =>
+      scope === 'team' ? nameOf(row) : `${typeof row.TM === 'string' ? row.TM : ''}|${nameOf(row)}`;
+    const seasonRows = rows(season);
+    const byKey = new Map(seasonRows.map((row) => [keyOf(row), row]));
+    const byName = new Map<string, ExportRow[]>();
+    for (const row of seasonRows) {
+      byName.set(nameOf(row), [...(byName.get(nameOf(row)) ?? []), row]);
+    }
+    const pairOf = (row: ExportRow) => {
+      const named = byName.get(nameOf(row)) ?? [];
+      return byKey.get(keyOf(row)) ?? (named.length === 1 ? named[0] : undefined);
+    };
+
+    const paired = new Map<ExportRow, ExportRow[]>();
+    const unpaired = new Set<string>();
+    for (const row of [...rows(splits.L), ...rows(splits.R)]) {
+      const own = pairOf(row);
+      if (own) {
+        paired.set(own, [...(paired.get(own) ?? []), row]);
+      } else if (!unpaired.has(keyOf(row))) {
+        unpaired.add(keyOf(row));
+        events.push({
+          level: 'info',
+          code: 'split-unmatched',
+          message: `${nameOf(row)} has a vs-left or vs-right row among the ${scope === 'team' ? 'team' : 'league'}'s ${side} but no season row, so the splits' check leaves that player out.`,
+          details: { name: nameOf(row), side },
+          view: null,
+          scope,
+        });
+      }
+    }
+
+    for (const [own, splitRows] of paired) {
+      const columns = SPLIT_COUNTS[side].filter((column) => {
+        if (!Object.hasOwn(own, column) || !splitRows.some((row) => Object.hasOwn(row, column))) {
+          return false;
+        }
+        const total = splitRows.reduce((sum, row) => sum + (num(row[column]) ?? 0), 0);
+        return Math.abs(total - (num(own[column]) ?? 0)) > EPSILON;
+      });
+      if (columns.length > 0) {
+        events.push({
+          level: 'warning',
+          code: 'split-mismatch',
+          message: `${nameOf(own)}: vs left plus vs right differs from the season in ${columns.join(', ')}, so the splits may come from another game.`,
+          details: { name: nameOf(own), side, columns },
+          view: null,
+          scope,
+        });
       }
     }
   }

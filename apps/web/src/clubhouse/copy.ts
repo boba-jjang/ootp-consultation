@@ -9,6 +9,7 @@ import {
   type DataSet,
   type ImportedFile,
   type Side,
+  type Split,
   type ViewId,
 } from '@ootp/core';
 
@@ -16,7 +17,7 @@ import { upperFirst } from '../setup/exports.ts';
 
 /**
  * The Clubhouse's copy, as pure functions of the coverage and the counts, so the screen only
- * renders it: the cards of what to upload next, the matrix headings, the Add data drop zone,
+ * renders it: the cards of what to upload next, the matrix headings, the Add data drop zones,
  * the timeline's labels and what "How columns were read" lists.
  */
 
@@ -25,6 +26,24 @@ export const ADD_DATA = {
   title: 'Drop any OOTP export here',
   text: "Hitters or pitchers, stats or ratings, one file or a whole folder. A re-export merges with what's on file: a later value wins and a blank never replaces one. Exports from a later game open that game's snapshot.",
 };
+
+/**
+ * The split windows under the main drop zone, vs left then vs right: whatever goes through one
+ * is stored as its split, whatever the file is called (Knowledge Base › Import contract › Split
+ * exports).
+ */
+export const SPLIT_WINDOWS: readonly { split: Split; title: string; text: string }[] = [
+  {
+    split: 'L',
+    title: 'Split vs left',
+    text: 'Batting views vs left-handed pitchers, pitching views vs left-handed batters. Stored as the vs-left split, whatever the file is called.',
+  },
+  {
+    split: 'R',
+    title: 'Split vs right',
+    text: 'Batting views vs right-handed pitchers, pitching views vs right-handed batters. Stored as the vs-right split, whatever the file is called.',
+  },
+];
 
 /** A card of what to upload next: one side's data set still missing, or there only in part. */
 export interface NextCard {

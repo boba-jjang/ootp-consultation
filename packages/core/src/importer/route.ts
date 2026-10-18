@@ -37,7 +37,10 @@ export interface RoutedExport {
   scope: Scope | null;
   /** The side the rows list; null for a team file with rows on both sides, placed by POS. */
   side: Side | null;
-  /** The split the file name gives (splitOf); null for a season file. */
+  /**
+   * The split the upload gives (a split window's) or else the file name's (splitOf); null for
+   * a season file.
+   */
   split: Split | null;
   routing: Routing;
   /**
@@ -133,6 +136,8 @@ export function splitWords(split: Split, side: Side | null | undefined): string 
 export const carriesPlateAppearances = (file: Pick<RoutedExport, 'rows'>) =>
   file.rows.some((row) => Object.hasOwn(row, 'PA') || Object.hasOwn(row, 'BF'));
 
+const HAND_WORDS: Record<Split, string> = { L: 'left', R: 'right' };
+
 /**
  * Reads one CSV through the column dictionary and decides how the import treats it:
  * Knowledge Base › Import contract › Column dictionary and › Side and scope. Any header
@@ -142,23 +147,38 @@ export const carriesPlateAppearances = (file: Pick<RoutedExport, 'rows'>) =>
  * the rows' POS. A split export routes as its season view would, and an info event names its
  * split (› Split exports). Every decision is logged as an import event. A rejected file keeps
  * no rows.
+ *
+ * split is the split the upload gives: a split window's, or the one stored with the file. It
+ * wins over the file name, and a file whose name says the other split is refused. Without it
+ * the name decides. When the name says the same split the log keeps the name's line, so a
+ * file reads alike whether a window gave its split or the name did.
  */
 export function routeExport(
   fileName: string,
   text: string,
+  split: Split | null = null,
   settings: RoutingSettings = DEFAULT_ROUTING_SETTINGS,
 ): RoutedExport {
-  const result = routeRows(fileName, text, settings);
-  const { split } = result;
-  if (split === null || result.routing === 'rejected') {
+  const result = routeRows(fileName, text, split, settings);
+  if (result.split === null || result.routing === 'rejected') {
     return result;
   }
-  result.events.push({
-    level: 'info',
-    code: 'split',
-    message: `Split ${splitWords(split, result.side)}: the name ends _vs${split === 'L' ? 'l' : 'r'}, so the rows stay apart from the season tables.`,
-    details: { split },
-  });
+  const words = splitWords(result.split, result.side);
+  result.events.push(
+    splitOf(fileName) === result.split
+      ? {
+          level: 'info',
+          code: 'split',
+          message: `Split ${words}: the name ends _vs${result.split === 'L' ? 'l' : 'r'}, so the rows stay apart from the season tables.`,
+          details: { split: result.split },
+        }
+      : {
+          level: 'info',
+          code: 'split',
+          message: `Split ${words}: dropped in the vs-${HAND_WORDS[result.split]} window, so the rows stay apart from the season tables.`,
+          details: { split: result.split, from: 'window' },
+        },
+  );
   if (!carriesPlateAppearances(result)) {
     result.events.push({
       level: 'info',
@@ -170,17 +190,23 @@ export function routeExport(
   return result;
 }
 
-function routeRows(fileName: string, text: string, settings: RoutingSettings): RoutedExport {
+function routeRows(
+  fileName: string,
+  text: string,
+  given: Split | null,
+  settings: RoutingSettings,
+): RoutedExport {
   const events: ImportEvent[] = [];
   const [header = [], ...records] = parseCsv(text);
   const columns = header.map((column) => column.trim());
+  const named = splitOf(fileName);
   const result: RoutedExport = {
     name: fileName,
     view: null,
     version: null,
     scope: null,
     side: null,
-    split: splitOf(fileName),
+    split: given ?? named,
     routing: 'rejected',
     header: columns,
     rows: [],
@@ -194,6 +220,14 @@ function routeRows(fileName: string, text: string, settings: RoutingSettings): R
   };
   const info = (code: string, message: string, details?: Record<string, unknown>) =>
     events.push({ level: 'info', code, message, ...(details ? { details } : {}) });
+
+  if (given !== null && named !== null && named !== given) {
+    return reject(
+      'split-conflict',
+      `This file's name says vs ${HAND_WORDS[named]}, but it was dropped in vs ${HAND_WORDS[given]}.`,
+      { split: given, named },
+    );
+  }
 
   const detection = detectView(header);
   if (!detection.ok && (detection.reason === 'empty' || detection.reason === 'duplicate-columns')) {

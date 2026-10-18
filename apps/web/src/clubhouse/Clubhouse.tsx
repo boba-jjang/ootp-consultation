@@ -1,4 +1,10 @@
-import { replacementProblem, routeExport, type ImportedFile, type Upload } from '@ootp/core';
+import {
+  replacementProblem,
+  routeExport,
+  type ImportedFile,
+  type Split,
+  type Upload,
+} from '@ootp/core';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
@@ -8,7 +14,7 @@ import { useShell } from '../shell/context.ts';
 import { modulePath } from '../shell/modules.ts';
 import { Button } from '../ui/primitives.tsx';
 import styles from './Clubhouse.module.css';
-import { ADD_DATA } from './copy.ts';
+import { ADD_DATA, SPLIT_WINDOWS } from './copy.ts';
 import {
   ColumnNotes,
   CoverageMatrix,
@@ -33,11 +39,17 @@ export interface ClubhouseState {
 
 const NO_CSV = 'No CSV file was among those. OOTP exports are .csv files.';
 
+/** Files that arrive with a split: a split window's, or a stored file's that they replace. */
+const withSplit = (files: Promise<Upload[]>, split: Split | null) =>
+  files.then((uploads) => uploads.map((upload): Upload => ({ ...upload, split })));
+
 /**
  * The Clubhouse: everything on file for the team. Uploads go through the importer like the
  * first ones did: a re-export merges with what's on file, a later value winning and a blank
  * never replacing one, and an export with a new game number opens that game's snapshot,
- * which the screen follows. Each stored file can be replaced or removed on its own.
+ * which the screen follows. The vs-left and vs-right windows store their files as that split,
+ * whatever the name. Each stored file can be replaced or removed on its own, a split file by
+ * another export of its split.
  */
 export function Clubhouse() {
   const { team, snapshots, snapshotId, snapshot } = useShell();
@@ -116,7 +128,8 @@ export function Clubhouse() {
     if (file.id === undefined) {
       return;
     }
-    upload(files, {
+    // The chosen file takes the stored file's split, so an unrenamed re-export of a split fits.
+    upload(withSplit(files, file.split), {
       row: file.id,
       problem: (uploads) => {
         const [chosen] = uploads;
@@ -125,7 +138,7 @@ export function Clubhouse() {
         }
         return game === null
           ? null
-          : replacementProblem(file, game, routeExport(chosen.name, chosen.text));
+          : replacementProblem(file, game, routeExport(chosen.name, chosen.text, file.split));
       },
     });
   };
@@ -170,6 +183,21 @@ export function Clubhouse() {
             title={ADD_DATA.title}
             text={ADD_DATA.text}
           />
+          <div className={styles.splitZones}>
+            {SPLIT_WINDOWS.map((zone) => (
+              <div key={zone.split} role="group" aria-label={zone.title}>
+                <DropZone
+                  size="small"
+                  busy={busy}
+                  onFiles={(files) => {
+                    upload(withSplit(files, zone.split));
+                  }}
+                  title={zone.title}
+                  text={zone.text}
+                />
+              </div>
+            ))}
+          </div>
           {results ? (
             <UploadResults
               heading={resultsHeading(results.result, results.from)}

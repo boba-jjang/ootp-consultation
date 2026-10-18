@@ -31,6 +31,11 @@ export interface NewViewFile {
   detectedView: ViewId | null;
   side: Side | null;
   scope: Scope | null;
+  /**
+   * vs left or vs right for a split export, as the upload's window or the file name gave it;
+   * null for a season file, and for a row stored before the column, which re-reads by its name.
+   */
+  split: Split | null;
   routing: Routing;
   importerVersion: string;
 }
@@ -56,6 +61,11 @@ export interface SnapshotStore {
 export interface Upload {
   name: string;
   text: string;
+  /**
+   * The split the upload gives: the Clubhouse's vs-left or vs-right window, a replacement's
+   * stored file, or a restored file's. It wins over the file name; without it the name decides.
+   */
+  split?: Split | null;
 }
 
 export interface UploadOptions {
@@ -105,7 +115,8 @@ export type UploadResult =
  * a later game adds history. Split exports never date an upload, so uploaded alone they join
  * the snapshot given as into. Within a snapshot, a file already stored byte for byte is left alone and every
  * other file is added: uploading never removes a stored file (Knowledge Base › Joins and
- * snapshots). Rejected files are kept so the import log can show why.
+ * snapshots). Rejected files are kept so the import log can show why. Each file is stored with
+ * its split, the upload's or else its name's (› Split exports).
  */
 export async function importUpload(
   store: SnapshotStore,
@@ -115,7 +126,7 @@ export async function importUpload(
 ): Promise<UploadResult> {
   const routed = uploads.map((upload) => ({
     upload,
-    result: routeExport(upload.name, upload.text),
+    result: routeExport(upload.name, upload.text, upload.split ?? null),
   }));
   const { gameNumber, label } = assembleSnapshot(
     routed.map(({ result }) => result),
@@ -175,6 +186,7 @@ export async function importUpload(
         detectedView: result.view,
         side: result.side,
         scope: result.scope,
+        split: result.split,
         routing: result.routing,
         importerVersion: result.importerVersion,
       },
@@ -188,7 +200,7 @@ export async function importUpload(
 
 /**
  * Re-reads a snapshot's stored raw files with the current importer and assembles them, so
- * every derived value follows the current rules.
+ * every derived value follows the current rules. Each file re-reads with its stored split.
  */
 export async function loadSnapshot(
   store: SnapshotStore,
@@ -197,7 +209,7 @@ export async function loadSnapshot(
 ): Promise<Snapshot> {
   const files = await store.listFiles(snapshotId);
   const snapshot = assembleSnapshot(
-    files.map((file) => routeExport(file.originalFilename, file.content)),
+    files.map((file) => routeExport(file.originalFilename, file.content, file.split)),
     { scale },
   );
   // Each log row keeps its stored file's id, so a screen can replace or remove that file.

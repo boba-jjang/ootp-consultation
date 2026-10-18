@@ -281,8 +281,8 @@ describe('routeExport on the fixtures', () => {
     expect(bio.rows.find((row) => row.Name === 'Dong-hee Moon')).toMatchObject({ POS: 'SS' });
   });
 
-  it('stamps importer version 0.6.0, for the split exports', () => {
-    expect(IMPORTER_VERSION).toBe('0.6.0');
+  it('stamps importer version 0.7.0, for the split windows', () => {
+    expect(IMPORTER_VERSION).toBe('0.7.0');
   });
 
   it('keeps only Name, POS and DEF Pot from the hitter capture, and says so', () => {
@@ -374,6 +374,107 @@ describe('routeExport on split exports (Knowledge Base › Import contract › S
   });
 });
 
+describe('routeExport with a window’s split (Knowledge Base › Import contract › Split exports)', () => {
+  /** A split fixture under its season view's name, as OOTP names the export. */
+  const unrenamed = (path: string) => fileName(path).replace(/_vs[lr]\.csv$/, '.csv');
+  /** A split fixture dropped in a window, under OOTP's name. */
+  const dropped = (path: string, split: 'L' | 'R') =>
+    routeExport(unrenamed(path), readFixtureText(path), split);
+
+  it('reads an unrenamed split dropped in a window as its _vsl or _vsr fixture: the same rows', () => {
+    for (const path of SPLITS) {
+      const named = route(path);
+      const result = dropped(path, named.split ?? 'L');
+      expect(result, path).toMatchObject({
+        name: unrenamed(path),
+        view: named.view,
+        scope: named.scope,
+        side: named.side,
+        split: named.split,
+        routing: named.routing,
+        header: named.header,
+      });
+      expect(result.rows, path).toEqual(named.rows);
+    }
+  });
+
+  it('says the window set the split, in the words of the hand the rows face', () => {
+    const named = (path: string, split: 'L' | 'R') =>
+      dropped(path, split).events.find((event) => event.code === 'split');
+    expect(named(`${G71_TEAM_SPLIT}batting_stats_c_vsl.csv`, 'L')).toEqual({
+      level: 'info',
+      code: 'split',
+      message:
+        'Split vs LHP: dropped in the vs-left window, so the rows stay apart from the season tables.',
+      details: { split: 'L', from: 'window' },
+    });
+    expect(named(`${G71_LEAGUE_SPLIT}batting_stats_c_vsr.csv`, 'R')?.message).toBe(
+      'Split vs RHP: dropped in the vs-right window, so the rows stay apart from the season tables.',
+    );
+    expect(named(`${G71_TEAM_SPLIT}pitching_stats_c_vsl.csv`, 'L')?.message).toBe(
+      'Split vs LHB: dropped in the vs-left window, so the rows stay apart from the season tables.',
+    );
+    expect(named(`${G71_LEAGUE_SPLIT}pitching_stats_c_vsr.csv`, 'R')?.message).toBe(
+      'Split vs RHB: dropped in the vs-right window, so the rows stay apart from the season tables.',
+    );
+  });
+
+  it('makes any file that window’s split, whatever its name: a season file too', () => {
+    const season = `${G71_TEAM}batting_stats_c.csv`;
+    const result = routeExport(fileName(season), readFixtureText(season), 'R');
+    expect(result).toMatchObject({ split: 'R', routing: 'primary', side: 'hitters' });
+    expect(result.rows).toEqual(route(season).rows);
+    expect(routeExport('export.csv', readFixtureText(season), 'L').split).toBe('L');
+  });
+
+  it('refuses a file whose name says the other split', () => {
+    const right = `${G71_TEAM_SPLIT}batting_stats_c_vsr.csv`;
+    const result = routeExport(fileName(right), readFixtureText(right), 'L');
+    expect(result).toMatchObject({ split: 'L', routing: 'rejected', rows: [] });
+    expect(result.header).toEqual(route(right).header);
+    expect(result.events).toEqual([
+      {
+        level: 'error',
+        code: 'split-conflict',
+        message: "This file's name says vs right, but it was dropped in vs left.",
+        details: { split: 'L', named: 'R' },
+      },
+    ]);
+    const left = `${G71_LEAGUE_SPLIT}pitching_stats_c_vsl.csv`;
+    expect(routeExport(fileName(left), readFixtureText(left), 'R').events).toEqual([
+      expect.objectContaining({
+        level: 'error',
+        code: 'split-conflict',
+        message: "This file's name says vs left, but it was dropped in vs right.",
+      }) as unknown,
+    ]);
+  });
+
+  it('routes a name that agrees with the window as the name alone does', () => {
+    for (const path of SPLITS) {
+      const named = route(path);
+      expect(routeExport(fileName(path), readFixtureText(path), named.split), path).toEqual(named);
+    }
+  });
+
+  it('keeps the name rule without a window, null or left out alike', () => {
+    for (const path of Object.keys(EXPECTED)) {
+      expect(routeExport(fileName(path), readFixtureText(path), null), path).toEqual(route(path));
+    }
+  });
+
+  it('stores superstats dropped in a window, but they fill no table', () => {
+    for (const path of SPLIT_SUPERSTATS) {
+      const result = dropped(path, 'L');
+      expect(result.routing, path).toBe('primary');
+      expect(
+        result.events.map((event) => event.code),
+        path,
+      ).toEqual(['split', 'split-no-table']);
+    }
+  });
+});
+
 describe('routeExport scope without a known file name', () => {
   it('reads a league batting file from its 30 teams in TM', () => {
     const result = route(leagueView('batting_superstats_1'), 'export.csv');
@@ -397,7 +498,7 @@ describe('routeExport scope without a known file name', () => {
 
   it('honors a lower league row threshold from the settings', () => {
     const text = readFixtureText(teamView('pitching_superstats_2'));
-    expect(routeExport('export.csv', text, { leagueRowThreshold: 10 }).scope).toBe('league');
+    expect(routeExport('export.csv', text, null, { leagueRowThreshold: 10 }).scope).toBe('league');
   });
 });
 

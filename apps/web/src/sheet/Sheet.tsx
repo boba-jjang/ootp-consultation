@@ -35,7 +35,13 @@ import {
   Timeline,
   Trend,
 } from '../ui/primitives.tsx';
-import { SHEET_COVERAGE, SHEET_LOG, SHEET_PENDING, SHEET_RESULTS } from './mock.ts';
+import {
+  SHEET_COVERAGE,
+  SHEET_LOG,
+  SHEET_PENDING,
+  SHEET_RESULTS,
+  SHEET_SPLIT_CARD,
+} from './mock.ts';
 import styles from './Sheet.module.css';
 
 const SWATCHES: [string, string][] = [
@@ -188,7 +194,13 @@ export function Sheet() {
             snapshots={[{ id: 'g42', teamId: 'sheet', label: 'Game 42', gameNumber: 42 }]}
             counts={new Map([['g42', 9]])}
           />
-          <UploadNext coverage={SHEET_COVERAGE} busy={false} onFiles={() => undefined} />
+          <UploadNext
+            coverage={SHEET_COVERAGE}
+            busy={false}
+            onFiles={() => undefined}
+            splits={SHEET_SPLIT_CARD}
+            onSplitWindow={() => undefined}
+          />
         </div>
         <UploadResults heading="4 files read." files={SHEET_RESULTS} onDismiss={() => undefined} />
         <div className={styles.columns}>

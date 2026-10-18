@@ -8,6 +8,7 @@ import {
   type ViewId,
 } from '@ootp/core';
 
+import { splitCard } from '../clubhouse/copy.ts';
 import type { PendingFile } from '../setup/exports.ts';
 
 /**
@@ -102,6 +103,9 @@ export const SHEET_FILES: RoutedExport[] = [
 ];
 
 export const SHEET_COVERAGE = measureCoverage(SHEET_FILES);
+
+/** The batting-splits card for a team using the DH with no split on file. */
+export const SHEET_SPLIT_CARD = splitCard({ coverage: SHEET_COVERAGE, splits: null }, true);
 
 export const SHEET_LOG: ImportedFile[] = SHEET_FILES.map((file, index) => ({
   id: `sheet-file-${String(index)}`,

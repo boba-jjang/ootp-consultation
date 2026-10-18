@@ -212,10 +212,40 @@ const EVENT_COUNTS: Readonly<Record<LeagueEvent, (counts: Record<CountColumn, nu
     K: (counts) => counts.K,
   };
 
-interface CountedRow {
-  row: ExportRow;
+/** A row's plate appearances and its count of each event. */
+export interface EventCounts {
   pa: number;
-  counts: Record<CountColumn, number>;
+  counts: Record<LeagueEvent, number>;
+}
+
+/**
+ * A row's PA and event counts as every fit reads them: uBB is BB − IBB and HBP the export's
+ * HP. Null without PA > 0, or when a count is missing.
+ */
+export function eventCounts(row: ExportRow): EventCounts | null {
+  const pa = numberOf(row.PA);
+  if (pa === null || pa <= 0) {
+    return null;
+  }
+  const columns: Partial<Record<CountColumn, number>> = {};
+  for (const column of COUNT_COLUMNS) {
+    const value = numberOf(row[column]);
+    if (value === null) {
+      return null;
+    }
+    columns[column] = value;
+  }
+  const counts = Object.fromEntries(
+    Object.entries(EVENT_COUNTS).map(([event, count]) => [
+      event,
+      count(columns as Record<CountColumn, number>),
+    ]),
+  ) as Record<LeagueEvent, number>;
+  return { pa, counts };
+}
+
+interface CountedRow extends EventCounts {
+  row: ExportRow;
 }
 
 /** The rows with PA > 0, with their counts; null when any of them lacks a count. */
@@ -226,15 +256,11 @@ function countedRows(rows: readonly ExportRow[]): CountedRow[] | null {
     if (pa === null || pa <= 0) {
       continue;
     }
-    const counts: Partial<Record<CountColumn, number>> = {};
-    for (const column of COUNT_COLUMNS) {
-      const value = numberOf(row[column]);
-      if (value === null) {
-        return null;
-      }
-      counts[column] = value;
+    const read = eventCounts(row);
+    if (read === null) {
+      return null;
     }
-    counted.push({ row, pa, counts: counts as Record<CountColumn, number> });
+    counted.push({ row, ...read });
   }
   return counted;
 }
@@ -352,7 +378,7 @@ function fitEventRates(snapshot: Pick<Snapshot, 'league'>, settings: BattingSett
   const totalPa = pa.reduce((sum, value) => sum + value, 0);
   const lines: Partial<Record<FittedEvent, EventLine>> = {};
   for (const event of FITTED_EVENTS) {
-    const y = rows.map(({ counts, pa: n }) => EVENT_COUNTS[event](counts) / n);
+    const y = rows.map(({ counts, pa: n }) => counts[event] / n);
     const fit = leastSquares(x, y, pa);
     if (fit === null) {
       return fallback;
@@ -361,9 +387,9 @@ function fitEventRates(snapshot: Pick<Snapshot, 'league'>, settings: BattingSett
     lines[event] = line(intercept, slopes, fit.r2);
   }
   const league = Object.fromEntries(
-    Object.entries(EVENT_COUNTS).map(([event, count]) => [
+    Object.keys(EVENT_COUNTS).map((event) => [
       event,
-      rows.reduce((sum, entry) => sum + count(entry.counts), 0) / totalPa,
+      rows.reduce((sum, entry) => sum + entry.counts[event as LeagueEvent], 0) / totalPa,
     ]),
   ) as Record<LeagueEvent, number>;
   return {
@@ -376,8 +402,8 @@ function fitEventRates(snapshot: Pick<Snapshot, 'league'>, settings: BattingSett
 }
 
 /** wOBA's counts in a row, in WOBA_EVENTS order. */
-const wobaCounts = (counts: Record<CountColumn, number>) =>
-  WOBA_EVENTS.map((event) => EVENT_COUNTS[event](counts));
+const wobaCounts = (counts: Record<LeagueEvent, number>) =>
+  WOBA_EVENTS.map((event) => counts[event]);
 
 /**
  * Open questions 5: the weights by unweighted least squares, without an intercept, of wOBA ×

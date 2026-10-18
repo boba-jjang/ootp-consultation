@@ -1083,17 +1083,18 @@ describe('handLineups without lineups by hand (Open questions 3)', () => {
     'EYE P': 60,
     'HT P': 60,
   });
-  const nine = [
-    player('Starter C', 'C', 'R'),
-    player('First Base', '1B', 'L'),
-    player('Second Base', '2B', 'R'),
-    player('Third Base', '3B', 'S'),
-    player('Shortstop', 'SS', 'R'),
-    player('Left Field', 'LF', 'L'),
-    player('Center Field', 'CF', 'R'),
-    player('Right Field', 'RF', 'L'),
-    player('Bat Only', 'DH', 'R'),
+  const NINE: [string, string, string][] = [
+    ['Starter C', 'C', 'R'],
+    ['First Base', '1B', 'L'],
+    ['Second Base', '2B', 'R'],
+    ['Third Base', '3B', 'S'],
+    ['Shortstop', 'SS', 'R'],
+    ['Left Field', 'LF', 'L'],
+    ['Center Field', 'CF', 'R'],
+    ['Right Field', 'RF', 'L'],
+    ['Bat Only', 'DH', 'R'],
   ];
+  const nine = NINE.map(([name, pos, hand]) => player(name, pos, hand));
   const handBuilt = (splits: Snapshot['splits']) => ({
     label: 'Hand built',
     scale: '1-10' as const,
@@ -1104,16 +1105,11 @@ describe('handLineups without lineups by hand (Open questions 3)', () => {
   });
   const teamSplits = (gs: boolean) =>
     splitsOf({
-      L: nine.map((row, i) =>
-        splitRow(String(row.Name), String(row.B), { '1B': 3, BB: 1, ...(gs ? { GS: i } : {}) }, 15),
+      L: NINE.map(([name, , hand], i) =>
+        splitRow(name, hand, { '1B': 3, BB: 1, ...(gs ? { GS: i } : {}) }, 15),
       ),
-      R: nine.map((row, i) =>
-        splitRow(
-          String(row.Name),
-          String(row.B),
-          { '1B': 8, HR: 1, BB: 3, ...(gs ? { GS: 2 * i } : {}) },
-          40,
-        ),
+      R: NINE.map(([name, , hand], i) =>
+        splitRow(name, hand, { '1B': 8, HR: 1, BB: 3, ...(gs ? { GS: 2 * i } : {}) }, 40),
       ),
     });
 

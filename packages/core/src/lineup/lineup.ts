@@ -1,4 +1,9 @@
-import { teamBatting, type BattingProjection, type ModelSource } from '../batting/batting.ts';
+import {
+  teamBatting,
+  type BattingProjection,
+  type ModelSource,
+  type TeamBatting,
+} from '../batting/batting.ts';
 import {
   defenseMatrix,
   type CellSource,
@@ -278,20 +283,22 @@ function catcherShare(
 /**
  * Selects the lineup for the snapshot's team hitters. Games per season, DH and the display
  * scale come from the team's settings; the fallback PA baseline and catcher share from
- * `settings`. The batting model, the batting order, the percentile pools and the defensive
- * model run with their defaults.
+ * `settings`. The batting order, the percentile pools and the defensive model run with their
+ * defaults. The hitters' projections come from `model`, the snapshot's batting model unless a
+ * caller hands in other rates, as the lineups by the starter's hand do; the order's
+ * calibration always reads `model.model`.
  */
 export function selectLineup(
   snapshot: LineupSnapshot,
   team: DefenseTeam,
   settings: LineupSettings = DEFAULT_LINEUP_SETTINGS,
+  model: TeamBatting = teamBatting(snapshot),
 ): LineupSelection {
   const pool = percentilePools(snapshot).hitters;
   const paPerGame = paBaseline(pool, settings);
   const pa = paPerGame.value * team.games_per_season;
   const share = catcherShare(snapshot, pool, settings);
   const matrix = defenseMatrix(snapshot, team);
-  const model = teamBatting(snapshot);
   const projections = new Map<string, BattingProjection>();
   for (const projection of model.hitters) {
     if (!projections.has(projection.name)) {

@@ -14,7 +14,7 @@ import { useShell } from '../shell/context.ts';
 import { modulePath } from '../shell/modules.ts';
 import { Button } from '../ui/primitives.tsx';
 import styles from './Clubhouse.module.css';
-import { ADD_DATA, SPLIT_WINDOWS } from './copy.ts';
+import { ADD_DATA, SPLIT_WINDOWS, splitCard } from './copy.ts';
 import {
   ColumnNotes,
   CoverageMatrix,
@@ -185,7 +185,12 @@ export function Clubhouse() {
           />
           <div className={styles.splitZones}>
             {SPLIT_WINDOWS.map((zone) => (
-              <div key={zone.split} role="group" aria-label={zone.title}>
+              <div
+                key={zone.split}
+                id={splitWindowId(zone.split)}
+                role="group"
+                aria-label={zone.title}
+              >
                 <DropZone
                   size="small"
                   busy={busy}
@@ -218,7 +223,13 @@ export function Clubhouse() {
             counts={counts.data ?? EMPTY_COUNTS}
           />
         </section>
-        <UploadNext coverage={snapshot.coverage} busy={busy} onFiles={upload} />
+        <UploadNext
+          coverage={snapshot.coverage}
+          busy={busy}
+          onFiles={upload}
+          splits={splitCard(snapshot, team.dh_enabled)}
+          onSplitWindow={focusSplitWindow}
+        />
       </div>
 
       <div className={styles.columns}>
@@ -251,9 +262,22 @@ export function Clubhouse() {
   );
 }
 
-/** Brings the Add data drop zone into view, with its first button focused. */
-function focusDropZone() {
-  const zone = document.getElementById('add-data');
+/** Brings an element into view, with its first button focused. */
+function focusFirstButton(id: string) {
+  const zone = document.getElementById(id);
   zone?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   zone?.querySelector('button')?.focus();
+}
+
+/** Brings the Add data drop zone into view, with its first button focused. */
+function focusDropZone() {
+  focusFirstButton('add-data');
+}
+
+/** The id of a split window's group, which the batting-splits card's button goes to. */
+const splitWindowId = (split: Split) => `split-window-${split === 'L' ? 'left' : 'right'}`;
+
+/** Brings a split window into view, with its first button, Add more files, focused. */
+function focusSplitWindow(split: Split) {
+  focusFirstButton(splitWindowId(split));
 }

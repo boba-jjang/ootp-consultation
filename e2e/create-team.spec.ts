@@ -233,6 +233,15 @@ test.describe('Create a Team from the fixtures', () => {
     await expect(
       left.getByText('Stored as the vs-left split, whatever the file is called.'),
     ).toBeVisible();
+    // What to upload next asks for the batting splits while they're missing.
+    const splitCard = page.getByRole('article').filter({
+      has: page.getByRole('heading', { name: 'Batting splits vs left and vs right', exact: true }),
+    });
+    await expect(
+      splitCard.getByText(
+        "The lineups by the starter's hand need the team's batting stats exported vs left and vs right.",
+      ),
+    ).toBeVisible();
     await expect(
       page
         .getByRole('group', { name: 'Split vs right' })
@@ -259,6 +268,19 @@ test.describe('Create a Team from the fixtures', () => {
     await expect(
       row.getByText('Routed to unknown view, hitters, vs LHP', { exact: true }),
     ).toBeVisible();
+    // The card now asks for the vs-right export, and its button goes to that window.
+    await expect(
+      splitCard.getByText(
+        "The team's batting stats are on file vs left only. Add the vs-right export for the lineups by the starter's hand. The league's batting stats split the same way set the league's platoon effect; without them the settings stand in. Splits don't change Data coverage.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await splitCard.getByRole('button', { name: 'Go to the split windows' }).click();
+    await expect(
+      page.getByRole('group', { name: 'Split vs right' }).getByRole('button', {
+        name: 'Add more files',
+      }),
+    ).toBeFocused();
     await expectAccessible(page);
     await expectTargets(page);
     await expectNoSideScroll(page);

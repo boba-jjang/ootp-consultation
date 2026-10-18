@@ -19,6 +19,7 @@ import {
   columnNotesList,
   matrixHeadings,
   nextCards,
+  splitCard,
   timelineLabel,
   usedFileCounts,
 } from '../src/clubhouse/copy.ts';
@@ -91,6 +92,109 @@ describe('the next cards', () => {
 
   it('shows three at most', () => {
     expect(nextCards(measureCoverage([]))).toHaveLength(3);
+  });
+});
+
+describe('the batting-splits card (Open questions 9)', () => {
+  const TEAM = 'seattle_arrows_lineups_-_overview_batting_stats_c_';
+  const LEAGUE = 'rsl_statistics_player_statistics_-_sortable_stats_batting_stats_c_';
+  const season = routed('seattle-g71');
+  const splits = routed('seattle-g71/splits');
+  /** Game 71's season files with the named split files, without their .csv. */
+  const snapshotOf = (...names: string[]) =>
+    assembleSnapshot(
+      [...season, ...splits.filter((file) => names.includes(file.name.replace(/\.csv$/, '')))],
+      { scale: '1-10' },
+    );
+  const LEAGUE_SENTENCE =
+    "The league's batting stats split the same way set the league's platoon effect; without them the settings stand in.";
+  const COVERAGE_SENTENCE = "Splits don't change Data coverage.";
+  const card = (detail: string, target: 'L' | 'R') => ({
+    title: 'Batting splits vs left and vs right',
+    views: ['batting_stats_1', 'batting_stats_2'],
+    detail,
+    target,
+  });
+
+  const none = snapshotOf();
+  const teamLeft = snapshotOf(`${TEAM}vsl`);
+  const teamRight = snapshotOf(`${TEAM}vsr`);
+  const teamLeftLeague = snapshotOf(`${TEAM}vsl`, `${LEAGUE}vsl`, `${LEAGUE}vsr`);
+  const teamBoth = snapshotOf(`${TEAM}vsl`, `${TEAM}vsr`);
+  const teamBothLeagueLeft = snapshotOf(`${TEAM}vsl`, `${TEAM}vsr`, `${LEAGUE}vsl`);
+  const all = snapshotOf(`${TEAM}vsl`, `${TEAM}vsr`, `${LEAGUE}vsl`, `${LEAGUE}vsr`);
+  const every = assembleSnapshot([...season, ...splits], { scale: '1-10' });
+
+  it('asks for the team’s and the league’s splits when the team has none', () => {
+    expect(splitCard(none, true)).toEqual(
+      card(
+        `The lineups by the starter's hand need the team's batting stats exported vs left and vs right. ${LEAGUE_SENTENCE} ${COVERAGE_SENTENCE}`,
+        'L',
+      ),
+    );
+  });
+
+  it('asks for the team’s missing side, then the league’s, with the team’s vs left alone', () => {
+    expect(splitCard(teamLeft, true)).toEqual(
+      card(
+        `The team's batting stats are on file vs left only. Add the vs-right export for the lineups by the starter's hand. ${LEAGUE_SENTENCE} ${COVERAGE_SENTENCE}`,
+        'R',
+      ),
+    );
+  });
+
+  it('mirrors it with the team’s vs right alone', () => {
+    expect(splitCard(teamRight, true)).toEqual(
+      card(
+        `The team's batting stats are on file vs right only. Add the vs-left export for the lineups by the starter's hand. ${LEAGUE_SENTENCE} ${COVERAGE_SENTENCE}`,
+        'L',
+      ),
+    );
+  });
+
+  it('leaves the league’s sentence out once the league’s are on file both ways', () => {
+    expect(splitCard(teamLeftLeague, true)).toEqual(
+      card(
+        `The team's batting stats are on file vs left only. Add the vs-right export for the lineups by the starter's hand. ${COVERAGE_SENTENCE}`,
+        'R',
+      ),
+    );
+  });
+
+  it('says the settings stand in with the team’s both ways and the league’s not', () => {
+    const detail = `The lineups by the starter's hand use the settings' platoon effect until the league's batting stats are on file vs left and vs right. ${COVERAGE_SENTENCE}`;
+    expect(splitCard(teamBoth, true)).toEqual(card(detail, 'L'));
+    // The league's vs left is on file, so its vs right is the first missing side.
+    expect(splitCard(teamBothLeagueLeft, true)).toEqual(card(detail, 'R'));
+  });
+
+  it('shows no card with all four on file', () => {
+    expect(splitCard(all, true)).toBeNull();
+    expect(splitCard(every, true)).toBeNull();
+  });
+
+  it('shows no card until the team’s season batting stats are on file', () => {
+    expect(splitCard(assembleSnapshot([], { scale: '1-10' }), true)).toBeNull();
+    // The splits alone: the season tables are empty.
+    expect(splitCard(assembleSnapshot(splits, { scale: '1-10' }), true)).toBeNull();
+    // Part of the hitter stats is enough.
+    const partial = assembleSnapshot([routeExport('mine.csv', 'POS,Name,G,PA\r\nSS,Ann,10,40')], {
+      scale: '1-10',
+    });
+    expect(partial.coverage.hitters.sets.stats).toBe('partial');
+    expect(splitCard(partial, true)?.target).toBe('L');
+  });
+
+  it('shows no card for a team without the DH', () => {
+    expect(splitCard(none, false)).toBeNull();
+    expect(splitCard(teamLeft, false)).toBeNull();
+  });
+
+  it('leaves Data coverage, its cards and its summary as they are', () => {
+    for (const snapshot of [teamLeft, teamBoth, all, every]) {
+      expect(snapshot.coverage).toEqual(none.coverage);
+      expect(nextCards(snapshot.coverage)).toEqual(nextCards(none.coverage));
+    }
   });
 });
 

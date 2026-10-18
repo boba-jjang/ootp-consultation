@@ -76,6 +76,38 @@ test.describe('updating exports, on the sheet', () => {
   });
 });
 
+test.describe('What to upload next, on the sheet', () => {
+  test('asks for the batting splits in a card of its own, and passes the checks', async ({
+    page,
+  }) => {
+    await page.goto('/sheet');
+    const next = page
+      .locator('section', {
+        has: page.getByRole('heading', { name: 'What to upload next', exact: true }),
+      })
+      .last();
+    const card = next.getByRole('article').filter({
+      has: page.getByRole('heading', { name: 'Batting splits vs left and vs right', exact: true }),
+    });
+    await expect(card).toBeVisible();
+    await expect(
+      card.getByText(
+        "The lineups by the starter's hand need the team's batting stats exported vs left and vs right. The league's batting stats split the same way set the league's platoon effect; without them the settings stand in. Splits don't change Data coverage.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await expect(card.getByText('batting_stats_1', { exact: true })).toBeVisible();
+    // It comes after the coverage cards.
+    await expect(next.getByRole('article').last()).toContainText(
+      'Batting splits vs left and vs right',
+    );
+    await expect(card.getByRole('button', { name: 'Go to the split windows' })).toBeVisible();
+    await expectAccessible(page);
+    await expectTargets(page);
+    await expectNoSideScroll(page);
+  });
+});
+
 test.describe('How columns were read, on the sheet', () => {
   test('offers the custom team file after the views, with its own notes', async ({ page }) => {
     await page.goto('/sheet');

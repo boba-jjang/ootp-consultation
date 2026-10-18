@@ -938,3 +938,39 @@ describe('hand-built rosters (Open questions 5 and 6)', () => {
     });
   });
 });
+
+describe('the hitters’ projections handed in (the lineups by the starter’s hand, req-season)', () => {
+  it(
+    'gives Game 71’s season result, JSON-identical, with its splits on file and its model handed in',
+    { timeout: 180_000 },
+    () => {
+      const withSplits = fixtureSnapshot('seattle-g71/', 'seattle-g71/splits/');
+      const lineup = selectLineup(
+        withSplits,
+        team,
+        DEFAULT_LINEUP_SETTINGS,
+        teamBatting(withSplits),
+      );
+      expect(JSON.stringify(lineup)).toBe(JSON.stringify(selectionOf('Game 71')));
+    },
+  );
+
+  it('prices the batting runs on the projections handed in', { timeout: 180_000 }, () => {
+    const snapshot = handBuilt(nine);
+    const noDh = { ...team, dh_enabled: false };
+    const model = teamBatting(snapshot);
+    const raised = {
+      ...model,
+      hitters: model.hitters.map((hitter) => ({ ...hitter, runsPerPa: hitter.runsPerPa + 0.01 })),
+    };
+    const base = selectLineup(snapshot, noDh);
+    const lineup = selectLineup(snapshot, noDh, DEFAULT_LINEUP_SETTINGS, raised);
+    expect(lineup.batting).toHaveLength(9);
+    for (const [i, hitter] of lineup.batting.entries()) {
+      expect(hitter.runs, hitter.name).toBeCloseTo(
+        (base.batting[i]?.runs ?? Number.NaN) + 0.01 * lineup.pa,
+        9,
+      );
+    }
+  });
+});

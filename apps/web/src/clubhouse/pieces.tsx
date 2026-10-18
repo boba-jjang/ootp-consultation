@@ -5,6 +5,7 @@ import {
   type ImportedFile,
   type Layer,
   type SideCoverage,
+  type Split,
   type StoredSnapshot,
   type Upload,
   type UploadedFile,
@@ -16,7 +17,13 @@ import { FileButton } from '../setup/pieces.tsx';
 import { CheckIcon, InfoIcon } from '../ui/icons.tsx';
 import { Button, Chip, MatrixCell, Panel, Timeline } from '../ui/primitives.tsx';
 import styles from './Clubhouse.module.css';
-import { columnNotesList, matrixHeadings, nextCards, timelineLabel } from './copy.ts';
+import {
+  columnNotesList,
+  matrixHeadings,
+  nextCards,
+  timelineLabel,
+  type SplitCard,
+} from './copy.ts';
 import { outcomeOf, routeOf } from './results.ts';
 
 /**
@@ -60,15 +67,22 @@ export function SnapshotTimeline({
   );
 }
 
-/** The layers, the badge's sentence, and a card per data set still missing. */
+/**
+ * The layers, the badge's sentence, and a card per data set still missing; then, apart from
+ * them, the batting-splits card while the splits are missing, whose button goes to a split window.
+ */
 export function UploadNext({
   coverage,
   busy,
   onFiles,
+  splits,
+  onSplitWindow,
 }: {
   coverage: Coverage;
   busy: boolean;
   onFiles: (files: Promise<Upload[]>) => void;
+  splits: SplitCard | null;
+  onSplitWindow: (split: Split) => void;
 }) {
   const cards = nextCards(coverage);
   return (
@@ -110,6 +124,26 @@ export function UploadNext({
         <p className={styles.muted}>
           Every data set is on file for both sides. New exports refresh them.
         </p>
+      ) : null}
+      {splits ? (
+        <article className={styles.card}>
+          <h3 className={styles.cardTitle}>{splits.title}</h3>
+          <div className={styles.chips}>
+            {splits.views.map((view) => (
+              <Chip key={view}>{view}</Chip>
+            ))}
+          </div>
+          <p className={styles.muted}>{splits.detail}</p>
+          <Button
+            variant="outline"
+            className={styles.cardAction}
+            onClick={() => {
+              onSplitWindow(splits.target);
+            }}
+          >
+            Go to the split windows
+          </Button>
+        </article>
       ) : null}
     </Panel>
   );

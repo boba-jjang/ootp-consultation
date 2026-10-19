@@ -215,4 +215,15 @@
 
   --timeline-dot: var(--color-accent);
   --timeline-halo: var(--tint-accent-glow);
+
+  --diamond-grass: var(--field-grass);
+  --diamond-dirt: var(--field-dirt);
+  --diamond-line: var(--line-marker);
+  --diamond-base: var(--color-text);
+  --slot-card-bg: var(--color-overlay);
+  --slot-card-border: var(--border-default);
+  --slot-card-changed-border: var(--border-accent);
+  --slot-card-empty-border: var(--border-accent-dashed); /* nobody eligible */
+  --changed-chip-fg: var(--color-accent);
+  --changed-chip-border: var(--border-accent-muted);
 }

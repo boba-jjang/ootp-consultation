@@ -34,6 +34,8 @@ const EMPTY_COUNTS: ReadonlyMap<string, number> = new Map();
  */
 export interface ClubhouseState {
   addData?: boolean;
+  /** The split window to focus: the Lineup card's lock sends the first missing side's. */
+  split?: Split;
   results?: { result: Uploaded; from: string | null };
 }
 
@@ -75,6 +77,8 @@ export function Clubhouse() {
     }
     if (state.addData) {
       focusDropZone();
+    } else if (state.split) {
+      focusSplitWindow(state.split);
     }
     void navigate(location.pathname, { replace: true, state: null });
   }, [location.state, location.pathname, navigate]);

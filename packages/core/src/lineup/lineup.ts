@@ -204,7 +204,7 @@ export interface LineupSelection {
 export type LineupSnapshot = Pick<Snapshot, 'label' | 'scale' | 'hitters' | 'pitchers' | 'league'>;
 
 /** A hitter at a slot: eligible with these figures, or null. */
-interface SlotValue {
+export interface SlotValue {
   share: number;
   fielding: number;
   value: number;
@@ -495,8 +495,12 @@ export function selectLineup(
   };
 }
 
-/** Open questions 5: share × (batting runs + the cell's runs), where the cell is eligible. */
-function slotValue(
+/**
+ * Open questions 5: share × (batting runs + the cell's runs), where the cell is eligible. The
+ * Lineup card values every placement it shows through this, so a shown slot is valued exactly
+ * as selection values it.
+ */
+export function slotValue(
   hitter: HitterDefense,
   battingRuns: number,
   slot: LineupSlot,

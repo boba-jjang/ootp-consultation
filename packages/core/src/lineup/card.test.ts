@@ -70,6 +70,9 @@ const NO_DH = lineupCard(g71Season, { ...team, dh_enabled: false });
 const SHORT = lineupCard(g71NoFielding, team);
 const G42 = lineupCard(g42, team);
 
+/** Game 71's hitters against each hand, as handLineups gives them. */
+const HAND_HITTERS = FITTED.sources.lineups.hitters;
+
 const NINE: LineupSlot[] = ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH'];
 const SIDES: Split[] = ['L', 'R'];
 
@@ -458,7 +461,7 @@ describe('the Game 71 hand views (req-views, req-game71)', () => {
         if (slot.name === null) {
           throw new Error(`${side} ${slot.slot} is empty`);
         }
-        const hitter = hitterOf(FITTED.hitters, slot.name);
+        const hitter = hitterOf(HAND_HITTERS, slot.name);
         expect(slot.battingRuns, `${side} ${slot.slot}`).toBeCloseTo(
           hitter.vs[side].runsPerPa * FITTED.pa,
           9,
@@ -481,14 +484,14 @@ describe('the Game 71 hand views (req-views, req-game71)', () => {
     for (const side of SIDES) {
       const view = views[side];
       for (const spot of orderOf(view).spots) {
-        const hitter = hitterOf(FITTED.hitters, spot.name);
+        const hitter = hitterOf(HAND_HITTERS, spot.name);
         expect(spot.wOBA, `${side} ${spot.name}`).toBe(hitter.vs[side].wOBA);
         expect(spot.weight, `${side} ${spot.name}`).toBe(hitter.weight);
         expect(spot.paVs, `${side} ${spot.name}`).toBe(hitter.pa[side]);
       }
       expect(view.hitters.map((hitter) => hitter.name)).toEqual(g71.hitters.map((row) => row.Name));
       for (const hitter of view.hitters) {
-        const fitted = hitterOf(FITTED.hitters, hitter.name);
+        const fitted = hitterOf(HAND_HITTERS, hitter.name);
         expect(hitter.wOBA, hitter.name).toBe(fitted.vs[side].wOBA);
         expect(hitter.weight, hitter.name).toBe(fitted.weight);
         expect(hitter.paVs, hitter.name).toBe(fitted.pa[side]);
@@ -513,7 +516,7 @@ describe('the Game 71 hand views (req-views, req-game71)', () => {
       const { bench } = views[side];
       expect(bench.map((entry) => entry.name)).toEqual(['Ling-lai Li', 'Daniel Wang']);
       for (const entry of bench) {
-        const hitter = hitterOf(FITTED.hitters, entry.name);
+        const hitter = hitterOf(HAND_HITTERS, entry.name);
         expect(entry.wOBA, `${side} ${entry.name}`).toBe(hitter.vs[side].wOBA);
         expect(entry.battingRuns, `${side} ${entry.name}`).toBeCloseTo(
           hitter.vs[side].runsPerPa * FITTED.pa,
@@ -576,7 +579,7 @@ describe('a standing hand, through cardFrom (req-views, Open questions 5)', () =
       if (slot.name === null) {
         throw new Error(`${slot.slot} is empty`);
       }
-      const hitter = hitterOf(FITTED.hitters, slot.name);
+      const hitter = hitterOf(HAND_HITTERS, slot.name);
       expect(slot.battingRuns, slot.slot).toBeCloseTo(hitter.vs.R.runsPerPa * FITTED.pa, 9);
       expect(slot.changed, slot.slot).toBe(false);
       expect(slot.fieldingRuns, slot.slot).toBe(
@@ -596,7 +599,7 @@ describe('a standing hand, through cardFrom (req-views, Open questions 5)', () =
     within(order.spots[8]?.pa, 596.84, 0.05, 'PA at #9');
     expect(order.runsPerSeason).toBeCloseTo(order.runsPerGame * 152, 6);
     for (const spot of order.spots) {
-      expect(spot.wOBA, spot.name).toBe(hitterOf(FITTED.hitters, spot.name).vs.R.wOBA);
+      expect(spot.wOBA, spot.name).toBe(hitterOf(HAND_HITTERS, spot.name).vs.R.wOBA);
     }
   });
 

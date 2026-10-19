@@ -161,7 +161,7 @@ test.describe('the Lineup card, on the sheet', () => {
     await expect(full.getByText('Against right-handed starters:', { exact: false })).toBeVisible();
     // The catchers changed: both cards and the one order row they bat in carry the chip.
     await expect(full.getByText('Changed', { exact: true })).toHaveCount(3);
-    await expect(full.getByText('was Tsumoto', { exact: true })).toBeVisible();
+    await expect(full.getByText('was Tsumoto', { exact: true }).first()).toBeVisible();
     await expect(full.getByText('New', { exact: true })).toBeVisible();
     await expect(
       full.getByText(/of the team’s starts came against left-handed starters/),
@@ -194,7 +194,7 @@ test.describe('the Lineup card, on the sheet', () => {
     const short = page.getByRole('region', { name: 'A short lineup', exact: true });
     await expect(short.getByText('Nobody eligible', { exact: true })).toBeVisible();
     await expect(
-      short.getByText('HT is missing, so 1B can’t be estimated.', { exact: true }),
+      short.getByText("HT is missing, so 1B can't be estimated.", { exact: true }),
     ).toBeVisible();
     await expect(
       short.getByText('No batting order without a full nine.', { exact: true }),

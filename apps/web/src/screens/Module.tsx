@@ -1,9 +1,10 @@
 import { useParams } from 'react-router';
 
 import { Clubhouse } from '../clubhouse/Clubhouse.tsx';
+import { LineupCard } from '../lineup/LineupCard.tsx';
 import { Gate } from '../shell/Gate.tsx';
 import { useShell } from '../shell/context.ts';
-import { moduleById, modulePath } from '../shell/modules.ts';
+import { gate, moduleById, modulePath } from '../shell/modules.ts';
 import styles from '../shell/Shell.module.css';
 import { NotBuiltText } from './ComingSoon.tsx';
 import { NotFound } from './NotFound.tsx';
@@ -19,6 +20,10 @@ export function ModuleScreen() {
   if (module.id === 'clubhouse') {
     // A new snapshot starts the screen afresh, with whatever results brought it there.
     return <Clubhouse key={snapshotId} />;
+  }
+  if (module.id === 'lineup-card' && gate(module, snapshot.coverage).kind === 'open') {
+    // Its selector goes back to Season with a new snapshot.
+    return <LineupCard key={snapshotId} />;
   }
   return (
     <main id="main" className={styles.main}>

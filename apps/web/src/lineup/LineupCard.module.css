@@ -1,0 +1,420 @@
+/* The Lineup card: the Dugout board's alignment and batting order, on the tokens. */
+
+.main {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6) var(--gutter) var(--space-12);
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.title {
+  font-size: var(--text-32);
+  line-height: var(--leading-tight);
+  font-weight: var(--weight-semibold);
+  text-wrap: balance;
+}
+
+.lead {
+  max-width: 62ch;
+  font-size: var(--text-16);
+  color: var(--color-text-secondary);
+}
+
+.board {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.selector {
+  display: flex;
+  flex-direction: column;
+}
+
+.optionStatus {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+
+/* Below 520 px the options fill the width, one under the other. */
+@container (max-width: 519px) {
+  .selector label {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}
+
+.note,
+.muted {
+  font-size: var(--text-13);
+  color: var(--color-text-secondary);
+}
+
+.gain {
+  max-width: 72ch;
+  font-size: var(--text-14);
+  color: var(--color-text-body);
+}
+
+.working {
+  font-size: var(--text-14);
+  color: var(--color-text-secondary);
+}
+
+.error {
+  font-size: var(--text-14);
+  color: var(--color-negative-text);
+}
+
+.notice {
+  max-width: 62ch;
+  font-size: var(--text-14);
+  color: var(--color-text-body);
+}
+
+.panels {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-5);
+}
+
+.panels > * {
+  flex: 1 1 400px;
+  min-width: 0;
+}
+
+.panels > .alignment {
+  flex: 3 1 500px;
+}
+
+.panels > .orderPanel {
+  flex: 2 1 400px;
+}
+
+.panels > .sources,
+.panels > .bench {
+  flex: 1 1 320px;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--panel-padding);
+  background: var(--panel-bg);
+  border: var(--panel-border);
+  border-radius: var(--panel-radius);
+}
+
+.panelHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+}
+
+.panelTitle {
+  font-size: var(--text-17);
+  font-weight: var(--weight-semibold);
+  text-wrap: balance;
+}
+
+.panelMeta {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-13);
+  color: var(--color-text-secondary);
+}
+
+.subtitle {
+  font-size: var(--text-13);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-left: var(--space-5);
+  font-size: var(--text-13);
+  color: var(--color-text-body);
+  list-style: disc;
+}
+
+.legend {
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+
+/* ---- The field ----------------------------------------------------------------------- */
+
+.fieldWrap {
+  container-type: inline-size;
+}
+
+.field {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 800 / 720;
+  margin-bottom: var(--space-5);
+}
+
+.diamond {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.grass {
+  fill: var(--diamond-grass);
+}
+
+.dirt {
+  fill: var(--diamond-dirt);
+}
+
+.warningTrack {
+  fill: none;
+  stroke: var(--diamond-dirt);
+  stroke-width: 16;
+}
+
+.foulLine {
+  fill: none;
+  stroke: var(--diamond-line);
+  stroke-width: 2;
+}
+
+.base {
+  fill: var(--diamond-base);
+}
+
+.slot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 120px;
+  padding: var(--space-1) var(--space-2-5);
+  background: var(--slot-card-bg);
+  border: var(--slot-card-border);
+  border-radius: var(--radius-4);
+  text-align: center;
+}
+
+.slot[data-changed='true'] {
+  border: var(--slot-card-changed-border);
+}
+
+.slot[data-empty='true'] {
+  border: var(--slot-card-empty-border);
+}
+
+.slotHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--space-1-5);
+  white-space: nowrap;
+}
+
+.slotPosition {
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  font-weight: var(--weight-semibold);
+  color: var(--color-accent);
+}
+
+.slotName {
+  font-size: var(--text-13);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+}
+
+.slotLine {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-11);
+  line-height: var(--leading-snug);
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+}
+
+.slotReason {
+  max-width: 24ch;
+  font-size: var(--text-11);
+  line-height: var(--leading-snug);
+  color: var(--color-accent);
+}
+
+.slotMark {
+  font-size: var(--text-11);
+  line-height: var(--leading-snug);
+  color: var(--color-text-body);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-1-5);
+  border: var(--changed-chip-border);
+  border-radius: var(--chip-radius);
+  font-family: var(--font-ui);
+  font-size: var(--text-10);
+  font-weight: var(--weight-semibold);
+  line-height: 1.6;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-brand);
+  color: var(--changed-chip-fg);
+}
+
+/* Below 520 px the diamond gives way to a two-column grid in scorebook order. */
+@container (max-width: 519px) {
+  .field {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+    aspect-ratio: auto;
+    margin-bottom: 0;
+  }
+
+  .diamond {
+    display: none;
+  }
+
+  .slot {
+    position: static;
+    transform: none;
+    min-width: 0;
+  }
+
+  .slotHead,
+  .slotLine {
+    white-space: normal;
+  }
+}
+
+/* ---- The order ----------------------------------------------------------------------- */
+
+.book summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--control);
+  cursor: pointer;
+  font-size: var(--text-14);
+  color: var(--color-text-secondary);
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-13);
+}
+
+.table th,
+.table td {
+  padding: var(--space-2) var(--space-2);
+  border-bottom: var(--border-hairline);
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table thead th {
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.table tbody th {
+  font-weight: var(--weight-regular);
+  color: var(--color-text);
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right !important;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.batter {
+  min-width: 0;
+}
+
+.batterName {
+  display: inline-block;
+  margin-right: var(--space-1-5);
+  font-size: var(--text-14);
+  font-weight: var(--weight-semibold);
+}
+
+.rowMark {
+  display: inline-block;
+  margin-right: var(--space-2);
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+
+.batterName + .rowMark,
+.chip + .rowMark {
+  display: block;
+  margin-right: 0;
+}
+
+.rowMark + .rowMark {
+  display: inline-block;
+}
+
+/* ---- The bench ----------------------------------------------------------------------- */
+
+.benchList {
+  display: flex;
+  flex-direction: column;
+}
+
+.benchRow {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: var(--space-2) 0;
+  border-bottom: var(--border-hairline);
+  font-size: var(--text-14);
+}
+
+.benchName {
+  font-weight: var(--weight-semibold);
+}
+
+.benchFacts {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}

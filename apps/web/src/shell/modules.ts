@@ -35,8 +35,11 @@ export const MODULES = [
   {
     id: 'lineup-card',
     label: 'Lineup card',
-    needs: [{ side: 'hitters', set: 'stats' }],
-    arrives: 'Phase 4',
+    needs: [
+      { side: 'hitters', set: 'stats' },
+      { side: 'hitters', set: 'ratings' },
+    ],
+    arrives: null,
   },
   {
     id: 'bullpen',

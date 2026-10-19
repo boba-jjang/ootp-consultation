@@ -296,6 +296,53 @@ test.describe('Create a Team from the fixtures', () => {
     await expect(row).toHaveCount(1);
   });
 
+  test('works the Lineup card out in its worker, with the hand views locked on one split', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    if (!session || !clubhouse) {
+      throw new Error('the first test did not create the team');
+    }
+    await withSession(page, required().env, session);
+    await page.goto(clubhouse);
+    await expect(page.getByRole('heading', { level: 1, name: 'The Clubhouse' })).toBeVisible();
+
+    // Game 42 carries the hitters' stats and ratings, so the tab is open.
+    await page.getByRole('link', { name: 'Lineup card', exact: true }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'The Dugout' })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Lineup against', exact: true })).toBeVisible();
+    // The first result waits on Vite transforming core inside the worker.
+    const alignment = page.getByRole('region', { name: 'Defensive alignment', exact: true });
+    await expect(alignment.getByRole('article')).toHaveCount(10, { timeout: 60_000 });
+    await expect(alignment.getByText(/^Backup C: /)).toBeVisible();
+    const order = page.getByRole('region', { name: 'Batting order', exact: true });
+    await expect(order.getByRole('row')).toHaveCount(10);
+    // Each row carries its spot's plate appearances, a whole number in the hundreds: the
+    // fourth cell after the row header (#, Pos, B, PA).
+    await expect(order.getByRole('row').nth(1).getByRole('cell').nth(3)).toHaveText(/^[5-8]\d\d$/);
+    await expect(order.getByRole('row').nth(9).getByRole('cell').nth(3)).toHaveText(/^[5-8]\d\d$/);
+    await expectAccessible(page);
+    await expectTargets(page);
+    await expectNoSideScroll(page);
+
+    // The vs-left split alone locks the hand views, under the one title both variants share.
+    await page.getByRole('radio', { name: /^vs RHP/ }).check();
+    await expect(page.getByText('Lineups by the starter’s hand are locked')).toBeVisible();
+    await expect(
+      page.getByText(
+        'The team’s batting stats are on file vs left only. Upload the vs-right export to unlock them.',
+      ),
+    ).toBeVisible();
+    await expectAccessible(page);
+    await page.getByRole('link', { name: 'Add batting splits' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'The Clubhouse' })).toBeVisible();
+    await expect(
+      page.getByRole('group', { name: 'Split vs right' }).getByRole('button', {
+        name: 'Add more files',
+      }),
+    ).toBeFocused();
+  });
+
   test('takes the first exports of a team set up without files', async ({ page }) => {
     test.setTimeout(120_000);
     if (!session) {

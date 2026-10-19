@@ -10,6 +10,7 @@ import {
   UploadNext,
   UploadResults,
 } from '../clubhouse/pieces.tsx';
+import { LineupBoard } from '../lineup/pieces.tsx';
 import { ExportPanel, RestorePanel } from '../settings/pieces.tsx';
 import { BestFirstUpload, DropZone, FilesRead, FoundInFiles } from '../setup/pieces.tsx';
 import { Gate } from '../shell/Gate.tsx';
@@ -37,6 +38,10 @@ import {
 } from '../ui/primitives.tsx';
 import {
   SHEET_COVERAGE,
+  SHEET_LINEUP,
+  SHEET_LINEUP_LOCKED,
+  SHEET_LINEUP_NO_DH,
+  SHEET_LINEUP_SHORT,
   SHEET_LOG,
   SHEET_PENDING,
   SHEET_RESULTS,
@@ -225,6 +230,34 @@ export function Sheet() {
         </div>
       </Section>
 
+      <Section
+        title="Lineup card"
+        note="The Dugout's alignment and batting order on a pretend Game 71, and every state"
+      >
+        <Example label="Game 71 with its splits">
+          <LineupBoard card={SHEET_LINEUP} status={{ kind: 'ready' }} clubhouse="/sheet" />
+        </Example>
+        <Example label="Hands locked">
+          <LineupBoard card={SHEET_LINEUP_LOCKED} status={{ kind: 'ready' }} clubhouse="/sheet" />
+        </Example>
+        <Example label="No DH">
+          <LineupBoard card={SHEET_LINEUP_NO_DH} status={{ kind: 'ready' }} clubhouse="/sheet" />
+        </Example>
+        <Example label="A short lineup">
+          <LineupBoard card={SHEET_LINEUP_SHORT} status={{ kind: 'ready' }} clubhouse="/sheet" />
+        </Example>
+        <Example label="Working">
+          <LineupBoard card={null} status={{ kind: 'working' }} clubhouse="/sheet" />
+        </Example>
+        <Example label="Failed">
+          <LineupBoard
+            card={null}
+            status={{ kind: 'failed', message: 'the worker stopped', onRetry: () => undefined }}
+            clubhouse="/sheet"
+          />
+        </Example>
+      </Section>
+
       <Section title="Team settings" note="The backup and the restore, on mock data">
         <div className={styles.columns}>
           <ExportPanel
@@ -407,6 +440,16 @@ export function Sheet() {
         </div>
       </Section>
     </main>
+  );
+}
+
+/** One state of a screen, as its own region, so the tests can find it. */
+function Example({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <section aria-label={label} className={styles.section}>
+      <h3 className={styles.cardTitle}>{label}</h3>
+      {children}
+    </section>
   );
 }
 

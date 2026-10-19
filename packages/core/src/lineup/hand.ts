@@ -519,8 +519,12 @@ export function handBatting(
 export interface HandBaseline {
   /** The season loop's order, spot 1 first. */
   order: string[];
-  /** The chain's runs a season on the hand's rates: runs a game × the run factor × games. */
+  /** The chain's runs a game on the hand's rates × the run factor. */
+  runsPerGame: number;
+  /** The chain's runs a season on the hand's rates: runs a game × games. */
   orderRuns: number;
+  /** Plate appearances a season by spot on the hand's rates: the chain's PA a game × games. */
+  paBySpot: number[];
   /** The season loop's fielding runs. */
   fieldingRuns: number;
   /** orderRuns + fieldingRuns. */
@@ -641,10 +645,13 @@ function baselineOf(
     return hitter.rates;
   });
   const game = chainGame(rates, context.dpShare);
-  const orderRuns = game.runs * context.runFactor * context.gamesPerSeason;
+  const runsPerGame = game.runs * context.runFactor;
+  const orderRuns = runsPerGame * context.gamesPerSeason;
   return {
     order: season.order.names,
+    runsPerGame,
     orderRuns,
+    paBySpot: game.pa.map((pa) => pa * context.gamesPerSeason),
     fieldingRuns: season.fieldingRuns,
     value: orderRuns + season.fieldingRuns,
   };

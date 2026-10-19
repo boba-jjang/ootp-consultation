@@ -248,8 +248,30 @@ export {
   type StartsVsLeft,
 } from './lineup/hand.ts';
 export {
+  DEFAULT_CARD_SETTINGS,
+  cardFrom,
+  lineupCard,
+  type BookOrder,
+  type CardBench,
+  type CardHitter,
+  type CardInputs,
+  type CardNote,
+  type CardOrder,
+  type CardSettings,
+  type CardSlot,
+  type CardSources,
+  type CardSpot,
+  type CardViewKind,
+  type HandView,
+  type HandsState,
+  type LineupCard,
+  type SeasonGain,
+  type SeasonView,
+} from './lineup/card.ts';
+export {
   DEFAULT_LINEUP_SETTINGS,
   selectLineup,
+  slotValue,
   type BenchEntry,
   type CatcherShare,
   type HitterBatting,
@@ -264,6 +286,7 @@ export {
   type LineupSnapshot,
   type PaBaseline,
   type SlotEntry,
+  type SlotValue,
 } from './lineup/lineup.ts';
 export {
   DEFAULT_BATTING_SETTINGS,

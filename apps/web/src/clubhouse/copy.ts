@@ -115,7 +115,11 @@ export function splitCard(
   const teamOn = (['L', 'R'] as const).filter((side) => inputs.team[side]);
   let detail: string;
   if (teamOn.length === 0) {
-    detail = `The lineups by the starter's hand need the team's batting stats exported vs left and vs right. ${LEAGUE_EFFECT} ${NO_COVERAGE}`;
+    detail = [
+      "The lineups by the starter's hand need the team's batting stats exported vs left and vs right.",
+      ...(league ? [] : [LEAGUE_EFFECT]),
+      NO_COVERAGE,
+    ].join(' ');
   } else if (teamOn.length === 1) {
     const [on = 'L'] = teamOn;
     const off = on === 'L' ? 'R' : 'L';

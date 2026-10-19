@@ -132,6 +132,87 @@ test.describe('How columns were read, on the sheet', () => {
   });
 });
 
+test.describe('the Lineup card, on the sheet', () => {
+  test('shows every view, switched by keyboard, and passes the checks', async ({ page }) => {
+    await page.goto('/sheet');
+    const full = page.getByRole('region', { name: 'Game 71 with its splits', exact: true });
+    await expect(
+      full.getByRole('heading', { name: 'Defensive alignment', exact: true }),
+    ).toBeVisible();
+    await expect(full.getByRole('heading', { name: 'Batting order', exact: true })).toBeVisible();
+    const choices = full.getByRole('group', { name: 'Lineup against', exact: true });
+    const season = choices.getByRole('radio', { name: /^Season/ });
+    await expect(season).toBeChecked();
+    // Nine positions and the backup, each a card; the backup line names his share.
+    await expect(full.getByRole('article')).toHaveCount(10);
+    await expect(full.getByText(/^Backup C: /)).toBeVisible();
+    await expect(
+      full.getByText('The best order and The Book’s are equal', { exact: false }),
+    ).toBeVisible();
+    await expect(full.getByText('Changed', { exact: true })).toHaveCount(0);
+    await expectAccessible(page);
+    await expectTargets(page);
+    await expectNoSideScroll(page);
+
+    // The arrow keys move through the radio group, as a radio group does.
+    await season.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(choices.getByRole('radio', { name: /^vs RHP/ })).toBeChecked();
+    await expect(full.getByText('Against right-handed starters:', { exact: false })).toBeVisible();
+    // The catchers changed: both cards and the one order row they bat in carry the chip.
+    await expect(full.getByText('Changed', { exact: true })).toHaveCount(3);
+    await expect(full.getByText('was Tsumoto', { exact: true }).first()).toBeVisible();
+    await expect(full.getByText('New', { exact: true })).toBeVisible();
+    await expect(
+      full.getByText(/of the team’s starts came against left-handed starters/),
+    ).toBeVisible();
+    await expectAccessible(page);
+    await expectNoSideScroll(page);
+
+    await page.keyboard.press('ArrowRight');
+    await expect(choices.getByRole('radio', { name: /^vs LHP/ })).toBeChecked();
+    await expect(
+      full.getByText('The season lineup stands against left-handed starters', { exact: false }),
+    ).toBeVisible();
+    await expect(full.getByText('Changed', { exact: true })).toHaveCount(0);
+
+    // The hand views locked on one split, the no-DH notice, the short lineup, loading and an error.
+    const locked = page.getByRole('region', { name: 'Hands locked', exact: true });
+    await locked.getByRole('radio', { name: /^vs RHP/ }).check();
+    await expect(locked.getByText('Lineups by the starter’s hand are locked')).toBeVisible();
+    await expect(
+      locked.getByText(
+        'The team’s batting stats are on file vs left only. Upload the vs-right export to unlock them.',
+      ),
+    ).toBeVisible();
+    await expect(locked.getByRole('link', { name: 'Add batting splits' })).toBeVisible();
+    const noDh = page.getByRole('region', { name: 'No DH', exact: true });
+    await expect(
+      noDh.getByText('Batting orders without the DH aren’t covered yet', { exact: false }),
+    ).toBeVisible();
+    await expect(noDh.getByRole('radio', { name: /^vs RHP/ })).toHaveAccessibleName(/no DH/);
+    const short = page.getByRole('region', { name: 'A short lineup', exact: true });
+    await expect(short.getByText('Nobody eligible', { exact: true })).toBeVisible();
+    await expect(
+      short.getByText("HT is missing, so 1B can't be estimated.", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      short.getByText('No batting order without a full nine.', { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('region', { name: 'Working', exact: true }).getByRole('status'),
+    ).toHaveText('Working out the lineup…');
+    const failed = page.getByRole('region', { name: 'Failed', exact: true });
+    await expect(
+      failed.getByText('The lineup couldn’t be worked out:', { exact: false }),
+    ).toBeVisible();
+    await expect(failed.getByRole('button', { name: 'Try again' })).toBeVisible();
+    await expectAccessible(page);
+    await expectTargets(page);
+    await expectNoSideScroll(page);
+  });
+});
+
 test.describe('sign-in', () => {
   test('is where a visitor without a session lands', async ({ page }) => {
     await page.goto('/');

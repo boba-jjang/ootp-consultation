@@ -85,3 +85,9 @@ Notes added after the owner's Phase 3 review (5 October 2026, v3.1):
 - Team setup no longer asks for Dev Lab slots or what the league shows. The app reads potentials only for batting and pitching, for now; the choice can come back without a database change. Setup asks for the team name, league, rating scale, DH and games per season.
 - A team's exports can be added, replaced or removed after setup: from the team menu's "Add or update exports" (it opens the Clubhouse's Add data), on the page of a team with no snapshot yet, and file by file in the Clubhouse's import log, where Remove asks first. Every upload ends in a list of what happened to each file.
 - Best first upload no longer lists `default` under Stats. It is the bio view and counts toward no coverage layer; it is still read, and still suggested last.
+
+Notes added from the owner's Lineup card decision (18 October 2026):
+
+- The lineups by the starter's hand show through a Season / vs RHP / vs LHP selector above the Dugout's defensive alignment and batting order. Season is the default. Each hand's view marks what changed from the season lineup and shows its gain. The owner chose this over a separate two-card panel.
+- Without hitters' ratings the Lineup card locks and names the ratings view. This replaces the alignment's degradation rule above ("listed positions only, batting order from hitting alone, CF unassigned") and the DiamondNoRatings board: without `custom_bat_pot` no hitter has a batting estimate, so no order from hitting alone exists. Model gaps (no DH, a short lineup, no splits) are states inside the screen, not module locks.
+- The advisor drawer and the manager's card arrive with the advisor in Phase 5.

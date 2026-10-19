@@ -307,6 +307,10 @@ Phase 3.1 (v3.1), from the owner's Phase 3 review on 5 October 2026:
 - [x] Update exports after setup: add or update exports from any team screen, including a team with no snapshot yet; remove or replace a single file in Create a Team and in the Clubhouse, with each file's outcome listed; team settings without Dev Lab slots or the ratings-shown choice (potentials only, for now); Best first upload without the bio view.
 - [ ] Retire `teams.dev_lab_slots`, which the app stopped using in v3.1: make the column nullable in one release, stop writing it in the next, then drop it. Needs the owner's go, since it changes production's schema.
 
+Phase 4 screens, one pull request each, each built on its models' output:
+
+- [x] The Lineup card: the Dugout board's defensive alignment and batting order from lineup v2, worked out in a Web Worker, with a Season / vs RHP / vs LHP selector for the lineups by the starter's hand (Season by default; each hand marks what changed from the season lineup and shows its gain); each slot's batting and fielding runs with the estimate's band, the backup catcher, the bench, PA by spot and The Book's order, and locked states that name what unlocks them (Knowledge Base › Lineup optimization › Selection, › Ordering and › Lineups by the starter's hand).
+
 ## Testing and quality
 
 The Seattle game-42 exports are the golden fixtures: every parser rule, identity check and model output is tested against them. Each row of the Knowledge Base's "Columns that need special handling" table becomes at least one test; that table is the checklist.

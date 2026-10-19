@@ -134,6 +134,18 @@ describe('the batting-splits card (Open questions 9)', () => {
     );
   });
 
+  it('asks for the team’s splits alone once the league’s are on file both ways (#82 QA note 2)', () => {
+    const leagueOnly = snapshotOf(`${LEAGUE}vsl`, `${LEAGUE}vsr`);
+    expect(splitCard(leagueOnly, true)).toEqual(
+      card(
+        `The lineups by the starter's hand need the team's batting stats exported vs left and vs right. ${COVERAGE_SENTENCE}`,
+        'L',
+      ),
+    );
+    // The league's vs left alone doesn't settle the platoon effect, so the sentence stays.
+    expect(splitCard(snapshotOf(`${LEAGUE}vsl`), true)?.detail).toContain(LEAGUE_SENTENCE);
+  });
+
   it('asks for the team’s missing side, then the league’s, with the team’s vs left alone', () => {
     expect(splitCard(teamLeft, true)).toEqual(
       card(

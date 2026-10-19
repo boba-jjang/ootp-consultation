@@ -976,6 +976,38 @@ describe('handLineups on Game 71 (req-lineups, req-game71)', () => {
     }
   });
 
+  it('gives each baseline its runs a game and PA by spot from the chain (the Lineup card)', () => {
+    for (const side of SIDES) {
+      const { baseline } = lineups[side];
+      expect(baseline.runsPerGame * 152, side).toBeCloseTo(baseline.orderRuns, 6);
+      expect(baseline.paBySpot, side).toHaveLength(9);
+      for (const [i, pa] of baseline.paBySpot.entries()) {
+        expect(pa, `${side} #${String(i + 1)}`).toBeGreaterThan(0);
+        if (i > 0) {
+          expect(pa, `${side} #${String(i + 1)}`).toBeLessThan(baseline.paBySpot[i - 1] ?? 0);
+        }
+      }
+    }
+    within(lineups.R.baseline.runsPerGame, 4.9679, 0.005, 'vs RHP runs a game');
+    within(lineups.R.baseline.paBySpot[0], 730.91, 0.05, 'vs RHP PA at #1');
+    within(lineups.R.baseline.paBySpot[8], 596.84, 0.05, 'vs RHP PA at #9');
+    within(lineups.L.baseline.runsPerGame, 4.9396, 0.005, 'vs LHP runs a game');
+    within(lineups.L.baseline.paBySpot[0], 733.22, 0.05, 'vs LHP PA at #1');
+  });
+
+  it('scales the baseline’s PA by spot with games per season, as the order does', () => {
+    const season = FITTED.season.loop;
+    if (!season) {
+      throw new Error('no season loop');
+    }
+    const { baseline } = lineups.R;
+    const seasonPa = season.order.paBySpot.reduce((sum, pa) => sum + pa, 0);
+    const baselinePa = baseline.paBySpot.reduce((sum, pa) => sum + pa, 0);
+    // The same nine over the same games: the chain's PA a game differ only by the rates.
+    expect(Math.abs(seasonPa - baselinePa)).toBeLessThan(seasonPa * 0.01);
+    expect(baseline.order).toEqual(season.order.names);
+  });
+
   it('prices each hand’s batting runs on its hitters’ rates over the season’s flat PA', () => {
     for (const side of SIDES) {
       for (const batting of lineups[side].selection.batting) {

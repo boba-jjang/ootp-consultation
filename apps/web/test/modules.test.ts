@@ -69,7 +69,10 @@ describe('the lock framework', () => {
         { side: 'hitters', set: 'stats' },
         { side: 'pitchers', set: 'stats' },
       ],
-      'lineup-card': [{ side: 'hitters', set: 'stats' }],
+      'lineup-card': [
+        { side: 'hitters', set: 'stats' },
+        { side: 'hitters', set: 'ratings' },
+      ],
       bullpen: [{ side: 'pitchers', set: 'stats' }],
       'dev-lab': [
         { side: 'hitters', set: 'ratings' },
@@ -126,9 +129,38 @@ describe('the lock framework', () => {
   it('names no missing stats or ratings on Game 53, and keeps Game 42’s states', () => {
     for (const coverage of [fixtures('seattle-g42'), fixtures('seattle-g53')]) {
       for (const module of MODULES.slice(1)) {
-        expect(gate(module, coverage)).toEqual({ kind: 'arrives', phase: 'Phase 4', missing: [] });
+        expect(gate(module, coverage)).toEqual(
+          module.id === 'lineup-card'
+            ? { kind: 'open' }
+            : { kind: 'arrives', phase: 'Phase 4', missing: [] },
+        );
       }
     }
+  });
+
+  it('opens the Lineup card on hitter stats and ratings, and locks it on either alone', () => {
+    const lineupCard = MODULES[2];
+    expect(lineupCard.id).toBe('lineup-card');
+    expect(lineupCard.arrives).toBeNull();
+    expect(gate(lineupCard, withSets({ side: 'hitters', set: 'stats' }))).toEqual({
+      kind: 'locked',
+      missing: [{ side: 'hitters', set: 'ratings' }],
+    });
+    expect(gate(lineupCard, withSets({ side: 'hitters', set: 'ratings' }))).toEqual({
+      kind: 'locked',
+      missing: [{ side: 'hitters', set: 'stats' }],
+    });
+    expect(
+      gate(
+        lineupCard,
+        withSets({ side: 'hitters', set: 'stats' }, { side: 'hitters', set: 'ratings' }),
+      ),
+    ).toEqual({ kind: 'open' });
+    // Game 71 carries both for every hitter, in custom views.
+    expect(gate(lineupCard, fixtures('seattle-g71'))).toEqual({ kind: 'open' });
+    expect(namedNeeds(lineupCard.needs)).toBe(
+      'hitter stats (batting_stats_1 and batting_stats_2, or a custom stats view) and hitter ratings (custom_bat_pot, or a custom ratings view)',
+    );
   });
 
   it('marks every tab but the Clubhouse locked today', () => {

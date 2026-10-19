@@ -317,9 +317,10 @@ test.describe('Create a Team from the fixtures', () => {
     await expect(alignment.getByText(/^Backup C: /)).toBeVisible();
     const order = page.getByRole('region', { name: 'Batting order', exact: true });
     await expect(order.getByRole('row')).toHaveCount(10);
-    // Each row carries its spot's plate appearances, a whole number in the hundreds.
-    await expect(order.getByRole('row').nth(1)).toContainText(/\b[5-8]\d\d\b/);
-    await expect(order.getByRole('row').nth(9)).toContainText(/\b[5-8]\d\d\b/);
+    // Each row carries its spot's plate appearances, a whole number in the hundreds: the
+    // fourth cell after the row header (#, Pos, B, PA).
+    await expect(order.getByRole('row').nth(1).getByRole('cell').nth(3)).toHaveText(/^[5-8]\d\d$/);
+    await expect(order.getByRole('row').nth(9).getByRole('cell').nth(3)).toHaveText(/^[5-8]\d\d$/);
     await expectAccessible(page);
     await expectTargets(page);
     await expectNoSideScroll(page);

@@ -72,6 +72,23 @@ const G42 = lineupCard(g42, team);
 
 /** Game 71's hitters against each hand, as handLineups gives them. */
 const HAND_HITTERS = FITTED.sources.lineups.hitters;
+/** Game 71's season selection and matrix, built once: a selection with its loop takes seconds under coverage. */
+const G71_SELECTION = selectLineup(g71, team);
+const G71_MATRIX = defenseMatrix(g71, team);
+const G71_BATTING = teamBatting(g71);
+/** optimizeOrder's own reading of the season nine, for the Season view's gain. */
+const G71_ORDERING = (() => {
+  const calibration = calibrateOrder(g71, G71_BATTING.model);
+  const nine = new Set(G71_SELECTION.loop?.order.names ?? []);
+  return optimizeOrder(
+    G71_BATTING.hitters.filter((hitter) => nine.has(hitter.name)),
+    {
+      dpShare: calibration.dpShare.value,
+      runFactor: calibration.runFactor.value,
+      gamesPerSeason: 152,
+    },
+  );
+})();
 
 const NINE: LineupSlot[] = ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH'];
 const SIDES: Split[] = ['L', 'R'];
@@ -192,8 +209,8 @@ describe('DEFAULT_CARD_SETTINGS (req-boundaries)', () => {
 
 describe('slotValue (req-core-card)', () => {
   it('values every shown placement exactly as selection values it', () => {
-    const matrix = defenseMatrix(g71, team);
-    const selection = selectLineup(g71, team);
+    const matrix = G71_MATRIX;
+    const selection = G71_SELECTION;
     for (const entry of [...selection.starters, ...(selection.backup ? [selection.backup] : [])]) {
       const hitter = hitterOf(matrix.hitters, entry.name);
       const runs = hitterOf(selection.batting, entry.name);
@@ -250,7 +267,7 @@ describe('the Game 71 season view (req-views, req-game71)', () => {
   });
 
   it('gives each slot the selection’s share, runs, value, cost and rating on the league’s scale', () => {
-    const selection = selectLineup(g71, team);
+    const selection = G71_SELECTION;
     const entries = [...selection.starters, ...(selection.backup ? [selection.backup] : [])];
     for (const entry of entries) {
       const slot = slotAt(season.slots, entry.slot);
@@ -318,7 +335,7 @@ describe('the Game 71 season view (req-views, req-game71)', () => {
 
   it('gives each spot his season wOBA', () => {
     const order = orderOf(season);
-    const model = teamBatting(g71);
+    const model = G71_BATTING;
     for (const spot of order.spots) {
       expect(spot.wOBA, spot.name).toBe(hitterOf(model.hitters, spot.name).wOBA);
     }
@@ -340,17 +357,8 @@ describe('the Game 71 season view (req-views, req-game71)', () => {
   });
 
   it('is optimizeOrder’s own reading of the season nine', () => {
-    const model = teamBatting(g71);
-    const calibration = calibrateOrder(g71, model.model);
-    const nine = new Set(SEASON_ORDER);
-    const order = optimizeOrder(
-      model.hitters.filter((hitter) => nine.has(hitter.name)),
-      {
-        dpShare: calibration.dpShare.value,
-        runFactor: calibration.runFactor.value,
-        gamesPerSeason: 152,
-      },
-    );
+    const order = G71_ORDERING;
+    expect(G71_SELECTION.loop?.order.names).toEqual(SEASON_ORDER);
     expect(season.gain?.book).toEqual({
       names: order.book.names,
       runsPerGame: order.book.runsPerGame,
@@ -361,8 +369,8 @@ describe('the Game 71 season view (req-views, req-game71)', () => {
   });
 
   it('benches Li and Wang with their wOBA, runs, bands and best slots', () => {
-    const selection = selectLineup(g71, team);
-    const model = teamBatting(g71);
+    const selection = G71_SELECTION;
+    const model = G71_BATTING;
     expect(season.bench.map((entry) => entry.name)).toEqual(['Ling-lai Li', 'Daniel Wang']);
     for (const entry of season.bench) {
       const assigned = hitterOf(selection.bench, entry.name);
@@ -381,7 +389,7 @@ describe('the Game 71 season view (req-views, req-game71)', () => {
   });
 
   it('lists every team hitter’s season wOBA, in snapshot order', () => {
-    const model = teamBatting(g71);
+    const model = G71_BATTING;
     expect(season.hitters.map((hitter) => hitter.name)).toEqual(g71.hitters.map((row) => row.Name));
     for (const hitter of season.hitters) {
       expect(hitter.wOBA, hitter.name).toBe(hitterOf(model.hitters, hitter.name).wOBA);
@@ -454,7 +462,7 @@ describe('the Game 71 hand views (req-views, req-game71)', () => {
   });
 
   it('values each hand’s slots on the hand’s rates, with no alternative cost', () => {
-    const matrix = defenseMatrix(g71, team);
+    const matrix = G71_MATRIX;
     for (const side of SIDES) {
       const view = views[side];
       for (const slot of view.slots) {
@@ -553,8 +561,8 @@ describe('a standing hand, through cardFrom (req-views, Open questions 5)', () =
     return cardFrom({
       lineups: rejudged,
       ordering: FITTED.sources.ordering,
-      matrix: defenseMatrix(g71, team),
-      batting: teamBatting(g71),
+      matrix: G71_MATRIX,
+      batting: G71_BATTING,
       team,
       settings: {
         ...DEFAULT_CARD_SETTINGS,
@@ -621,8 +629,8 @@ describe('the sources the card is assembled from (req-core-card)', () => {
     const again = cardFrom({
       lineups: FITTED.sources.lineups,
       ordering: FITTED.sources.ordering,
-      matrix: defenseMatrix(g71, team),
-      batting: teamBatting(g71),
+      matrix: G71_MATRIX,
+      batting: G71_BATTING,
       team,
       settings: DEFAULT_CARD_SETTINGS,
     });

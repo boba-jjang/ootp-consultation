@@ -2,7 +2,7 @@
 
 Oct 4, 2026 · @Jay
 
-> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 18 October 2026.
+> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 20 October 2026.
 
 ## Agent brief
 
@@ -460,11 +460,25 @@ The composites check out in the sample: Contact leans on avoid K's, and Movement
 
 ### Talent estimator
 
-1. Prior: potential is the ceiling. Development risk sets where the estimate starts below it and how wide its band is (Development risk, below). Where risk isn't exported, age is the fallback.
+1. Prior: potential is the ceiling. Development risk sets where the estimate starts below it and how wide its band is (Development risk, below). Where risk isn't exported, age is the fallback. That start then shrinks toward 50 by the component's factor s, prior′ = 50 + s × (prior − 50), since a potential is spread out more than the evidence it predicts (Prior shrink, below). From here on, a component's prior is the shrunk one.
 2. Evidence: each component's stats (Evidence map, below) become z-scores in their league percentile pool (hitters, starters or relievers), signed so that higher is better. A component's stats combine weighted by their link, Stuff using K%'s 0.72, and are re-standardized over the pool. On 20–80 the evidence is 50 + 10 × z, held to 20–80.
 3. Weight: the evidence counts w = n ÷ (n + k). n is the component's sample and k is 0.43 × its stabilization point (Evidence map), times the risk multiplier (Development risk), and times 2 for a moderate stance. Prior-driven components take no weight; their evidence shows only as a check. Season length needs no setting: 42 games or 140 change only n.
 4. Estimate: prior + w × (evidence − prior). Contact and Movement move by the mean of their two components' moves. The band narrows to the risk band × √(1 − w), never below half a step.
-5. Output: the estimate with its band and weight, flagged when it sits more than half a step from the prior. Every constant here is a starting setting, to recalibrate as snapshots accumulate.
+5. Output: the estimate with its band and weight, flagged when it sits more than half a step from the shrunk prior, so the shrink alone never raises a flag. Every constant here is a starting setting, to recalibrate as snapshots accumulate.
+
+**Prior shrink.** Over Game 71's league players with potentials, the evidence moves only 0.35 to 0.69 points per point of prior: ten points of power potential predict 0.0084 homers per PA, against 0.0142 per ten points of power evidence. So each component the evidence can move shrinks its prior toward 50 by its factor s, the slope of a fit of the evidence on (prior − 50) with each player weighted by his w (the owner, 19 October 2026). Prior-driven components keep s = 1: their estimate is their prior, and the shrink applies only where the evidence also counts. Contact and Movement have no factor of their own; they move by their components' moves from the shrunk priors.
+
+| Component | s | 95% interval | League players |
+| --- | --- | --- | --- |
+| Avoid K's | 0.6889 | 0.617–0.761 | 517 |
+| Power | 0.6016 | 0.575–0.629 | 517 |
+| Gap | 0.3500 | 0.224–0.479 | 507 |
+| Eye | 0.4140 | 0.338–0.486 | 517 |
+| Stuff | 0.4841 | 0.415–0.545 | 455 |
+| Control | 0.4908 | 0.429–0.554 | 455 |
+| BABIP, HR avoidance, BABIP allowed | 1 | Measured 0.27, 0.21 and −0.11; not applied | 517, 455, 455 |
+
+Each factor is a setting, held between 0 and 1, so a factor never stretches a prior or turns it around. At Game 71 the shrink moves Ishida into the season nine at catcher in place of Tsumoto, batting sixth in the order Yamanaka, Obata, Kawasaki, Shinn, Kamimura, Ishida, Geng, Moon, Choi. The season lineup projects 776.09 runs, and the lineups by the starter's hand gain 0.01 runs against right-handers and 18.14 against left-handers. The Game 71 figures in Lineup optimization and in Modules by phase were measured before the shrink; they hold with every factor at 1.
 
 ### Development risk
 
@@ -807,6 +821,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 | Lineup v2 | Batting runs from the league's own wOBA weights, scale and average, recovered from each export; event rates refit per snapshot; fielding runs from the league line moved by the player's own zone rating and arm runs; PA by batting spot from the Markov chain, with an exchange loop over the nine; the hitters' pool floored at 3.1 PA per team game (the owner, 12 October 2026) |
 | Platoon lineups | The splits complement the season models: the season evaluation never reads them, and they shape only the lineups against right- and left-handed starters, where a bench player may start; league ratios by batting hand, each hitter's own split weighted by the league's spread, and a change only for 3 runs per 152 games (the owner, 13 October 2026) |
 | Split upload windows | Split exports arrive through vs-left and vs-right windows in the Clubhouse, unrenamed; a stored file keeps its split through reloads, replacement, Export team and restore, and the file-name rule stays as a fallback (the owner, 13 October 2026) |
+| Prior shrink | Each component the evidence can move shrinks its prior toward 50 before the evidence mix, prior′ = 50 + s × (prior − 50), by its factor from Game 71's league fit (avoid K's 0.69, power 0.60, gap 0.35, eye 0.41, stuff 0.48, control 0.49); prior-driven components and the composites keep their prior; every factor held between 0 and 1 (the owner, 19 October 2026) |
 
 ### Assumptions
 
@@ -821,6 +836,7 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 | Positional weights and slider gates | Weights fitted to the league's fielding export; slider gates from the research | 9, 10 |
 | Inexperience discount | One step below the potential at an unlisted position | 9 |
 | Catcher runs | The fitted line (0.8 per 10 points) until framing, blocking and throwing are valued | 9 |
+| Prior-shrink factors | Game 71's league fit of the evidence on the prior | 7 |
 
 ### Open questions
 
@@ -830,7 +846,8 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 - [x] Persistence: a free hosted database, or browser storage with team export and import? Answered: Supabase Postgres (implementation plan).
 - [x] Hosting split: GitHub Pages, Vercel, or both with a defined role for each? Answered: Vercel hosts the app and the advisor function; GitHub holds the source and runs CI (implementation plan).
 - [x] Which scout's view do the exports use, the head scout or OSA? Development risk can differ between them. Answered: OSA. The scouting staff is disabled, so every export shows the same OSA view.
-- [ ] Does the league merge stats into scouting reports? If so, the estimator weights stats less.
+- [ ] Does the league merge stats into scouting reports? If so, the estimator weights stats less, and the prior-shrink factors, measured against the stats, are too mild.
+- [ ] Stuff's and control's priors sit off the evidence's centre: Game 71's league fit puts 50 on the prior at 47.4 and 52.4 points of evidence. Starters and relievers have their own evidence pools but share one prior scale, which may explain it. The prior shrink doesn't re-centre; a fit by role would tell.
 - [x] Does the view editor offer per-position ratings and handedness splits? Answered: per-position potential ratings come in the fielding view (section 9), since 11 October 2026; handedness splits came on 13 October 2026, the team's and the league's stats views exported vs left and vs right, while the ratings views can't be split (section 5, Split exports; section 11).
 - [x] Re-export the pitching ratings view with the staff listed, to get pitchers' work ethic, IQ and risk. Done: the staff cus\_pitch\_pot, the latest upload of that view, carries work ethic, IQ and risk for all 13 pitchers and is treated as part of the same snapshot.
 - [x] Can league standard stats and totals be exported, for wRC+, xFIP, luck baselines and standard-stat percentiles? Answered: from Game 53 the owner exports them through custom league views (qualified hitters, every pitcher), with wRC+ and wRAA. League totals over every player and park factors stay unavailable, and xFIP takes league HR/FB from the league pitching file.
@@ -866,6 +883,7 @@ Phase gates close in order. Inside a phase, modules follow the Depends on column
 | Metrics: pass-through, BACON, luck gaps against each pair's baseline | 6 | 4 | Team store | Fixture BACON and each pair's baseline match section 6 |
 | Percentiles: usage-based pools, floors, directions, mid-rank formula | 8 | 4 | League file import | Pools of 214, 151 and 260; 144 starters and 218 relievers after floors |
 | Talent estimator v0 | 7 | 4 | Metrics, scale conversion | Every fixture player gets an estimate and band; disagreements over one step are flagged |
+| Prior shrink | 7 | 4 | Talent estimator, lineups by the starter's hand | At Game 71 the six factors reproduce section 7's Prior shrink: Ishida at C in the season nine, 776.09 runs, gains of 0.01 and 18.14 by hand; with every factor at 1, every estimate and lineup is unchanged |
 | Defensive model and eligibility matrix | 9 | 4 | Scale conversion, fielding-view import | Every slot covered, DH included; non-catchers ineligible at C; DEF Pot caps the played position; the matrix reads the fielding fixtures' position ratings as the game gives them, and the fitted formula, rounded to a step and held to the scale, lands within one step of the game's rating for 95% of the league's position ratings (98.6% of 2,413 on the Game 70 export; first base is lowest, at 94.7%) |
 | Strategy rules engine | 10 | 4 | Talent estimator, defensive model | Gates read from configuration; the fixture yields a moderate shift |
 | Lineup selection with the assignment model | 11 | 4 | Talent estimator, defensive model | A legal nine and a backup catcher on Game 42 and Game 53, with CF and DH filled when enabled; the Game 53 nine is the one section 11 states |

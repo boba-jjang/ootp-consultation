@@ -478,7 +478,7 @@ The composites check out in the sample: Contact leans on avoid K's, and Movement
 | Control | 0.4908 | 0.429–0.554 | 455 |
 | BABIP, HR avoidance, BABIP allowed | 1 | Measured 0.27, 0.21 and −0.11; not applied | 517, 455, 455 |
 
-Each factor is a setting, held between 0 and 1, so a factor never stretches a prior or turns it around. At Game 71 the shrink moves Ishida into the season nine at catcher in place of Tsumoto, batting sixth in the order Yamanaka, Obata, Kawasaki, Shinn, Kamimura, Ishida, Geng, Moon, Choi. The season lineup projects 776.09 runs, and the lineups by the starter's hand gain 0.01 runs against right-handers and 18.14 against left-handers.
+Each factor is a setting, held between 0 and 1, so a factor never stretches a prior or turns it around. At Game 71 the shrink moves Ishida into the season nine at catcher in place of Tsumoto, batting sixth in the order Yamanaka, Obata, Kawasaki, Shinn, Kamimura, Ishida, Geng, Moon, Choi. The season lineup projects 776.09 runs, and the lineups by the starter's hand gain 0.01 runs against right-handers and 18.14 against left-handers. The Game 71 figures in Lineup optimization and in Modules by phase were measured before the shrink; they hold with every factor at 1.
 
 ### Development risk
 

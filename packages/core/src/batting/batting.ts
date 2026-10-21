@@ -3,6 +3,7 @@ import {
   DEFAULT_ESTIMATOR_SETTINGS,
   evidenceOf,
   teamEstimates,
+  type EstimatorSettings,
   type HitterComponentId,
   type PlayerEstimates,
 } from '../estimator/estimator.ts';
@@ -580,17 +581,18 @@ function projectHitter(
 
 /**
  * Each team hitter's projected event rates, wOBA and batting runs per PA with a band, from the
- * talent estimates (with their defaults) and the snapshot's batting model. A hitter without
- * any hitter-component estimate gets no projection and the `no-batting-estimate` flag.
+ * talent estimates on the estimator's settings and the snapshot's batting model. A hitter
+ * without any hitter-component estimate gets no projection and the `no-batting-estimate` flag.
  */
 export function teamBatting(
   snapshot: BattingSnapshot,
   settings: BattingSettings = DEFAULT_BATTING_SETTINGS,
+  estimator: EstimatorSettings = DEFAULT_ESTIMATOR_SETTINGS,
 ): TeamBatting {
   const model = battingModel(snapshot, settings);
   const hitters: BattingProjection[] = [];
   const flags: BattingFlag[] = [];
-  for (const player of teamEstimates(snapshot)) {
+  for (const player of teamEstimates(snapshot, estimator)) {
     if (player.side !== 'hitters') {
       continue;
     }

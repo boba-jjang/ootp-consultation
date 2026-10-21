@@ -1,4 +1,9 @@
-import { teamBatting, type ModelSource, type TeamBatting } from '../batting/batting.ts';
+import {
+  DEFAULT_BATTING_SETTINGS,
+  teamBatting,
+  type ModelSource,
+  type TeamBatting,
+} from '../batting/batting.ts';
 import {
   defenseMatrix,
   type CellSource,
@@ -6,6 +11,7 @@ import {
   type DefenseTeam,
   type HitterDefense,
 } from '../defense/defense.ts';
+import { DEFAULT_ESTIMATOR_SETTINGS, type EstimatorSettings } from '../estimator/estimator.ts';
 import type { Split } from '../importer/route.ts';
 import {
   DEFAULT_ORDER_SETTINGS,
@@ -263,9 +269,10 @@ export function lineupCard(
   snapshot: HandSnapshot,
   team: DefenseTeam,
   settings: CardSettings = DEFAULT_CARD_SETTINGS,
+  estimator: EstimatorSettings = DEFAULT_ESTIMATOR_SETTINGS,
 ): LineupCard {
-  const lineups = handLineups(snapshot, team, settings.hand);
-  const batting = teamBatting(snapshot);
+  const lineups = handLineups(snapshot, team, settings.hand, estimator);
+  const batting = teamBatting(snapshot, DEFAULT_BATTING_SETTINGS, estimator);
   const matrix = defenseMatrix(snapshot, team);
   const loop = lineups.season.loop;
   let ordering: OrderResult | null = null;

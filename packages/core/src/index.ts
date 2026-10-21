@@ -168,6 +168,7 @@ export {
   DEFAULT_ESTIMATOR_SETTINGS,
   evidenceOf,
   teamEstimates,
+  withoutPriorShrink,
   type ComponentEstimate,
   type ComponentId,
   type ComponentSettings,

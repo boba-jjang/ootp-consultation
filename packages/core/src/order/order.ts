@@ -9,6 +9,7 @@ import {
   type ModelSource,
 } from '../batting/batting.ts';
 import type { SettingNote } from '../defense/defense.ts';
+import { DEFAULT_ESTIMATOR_SETTINGS, type EstimatorSettings } from '../estimator/estimator.ts';
 import type { ExportRow } from '../importer/route.ts';
 import type { Snapshot } from '../importer/snapshot.ts';
 import type { TeamSettings } from '../team.ts';
@@ -839,8 +840,9 @@ export function battingOrder(
   nine: readonly string[],
   settings: OrderSettings = DEFAULT_ORDER_SETTINGS,
   battingSettings: BattingSettings = DEFAULT_BATTING_SETTINGS,
+  estimator: EstimatorSettings = DEFAULT_ESTIMATOR_SETTINGS,
 ): BattingOrder {
-  const batting = teamBatting(snapshot, battingSettings);
+  const batting = teamBatting(snapshot, battingSettings, estimator);
   const known = new Set([
     ...batting.hitters.map((hitter) => hitter.name),
     ...batting.flags.map((flag) => flag.name),

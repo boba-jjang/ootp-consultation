@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  DEFAULT_BATTING_SETTINGS,
   DEFAULT_CARD_SETTINGS,
   DEFAULT_HAND_SETTINGS,
+  DEFAULT_LINEUP_SETTINGS,
   DEFAULT_ORDER_SETTINGS,
   assembleSnapshot,
   calibrateOrder,
@@ -14,6 +16,7 @@ import {
   selectLineup,
   slotValue,
   teamBatting,
+  withoutPriorShrink,
   type CardSlot,
   type ExportRow,
   type HandLineups,
@@ -61,21 +64,32 @@ const g71NoFielding = assembleSnapshot(
 );
 const g42 = fixtureSnapshot('seattle-g42/');
 
+/**
+ * Every prior-shrink factor at 1. The Context's figures were measured before the shrink, and
+ * they hold with every factor at 1 (Knowledge Base › Talent estimator › Prior shrink).
+ */
+const UNSHRUNK = withoutPriorShrink();
+
 // Each distinct Game 71 result is built once per file: a handLineups takes seconds, and tens of
 // seconds under coverage. Never two handLineups in one test.
-const FITTED = lineupCard(g71, team);
-const SETTINGS_ONLY = lineupCard(g71TeamSplits, team);
-const NO_SPLITS = lineupCard(g71Season, team);
-const NO_DH = lineupCard(g71Season, { ...team, dh_enabled: false });
-const SHORT = lineupCard(g71NoFielding, team);
-const G42 = lineupCard(g42, team);
+const FITTED = lineupCard(g71, team, DEFAULT_CARD_SETTINGS, UNSHRUNK);
+const SETTINGS_ONLY = lineupCard(g71TeamSplits, team, DEFAULT_CARD_SETTINGS, UNSHRUNK);
+const NO_SPLITS = lineupCard(g71Season, team, DEFAULT_CARD_SETTINGS, UNSHRUNK);
+const NO_DH = lineupCard(
+  g71Season,
+  { ...team, dh_enabled: false },
+  DEFAULT_CARD_SETTINGS,
+  UNSHRUNK,
+);
+const SHORT = lineupCard(g71NoFielding, team, DEFAULT_CARD_SETTINGS, UNSHRUNK);
+const G42 = lineupCard(g42, team, DEFAULT_CARD_SETTINGS, UNSHRUNK);
 
 /** Game 71's hitters against each hand, as handLineups gives them. */
 const HAND_HITTERS = FITTED.sources.lineups.hitters;
+const G71_BATTING = teamBatting(g71, DEFAULT_BATTING_SETTINGS, UNSHRUNK);
 /** Game 71's season selection and matrix, built once: a selection with its loop takes seconds under coverage. */
-const G71_SELECTION = selectLineup(g71, team);
+const G71_SELECTION = selectLineup(g71, team, DEFAULT_LINEUP_SETTINGS, G71_BATTING);
 const G71_MATRIX = defenseMatrix(g71, team);
-const G71_BATTING = teamBatting(g71);
 /** optimizeOrder's own reading of the season nine, for the Season view's gain. */
 const G71_ORDERING = (() => {
   const calibration = calibrateOrder(g71, G71_BATTING.model);
@@ -693,7 +707,12 @@ describe('Game 53 with the Game 70 fielding view (req-game71)', () => {
     'reads the orders as equal: the best beats The Book’s by 3.06, which the simulation doesn’t confirm',
     { timeout: 180_000 },
     () => {
-      const card = lineupCard(fixtureSnapshot('seattle-g53/', 'seattle-g70/'), team);
+      const card = lineupCard(
+        fixtureSnapshot('seattle-g53/', 'seattle-g70/'),
+        team,
+        DEFAULT_CARD_SETTINGS,
+        UNSHRUNK,
+      );
       const { gain } = card.season;
       within(gain?.gain, 3.056, 0.005, 'gain');
       expect(gain?.gain).toBeGreaterThanOrEqual(card.bars.orderGain);
@@ -721,7 +740,12 @@ describe('without the DH (req-states, Open questions 11)', () => {
       expect(entry.bestSlot).not.toBe('DH');
     }
     expect(NO_DH.notes).toEqual([]);
-    const selection = selectLineup(g71Season, { ...team, dh_enabled: false });
+    const selection = selectLineup(
+      g71Season,
+      { ...team, dh_enabled: false },
+      DEFAULT_LINEUP_SETTINGS,
+      teamBatting(g71Season, DEFAULT_BATTING_SETTINGS, UNSHRUNK),
+    );
     for (const entry of selection.starters) {
       expect(slotAt(NO_DH.season.slots, entry.slot)).toMatchObject({
         name: entry.name,
@@ -801,8 +825,13 @@ describe('the exchange loop’s lineup (req-views, Open questions 8)', () => {
     league: { hitters: [], pitchers: [] },
     splits: null,
   };
-  const card = lineupCard(snapshot, team);
-  const selection = selectLineup(snapshot, team);
+  const card = lineupCard(snapshot, team, DEFAULT_CARD_SETTINGS, UNSHRUNK);
+  const selection = selectLineup(
+    snapshot,
+    team,
+    DEFAULT_LINEUP_SETTINGS,
+    teamBatting(snapshot, DEFAULT_BATTING_SETTINGS, UNSHRUNK),
+  );
 
   it('shows the lineup after the loop, with the two exchanges it took', () => {
     expect(card.season.exchanges).toHaveLength(2);
@@ -868,5 +897,19 @@ describe('the exchange loop’s lineup (req-views, Open questions 8)', () => {
     expect(hitterOf(order.spots, 'Catcher B').slot).toBe('C');
     expect(card.hands).toEqual({ kind: 'locked' });
     expect(card.notes.map((note) => note.code)).toEqual(['no-backup-catcher']);
+  });
+
+  it('builds on the estimator’s settings, the defaults shrinking the priors', () => {
+    const shrunk = lineupCard(snapshot, team);
+    const batting = teamBatting(snapshot);
+    const season = selectLineup(snapshot, team, DEFAULT_LINEUP_SETTINGS, batting);
+    expect(shrunk.sources.lineups.season).toEqual(season);
+    for (const spot of orderOf(shrunk.season).spots) {
+      expect(spot.wOBA, spot.name).toBe(hitterOf(batting.hitters, spot.name).wOBA);
+    }
+    expect(hitterOf(batting.hitters, 'Slugger').wOBA).not.toBeCloseTo(
+      hitterOf(teamBatting(snapshot, DEFAULT_BATTING_SETTINGS, UNSHRUNK).hitters, 'Slugger').wOBA,
+      6,
+    );
   });
 });

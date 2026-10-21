@@ -6,7 +6,9 @@ import {
   WOBA_EVENTS,
   battingModel,
   teamBatting,
+  teamEstimates,
   toTwentyEighty,
+  withoutPriorShrink,
   type BattingModel,
   type BattingProjection,
   type BattingSettings,
@@ -22,6 +24,12 @@ import {
 import { fixtureSnapshot } from '../../test/fixtures.ts';
 
 const COMPONENTS: HitterComponentId[] = ['avoidKs', 'power', 'gap', 'eye', 'babip'];
+
+/**
+ * Every prior-shrink factor at 1. The Context's figures were measured before the shrink, and
+ * they hold with every factor at 1 (Knowledge Base › Talent estimator › Prior shrink).
+ */
+const UNSHRUNK = withoutPriorShrink();
 
 /** A Context line: intercept, the slopes for Avoid K's, Power, Gap, Eye and BABIP, and R². */
 type ContextLine = readonly [number, number, number, number, number, number, number];
@@ -363,7 +371,7 @@ describe.each([
   ['Game 53', g53, 2],
   ['Game 42', g42, 3],
 ] as const)('teamBatting on %s (task Open questions 6)', (label, snapshot, column) => {
-  const result = teamBatting(snapshot);
+  const result = teamBatting(snapshot, DEFAULT_BATTING_SETTINGS, UNSHRUNK);
   const expected = RUNS.flatMap(([name, ...values]) => {
     const value = values[column - 1];
     return value ? [{ name, runs: value[0], band: value[1] }] : [];
@@ -421,13 +429,48 @@ describe.each([
 
 describe('teamBatting’s floors on the fixtures', () => {
   it('holds Moon’s homers at 10% of the league rate at Game 71, and Mangjeol’s at Game 42', () => {
-    const moon = projectionOf(teamBatting(g71).hitters, 'Dong-hee Moon');
+    const moon = projectionOf(
+      teamBatting(g71, DEFAULT_BATTING_SETTINGS, UNSHRUNK).hitters,
+      'Dong-hee Moon',
+    );
     expect(moon.floored).toEqual(['HR']);
     within(moon.rates.HR, 0.1 * 0.02549, 0.000001, 'Moon HR');
-    const mangjeol = projectionOf(teamBatting(g42).hitters, 'Bitgaram Mangjeol');
+    const mangjeol = projectionOf(
+      teamBatting(g42, DEFAULT_BATTING_SETTINGS, UNSHRUNK).hitters,
+      'Bitgaram Mangjeol',
+    );
     expect(mangjeol.floored).toEqual(['HR']);
     expect(mangjeol.rates.HR).toBeCloseTo(0.1 * DEFAULT_BATTING_SETTINGS.leagueRates.HR, 12);
   });
+});
+
+describe('teamBatting on the estimator’s settings (the prior shrink)', () => {
+  it(
+    'projects from the estimates the settings give, the defaults shrinking the priors, on one model',
+    { timeout: 180_000 },
+    () => {
+      const shrunk = teamBatting(g71);
+      const off = teamBatting(g71, DEFAULT_BATTING_SETTINGS, UNSHRUNK);
+      // The league's fit reads evidence, never estimates.
+      expect(shrunk.model).toEqual(off.model);
+      for (const [result, estimates] of [
+        [shrunk, teamEstimates(g71)],
+        [off, teamEstimates(g71, UNSHRUNK)],
+      ] as const) {
+        for (const hitter of result.hitters) {
+          const player = estimates.find((entry) => entry.name === hitter.name);
+          for (const id of COMPONENTS) {
+            const estimate = player?.components[id]?.estimate ?? Number.NaN;
+            expect(hitter.z[id], `${hitter.name} ${id}`).toBe((estimate - 50) / 10);
+          }
+        }
+      }
+      expect(projectionOf(shrunk.hitters, 'Jin-soo Shinn').z.power).not.toBeCloseTo(
+        projectionOf(off.hitters, 'Jin-soo Shinn').z.power,
+        3,
+      );
+    },
+  );
 });
 
 describe('teamBatting on hand-built snapshots (task Open questions 6)', () => {
@@ -466,7 +509,7 @@ describe('teamBatting on hand-built snapshots (task Open questions 6)', () => {
     babip: (r(6) - 50) / 10,
   };
   const only = (snapshot: BattingSnapshot, settings?: BattingSettings) => {
-    const result = teamBatting(snapshot, settings);
+    const result = teamBatting(snapshot, settings, UNSHRUNK);
     const [first, ...rest] = result.hitters;
     if (!first || rest.length > 0) {
       throw new Error('expected one projection');
@@ -571,7 +614,11 @@ describe('teamBatting on hand-built snapshots (task Open questions 6)', () => {
 
   it('gives a hitter with no hitter-component estimate no projection and the flag', () => {
     const bare: ExportRow = { POS: 'C', Name: 'Bea', TM: 'Here', Age: 30, 'Contact P': r(6) };
-    const result = teamBatting(built([hitter('Ann'), bare, hitter('Cal')]));
+    const result = teamBatting(
+      built([hitter('Ann'), bare, hitter('Cal')]),
+      DEFAULT_BATTING_SETTINGS,
+      UNSHRUNK,
+    );
     expect(result.hitters.map((entry) => entry.name)).toEqual(['Ann', 'Cal']);
     expect(result.flags).toEqual([
       {

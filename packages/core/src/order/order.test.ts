@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  DEFAULT_BATTING_SETTINGS,
   DEFAULT_ORDER_SETTINGS,
   battingModel,
   battingOrder,
@@ -11,6 +12,7 @@ import {
   plateAppearance,
   simulateGames,
   teamBatting,
+  withoutPriorShrink,
   type BattingEvent,
   type BattingOrder,
   type ExportRow,
@@ -28,6 +30,24 @@ const TEAM = { games_per_season: 152 };
 const g71 = fixtureSnapshot('seattle-g71/');
 const g53 = fixtureSnapshot('seattle-g53/');
 const g42 = fixtureSnapshot('seattle-g42/');
+
+/**
+ * Every prior-shrink factor at 1. The Context's figures were measured before the shrink, and
+ * they hold with every factor at 1 (Knowledge Base › Talent estimator › Prior shrink).
+ */
+const UNSHRUNK = withoutPriorShrink();
+
+/** The team's batting projections on the estimates with every factor at 1. */
+const unshrunkBatting = (snapshot: Snapshot) =>
+  teamBatting(snapshot, DEFAULT_BATTING_SETTINGS, UNSHRUNK);
+
+/** battingOrder on the estimates with every factor at 1. */
+const unshrunkOrder = (
+  snapshot: Snapshot,
+  team: { games_per_season: number },
+  names: readonly string[],
+) =>
+  battingOrder(snapshot, team, names, DEFAULT_ORDER_SETTINGS, DEFAULT_BATTING_SETTINGS, UNSHRUNK);
 
 /** |actual − expected| at most the tolerance, labelled. */
 const within = (actual: number | undefined, expected: number, tolerance: number, label: string) => {
@@ -234,7 +254,9 @@ describe('plateAppearance (task Open questions 1; Knowledge Base › Ordering, b
   });
 
   it('gives chances that sum to 1 from every state, for a projected hitter', () => {
-    const yamanaka = teamBatting(g71).hitters.find((hitter) => hitter.name === 'Hideji Yamanaka');
+    const yamanaka = unshrunkBatting(g71).hitters.find(
+      (hitter) => hitter.name === 'Hideji Yamanaka',
+    );
     expect(yamanaka).toBeDefined();
     for (let outs = 0; outs < 3; outs += 1) {
       for (let bases = 0; bases < 8; bases += 1) {
@@ -497,7 +519,7 @@ const orderOf = (result: BattingOrder): OrderResult => {
 };
 
 describe.each(CONTEXT)('battingOrder at $label (task Open questions 4 to 7)', (context) => {
-  const result = once(() => battingOrder(context.snapshot, TEAM, fullNames(context.nine)));
+  const result = once(() => unshrunkOrder(context.snapshot, TEAM, fullNames(context.nine)));
   const order = () => orderOf(result());
 
   it('orders the nine', () => {
@@ -530,7 +552,7 @@ describe.each(CONTEXT)('battingOrder at $label (task Open questions 4 to 7)', (c
   });
 
   it('stops where no swap or move adds more than 1e-9 runs a game', () => {
-    const hitters = teamBatting(context.snapshot).hitters;
+    const hitters = unshrunkBatting(context.snapshot).hitters;
     const ratesOf = (names: readonly string[]) =>
       names.map((name) => hitters.find((hitter) => hitter.name === name)?.rates ?? ZERO);
     const dpShare = result().calibration.dpShare.value;
@@ -563,19 +585,19 @@ describe('battingOrder’s nine', SLOW, () => {
   const g71Nine = fullNames(CONTEXT[0]?.nine ?? '');
 
   it('gives the same orders whatever order the nine come in', () => {
-    const reversed = battingOrder(g71, TEAM, [...g71Nine].reverse());
-    expect(reversed).toEqual(battingOrder(g71, TEAM, g71Nine));
+    const reversed = unshrunkOrder(g71, TEAM, [...g71Nine].reverse());
+    expect(reversed).toEqual(unshrunkOrder(g71, TEAM, g71Nine));
   });
 
   it('leaves the snapshot as it was', () => {
     const before = JSON.stringify(g53);
-    battingOrder(g53, TEAM, fullNames(CONTEXT[1]?.nine ?? ''));
+    unshrunkOrder(g53, TEAM, fullNames(CONTEXT[1]?.nine ?? ''));
     expect(JSON.stringify(g53)).toBe(before);
   });
 
   it('scales the runs and PA with games per season', () => {
-    const short = battingOrder(g71, { games_per_season: 76 }, g71Nine).order;
-    const full = battingOrder(g71, TEAM, g71Nine).order;
+    const short = unshrunkOrder(g71, { games_per_season: 76 }, g71Nine).order;
+    const full = unshrunkOrder(g71, TEAM, g71Nine).order;
     expect(short?.best.runsPerGame).toBeCloseTo(full?.best.runsPerGame ?? 0, 12);
     expect(short?.best.runsPerSeason).toBeCloseTo((full?.best.runsPerSeason ?? 0) / 2, 9);
     expect(short?.best.paBySpot[0]).toBeCloseTo((full?.best.paBySpot[0] ?? 0) / 2, 9);
@@ -586,7 +608,7 @@ describe('battingOrder’s nine', SLOW, () => {
     const bare: ExportRow = { POS: 'C', Name: 'Bea Bare', TM: 'Seattle', Age: 30 };
     const snapshot = { ...g71, hitters: [...g71.hitters, bare] };
     const withBare = [...g71Nine.slice(1), 'Bea Bare'];
-    const result: BattingOrder = battingOrder(snapshot, TEAM, withBare);
+    const result: BattingOrder = unshrunkOrder(snapshot, TEAM, withBare);
     expect(result.order).toBeNull();
     expect(result.flags).toEqual([
       {
@@ -595,20 +617,36 @@ describe('battingOrder’s nine', SLOW, () => {
         message: 'Bea Bare has no batting estimate, so no projection.',
       },
     ]);
-    expect(result.calibration).toEqual(battingOrder(g71, TEAM, g71Nine).calibration);
+    expect(result.calibration).toEqual(unshrunkOrder(g71, TEAM, g71Nine).calibration);
   });
 
   it('is an error unless the nine are nine different team hitters', () => {
-    expect(() => battingOrder(g71, TEAM, g71Nine.slice(1))).toThrow('takes nine hitters, not 8');
-    expect(() => battingOrder(g71, TEAM, [...g71Nine, 'Ling-lai Li'])).toThrow(
+    expect(() => unshrunkOrder(g71, TEAM, g71Nine.slice(1))).toThrow('takes nine hitters, not 8');
+    expect(() => unshrunkOrder(g71, TEAM, [...g71Nine, 'Ling-lai Li'])).toThrow(
       'takes nine hitters, not 10',
     );
-    expect(() => battingOrder(g71, TEAM, [...g71Nine.slice(1), g71Nine[1] ?? ''])).toThrow(
+    expect(() => unshrunkOrder(g71, TEAM, [...g71Nine.slice(1), g71Nine[1] ?? ''])).toThrow(
       'nine different hitters',
     );
-    expect(() => battingOrder(g71, TEAM, [...g71Nine.slice(1), 'Nobody Here'])).toThrow(
+    expect(() => unshrunkOrder(g71, TEAM, [...g71Nine.slice(1), 'Nobody Here'])).toThrow(
       'Nobody Here isn’t one of the team’s hitters',
     );
+  });
+
+  it('orders on the estimator’s settings, the defaults shrinking the priors', () => {
+    const shrunk = battingOrder(g71, TEAM, g71Nine);
+    const off = unshrunkOrder(g71, TEAM, g71Nine);
+    const hitters = teamBatting(g71).hitters;
+    const lineup = orderOf(shrunk).best.names.map(
+      (name) => hitters.find((entry) => entry.name === name)?.rates ?? ZERO,
+    );
+    const { dpShare, runFactor } = shrunk.calibration;
+    expect(orderOf(shrunk).best.runsPerGame).toBeCloseTo(
+      chainGame(lineup, dpShare.value).runs * runFactor.value,
+      12,
+    );
+    expect(shrunk.calibration).toEqual(off.calibration);
+    expect(orderOf(shrunk).best.runsPerGame).not.toBeCloseTo(orderOf(off).best.runsPerGame, 6);
   });
 });
 
@@ -784,8 +822,8 @@ describe('simulateGames (task Open questions 6)', SLOW, () => {
   });
 
   it('keeps Game 71’s best order within 3 standard errors of the chain’s runs a game', () => {
-    const result = battingOrder(g71, TEAM, fullNames(CONTEXT[0]?.nine ?? ''));
-    const hitters = teamBatting(g71).hitters;
+    const result = unshrunkOrder(g71, TEAM, fullNames(CONTEXT[0]?.nine ?? ''));
+    const hitters = unshrunkBatting(g71).hitters;
     const lineup = (result.order?.best.names ?? []).map(
       (name) => hitters.find((entry) => entry.name === name)?.rates ?? ZERO,
     );

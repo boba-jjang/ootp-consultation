@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  DEFAULT_BATTING_SETTINGS,
   DEFAULT_DEFENSE_SETTINGS,
   DEFAULT_LINEUP_SETTINGS,
   DEFAULT_ORDER_SETTINGS,
@@ -10,10 +11,15 @@ import {
   optimizeOrder,
   selectLineup,
   teamBatting,
+  withoutPriorShrink,
+  type BattingSnapshot,
+  type DefenseTeam,
   type ExportRow,
   type FieldPosition,
   type LineupSelection,
+  type LineupSettings,
   type LineupSlot,
+  type LineupSnapshot,
   type SlotEntry,
   type Snapshot,
   type TeamSettings,
@@ -29,6 +35,23 @@ const team: Pick<TeamSettings, 'games_per_season' | 'dh_enabled' | 'rating_scale
 const g42 = fixtureSnapshot('seattle-g42/');
 const g53 = fixtureSnapshot('seattle-g53/');
 const g71 = fixtureSnapshot('seattle-g71/');
+
+/**
+ * Every prior-shrink factor at 1. The Context's figures were measured before the shrink, and
+ * they hold with every factor at 1 (Knowledge Base › Talent estimator › Prior shrink).
+ */
+const UNSHRUNK = withoutPriorShrink();
+
+/** The team's batting projections on the estimates with every factor at 1. */
+const unshrunkBatting = (snapshot: BattingSnapshot) =>
+  teamBatting(snapshot, DEFAULT_BATTING_SETTINGS, UNSHRUNK);
+
+/** selectLineup on the estimates with every factor at 1. */
+const unshrunkSelection = (
+  snapshot: LineupSnapshot,
+  lineupTeam: DefenseTeam,
+  settings: LineupSettings = DEFAULT_LINEUP_SETTINGS,
+) => selectLineup(snapshot, lineupTeam, settings, unshrunkBatting(snapshot));
 
 const NINE: LineupSlot[] = ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH'];
 
@@ -294,7 +317,7 @@ const CONTEXT: Record<string, [Snapshot, ContextFigures]> = {
 };
 
 const SELECTIONS = Object.fromEntries(
-  Object.entries(CONTEXT).map(([label, [snapshot]]) => [label, selectLineup(snapshot, team)]),
+  Object.entries(CONTEXT).map(([label, [snapshot]]) => [label, unshrunkSelection(snapshot, team)]),
 );
 const selectionOf = (label: string): LineupSelection => {
   const found = SELECTIONS[label];
@@ -386,7 +409,7 @@ describe('batting runs from the batting model (req-selection, Open questions 3)'
     (label) => {
       const [snapshot] = CONTEXT[label] ?? [];
       const lineup = selectionOf(label);
-      const model = teamBatting(snapshot ?? g71);
+      const model = unshrunkBatting(snapshot ?? g71);
       expect(lineup.batting.map((hitter) => hitter.name)).toEqual(
         (snapshot?.hitters ?? []).map((row) => row.Name),
       );
@@ -400,7 +423,7 @@ describe('batting runs from the batting model (req-selection, Open questions 3)'
   );
 
   // These tests don't read the exchange loop, so they skip it: without the DH it doesn't run.
-  const longer = selectLineup(g71, { ...team, games_per_season: 162, dh_enabled: false });
+  const longer = unshrunkSelection(g71, { ...team, games_per_season: 162, dh_enabled: false });
 
   it('scales the flat PA and the runs with games per season', () => {
     const lineup = selectionOf('Game 71');
@@ -413,7 +436,7 @@ describe('batting runs from the batting model (req-selection, Open questions 3)'
   });
 
   it('gives a hitter with no projection 0 runs, no band and the flag', () => {
-    const lineup = selectLineup(
+    const lineup = unshrunkSelection(
       handBuilt([{ Name: 'No Estimate', POS: 'LF', DEF: 60 }, player('Hand Built', 'RF')]),
       team,
     );
@@ -455,7 +478,7 @@ describe('the flat PA and the catcher share on hand-built pools (Open questions 
   ];
 
   it('takes the pool’s PA over its games, and the median catcher’s games over his team’s', () => {
-    const lineup = selectLineup(handBuilt(nine, [...regulars, ...catchers]), team);
+    const lineup = unshrunkSelection(handBuilt(nine, [...regulars, ...catchers]), team);
     // The pool: R1, R2, R3 and the three catchers at 310 PA or more; Bench and Catcher 50 below.
     const pa = 450 + 420 + 400 + 340 + 320 + 315;
     const games = 100 + 95 + 98 + 80 + 70 + 60;
@@ -465,7 +488,7 @@ describe('the flat PA and the catcher share on hand-built pools (Open questions 
   });
 
   it('takes the mean of the middle two for an even count of catchers', () => {
-    const lineup = selectLineup(
+    const lineup = unshrunkSelection(
       handBuilt(nine, [...regulars, ...catchers, row('Catcher 90', 'C', 400, 90)]),
       team,
     );
@@ -473,7 +496,7 @@ describe('the flat PA and the catcher share on hand-built pools (Open questions 
   });
 
   it('counts the team’s games as the floor does: a team under 5 rows takes the league’s most', () => {
-    const lineup = selectLineup(
+    const lineup = unshrunkSelection(
       handBuilt(nine, [
         ...regulars,
         ...catchers,
@@ -486,13 +509,13 @@ describe('the flat PA and the catcher share on hand-built pools (Open questions 
   });
 
   it('takes the fallback share with PA in the pool but no catcher', () => {
-    const lineup = selectLineup(handBuilt(nine, regulars), team);
+    const lineup = unshrunkSelection(handBuilt(nine, regulars), team);
     expect(lineup.paPerGame.source).toBe('fit');
     expect(lineup.catcherShare).toEqual({ value: FALLBACK_SHARE, source: 'settings', catchers: 0 });
   });
 
   it('takes both fallbacks without PA and G in the pool', () => {
-    const lineup = selectLineup(handBuilt(nine), team);
+    const lineup = unshrunkSelection(handBuilt(nine), team);
     expect(lineup.paPerGame).toEqual({ value: 4.2802, source: 'settings' });
     expect(lineup.pa).toBeCloseTo(FALLBACK_PA, 9);
     expect(lineup.catcherShare).toEqual({ value: FALLBACK_SHARE, source: 'settings', catchers: 0 });
@@ -504,8 +527,8 @@ describe('the flat PA and the catcher share on hand-built pools (Open questions 
     fallbackCatcherShare: 0.6,
   };
   // These tests don't read the exchange loop, so they skip it: without the DH it doesn't run.
-  const shared = selectLineup(g42, { ...team, dh_enabled: false }, settings);
-  const fitted = selectLineup(g71, { ...team, dh_enabled: false }, settings);
+  const shared = unshrunkSelection(g42, { ...team, dh_enabled: false }, settings);
+  const fitted = unshrunkSelection(g71, { ...team, dh_enabled: false }, settings);
 
   it('reads the fallbacks from the settings: both catcher slots take the share', () => {
     expect(shared.pa).toBeCloseTo(4 * 152, 9);
@@ -550,7 +573,14 @@ describe.each(Object.entries(CONTEXT))(
 
     it('takes the best order the batting order module gives the nine', () => {
       const nineNames = lineup.starters.map((entry) => entry.name);
-      const order = battingOrder(snapshot, team, nineNames).order;
+      const order = battingOrder(
+        snapshot,
+        team,
+        nineNames,
+        DEFAULT_ORDER_SETTINGS,
+        DEFAULT_BATTING_SETTINGS,
+        UNSHRUNK,
+      ).order;
       expect(loop?.order).toEqual(order?.best);
       expect(loop?.orderRuns).toBe(order?.best.runsPerSeason);
     });
@@ -593,13 +623,13 @@ describe('the exchange loop on a hand-built team (req-loop, Open questions 6)', 
     player('Slugger', 'CF', 65, { DEF: 37.5 }),
   ];
   const snapshot = handBuilt(roster);
-  const lineup = selectLineup(snapshot, team);
+  const lineup = unshrunkSelection(snapshot, team);
   const loop = lineup.loop;
   const runs = (name: string) => battingOf(lineup, name).runs;
 
   /** The best order's runs a season for the nine left when `out` sits, judged independently. */
   const orderRuns = (out: string) => {
-    const batting = teamBatting(snapshot);
+    const batting = unshrunkBatting(snapshot);
     const calibration = calibrateOrder(snapshot, batting.model);
     const hitters = batting.hitters.filter((hitter) => hitter.name !== out);
     return optimizeOrder(
@@ -703,7 +733,7 @@ describe('the exchange loop on a hand-built team (req-loop, Open questions 6)', 
 
 describe('hand-built rosters (Open questions 5 and 6)', () => {
   it('leaves the backup empty and flagged when the team has one catcher', () => {
-    const lineup = selectLineup(handBuilt(nine), team);
+    const lineup = unshrunkSelection(handBuilt(nine), team);
     expect(lineup.feasible).toBe(true);
     expect(lineup.starters.map((entry) => entry.name)).toEqual(nine.map((row) => row.Name));
     expect(lineup.backup).toBeNull();
@@ -731,7 +761,7 @@ describe('hand-built rosters (Open questions 5 and 6)', () => {
     // stays empty. The catcher share discounts the weaker bat, so he catches and the better one
     // DHs. The order and the fielding are the same either way, so the loop leaves it.
     const roster = [...nine.slice(0, 8), player('Second C', 'C', 30)];
-    const lineup = selectLineup(handBuilt(roster), team);
+    const lineup = unshrunkSelection(handBuilt(roster), team);
     expect(lineup.feasible).toBe(true);
     expect(nameAt(lineup, 'C')).toBe('Second C');
     expect(at(lineup, 'C').value).toBeCloseTo(
@@ -745,7 +775,7 @@ describe('hand-built rosters (Open questions 5 and 6)', () => {
   });
 
   it('reports a team short of the nine as infeasible, naming the slots, with no loop', () => {
-    const lineup = selectLineup(
+    const lineup = unshrunkSelection(
       handBuilt(nine.filter((row) => row.POS !== 'SS' && row.POS !== '3B')),
       team,
     );
@@ -775,7 +805,7 @@ describe('hand-built rosters (Open questions 5 and 6)', () => {
     const roster = nine.map((row) =>
       row.POS === '1B' ? { Name: 'No Estimate', POS: '1B', DEF: 60 } : row,
     );
-    const lineup = selectLineup(handBuilt(roster), team);
+    const lineup = unshrunkSelection(handBuilt(roster), team);
     expect(at(lineup, '1B')).toMatchObject({
       name: 'No Estimate',
       battingRuns: 0,
@@ -792,7 +822,7 @@ describe('hand-built rosters (Open questions 5 and 6)', () => {
   });
 
   it('benches a DH-only hitter when the league has no DH, with no best slot and no loop', () => {
-    const lineup = selectLineup(handBuilt(nine), { ...team, dh_enabled: false });
+    const lineup = unshrunkSelection(handBuilt(nine), { ...team, dh_enabled: false });
     expect(lineup.slots).not.toContain('DH');
     expect(lineup.bench).toEqual([
       {
@@ -807,7 +837,7 @@ describe('hand-built rosters (Open questions 5 and 6)', () => {
   });
 
   it('drops the DH slot from Game 53 when the league has no DH', () => {
-    const noDh = selectLineup(g53, { ...team, dh_enabled: false });
+    const noDh = unshrunkSelection(g53, { ...team, dh_enabled: false });
     expect(noDh.slots).toEqual(['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'C2']);
     expect(noDh.starters.map((entry) => entry.slot)).toEqual(NINE.slice(0, 8));
     expect(noDh.backup?.name).toBe('Yoshitsugu Ishida');
@@ -821,11 +851,11 @@ describe('hand-built rosters (Open questions 5 and 6)', () => {
 
   it('breaks a tie by the hitters’ order in the snapshot, and the loop keeps it', () => {
     const roster = [...nine, player('Twin Field', 'LF')];
-    const lineup = selectLineup(handBuilt(roster), team);
+    const lineup = unshrunkSelection(handBuilt(roster), team);
     expect(nameAt(lineup, 'LF')).toBe('Left Field');
     expect(lineup.bench.map((entry) => entry.name)).toEqual(['Twin Field']);
     expect(lineup.loop?.exchanges).toEqual([]);
-    const swapped = selectLineup(
+    const swapped = unshrunkSelection(
       handBuilt([
         ...nine.filter((row) => row.POS !== 'LF'),
         player('Twin Field', 'LF'),
@@ -845,7 +875,7 @@ describe('hand-built rosters (Open questions 5 and 6)', () => {
       player('Third C', 'C', 40),
       player('Bat Only', 'DH', 55),
     ];
-    const lineup = selectLineup(handBuilt(roster), team);
+    const lineup = unshrunkSelection(handBuilt(roster), team);
     const catching = lineRuns('C', 60);
     const value = (name: string, share: number) =>
       share * (battingOf(lineup, name).runs + catching);
@@ -882,7 +912,7 @@ describe('hand-built rosters (Open questions 5 and 6)', () => {
     });
 
     it('is null where nobody else could fill the slot', () => {
-      const alone = selectLineup(handBuilt(nine), team);
+      const alone = unshrunkSelection(handBuilt(nine), team);
       for (const slot of NINE) {
         expect(at(alone, slot).alternativeCost, slot).toBeNull();
       }
@@ -897,7 +927,7 @@ describe('hand-built rosters (Open questions 5 and 6)', () => {
       player('Second C', 'C', 50),
       player('Bat Only', 'DH', 55),
     ];
-    const lineup = selectLineup(handBuilt(roster), team);
+    const lineup = unshrunkSelection(handBuilt(roster), team);
     const catching = lineRuns('C', 60);
     const value = (name: string, share: number) =>
       share * (battingOf(lineup, name).runs + catching);
@@ -949,7 +979,7 @@ describe('the hitters’ projections handed in (the lineups by the starter’s h
         withSplits,
         team,
         DEFAULT_LINEUP_SETTINGS,
-        teamBatting(withSplits),
+        unshrunkBatting(withSplits),
       );
       expect(JSON.stringify(lineup)).toBe(JSON.stringify(selectionOf('Game 71')));
     },
@@ -958,12 +988,12 @@ describe('the hitters’ projections handed in (the lineups by the starter’s h
   it('prices the batting runs on the projections handed in', { timeout: 180_000 }, () => {
     const snapshot = handBuilt(nine);
     const noDh = { ...team, dh_enabled: false };
-    const model = teamBatting(snapshot);
+    const model = unshrunkBatting(snapshot);
     const raised = {
       ...model,
       hitters: model.hitters.map((hitter) => ({ ...hitter, runsPerPa: hitter.runsPerPa + 0.01 })),
     };
-    const base = selectLineup(snapshot, noDh);
+    const base = unshrunkSelection(snapshot, noDh);
     const lineup = selectLineup(snapshot, noDh, DEFAULT_LINEUP_SETTINGS, raised);
     expect(lineup.batting).toHaveLength(9);
     for (const [i, hitter] of lineup.batting.entries()) {

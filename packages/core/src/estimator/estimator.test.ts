@@ -9,11 +9,13 @@ import {
   roleOf,
   teamEstimates,
   toTwentyEighty,
+  withoutPriorShrink,
   type ComponentEstimate,
   type ComponentId,
   type ComponentSettings,
   type EstimatorSettings,
   type ExportRow,
+  type HitterComponentId,
   type PlayerEstimates,
   type Snapshot,
 } from '../index.ts';
@@ -21,6 +23,26 @@ import { fixtureFiles, fixtureSnapshot, routeFixture } from '../../test/fixtures
 
 /** One 1–10 step on 20–80: 60 ÷ (10 − 1). */
 const STEP = 60 / 9;
+
+/**
+ * Every prior-shrink factor at 1. The figures below were measured before the shrink, and they
+ * hold with every factor at 1 (Knowledge Base › Talent estimator › Prior shrink).
+ */
+const UNSHRUNK = withoutPriorShrink();
+
+/** Each component's prior-shrink factor, by component. */
+const factorsOf = (settings: EstimatorSettings) =>
+  Object.fromEntries(
+    [
+      ...Object.entries(settings.components.hitters),
+      ...Object.entries(settings.components.pitchers),
+    ].map(([id, config]) => [id, config.priorShrink]),
+  );
+
+/** |actual − expected| at most the tolerance, labelled. */
+const within = (actual: number | undefined, expected: number, tolerance: number, label: string) => {
+  expect(Math.abs((actual ?? Number.NaN) - expected), label).toBeLessThanOrEqual(tolerance);
+};
 
 const snapshotOf = (folder: string) =>
   assembleSnapshot(fixtureFiles(folder).map(routeFixture), { scale: '1-10' });
@@ -93,6 +115,7 @@ describe('DEFAULT_ESTIMATOR_SETTINGS (Knowledge Base › Ratings model)', () => 
         ],
         sample: 'PA',
         stabilizesAt: 60,
+        priorShrink: 0.6889,
       },
       power: {
         label: 'Power',
@@ -105,6 +128,7 @@ describe('DEFAULT_ESTIMATOR_SETTINGS (Knowledge Base › Ratings model)', () => 
         ],
         sample: 'BIP',
         stabilizesAt: 50,
+        priorShrink: 0.6016,
       },
       gap: {
         label: 'Gap',
@@ -113,6 +137,7 @@ describe('DEFAULT_ESTIMATOR_SETTINGS (Knowledge Base › Ratings model)', () => 
         evidence: [{ stat: '(2B+3B)/AB', link: 0.62, better: 'higher' }],
         sample: 'PA',
         stabilizesAt: 1610,
+        priorShrink: 0.35,
       },
       eye: {
         label: 'Eye',
@@ -124,6 +149,7 @@ describe('DEFAULT_ESTIMATOR_SETTINGS (Knowledge Base › Ratings model)', () => 
         ],
         sample: 'PA',
         stabilizesAt: 120,
+        priorShrink: 0.414,
       },
       babip: {
         label: 'BABIP',
@@ -135,6 +161,7 @@ describe('DEFAULT_ESTIMATOR_SETTINGS (Knowledge Base › Ratings model)', () => 
         ],
         sample: null,
         stabilizesAt: null,
+        priorShrink: 1,
       },
     });
   });
@@ -151,6 +178,7 @@ describe('DEFAULT_ESTIMATOR_SETTINGS (Knowledge Base › Ratings model)', () => 
         ],
         sample: 'BF',
         stabilizesAt: 70,
+        priorShrink: 0.4841,
       },
       control: {
         label: 'Control',
@@ -162,6 +190,7 @@ describe('DEFAULT_ESTIMATOR_SETTINGS (Knowledge Base › Ratings model)', () => 
         ],
         sample: 'BF',
         stabilizesAt: 170,
+        priorShrink: 0.4908,
       },
       hrAvoidance: {
         label: 'HR avoidance',
@@ -173,6 +202,7 @@ describe('DEFAULT_ESTIMATOR_SETTINGS (Knowledge Base › Ratings model)', () => 
         ],
         sample: null,
         stabilizesAt: null,
+        priorShrink: 1,
       },
       babipAllowed: {
         label: 'BABIP allowed',
@@ -184,6 +214,7 @@ describe('DEFAULT_ESTIMATOR_SETTINGS (Knowledge Base › Ratings model)', () => 
         ],
         sample: null,
         stabilizesAt: null,
+        priorShrink: 1,
       },
     });
   });
@@ -196,11 +227,62 @@ describe('DEFAULT_ESTIMATOR_SETTINGS (Knowledge Base › Ratings model)', () => 
       },
     });
   });
+
+  it('shrinks each prior the evidence can move by Game 71’s factor, the prior-driven at 1 (Prior shrink)', () => {
+    expect(factorsOf(DEFAULT_ESTIMATOR_SETTINGS)).toEqual({
+      avoidKs: 0.6889,
+      power: 0.6016,
+      gap: 0.35,
+      eye: 0.414,
+      babip: 1,
+      stuff: 0.4841,
+      control: 0.4908,
+      hrAvoidance: 1,
+      babipAllowed: 1,
+    });
+  });
+});
+
+describe('withoutPriorShrink', () => {
+  it('sets every component’s factor to 1, leaving the rest of the defaults as they are', () => {
+    const unshrunk = withoutPriorShrink();
+    expect(factorsOf(unshrunk)).toEqual({
+      avoidKs: 1,
+      power: 1,
+      gap: 1,
+      eye: 1,
+      babip: 1,
+      stuff: 1,
+      control: 1,
+      hrAvoidance: 1,
+      babipAllowed: 1,
+    });
+    expect({ ...unshrunk, components: DEFAULT_ESTIMATOR_SETTINGS.components }).toEqual(
+      DEFAULT_ESTIMATOR_SETTINGS,
+    );
+    for (const side of ['hitters', 'pitchers'] as const) {
+      const defaults: Record<string, ComponentSettings> =
+        DEFAULT_ESTIMATOR_SETTINGS.components[side];
+      for (const [id, config] of Object.entries(unshrunk.components[side])) {
+        expect({ ...config, priorShrink: defaults[id]?.priorShrink }, id).toEqual(defaults[id]);
+      }
+    }
+    expect(factorsOf(DEFAULT_ESTIMATOR_SETTINGS).avoidKs).toBe(0.6889);
+  });
+
+  it('takes the settings it is given, and leaves them as they were', () => {
+    const settings: EstimatorSettings = { ...DEFAULT_ESTIMATOR_SETTINGS, flagSteps: 1 };
+    const before = JSON.stringify(settings);
+    const unshrunk = withoutPriorShrink(settings);
+    expect(unshrunk.flagSteps).toBe(1);
+    expect(Object.values(factorsOf(unshrunk))).toEqual(new Array<number>(9).fill(1));
+    expect(JSON.stringify(settings)).toBe(before);
+  });
 });
 
 describe('teamEstimates on the Seattle game-53 files (task Context)', () => {
   const g53 = snapshotOf('seattle-g53/');
-  const results = teamEstimates(g53);
+  const results = teamEstimates(g53, UNSHRUNK);
   const hitters = results.filter((player) => player.side === 'hitters');
   const pitchers = results.filter((player) => player.side === 'pitchers');
 
@@ -381,7 +463,7 @@ describe('teamEstimates on the Seattle game-53 files (task Context)', () => {
 
 describe('teamEstimates on the Seattle game-42 files, superstats only (task Context)', () => {
   const g42 = snapshotOf('seattle-g42/');
-  const results = teamEstimates(g42);
+  const results = teamEstimates(g42, UNSHRUNK);
   const hitters = results.filter((player) => player.side === 'hitters');
   const pitchers = results.filter((player) => player.side === 'pitchers');
 
@@ -502,7 +584,7 @@ describe('teamEstimates on hand-built snapshots', () => {
     ...overrides,
   });
 
-  const only = (snapshot: Built, settings?: EstimatorSettings) => {
+  const only = (snapshot: Built, settings: EstimatorSettings = UNSHRUNK) => {
     const [player, ...rest] = teamEstimates(snapshot, settings);
     if (!player || rest.length > 0) {
       throw new Error('expected one player');
@@ -659,7 +741,7 @@ describe('teamEstimates on hand-built snapshots', () => {
     expect(gap.evidence?.value).toBeCloseTo(40, 10);
     const single = only(
       built({ hitters: [hitter('Ann', { PA: 200, '2B': 5, '3B': 0, AB: 100 })] }),
-      { ...DEFAULT_ESTIMATOR_SETTINGS, moderateMultiplier: 1 },
+      withoutPriorShrink({ ...DEFAULT_ESTIMATOR_SETTINGS, moderateMultiplier: 1 }),
     );
     expect(componentOf(single, 'gap').k).toBeCloseTo(0.43 * 1610, 10);
   });
@@ -706,10 +788,10 @@ describe('teamEstimates on hand-built snapshots', () => {
     expect(roleOf(below, DEFAULT_PERCENTILE_SETTINGS)).toBe('relievers');
     expect(only(built({ pitchers: [below] })).pool).toBe('relievers');
     // The estimator reads the share from the percentile settings it carries.
-    const stricter: EstimatorSettings = {
+    const stricter: EstimatorSettings = withoutPriorShrink({
       ...DEFAULT_ESTIMATOR_SETTINGS,
       pools: { ...DEFAULT_PERCENTILE_SETTINGS, starterShare: 0.6 },
-    };
+    });
     expect(roleOf(atShare, stricter.pools)).toBe('relievers');
     expect(only(built({ pitchers: [atShare] }), stricter).pool).toBe('relievers');
   });
@@ -798,6 +880,127 @@ describe('teamEstimates on hand-built snapshots', () => {
     // High risk: two steps of one point each below 60.
     expect(componentOf(player, 'avoidKs').prior).toBe(58);
   });
+
+  describe('the prior shrink (Knowledge Base › Talent estimator › Prior shrink)', () => {
+    const defaults = DEFAULT_ESTIMATOR_SETTINGS;
+    /** Ann on the 20–80 scale, whose step is one point: Very Low risk starts at the potential. */
+    const onTwentyEighty = (values: ExportRow) =>
+      built({ scale: '20-80', hitters: [hitter('Ann', { Risk: 0, ...values })] });
+    /** The defaults with one hitter component's factor changed. */
+    const withFactor = (id: HitterComponentId, priorShrink: number): EstimatorSettings => ({
+      ...defaults,
+      components: {
+        ...defaults.components,
+        hitters: {
+          ...defaults.components.hitters,
+          [id]: { ...defaults.components.hitters[id], priorShrink },
+        },
+      },
+    });
+
+    it.each([
+      [70, 63.778],
+      [30, 36.222],
+    ])('pulls a prior of %s toward 50 by Avoid K’s 0.6889, to %s', (potential, prior) => {
+      const avoidKs = componentOf(only(onTwentyEighty({ 'K P': potential }), defaults), 'avoidKs');
+      expect(avoidKs.potential).toBe(potential);
+      expect(avoidKs.unshrunkPrior).toBe(potential);
+      expect(avoidKs.shrink).toBe(0.6889);
+      expect(avoidKs.prior).toBeCloseTo(prior, 10);
+      // The risk band is the risk's, shrink or not: ½ step of one point.
+      expect(avoidKs.priorBand).toBe(0.5);
+    });
+
+    it.each([
+      ['1.5 as 1, leaving the prior where it is', 1.5, 1, 70],
+      ['−0.2 as 0, putting the prior at 50', -0.2, 0, 50],
+    ])('holds the factor to 0–1: %s', (_case, factor, shrink, prior) => {
+      const player = only(onTwentyEighty({ 'K P': 70 }), withFactor('avoidKs', factor));
+      const avoidKs = componentOf(player, 'avoidKs');
+      expect(avoidKs.shrink).toBe(shrink);
+      expect(avoidKs.unshrunkPrior).toBe(70);
+      expect(avoidKs.prior).toBe(prior);
+    });
+
+    it('never shrinks a prior-driven component, whatever its factor', () => {
+      const player = only(onTwentyEighty({ 'HT P': 70 }), withFactor('babip', 0.3));
+      const babip = componentOf(player, 'babip');
+      expect(babip).toMatchObject({ stance: 'prior', shrink: 1, unshrunkPrior: 70, prior: 70 });
+      expect(babip.estimate).toBe(70);
+      expect(babip.move).toBe(0);
+    });
+
+    it('leaves a component without evidence at its shrunk prior, with no move and no flag', () => {
+      const avoidKs = componentOf(only(onTwentyEighty({ 'K P': 70 }), defaults), 'avoidKs');
+      expect(avoidKs.evidence).toBeNull();
+      expect(avoidKs.weight).toBe(0);
+      expect(avoidKs.estimate).toBe(avoidKs.prior);
+      expect(avoidKs.move).toBe(0);
+      expect(avoidKs.flag).toBe(false);
+      // 6.2 steps below the potential: the shrink alone never raises a flag.
+      expect(avoidKs.unshrunkPrior - avoidKs.estimate).toBeGreaterThan(defaults.flagSteps);
+    });
+
+    it('mixes the evidence with the shrunk prior, and measures the move and the flag from it', () => {
+      const player = only(
+        built({ hitters: [hitter('Ann', { PA: 100, 'K%': 0.15, 'WH%': 0.25 })] }),
+        defaults,
+      );
+      const avoidKs = componentOf(player, 'avoidKs');
+      // Medium risk: one step below the potential, then 0.6889 of the way from 50.
+      const unshrunk = r(5) - STEP;
+      const prior = 50 + 0.6889 * (unshrunk - 50);
+      const w = 100 / (100 + 0.43 * 60);
+      const evidence = avoidKs.evidence?.value ?? Number.NaN;
+      const estimate = prior + w * (evidence - prior);
+      expect(avoidKs.unshrunkPrior).toBeCloseTo(unshrunk, 10);
+      expect(avoidKs.prior).toBeCloseTo(prior, 10);
+      expect(avoidKs.weight).toBeCloseTo(w, 10);
+      expect(avoidKs.estimate).toBeCloseTo(estimate, 10);
+      expect(avoidKs.move).toBeCloseTo((estimate - prior) / STEP, 10);
+      expect(avoidKs.flag).toBe(Math.abs(avoidKs.move) > 0.5);
+      expect(avoidKs.band).toBeCloseTo(Math.max(1.5 * Math.sqrt(1 - w), 0.5) * STEP, 10);
+      // The evidence and its weight don't read the prior.
+      const off = componentOf(
+        only(built({ hitters: [hitter('Ann', { PA: 100, 'K%': 0.15, 'WH%': 0.25 })] })),
+        'avoidKs',
+      );
+      expect(avoidKs.evidence).toEqual(off.evidence);
+      expect(avoidKs.weight).toBe(off.weight);
+      expect(off.prior).toBe(avoidKs.unshrunkPrior);
+    });
+
+    it('keeps Contact at its own prior without evidence, its components shrunk', () => {
+      const player = only(
+        built({ hitters: [hitter('Ann', { Risk: 0, 'Contact P': r(6), 'K P': r(8) })] }),
+        defaults,
+      );
+      const contact = player.composites.contact;
+      // Very Low risk: Contact's prior is its potential, unshrunk.
+      expect(contact?.prior).toBeCloseTo(r(6), 10);
+      expect(contact?.estimate).toBe(contact?.prior);
+      expect(contact?.move).toBe(0);
+      expect(contact?.flag).toBe(false);
+      expect(componentOf(player, 'avoidKs').prior).toBeCloseTo(50 + 0.6889 * (r(8) - 50), 10);
+    });
+
+    it('moves Contact from its own prior by its components’ moves from their shrunk priors', () => {
+      const ann = built({
+        hitters: [hitter('Ann', { Risk: 0, PA: 400, 'K%': 0.1, 'Contact P': r(6) })],
+      });
+      const player = only(ann, defaults);
+      const off = only(ann);
+      const avoidKs = componentOf(player, 'avoidKs');
+      const babip = componentOf(player, 'babip');
+      const contact = player.composites.contact;
+      expect(contact?.prior).toBe(off.composites.contact?.prior);
+      expect(avoidKs.move).toBeCloseTo((avoidKs.estimate - avoidKs.prior) / STEP, 10);
+      expect(contact?.move).toBeCloseTo((avoidKs.move + babip.move) / 2, 10);
+      expect(contact?.estimate).toBeCloseTo(r(6) + ((avoidKs.move + babip.move) / 2) * STEP, 10);
+      // Measured from a prior pulled toward 50, the move isn't the shrink-off one.
+      expect(avoidKs.move).not.toBeCloseTo(componentOf(off, 'avoidKs').move, 2);
+    });
+  });
 });
 
 describe('evidenceOf, the evidence step for any row (Knowledge Base › Talent estimator, step 2)', () => {
@@ -808,7 +1011,7 @@ describe('evidenceOf, the evidence step for any row (Knowledge Base › Talent e
     (folder) => {
       const snapshot = fixtureSnapshot(folder);
       const pools = percentilePools(snapshot, settings.pools);
-      const results = teamEstimates(snapshot);
+      const results = teamEstimates(snapshot, UNSHRUNK);
       let compared = 0;
       for (const side of ['hitters', 'pitchers'] as const) {
         const rows = snapshot[side].filter((row) => typeof row.Name === 'string');
@@ -862,13 +1065,16 @@ describe('evidenceOf, the evidence step for any row (Knowledge Base › Talent e
     expect(evidence).toEqual(evidenceOf(rated, 'hitters', pool, stats, settings));
     expect(evidence?.n).toBe(3);
     // And the estimator reports the same for a hitter with a potential.
-    const [player] = teamEstimates({
-      label: null,
-      scale: '1-10',
-      hitters: [{ POS: 'CF', TM: 'Here', PA: 100, ...rated }],
-      pitchers: [],
-      league: { hitters: pool, pitchers: [] },
-    });
+    const [player] = teamEstimates(
+      {
+        label: null,
+        scale: '1-10',
+        hitters: [{ POS: 'CF', TM: 'Here', PA: 100, ...rated }],
+        pitchers: [],
+        league: { hitters: pool, pitchers: [] },
+      },
+      UNSHRUNK,
+    );
     expect(player?.components.avoidKs?.evidence).toEqual(evidence);
   });
 
@@ -879,7 +1085,7 @@ describe('evidenceOf, the evidence step for any row (Knowledge Base › Talent e
 
   it('standardizes Game 71’s evidence over the 199 qualified hitters', () => {
     const g71 = fixtureSnapshot('seattle-g71/');
-    const shinn = playerOf(teamEstimates(g71), 'Jin-soo Shinn');
+    const shinn = playerOf(teamEstimates(g71, UNSHRUNK), 'Jin-soo Shinn');
     expect(componentOf(shinn, 'avoidKs').evidence?.n).toBe(199);
     expect(componentOf(shinn, 'power').evidence?.n).toBe(199);
   });
@@ -888,12 +1094,129 @@ describe('evidenceOf, the evidence step for any row (Knowledge Base › Talent e
     'estimates %s exactly as with every league hitter in the pool, as before',
     (folder) => {
       const snapshot = fixtureSnapshot(folder);
-      const everyone = {
+      const everyone = withoutPriorShrink({
         ...settings,
         pools: { ...settings.pools, hitterPaPerGame: 0 },
-      };
+      });
       expect(percentilePools(snapshot, everyone.pools).hitters).toEqual(snapshot.league.hitters);
-      expect(teamEstimates(snapshot)).toEqual(teamEstimates(snapshot, everyone));
+      expect(teamEstimates(snapshot, UNSHRUNK)).toEqual(teamEstimates(snapshot, everyone));
     },
   );
+});
+
+describe('teamEstimates on Game 71 with the prior shrink (Knowledge Base › Talent estimator › Prior shrink)', () => {
+  const g71 = fixtureSnapshot('seattle-g71/', 'seattle-g71/splits/');
+  const shrunk = teamEstimates(g71);
+  const off = teamEstimates(g71, UNSHRUNK);
+  const PRIOR_DRIVEN: ComponentId[] = ['babip', 'hrAvoidance', 'babipAllowed'];
+
+  // The task's Context table: the analysis's pipeline and QA's independent one, within 0.01.
+  const HITTERS: [string, number, number, number, number, number][] = [
+    ['Yoshitsugu Ishida', 46.29, 51.58, 44.16, 49.09, 43.33],
+    ['Yasuhiro Tsumoto', 38.27, 52.48, 43.92, 59.19, 40.0],
+    ['Jin-soo Shinn', 57.72, 60.05, 46.8, 46.92, 46.67],
+    ['Han-lee Choi', 49.05, 41.57, 51.16, 48.95, 46.67],
+    ['Ling-lai Li', 47.74, 38.79, 44.14, 56.22, 33.33],
+    ['Manichiro Kawasaki', 43.7, 59.97, 48.65, 51.8, 40.0],
+    ['Dong-hee Moon', 56.38, 31.84, 48.56, 38.41, 36.67],
+    ['Hideji Yamanaka', 56.13, 54.61, 54.44, 62.31, 50.0],
+    ['Zhong-shan Geng', 48.38, 50.8, 48.84, 44.77, 40.0],
+    ['Tomofumi Kamimura', 37.05, 58.85, 51.15, 45.33, 33.33],
+    ['Etsuji Obata', 38.22, 58.65, 50.56, 41.2, 63.33],
+    ['Daniel Wang', 43.69, 41.06, 52.14, 41.27, 56.67],
+  ];
+  const PITCHERS: [string, number, number][] = [
+    ['Hajime Ito', 43.53, 47.23],
+    ['Yasuhiro Katayama', 49.47, 52.21],
+    ['Jeong Lee', 54.4, 58.28],
+    ['Su-shun Nie', 26.11, 65.69],
+    ['Chua chay Niu', 63.79, 46.97],
+    ['Tse-peng Gong', 51.68, 46.95],
+    ['Jimmy Hsia', 61.91, 61.69],
+    ['Hyun-koo Ka', 37.82, 48.85],
+    ['Kiyohiro Kaneshiro', 49.57, 48.35],
+    ['Lan-fang Lai', 43.21, 46.16],
+    ['Xiong Loh', 54.55, 48.33],
+    ['Midori Murakami', 59.14, 51.86],
+    ['Yoichibei Inouye', 60.98, 52.04],
+  ];
+
+  it('lists every team player, as without the shrink', () => {
+    expect(shrunk.map((player) => player.name)).toEqual(
+      HITTERS.map(([name]) => name).concat(PITCHERS.map(([name]) => name)),
+    );
+    expect(off.map((player) => player.name)).toEqual(shrunk.map((player) => player.name));
+  });
+
+  it.each(HITTERS)('%s: Avoid K’s %s, Power %s, Gap %s, Eye %s, BABIP %s', (name, ...values) => {
+    const player = playerOf(shrunk, name);
+    (['avoidKs', 'power', 'gap', 'eye', 'babip'] as const).forEach((id, i) => {
+      within(componentOf(player, id).estimate, values[i] ?? Number.NaN, 0.01, `${name} ${id}`);
+    });
+  });
+
+  it.each(PITCHERS)('%s: Stuff %s, Control %s', (name, stuff, control) => {
+    const player = playerOf(shrunk, name);
+    within(componentOf(player, 'stuff').estimate, stuff, 0.01, `${name} stuff`);
+    within(componentOf(player, 'control').estimate, control, 0.01, `${name} control`);
+  });
+
+  it('leaves the prior-driven components and Movement exactly as without the shrink', () => {
+    for (const [i, player] of shrunk.entries()) {
+      const before = off[i];
+      for (const id of PRIOR_DRIVEN) {
+        const component = player.components[id];
+        if (component !== undefined) {
+          expect(component, `${player.name} ${id}`).toEqual(before?.components[id]);
+          expect(component.shrink).toBe(1);
+        }
+      }
+      expect(player.composites.movement, player.name).toEqual(before?.composites.movement);
+    }
+  });
+
+  it('shrinks the shrink-off prior by each component’s factor, the evidence and its weight as they were', () => {
+    const factors = factorsOf(DEFAULT_ESTIMATOR_SETTINGS);
+    let shrinking = 0;
+    for (const [i, player] of shrunk.entries()) {
+      for (const [id, component] of Object.entries(player.components)) {
+        const before = off[i]?.components[id as ComponentId];
+        const label = `${player.name} ${id}`;
+        expect(component.unshrunkPrior, label).toBe(before?.prior);
+        expect(component.shrink, label).toBe(factors[id]);
+        expect(component.prior, label).toBeCloseTo(
+          50 + component.shrink * (component.unshrunkPrior - 50),
+          12,
+        );
+        expect(component.priorBand, label).toBe(before?.priorBand);
+        expect(component.evidence, label).toEqual(before?.evidence);
+        expect([component.n, component.k, component.weight, component.band], label).toEqual([
+          before?.n,
+          before?.k,
+          before?.weight,
+          before?.band,
+        ]);
+        expect(component.flag, label).toBe(Math.abs(component.move) > 0.5);
+        shrinking += component.shrink < 1 ? 1 : 0;
+      }
+    }
+    // Four components for each of 12 hitters and two for each of 13 pitchers.
+    expect(shrinking).toBe(4 * 12 + 2 * 13);
+  });
+
+  it('keeps Contact at its own prior, moved by its components’ moves from the shrunk priors', () => {
+    for (const [i, player] of shrunk.entries()) {
+      const contact = player.composites.contact;
+      if (contact === undefined) {
+        continue;
+      }
+      expect(contact.prior, player.name).toBe(off[i]?.composites.contact?.prior);
+      const avoidKs = componentOf(player, 'avoidKs');
+      const babip = componentOf(player, 'babip');
+      expect(contact.estimate, player.name).toBeCloseTo(
+        Math.min(80, Math.max(20, contact.prior + ((avoidKs.move + babip.move) / 2) * STEP)),
+        10,
+      );
+    }
+  });
 });

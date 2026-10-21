@@ -14,7 +14,8 @@ import { scaleBounds } from '../ratings/scale.ts';
  * The talent estimator v0: Knowledge Base › Ratings model › Talent estimator. Where a league
  * shows only potentials, each batting and pitching component's current rating is estimated
  * from its potential, the player's development risk and the season's stats, with a band and
- * a flag where performance disagrees with the scouting. Values are on 20–80 and moves in the
+ * a flag where performance disagrees with the scouting. Each component the stats can move
+ * starts from a prior shrunk toward 50 (Prior shrink). Values are on 20–80 and moves in the
  * league's display steps, unrounded; screens round.
  */
 
@@ -53,6 +54,13 @@ export interface ComponentSettings {
   sample: EstimatorSample | null;
   /** The stabilization point k is built on; null for a prior-driven component. */
   stabilizesAt: number | null;
+  /**
+   * The prior-shrink factor s: the prior starts at evidenceCentre + s × (prior −
+   * evidenceCentre), s held to 0–1. A prior-driven component ignores it and keeps s = 1.
+   * Source: Knowledge Base › Ratings model › Talent estimator › Prior shrink, Game 71's league
+   * calibration, 19 October 2026.
+   */
+  priorShrink: number;
 }
 
 export interface CompositeSettings {
@@ -167,6 +175,7 @@ export const DEFAULT_ESTIMATOR_SETTINGS: EstimatorSettings = {
         ],
         sample: 'PA',
         stabilizesAt: 60,
+        priorShrink: 0.6889,
       },
       power: {
         label: 'Power',
@@ -179,6 +188,7 @@ export const DEFAULT_ESTIMATOR_SETTINGS: EstimatorSettings = {
         ],
         sample: 'BIP',
         stabilizesAt: 50,
+        priorShrink: 0.6016,
       },
       gap: {
         label: 'Gap',
@@ -187,6 +197,7 @@ export const DEFAULT_ESTIMATOR_SETTINGS: EstimatorSettings = {
         evidence: [{ stat: '(2B+3B)/AB', link: 0.62, better: 'higher' }],
         sample: 'PA',
         stabilizesAt: 1610,
+        priorShrink: 0.35,
       },
       eye: {
         label: 'Eye',
@@ -199,6 +210,7 @@ export const DEFAULT_ESTIMATOR_SETTINGS: EstimatorSettings = {
         ],
         sample: 'PA',
         stabilizesAt: 120,
+        priorShrink: 0.414,
       },
       babip: {
         label: 'BABIP',
@@ -210,6 +222,7 @@ export const DEFAULT_ESTIMATOR_SETTINGS: EstimatorSettings = {
         ],
         sample: null,
         stabilizesAt: null,
+        priorShrink: 1,
       },
     },
     pitchers: {
@@ -224,6 +237,7 @@ export const DEFAULT_ESTIMATOR_SETTINGS: EstimatorSettings = {
         ],
         sample: 'BF',
         stabilizesAt: 70,
+        priorShrink: 0.4841,
       },
       control: {
         label: 'Control',
@@ -236,6 +250,7 @@ export const DEFAULT_ESTIMATOR_SETTINGS: EstimatorSettings = {
         ],
         sample: 'BF',
         stabilizesAt: 170,
+        priorShrink: 0.4908,
       },
       // The two checks below read each stat in the direction that helps the rating, whatever
       // the sign of its weak link in the sample.
@@ -249,6 +264,7 @@ export const DEFAULT_ESTIMATOR_SETTINGS: EstimatorSettings = {
         ],
         sample: null,
         stabilizesAt: null,
+        priorShrink: 1,
       },
       babipAllowed: {
         label: 'BABIP allowed',
@@ -260,6 +276,7 @@ export const DEFAULT_ESTIMATOR_SETTINGS: EstimatorSettings = {
         ],
         sample: null,
         stabilizesAt: null,
+        priorShrink: 1,
       },
     },
   },
@@ -300,7 +317,14 @@ export interface ComponentEstimate {
   stance: Stance;
   /** The potential on 20–80: the ceiling. */
   potential: number;
-  /** Where the estimate starts: the potential less the risk's offset, held to 20–80. */
+  /** The potential less the risk's offset, held to 20–80: the prior before the shrink. */
+  unshrunkPrior: number;
+  /** The prior-shrink factor applied, held to 0–1; 1 for a prior-driven component. */
+  shrink: number;
+  /**
+   * Where the estimate starts: the unshrunk prior shrunk toward evidenceCentre,
+   * evidenceCentre + shrink × (unshrunkPrior − evidenceCentre).
+   */
   prior: number;
   /** The risk band around the prior, in points either way. */
   priorBand: number;
@@ -327,7 +351,10 @@ export interface CompositeEstimate {
   column: string;
   from: readonly [ComponentId, ComponentId];
   potential: number;
-  /** From its own potential and the player's risk, as a component's. */
+  /**
+   * From its own potential and the player's risk, as a component's, and never shrunk: a
+   * composite has no factor of its own.
+   */
   prior: number;
   priorBand: number;
   /** prior + the mean of its components' moves × step, held to 20–80. */
@@ -498,7 +525,7 @@ interface PlayerContext {
   settings: EstimatorSettings;
 }
 
-/** The potential and the prior with its band, for a component or a composite. */
+/** The potential and the unshrunk prior with its band, for a component or a composite. */
 function priorOf(context: PlayerContext, column: string) {
   const potential = numberOf(context.row[column]);
   if (potential === null) {
@@ -511,7 +538,11 @@ function priorOf(context: PlayerContext, column: string) {
   };
 }
 
-/** Knowledge Base › Talent estimator, steps 1 to 5, for one component. */
+/**
+ * Knowledge Base › Talent estimator, steps 1 to 5, for one component. The prior shrinks toward
+ * evidenceCentre by the component's factor before the evidence mix (Prior shrink), and the
+ * estimate, move and flag read the shrunk prior.
+ */
 function estimateComponent(
   context: PlayerContext,
   component: ComponentId,
@@ -522,6 +553,8 @@ function estimateComponent(
     return null;
   }
   const { settings, step, risk } = context;
+  const shrink = config.stance === 'prior' ? 1 : Math.min(1, Math.max(0, config.priorShrink));
+  const prior = settings.evidenceCentre + shrink * (start.prior - settings.evidenceCentre);
   const evidence =
     context.pool === null
       ? null
@@ -540,14 +573,17 @@ function estimateComponent(
     weight = evidence === null || n + k <= 0 ? 0 : n / (n + k);
   }
 
-  const estimate =
-    evidence === null ? start.prior : start.prior + weight * (evidence.value - start.prior);
-  const move = (estimate - start.prior) / step;
+  const estimate = evidence === null ? prior : prior + weight * (evidence.value - prior);
+  const move = (estimate - prior) / step;
   return {
     component,
     column: config.column,
     stance: config.stance,
-    ...start,
+    potential: start.potential,
+    unshrunkPrior: start.prior,
+    shrink,
+    prior,
+    priorBand: start.priorBand,
     evidence,
     n,
     k,
@@ -587,6 +623,29 @@ function estimateComposite(
     band: (first.band + second.band) / 2,
     move,
     flag: Math.abs(move) > context.settings.flagSteps,
+  };
+}
+
+/**
+ * The settings with every component's prior-shrink factor at 1: the estimates as they were
+ * before the shrink (Knowledge Base › Talent estimator › Prior shrink).
+ */
+export function withoutPriorShrink(
+  settings: EstimatorSettings = DEFAULT_ESTIMATOR_SETTINGS,
+): EstimatorSettings {
+  const unshrunk = <Id extends string>(components: Record<Id, ComponentSettings>) =>
+    Object.fromEntries(
+      Object.entries<ComponentSettings>(components).map(([id, config]) => [
+        id,
+        { ...config, priorShrink: 1 },
+      ]),
+    ) as Record<Id, ComponentSettings>;
+  return {
+    ...settings,
+    components: {
+      hitters: unshrunk(settings.components.hitters),
+      pitchers: unshrunk(settings.components.pitchers),
+    },
   };
 }
 

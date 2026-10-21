@@ -1,4 +1,5 @@
 import {
+  DEFAULT_BATTING_SETTINGS,
   FITTED_EVENTS,
   WOBA_EVENTS,
   eventCounts,
@@ -12,6 +13,7 @@ import {
   type WobaEvent,
 } from '../batting/batting.ts';
 import type { DefenseTeam, SettingNote } from '../defense/defense.ts';
+import { DEFAULT_ESTIMATOR_SETTINGS, type EstimatorSettings } from '../estimator/estimator.ts';
 import type { ExportRow, Split } from '../importer/route.ts';
 import type { Snapshot, SplitTables } from '../importer/snapshot.ts';
 import {
@@ -668,8 +670,9 @@ export function handLineups(
   snapshot: HandSnapshot,
   team: DefenseTeam,
   settings: HandSettings = DEFAULT_HAND_SETTINGS,
+  estimator: EstimatorSettings = DEFAULT_ESTIMATOR_SETTINGS,
 ): HandLineups {
-  const batting = teamBatting(snapshot);
+  const batting = teamBatting(snapshot, DEFAULT_BATTING_SETTINGS, estimator);
   const season = selectLineup(snapshot, team, DEFAULT_LINEUP_SETTINGS, batting);
   const inputs = handInputs(snapshot);
   const league = leagueHands(snapshot, batting.model.weights.weights, settings);

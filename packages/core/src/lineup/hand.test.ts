@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  DEFAULT_BATTING_SETTINGS,
   DEFAULT_HAND_SETTINGS,
   DEFAULT_ORDER_SETTINGS,
   WOBA_EVENTS,
@@ -12,6 +13,7 @@ import {
   handResult,
   leagueHands,
   teamBatting,
+  withoutPriorShrink,
   type BattingHand,
   type BattingProjection,
   type ExportRow,
@@ -51,11 +53,19 @@ const g71TeamSplits = assembleSnapshot(
   { scale: '1-10' },
 );
 
-// Each Game 71 result is built once per file: a selectLineup takes seconds under coverage.
-const FITTED = handLineups(g71, team);
-const SETTINGS_ONLY = handLineups(g71TeamSplits, team);
+/**
+ * Every prior-shrink factor at 1. The Context's figures were measured before the shrink, and
+ * they hold with every factor at 1 (Knowledge Base › Talent estimator › Prior shrink).
+ */
+const UNSHRUNK = withoutPriorShrink();
 
-const g71Batting = teamBatting(g71);
+// Each Game 71 result is built once per file: a selectLineup takes seconds under coverage.
+const FITTED = handLineups(g71, team, DEFAULT_HAND_SETTINGS, UNSHRUNK);
+const SETTINGS_ONLY = handLineups(g71TeamSplits, team, DEFAULT_HAND_SETTINGS, UNSHRUNK);
+/** Game 71 on the default estimates, the prior shrink on. */
+const SHRUNK = handLineups(g71, team);
+
+const g71Batting = teamBatting(g71, DEFAULT_BATTING_SETTINGS, UNSHRUNK);
 const WEIGHTS = g71Batting.model.weights.weights;
 
 const HANDS: BattingHand[] = ['L', 'R', 'S'];
@@ -1025,6 +1035,84 @@ describe('handLineups on Game 71 (req-lineups, req-game71)', () => {
   });
 });
 
+describe('handLineups on Game 71 with the prior shrink (Knowledge Base › Talent estimator › Prior shrink)', () => {
+  const lineups = lineupsOf(SHRUNK);
+  const SHRUNK_LINEUP = { ...SEASON_LINEUP, C: 'Yoshitsugu Ishida', C2: 'Yasuhiro Tsumoto' };
+  const SHRUNK_ORDER = [
+    'Hideji Yamanaka',
+    'Etsuji Obata',
+    'Manichiro Kawasaki',
+    'Jin-soo Shinn',
+    'Tomofumi Kamimura',
+    'Yoshitsugu Ishida',
+    'Zhong-shan Geng',
+    'Dong-hee Moon',
+    'Han-lee Choi',
+  ];
+  const SHRUNK_VS_LEFT_ORDER = [
+    'Yasuhiro Tsumoto',
+    'Hideji Yamanaka',
+    'Manichiro Kawasaki',
+    'Jin-soo Shinn',
+    'Han-lee Choi',
+    'Daniel Wang',
+    'Etsuji Obata',
+    'Zhong-shan Geng',
+    'Dong-hee Moon',
+  ];
+
+  it('catches Ishida in the season nine, Tsumoto backing up, sixth in the order: 776.09 runs', () => {
+    const loop = SHRUNK.season.loop;
+    expect(placed(loop?.final ?? [])).toEqual(SHRUNK_LINEUP);
+    expect(loop?.order.names).toEqual(SHRUNK_ORDER);
+    within(loop?.value, 776.086, 0.01, 'value');
+    within(loop?.orderRuns, 761.988, 0.01, 'order runs');
+    within(loop?.fieldingRuns, 14.098, 0.01, 'fielding');
+  });
+
+  it(
+    'builds the hands on the shrunk estimates, the league’s fit as without the shrink',
+    { timeout: 180_000 },
+    () => {
+      expect(SHRUNK.flags).toEqual([]);
+      expect(SHRUNK.inputs).toEqual(FITTED.inputs);
+      expect(SHRUNK.league).toEqual(FITTED.league);
+      expect(SHRUNK.startsVsLeft).toEqual(FITTED.startsVsLeft);
+      expect(SHRUNK.hitters).toEqual(handBatting(g71, teamBatting(g71), SHRUNK.league).hitters);
+      expect(SHRUNK.hitters).not.toEqual(FITTED.hitters);
+    },
+  );
+
+  it('keeps the season lineup against right-handers: a gain of 0.01', () => {
+    const right = lineups.R;
+    within(right.gain, 0.008, 0.005, 'gain');
+    expect(right.replaces).toBe(false);
+    expect(placed(right.lineup)).toEqual(SHRUNK_LINEUP);
+    expect(right.order).toEqual(SHRUNK_ORDER);
+    expect(right.changes).toEqual([]);
+    expect(right.orderChanged).toBe(false);
+  });
+
+  it('catches Tsumoto with Wang in left against left-handers, Ishida backing up: +18.14', () => {
+    const left = lineups.L;
+    within(left.gain, 18.141, 0.005, 'gain');
+    expect(left.replaces).toBe(true);
+    expect(placed(left.lineup)).toEqual({
+      ...SHRUNK_LINEUP,
+      C: 'Yasuhiro Tsumoto',
+      LF: 'Daniel Wang',
+      C2: 'Yoshitsugu Ishida',
+    });
+    expect(left.order).toEqual(SHRUNK_VS_LEFT_ORDER);
+    expect(left.changes).toEqual([
+      { slot: 'C', season: 'Yoshitsugu Ishida', hand: 'Yasuhiro Tsumoto' },
+      { slot: 'LF', season: 'Tomofumi Kamimura', hand: 'Daniel Wang' },
+      { slot: 'C2', season: 'Yasuhiro Tsumoto', hand: 'Yoshitsugu Ishida' },
+    ]);
+    expect(left.orderChanged).toBe(true);
+  });
+});
+
 describe('handResult: the bar (Open questions 2 and 8)', () => {
   const lineups = lineupsOf(FITTED);
   const season = FITTED.season.loop;
@@ -1151,7 +1239,7 @@ describe('handLineups without lineups by hand (Open questions 3)', () => {
     () => {
       const vsLeftOnly = teamSplits(true);
       vsLeftOnly.R.hitters = [];
-      const result = handLineups(handBuilt(vsLeftOnly), team);
+      const result = handLineups(handBuilt(vsLeftOnly), team, DEFAULT_HAND_SETTINGS, UNSHRUNK);
       expect(result.season.loop).not.toBeNull();
       expect(result.lineups).toBeNull();
       expect(result.inputs.team).toEqual({ L: true, R: false });
@@ -1169,7 +1257,12 @@ describe('handLineups without lineups by hand (Open questions 3)', () => {
   );
 
   it('returns no lineups without a season loop, the hitters and the starts still given', () => {
-    const result = handLineups(handBuilt(teamSplits(true)), { ...team, dh_enabled: false });
+    const result = handLineups(
+      handBuilt(teamSplits(true)),
+      { ...team, dh_enabled: false },
+      DEFAULT_HAND_SETTINGS,
+      UNSHRUNK,
+    );
     expect(result.season.loop).toBeNull();
     expect(result.lineups).toBeNull();
     expect(result.inputs.team).toEqual({ L: true, R: true });
@@ -1187,12 +1280,22 @@ describe('handLineups without lineups by hand (Open questions 3)', () => {
   });
 
   it('gives no starts share without GS in the team’s splits', () => {
-    const result = handLineups(handBuilt(teamSplits(false)), { ...team, dh_enabled: false });
+    const result = handLineups(
+      handBuilt(teamSplits(false)),
+      { ...team, dh_enabled: false },
+      DEFAULT_HAND_SETTINGS,
+      UNSHRUNK,
+    );
     expect(result.startsVsLeft).toBeNull();
   });
 
   it('flags both when neither the team’s splits nor a season loop is there', () => {
-    const result = handLineups(handBuilt(null), { ...team, dh_enabled: false });
+    const result = handLineups(
+      handBuilt(null),
+      { ...team, dh_enabled: false },
+      DEFAULT_HAND_SETTINGS,
+      UNSHRUNK,
+    );
     expect(result.lineups).toBeNull();
     expect(result.flags.map((flag) => flag.code).filter((code) => code !== 'no-split-pa')).toEqual([
       'no-team-splits',

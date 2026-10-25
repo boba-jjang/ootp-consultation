@@ -2,7 +2,7 @@
 
 Oct 4, 2026 · @Jay
 
-> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 20 October 2026.
+> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 25 October 2026.
 
 ## Agent brief
 
@@ -79,7 +79,7 @@ The app is a persistent franchise assistant for Out of the Park Baseball (OOTP 2
 
 - OOTP database-dump imports (full league tables keyed by player ID).
 - Trade and contract valuation.
-- Opponent-specific advice, which needs opponent exports, and pinch-hitting rules by the pitcher's hand; the lineups by the starter's hand are in (section 11).
+- Opponent-specific advice, which needs opponent exports, pinch-hitting rules by the pitcher's hand are promoted, the first strategy rule to come from the splits (section 10), and the lineups by the starter's hand are in (section 11).
 
 ### Constraints
 
@@ -105,7 +105,7 @@ Exports pass validation into the team store. The store feeds metrics, percentile
 | Talent estimator | Potentials, development risk, age, metrics | Current-rating estimates with confidence bands |
 | Defensive model | Fielding ratings, DEF, DEF Pot | Player × position eligibility and fielding-run estimates |
 | Lineup optimizer | Estimates, eligibility, league settings | Starting nine with positions and batting order, and the lineups against right- and left-handed starters |
-| Strategy rules | Estimates, fielding and running ratings, staff ratings | Slider settings by situation, plus per-player overrides |
+| Strategy rules | Estimates, the week's lineup, fielding and running ratings, the league's running stats and ratings | One team set by situation with a value, reason and label per slider, per-player overrides, and the left-handers' note |
 | Development planner | Potentials, risk, work ethic, IQ, age | Development priorities and suggested levers |
 | Consultation output | Every module's results | Recommendations, each with evidence and confidence |
 
@@ -610,31 +610,54 @@ Sliders run 0–10 with 5 as the AI's neutral. Each moves the AI's risk threshol
 
 ### Where settings apply
 
-- Team strategy can differ by inning band (1–6, 7–8, 9+) and score state (tied, up or down one, within three runs, blowout).
-- Player strategy overrides team strategy for that player: steal and baserunning aggressiveness, and pinch-hitting by pitcher handedness.
-- The research's steal success proxy is (runner speed + steal ability) − (pitcher hold + catcher arm).
+- Team strategy can differ by inning band (1–6, 7–8, and 9 with extra innings: OOTP's Game Strategy Time) and score state (tied, up or down one, within three runs, blowout: OOTP's Game Score Situation). A cell differs from the team's value only where a rule says so; so far none does (Rule set). The 1–3, 4–6, 7–8, 9+ bands in the owner's issue #87 are the screen of OOTP 15 and earlier.
+- One team set for the week (the owner, 22 October 2026). The Team Strategy screen holds no set by the opposing starter's hand, and the league simulates a week at a time, so the engine reads the week's lineup: the lineup against right-handed starters, which is section 11's vs-RHP lineup where that replaces the season lineup and the season lineup otherwise (at Game 71 the season lineup, Ishida catching), and notes what the left-handers' lineup would change. Blending the two lineups' settings is a later question (the owner's issue #87).
+- Player strategy overrides team strategy for that player: steal and baserunning aggressiveness, and pinch-hitting by pitcher handedness. OOTP applies a player's override whenever he plays, so differences between runners go here.
+- The research's steal success proxy, (runner speed + steal ability) − (pitcher hold + catcher arm), gives way to the running reads (below): at Game 71 speed adds nothing measurable to a runner's success, and no export carries the opponent's hold or arm.
+
+### Values and labels
+
+The owner settled how a rule becomes a value on 22 October 2026.
+
+- **Gated sliders are all or nothing:** the rule's value when every gated input clears, 5 otherwise. Where the rule gives a range or a word, the value is the end nearest neutral: 8 for 8–9, 8–10 and "high". Gates are whole steps on the 1–10 scale; a league on another display scale has its ratings converted through 20–80 to 1–10 and rounded to the nearest step before a gate reads them. An estimator read (hit and run) is compared unrounded.
+- **Graded only where data calibrates them:** stealing and baserunning (Running reads, below).
+- **No rule, no advice:** a slider without a rule stays at 5. Rules come one at a time from data, pinch hitting first, from the splits.
+- **Labels:** every value carries one, beside its reason. Calibrated: fitted on the league's results. Research rule: a gate from the research, not yet tested against results. Borderline: a gate that fails with no input more than one step short and at least one exactly one step short (an estimator read under the gate by at most one step), or an override decision within half a step of the override gate. No rule yet: the slider stays at 5.
 
 ### Rule set
 
-Every gate is a research claim without supporting data, so each is a setting validated against game results.
+Stealing and baserunning are calibrated on the league (Running reads, below). The other gates are research claims without supporting data, so each is a setting to validate against game results.
 
-| Slider | Inputs | Research rule (20–80) | 1–10 gate |
+| Slider | Inputs | Research rule (20–80) | 1–10 gate and value |
 | --- | --- | --- | --- |
-| Stealing | Runner speed, steal ability, steal rate; pitcher hold; catcher arm | Keep the team low (1–2) when few runners qualify; push elite runners (80 speed and steal) to 9–10 by override; set any high-steal-rate, low-speed runner to 0 | 10 speed and steal for a full green light |
-| Baserunning | Baserunning, speed | Aggressive only with high baserunning ratings | Not stated |
-| Hit and run | Batter avoid K's and contact | Only with elite avoid K's and contact | About 9+ |
-| Run and hit | Runner steal ability and speed; batter eye | No threshold given | Not stated |
-| Sacrifice bunt | Sacrifice bunt rating | Negative value except late and close | Not stated |
-| Bunt for hit | Bunt for hit, speed, batting left | Fast left-handed hitters with good bunt-for-hit | Not stated |
-| Pitch around | Catcher framing, pitcher control | 8–9 only with a 70+ framer | Framing 9+ |
-| Hold runners | Catcher arm, pitcher hold | 8–10 behind a weak arm (about 35); costs some stuff and control | Arm 3 or lower; 4 borderline |
-| Infield shift | Middle-infield range; opposing hitters' pull tendency | 10 only with 65+ middle-infield range | Range 8+ |
-| Guard lines | SS and 2B range | High only with 70+ at both | Range 9+ at both |
-| Pinch hitting and platoons | Handedness splits: on file from Game 71 and used so far for the lineups by the starter's hand (section 11) | Player-level rules by pitcher hand | Not stated |
+| Stealing | Steal ability and speed; the runner's own SB and CS; the league's wSB, for the break-even; steal rate in the fallback only | Calibrated (Running reads): success rides on steal ability, and a steal pays above the league's break-even, 68.1% at Game 71 | Graded, not gated: 5 at the break-even, one step per 3 points of expected success, held to 0–10. On ratings alone, steal ability 6 reaches the break-even, 9 gives 9 and 10 gives 10, at any speed |
+| Baserunning | Baserunning, speed; the runner's own UBR | Aggressive only with high baserunning ratings, read with speed against the league's centre (Running reads) | Graded: 5 at the league's centre, one step per 0.005 runs per time on base, held to 0–10. The read is calibrated; the step to aggressiveness is an assumption |
+| Hit and run | Batter avoid K's and Contact, the estimator's reads | Only with elite avoid K's and contact | 8 (as for "high") when every hitter in the week's nine reads 9+ on both, a team-level reading of a per-batter rule; otherwise 5 |
+| Run and hit | Runner steal ability and speed; batter eye | No threshold given | No rule yet: 5 |
+| Sacrifice bunt | Sacrifice bunt rating | Negative value except late and close | No rule yet: 5. Its rule, from the batting order's base-out model, is the one expected to vary by situation: innings 7–8 and 9+, tied or within one run |
+| Bunt for hit | Bunt for hit, speed, batting left | Fast left-handed hitters with good bunt-for-hit | No rule yet: 5 |
+| Pitch around | Catcher framing, pitcher control | 8–9 only with a 70+ framer | 8 when the week's catcher has framing 9+; otherwise 5. Pitcher control waits for pitcher-level overrides (issue #87) |
+| Hold runners | Catcher arm, pitcher hold | 8–10 behind a weak arm (about 35); costs some stuff and control | 8 when the week's catcher has arm 3 or lower, 4 borderline; otherwise 5. Pitcher hold waits for pitcher-level overrides (issue #87) |
+| Infield shift | Middle-infield range; opposing hitters' pull tendency | 10 only with 65+ middle-infield range | 10 when the week's shortstop and second baseman both have range 8+; otherwise 5. The opponent's pull tendency: no rule yet |
+| Guard lines | SS and 2B range | High only with 70+ at both | 8 when both have range 9+; otherwise 5 |
+| Pinch hitting and platoons | Handedness splits: on file from Game 71 and used so far for the lineups by the starter's hand (section 11) | Player-level rules by pitcher hand | No rule yet: 5. The first rule to come, from each hitter's split |
 
-In the sample, a shortstop at range 8 cleared the shift gate while all three second basemen sat at a borderline 7, so the rule produced a moderate shift.
+**At Game 71** the week's lineup is the season lineup: the vs-RHP lineup gains 0.01 runs, under section 11's bar. It gives stealing 0 and baserunning 2, with the ten overrides of Running reads. Pitch around and hold runners are 5 on Ishida's framing and arm (7 and 7); against left-handers Tsumoto's framing 9 would give pitch around 8, and his arm 4 is borderline for hold runners. The shift is 5 and borderline, with Moon and Choi both at range 7, and guard lines 5. Hit and run is 5: the nine's best reads are 6.7 on avoid K's and 7.0 on Contact. The other sliders are 5, no rule yet.
 
 Shift and steal decisions also depend on the opponent's pull tendencies and catcher arms. That input needs opponent exports, which aren't available.
+
+### Running reads
+
+A runner's steals and baserunning are read like the talent estimator: the running ratings give a starting read fitted on the league, his own record moves it by w = n ÷ (n + k), and each read is set against the league's own centre, not zero (the owner, 22 October 2026). The calibration analysis of 23 October 2026, accepted by QA, measured the fits below on Game 71's 517 league hitters. Two defaults are the analysis's named revisions rather than its proposals: k = 55 (its R-k55) and the team value with the fewest overrides, adopted on 23 October and reviewed on 24 October (Assumptions: Steal weight, Team value rule).
+
+- **Steal success** is a logistic fit of SB out of SB + CS on speed and steal ability as separate terms. Steal ability carries it (0.21 a point on the logit: 43% at speed and steal ability 1, 84% at 10 and 10) and speed adds nothing measurable (0.0065, its interval across zero). His own success rate counts with k = 55 attempts. The method of moments gives 12.91, but that spread comes from short records: runners with 1 attempt, and with 3 or 4, run 8 to 9 points below their ratings (1 to 4 together, 5.4), probably because the game stops sending a runner who is caught. Among runners with 5 or more attempts the ratings explain everything. A runner's own wSB is a sum of his SB, CS and opportunities, so it adds nothing to his SB and CS as evidence.
+- **The break-even** is −runCS ÷ (runSB − runCS), with runSB and runCS recovered from the league's wSB column by least squares on SB, CS and opportunities, 1B + BB + HP − IBB: 0.244 and −0.521 at Game 71, so 68.1%. It is a season's run-value break-even, which suits a setting held for a week of games. wSB is exactly 0 for a hitter without an attempt.
+- **UBR** per time on base other than by a home run (H − HR + BB + HP) is a fit on baserunning and speed, a speed point worth 0.8 of a baserunning point (R² 0.40). The ratings explain essentially all its real spread, so his own UBR counts with k = 2,000 opportunities (2,077 measured). The league's centre is the opportunity-weighted mean over the hitters' pool (League percentiles › Peer pools): −0.009 runs per opportunity at Game 71, well below zero.
+- **Values:** a runner's steal value is 5 + (p̂ − p\*) ÷ 0.03 and his baserunning value 5 + (read − centre) ÷ 0.005, each held to 0–10 and rounded half up. The steps put the research's elite runner at 10.
+- **The team value** is the one that needs the fewest Player Strategy overrides across the team's hitters: every hitter in the team's batting views, Seattle's 12 at Game 71. A runner gets an override when his grade, before rounding, sits 2 or more steps from the team value, and the override carries his own value. Ties go to the lower value. Every runner then plays within 2 steps of his own value with the fewest entries in OOTP, and a runner without an override, a call-up say, plays at the team value.
+- **Labels:** steal values are calibrated. Baserunning values carry the research rule label: the read is calibrated, but no export shows how the slider moves UBR.
+- **Refits and fallback:** every fit refits per snapshot from the league files, and calibration is all or nothing per slider. Stealing needs league rows carrying speed, steal ability, SB and CS; baserunning needs baserunning, speed and UBR with the times on base. A slider whose fit can't run falls back. Stealing falls back to the research rule: team 2, an override of 9 for a runner with 10 speed and 10 steal ability, and 0 for steal rate 8+ with speed 3 or less, each labelled research rule, skipping the override gate, with the near-miss rule on their inputs. Baserunning falls back to 5, no rule yet. Game 42's league files carry none of the running columns, and Game 53's carry SB, CS, wSB and UBR without the ratings, so both fall back. With SB and CS but no wSB, the break-even falls back to Game 71's 68.1%.
+- **At Game 71:** stealing 0, with steal overrides for Geng 10, Wang 8, Obata 7, Moon 5 and Choi 4, and Kamimura borderline without one; baserunning 2, with overrides for Obata 10, Geng 9, Li 6, Wang 6 and Moon 5, and Shinn, Kawasaki and Ishida borderline without one. The left-handers' lineup changes neither team value.
 
 ## Lineup optimization
 
@@ -822,6 +845,8 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 | Platoon lineups | The splits complement the season models: the season evaluation never reads them, and they shape only the lineups against right- and left-handed starters, where a bench player may start; league ratios by batting hand, each hitter's own split weighted by the league's spread, and a change only for 3 runs per 152 games (the owner, 13 October 2026) |
 | Split upload windows | Split exports arrive through vs-left and vs-right windows in the Clubhouse, unrenamed; a stored file keeps its split through reloads, replacement, Export team and restore, and the file-name rule stays as a fallback (the owner, 13 October 2026) |
 | Prior shrink | Each component the evidence can move shrinks its prior toward 50 before the evidence mix, prior′ = 50 + s × (prior − 50), by its factor from Game 71's league fit (avoid K's 0.69, power 0.60, gap 0.35, eye 0.41, stuff 0.48, control 0.49); prior-driven components and the composites keep their prior; every factor held between 0 and 1 (the owner, 19 October 2026) |
+| Strategy settings | One team set for the week, read from the lineup against right-handed starters, with Player Strategy overrides for runners, since OOTP's Team Strategy holds no set by the starter's hand and the league simulates a week at a time; gated sliders all or nothing, near misses borderline, the end nearest neutral for a range or a word; graded only where data calibrates; a slider without a rule at 5, rules added one at a time from data, pinch hitting first; only the sacrifice bunt's rule to vary by situation; four labels; a record of applied settings comes with the manager's card (Phase 5) and the comparison of exports with the trends (Phase 6) (the owner, 22 October 2026) |
+| Running reads | Steal success and UBR read like the talent estimator: ratings fitted on the league per snapshot, the runner's own record moving the read by n ÷ (n + k), each read against the league's own centre, and steals graded against the break-even recovered from wSB (the owner, 22 October 2026). The defaults, k, the steps and the team value rule, are Assumptions |
 
 ### Assumptions
 
@@ -837,6 +862,9 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 | Inexperience discount | One step below the potential at an unlisted position | 9 |
 | Catcher runs | The fitted line (0.8 per 10 points) until framing, blocking and throwing are valued | 9 |
 | Prior-shrink factors | Game 71's league fit of the evidence on the prior | 7 |
+| Running slider steps | 3 points of success and 0.005 runs per opportunity a step, anchored on the research's elite runner at 10 | 10 |
+| Steal weight | k = 55 attempts, the attempt-weighted estimate, in place of the method of moments' 12.91 | 10 |
+| Team value rule | The slider value needing the fewest Player Strategy overrides across the team's hitters, ties to the lower value; the calibration analysis's attempt-weighted read is the alternative | 10 |
 
 ### Open questions
 
@@ -857,6 +885,8 @@ Decisions below are settled by the user and binding. Assumptions are proposed de
 - [x] Team names come in two forms, the city in the batting views and the abbreviation in the fielding view. Answered: every export uses the short code from now on, and the importer reads Seattle in the Game 42 and Game 53 exports as SEA, with no other map (the owner, 11 October 2026).
 - [ ] The starting catcher's rest days: the lineup model leaves him out of those games. Letting him DH on them would need a second lineup.
 - [x] The hitters' percentile pool: since Game 71 the league files list every hitter, not qualified ones only, which widens every evidence spread (K% from 4.66 to 7.05 points). Answered (the owner, 12 October 2026): 3.1 PA per team game, team by team, with affiliates at the league's most games; 199 of 517 hitters at Game 71, and all 199 at Game 53.
+- [ ] Pitcher-level overrides for hold runners and pitch around, and blending the two lineups' catcher settings across a week's games (the owner's issue #87).
+- [ ] How far does a slider step move UBR and steals in OOTP? The baserunning step is assumed; a record of applied settings and later exports would measure it (Phases 5 and 6).
 
 ## Delivery plan
 
@@ -885,13 +915,13 @@ Phase gates close in order. Inside a phase, modules follow the Depends on column
 | Talent estimator v0 | 7 | 4 | Metrics, scale conversion | Every fixture player gets an estimate and band; disagreements over one step are flagged |
 | Prior shrink | 7 | 4 | Talent estimator, lineups by the starter's hand | At Game 71 the six factors reproduce section 7's Prior shrink: Ishida at C in the season nine, 776.09 runs, gains of 0.01 and 18.14 by hand; with every factor at 1, every estimate and lineup is unchanged |
 | Defensive model and eligibility matrix | 9 | 4 | Scale conversion, fielding-view import | Every slot covered, DH included; non-catchers ineligible at C; DEF Pot caps the played position; the matrix reads the fielding fixtures' position ratings as the game gives them, and the fitted formula, rounded to a step and held to the scale, lands within one step of the game's rating for 95% of the league's position ratings (98.6% of 2,413 on the Game 70 export; first base is lowest, at 94.7%) |
-| Strategy rules engine | 10 | 4 | Talent estimator, defensive model | Gates read from configuration; the fixture yields a moderate shift |
+| Strategy rules engine | 10 | 4 | Talent estimator, defensive model, lineups by the starter's hand | Gates, steps, k and the override gate read from configuration; at Game 71, stealing 0 and baserunning 2 with the ten overrides of section 10's Running reads, and every other slider as section 10's Game 71 paragraph gives it |
 | Lineup selection with the assignment model | 11 | 4 | Talent estimator, defensive model | A legal nine and a backup catcher on Game 42 and Game 53, with CF and DH filled when enabled; the Game 53 nine is the one section 11 states |
 | Event rates and batting runs: the league's wOBA weights recovered per snapshot, event rates refit per snapshot, the hitters' pool floor | 8, 11 | 4 | Game 71 exports, talent estimator | On Game 71 the recovered weights give the export's wOBA within .0006 and its wRAA within 0.17 runs, the pool keeps 199 of 517 hitters, and the event-rate slopes are section 11's |
 | Batting order: Markov model with The Book fallback | 11 | 4 | Lineup selection, event rates and batting runs | Run expectancy matches hand-computed toy lineups (homer-or-strikeout gives 3h ÷ (1 − h) runs per inning); Game 71's order is Yamanaka, Obata, Kawasaki, Shinn, Kamimura, Geng, Moon, Tsumoto, Choi, the best of all 9! orders, with 732 PA at #1 to 598 at #9 |
 | Lineup v2: selection on the league-wOBA batting runs, the defensive blend, the catcher share and the exchange loop | 9, 11 | 4 | Event rates and batting runs, batting order | On Game 71: C Tsumoto (backup Ishida), 1B Shinn, 2B Choi, 3B Kawasaki, SS Moon, LF Kamimura, CF Geng, RF Obata, DH Yamanaka |
 | Lineups by the starter's hand: league platoon ratios, each hitter's own split weighted by the league's spread, the lineup v2 search per hand, and What to upload next's card for the batting splits | 11 | 4 | Split exports, lineup v2 | On Game 71 the ratios, weights and both lineups are section 11's: against right-handers Ishida catches, +4.99 runs per 152 games; against left-handers the season nine in a new order, +3.59; the season lineup unchanged |
-| Development planner | 12 | 4 | Talent estimator, defensive model | Selection rules from section 12 reproduce the sample example |
+| Development planner | 12 | 4 | Talent estimator, defensive model, strategy rules engine (its gates) | Selection rules from section 12 reproduce the sample example |
 | Consultation output | 3 | 4–5 | Strategy rules, lineup and batting order, development planner | Every recommendation shows its evidence and confidence |
 | Backtest across snapshots | 2 | 6 | Team store, talent estimator | Adding a second snapshot reports estimator error per player |
 
@@ -949,6 +979,8 @@ Tasks that depend on an open question (section 14) carry it in their charter and
 | BIZ-R, BIZ-L, BIZ-E, BIZ-U, BIZ-Z, BIZ-I | Balls in zone by difficulty: routine, likely, even, unlikely, remote and impossible, each with the number fielded (m) and the share fielded (%) |
 | FRM, ARM | Catcher framing runs; arm runs |
 | RNG, TC, PCT, CER, CERA, PB, RTO, SBA | Range factor, total chances, fielding percentage, catcher earned runs and ERA, passed balls, runners thrown out, stolen-base attempts |
+| Break-even (steals) | The success rate at which a steal's runs gained and lost balance, −runCS ÷ (runSB − runCS), with the run values recovered from the league's wSB column; 68.1% at Game 71 |
+| Opportunity (running) | For steals, 1B + BB + HP − IBB, wSB's own denominator; for baserunning, times on base other than by a home run, H − HR + BB + HP |
 
 ### Ratings and game terms
 
@@ -982,3 +1014,4 @@ Tasks that depend on an open question (section 14) carry it in their charter and
 | WE, INT | Work ethic; intelligence (baseball IQ) |
 | C Pot to RF Pot, P Pot | The game's potential rating at each position; "-" means he can't play there |
 | Fielding view | The owner's custom view from the Fielding screen: components, DEF, position potentials and fielding stats, for the team and the league |
+| Grade and value (sliders) | A slider's unrounded position on 0–10 from the running reads (the grade), and the grade rounded half up (the value entered in OOTP) |

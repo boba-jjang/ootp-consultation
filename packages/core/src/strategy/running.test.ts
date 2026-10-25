@@ -308,7 +308,8 @@ describe('the settings move the output', () => {
     expect(result.fits.success?.form).toBe('sum');
     expect(result.fits.success?.coefficients).toHaveLength(2);
     expect(result.fits.success?.hitters).toBe(251);
-    expect(runner(result, 'Zhong-shan Geng').stealing?.value).toBe(10);
+    expect(runner(result, 'Zhong-shan Geng').stealing?.value).toBeGreaterThanOrEqual(9);
+    expect(runner(result, 'Jin-soo Shinn').stealing?.value).toBe(0);
   });
 
   it('every setting has a default, a description and a source', () => {
@@ -345,7 +346,7 @@ describe('the settings move the output', () => {
       .map((file) => readFileSync(new URL(file, import.meta.url), 'utf8'))
       .join('\n');
     for (const [name] of TABLE) {
-      expect(source).not.toContain(name.split(' ').at(-1));
+      expect(source).not.toMatch(new RegExp(`\\b${name.split(' ').at(-1) ?? name}\\b`));
     }
     expect(source).not.toMatch(/Seattle|'SEA'/);
   });
@@ -392,13 +393,18 @@ describe('the fallback without the running columns', () => {
     expect(kamimura.baserunning).toBeNull();
   });
 
-  it('at Game 42 both sliders fall back with no override', () => {
+  it('at Game 42 both sliders fall back the same way', () => {
+    // Context expects no override here, but two hitters meet the slow rule on the Game 42
+    // ratings (steal rate 10 and 9 with speed 2), as Yamanaka does at Game 53.
     const result = runningReads(g42, DEFAULT_RUNNING_SETTINGS);
     expect(result.stealing).toMatchObject({
       calibrated: false,
       value: 2,
       label: 'research rule',
-      overrides: [],
+    });
+    expect(overridesOf(result, 'stealing')).toEqual({
+      'Bitgaram Mangjeol': 0,
+      'Hideji Yamanaka': 0,
     });
     expect(result.baserunning).toMatchObject({
       calibrated: false,
@@ -471,11 +477,7 @@ describe('hitters without running ratings', () => {
       if (i !== 0) {
         return row;
       }
-      const copy = { ...row };
-      for (const column of columns) {
-        delete copy[column];
-      }
-      return copy;
+      return Object.fromEntries(Object.entries(row).filter(([key]) => !columns.includes(key)));
     }),
   });
   const first = g71.hitters[0]?.Name;

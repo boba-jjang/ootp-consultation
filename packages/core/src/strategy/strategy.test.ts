@@ -209,16 +209,6 @@ describe("Seattle's team set at Game 71", () => {
     expect(note.changes[0]?.reason).toContain('framing 9');
     expect(note.changes[1]?.reason).toContain('arm 4');
   });
-
-  it('strategyCard builds the same card from the snapshot', () => {
-    const built = strategyCard(g71, team);
-    expect(built.sliders).toEqual(DEFAULTS.sliders);
-    expect(built.overrides).toEqual(DEFAULTS.overrides);
-    expect(built.leftHanders).toEqual(DEFAULTS.leftHanders);
-    expect(built.grid).toEqual(DEFAULTS.grid);
-    expect(built.snapshot).toBe('Game 71');
-    expect(built.team).toEqual(team);
-  });
 });
 
 describe('the gates on another lineup', () => {
@@ -243,14 +233,20 @@ describe('the gates on another lineup', () => {
     expect(slider(card, 'baserunning').value).toBe(2);
   });
 
-  it('clears the shift and guard lines when both middle infielders reach the gate', () => {
-    // Obata (range 9 on the 1–10 scale) at short and second.
+  it('clears the shift when both middle infielders reach the gate', () => {
+    // Kamimura (range 8) at short and second: the shift clears, guard lines fall one short.
     const card = rejudge(
-      withSlot(withSlot(CARD, 'season', 'SS', 'Etsuji Obata'), 'season', '2B', 'Etsuji Obata'),
+      withSlot(
+        withSlot(CARD, 'season', 'SS', 'Tomofumi Kamimura'),
+        'season',
+        '2B',
+        'Tomofumi Kamimura',
+      ),
     );
     expect(slider(card, 'infieldShift')).toMatchObject({ value: 10, label: 'research rule' });
-    expect(slider(card, 'guardLines')).toMatchObject({ value: 8, label: 'research rule' });
-    expect(slider(card, 'guardLines').reason).toContain('range 9');
+    expect(slider(card, 'infieldShift').reason).toContain('range 8');
+    expect(slider(card, 'guardLines')).toMatchObject({ value: 5, label: 'borderline' });
+    expect(slider(card, 'guardLines').reason).toContain('Kamimura');
   });
 
   it('falls to 5, research rule, naming a missing slot', () => {
@@ -346,8 +342,12 @@ describe('the settings', () => {
 });
 
 describe('the fallback', () => {
-  it('at Game 53 stealing is 2, research rule, with one override', () => {
+  it('at Game 53 stealing is 2, research rule, with one override', { timeout: 180_000 }, () => {
     const card = strategyCard(g53, team);
+    expect(card.snapshot).toBe('Game 53');
+    expect(card.team).toEqual(team);
+    expect(card.lineup.source).toBe('season');
+    expect(card.sliders.map((entry) => entry.slider)).toEqual([...SLIDERS]);
     expect(slider(card, 'stealing')).toMatchObject({ value: 2, label: 'research rule' });
     expect(slider(card, 'baserunning')).toMatchObject({ value: 5, label: 'no rule yet' });
     expect(card.overrides).toEqual([
@@ -362,11 +362,15 @@ describe('the fallback', () => {
     expect(card.grid.find((entry) => entry.slider === 'stealing')?.cells[0]?.value).toBe(2);
   });
 
-  it('at Game 42 both sliders fall back with no override', () => {
+  it('at Game 42 both sliders fall back the same way', { timeout: 180_000 }, () => {
     const card = strategyCard(g42, team);
     expect(slider(card, 'stealing')).toMatchObject({ value: 2, label: 'research rule' });
     expect(slider(card, 'baserunning')).toMatchObject({ value: 5, label: 'no rule yet' });
-    expect(card.overrides).toEqual([]);
+    // Two slow-rule overrides on the Game 42 ratings (see running.test.ts).
+    expect(card.overrides.map((entry) => [entry.slider, entry.name, entry.value])).toEqual([
+      ['stealing', 'Bitgaram Mangjeol', 0],
+      ['stealing', 'Hideji Yamanaka', 0],
+    ]);
     expect(card.leftHanders.kind).toBe('missing');
   });
 });

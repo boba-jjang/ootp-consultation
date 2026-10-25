@@ -320,6 +320,8 @@ The optimizer needs a player × position matrix. The listed position uses DEF, w
 
 ## Strategy rules
 
+> Superseded by the Knowledge Base › Strategy rules (rev 245, 25 October 2026): the three inning bands, the calibrated stealing and baserunning values, all-or-nothing gates and the four labels are there. The Seattle now column below predates the calibration and the splits.
+
 Sliders run 0–10 with 5 as the AI's neutral. Each one moves the AI's risk threshold for an action: 0 effectively forbids it, 10 authorizes it even at poor odds.
 
 ### Where settings apply

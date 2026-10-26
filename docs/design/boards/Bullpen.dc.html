@@ -1,14 +1,292 @@
-<!doctype html>
-<html lang="en">
-<head>
+<!DOCTYPE html>
+<html lang="en"><head>
 <meta charset="utf-8">
 <title>Bullpen and tactics</title>
-<script src="./support.js"></script>
+<script src="1e918b28-0241-4b86-8b63-b06a9127bb04"></script>
 </head>
 <body>
 <x-dc>
 <helmet>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap">
+<style>/* thai */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIf6MapbsEk7TDLdtEz1BwkWi6pgar3I1D8t.woff2) format('woff2');
+  unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIf6MapbsEk7TDLdtEz1BwkWkKpgar3I1D8t.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIf6MapbsEk7TDLdtEz1BwkWkapgar3I1D8t.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("8257ae4a-5ab2-4bac-aec1-08be2dcd5836") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* thai */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkebIl1U5_F_gUk0wzH.woff2) format('woff2');
+  unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkebIl1SJ_F_gUk0wzH.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkebIl1SZ_F_gUk0wzH.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkebIl1R5_F_gUk0w.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* thai */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkeQI51U5_F_gUk0wzH.woff2) format('woff2');
+  unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkeQI51SJ_F_gUk0wzH.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkeQI51SZ_F_gUk0wzH.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("cb247a8e-efa6-4029-9cc4-760c347fdab0") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* thai */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkeJI91U5_F_gUk0wzH.woff2) format('woff2');
+  unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkeJI91SJ_F_gUk0wzH.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/chakrapetch/v13/cIflMapbsEk7TDLdtEz1BwkeJI91SZ_F_gUk0wzH.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("f8bc7b0f-54ea-427e-bf14-1973510e3158") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ibmplexmono/v20/-F63fjptAgt5VM-kVkqdyU8n1iIq131nj-otFQ.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ibmplexmono/v20/-F63fjptAgt5VM-kVkqdyU8n1isq131nj-otFQ.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ibmplexmono/v20/-F63fjptAgt5VM-kVkqdyU8n1iAq131nj-otFQ.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ibmplexmono/v20/-F63fjptAgt5VM-kVkqdyU8n1iEq131nj-otFQ.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ibmplexmono/v20/-F63fjptAgt5VM-kVkqdyU8n1i8q131nj-o.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ibmplexmono/v20/-F6qfjptAgt5VM-kVkqdyU8n3twJwl1FgsAXHNlYzg.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ibmplexmono/v20/-F6qfjptAgt5VM-kVkqdyU8n3twJwlRFgsAXHNlYzg.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ibmplexmono/v20/-F6qfjptAgt5VM-kVkqdyU8n3twJwl9FgsAXHNlYzg.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ibmplexmono/v20/-F6qfjptAgt5VM-kVkqdyU8n3twJwl5FgsAXHNlYzg.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ibmplexmono/v20/-F6qfjptAgt5VM-kVkqdyU8n3twJwlBFgsAXHNk.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ibmplexmono/v20/-F6qfjptAgt5VM-kVkqdyU8n3vAOwl1FgsAXHNlYzg.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ibmplexmono/v20/-F6qfjptAgt5VM-kVkqdyU8n3vAOwlRFgsAXHNlYzg.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ibmplexmono/v20/-F6qfjptAgt5VM-kVkqdyU8n3vAOwl9FgsAXHNlYzg.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ibmplexmono/v20/-F6qfjptAgt5VM-kVkqdyU8n3vAOwl5FgsAXHNlYzg.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/ibmplexmono/v20/-F6qfjptAgt5VM-kVkqdyU8n3vAOwlBFgsAXHNk.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
 <style>
 body{margin:0;background:#0A1118}
 *,*::before,*::after{box-sizing:border-box}
@@ -22,21 +300,21 @@ button,input{font:inherit}
 
 <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 24px; padding: 4px clamp(16px, 3vw, 32px); border-bottom: 1px solid rgba(245,247,250,0.08)">
 <div style="display: flex; align-items: center; gap: 2px">
-<a href="Main.dc.html" aria-label="Lineup card" style="display: flex; align-items: center; justify-content: center; width: 40px; min-height: 48px; text-decoration: none"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M5 19 L19 5 M9 5 L19 5 L19 15" style="fill: none; stroke: #E5A93C; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"></path></svg></a>
+<a href="Main.dc.html" aria-label="Lineup card" style="display: flex; align-items: center; justify-content: center; width: 40px; min-height: 48px; text-decoration: none"><svg sc-camel-view-box="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M5 19 L19 5 M9 5 L19 5 L19 15" style="fill: none; stroke: #E5A93C; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"></path></svg></a>
 <button type="button" aria-haspopup="menu" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 10px; background: transparent; color: #F5F7FA; border: 0; border-radius: 4px; cursor: pointer">
 <span style="font-size: 17px; font-weight: 700; letter-spacing: 0.02em">Seattle Arrows</span>
 <span style="padding: 1px 6px; border: 1px solid rgba(245,247,250,0.20); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 11px; color: #9AA7B4">RSL</span>
-<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false"><path d="M6 9 L12 15 L18 9" style="fill: none; stroke: #9AA7B4; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"></path></svg>
+<svg sc-camel-view-box="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false"><path d="M6 9 L12 15 L18 9" style="fill: none; stroke: #9AA7B4; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"></path></svg>
 </button>
 </div>
 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 20px; font-size: 13px; color: #9AA7B4">
 <div style="display: flex; align-items: center">
 <label for="snapshot" style="padding-right: 4px">Snapshot</label>
-<button type="button" aria-label="Previous snapshot" disabled="{{ true }}" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: transparent; color: #9AA7B4; border: 0; opacity: 0.4; cursor: not-allowed"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M15 6 L9 12 L15 18" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"></path></svg></button>
-<select id="snapshot" style="min-height: 44px; padding: 0 10px; background: #0D161D; color: #F5F7FA; border: 1px solid rgba(245,247,250,0.18); border-radius: 4px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px">
+<button type="button" aria-label="Previous snapshot" disabled="{{ true }}" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: transparent; color: #9AA7B4; border: 0; opacity: 0.4; cursor: not-allowed"><svg sc-camel-view-box="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M15 6 L9 12 L15 18" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"></path></svg></button>
+<sc-raw-select id="snapshot" style="min-height: 44px; padding: 0 10px; background: #0D161D; color: #F5F7FA; border: 1px solid rgba(245,247,250,0.18); border-radius: 4px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px">
 <option value="42">Game 42 (latest)</option>
-</select>
-<button type="button" aria-label="Next snapshot" disabled="{{ true }}" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: transparent; color: #9AA7B4; border: 0; opacity: 0.4; cursor: not-allowed"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M9 6 L15 12 L9 18" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"></path></svg></button>
+</sc-raw-select>
+<button type="button" aria-label="Next snapshot" disabled="{{ true }}" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: transparent; color: #9AA7B4; border: 0; opacity: 0.4; cursor: not-allowed"><svg sc-camel-view-box="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M9 6 L15 12 L9 18" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"></path></svg></button>
 </div>
 <a href="Clubhouse.dc.html" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 1px solid rgba(245,247,250,0.14); border-radius: 4px; color: #9AA7B4; text-decoration: none">Confidence<span aria-hidden="true" style="display: flex; gap: 3px"><span style="width: 14px; height: 6px; border-radius: 1px; background: #2ECC71"></span><span style="width: 14px; height: 6px; border-radius: 1px; background: #2ECC71"></span><span style="width: 14px; height: 6px; border-radius: 1px; background: #2ECC71"></span></span><span style="font-weight: 600; color: #2ECC71">High</span></a>
 <span style="display: flex; align-items: center; gap: 6px">DH<span style="color: #F5F7FA">on</span></span>
@@ -47,7 +325,7 @@ button,input{font:inherit}
 <nav aria-label="Modules" style="padding: 0 clamp(2px, 2vw, 18px); border-bottom: 1px solid rgba(245,247,250,0.08)">
 <ul style="display: flex; flex-wrap: wrap; margin: 0; padding: 0; list-style: none">
 <li><a href="Clubhouse.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-bottom: 2px solid transparent; font-size: 14px; color: #9AA7B4; text-decoration: none">Clubhouse</a></li>
-<li><a href="#talent-radar" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-bottom: 2px solid transparent; font-size: 14px; color: #9AA7B4; text-decoration: none">Talent radar</a></li>
+<li><a href="TalentRadar.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-bottom: 2px solid transparent; font-size: 14px; color: #9AA7B4; text-decoration: none">Talent radar</a></li>
 <li><a href="Main.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-bottom: 2px solid transparent; font-size: 14px; color: #9AA7B4; text-decoration: none">Lineup card</a></li>
 <li><a href="Bullpen.dc.html" aria-current="page" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-bottom: 2px solid #E5A93C; font-size: 14px; font-weight: 600; color: #F5F7FA; text-decoration: none">Bullpen &amp; tactics</a></li>
 <li><a href="#dev-lab" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-bottom: 2px solid transparent; font-size: 14px; color: #9AA7B4; text-decoration: none">Dev lab</a></li>
@@ -67,63 +345,88 @@ button,input{font:inherit}
 <h2 id="monitor-title" style="margin: 0; font-size: 17px; font-weight: 600">Pitching regression monitor</h2>
 <ul style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin: 0; padding: 0; list-style: none; font-size: 13px; color: #9AA7B4">
 <li style="display: flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 50%; border: 2px solid #F5F7FA"></span>ERA</li>
-<li style="display: flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 50%; background: #9AA7B4"></span>xERA</li>
+<li style="display: flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 20px; height: 10px; border-radius: 2px; background: rgba(245,247,250,0.18)"></span>FIP, SIERA, xERA range</li>
+<li style="display: flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 2px; height: 14px; background: #F5F7FA"></span>Middle estimate</li>
 <li style="color: #2ECC71">▲ Should improve</li>
 <li style="color: #E8706C">▼ Should decline</li>
 </ul>
 </div>
 
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 14px 16px; background: rgba(229,169,60,0.07); border: 1px solid rgba(229,169,60,0.50); border-radius: 6px">
+<div style="display: flex; align-items: flex-start; gap: 10px">
+<svg sc-camel-view-box="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" style="flex: none; margin-top: 2px"><path d="M12 3 L22 20 L2 20 Z M12 10 L12 14 M12 17 L12 17.2" style="fill: none; stroke: #E5A93C; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h3 style="margin: 0; font-size: 15px; font-weight: 600">Decide who closes</h3>
+<p style="margin: 0; font-size: 14px; line-height: 1.5; color: #C9D2DB">Hsia is closing in practice, with 11 saves and the staff's top leverage (1.83 pLI). Inouye still holds the CL tag, with 1 save and 11 holds.</p>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #0D161D; border: 1px solid rgba(245,247,250,0.10); border-radius: 4px">
+<span style="font-size: 14px; font-weight: 600">Keep Hsia closing</span>
+<span style="font-size: 13px; line-height: 1.5; color: #9AA7B4">Control 9 and zero walks are real. Stuff 6 says his 14.4 K/9 will fall.</span>
+<button type="button" style="align-self: flex-start; min-height: 44px; padding: 0 14px; background: transparent; color: #E5A93C; border: 1px solid rgba(229,169,60,0.55); border-radius: 4px; font-weight: 600; cursor: pointer">Make Hsia the closer</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #0D161D; border: 1px solid rgba(245,247,250,0.10); border-radius: 4px">
+<span style="font-size: 14px; font-weight: 600">Give Inouye the ninth</span>
+<span style="font-size: 13px; line-height: 1.5; color: #9AA7B4">Stuff 10 and 11.5 K/9 with bad contact luck. HR avoidance 4 and an extreme fly-ball lean are real risks.</span>
+<button type="button" style="align-self: flex-start; min-height: 44px; padding: 0 14px; background: transparent; color: #E5A93C; border: 1px solid rgba(229,169,60,0.55); border-radius: 4px; font-weight: 600; cursor: pointer">Make Inouye the closer</button>
+</div>
+</div>
+</div>
+
 <div style="overflow-x: auto">
-<div style="min-width: 760px; display: flex; flex-direction: column">
-<div aria-hidden="true" style="display: grid; grid-template-columns: minmax(150px, 1.3fr) 34px 46px 44px 44px 44px 40px minmax(150px, 2fr) 128px; gap: 10px; align-items: end; padding-bottom: 8px; border-bottom: 1px solid rgba(245,247,250,0.16); font-size: 12px; color: #9AA7B4">
-<span>Pitcher</span><span>Role</span><span style="text-align: right">IP</span><span style="text-align: right">ERA</span><span style="text-align: right">FIP</span><span style="text-align: right">xERA</span><span style="text-align: right">pLI</span>
+<div style="min-width: 800px; display: flex; flex-direction: column">
+<div aria-hidden="true" style="display: grid; grid-template-columns: minmax(140px, 1.3fr) 34px 44px 44px 48px 44px 40px minmax(140px, 1.6fr) 190px; gap: 10px; align-items: end; padding-bottom: 8px; border-bottom: 1px solid rgba(245,247,250,0.16); font-size: 12px; color: #9AA7B4">
+<span>Pitcher</span><span>Role</span><span style="text-align: right">ERA</span><span style="text-align: right">FIP</span><span style="text-align: right">SIERA</span><span style="text-align: right">xERA</span><span style="text-align: right">pLI</span>
 <span style="position: relative; display: block; height: 18px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace"><span style="position: absolute; left: 0%">0</span><span style="position: absolute; left: 26.67%; transform: translateX(-50%)">2</span><span style="position: absolute; left: 53.33%; transform: translateX(-50%)">4</span><span style="position: absolute; left: 80%; transform: translateX(-50%)">6</span></span>
 <span>Next</span>
 </div>
 
 <p style="margin: 0; padding: 14px 0 4px; font-size: 13px; font-weight: 600; color: #9AA7B4">Rotation</p>
 <sc-for list="{{rotation}}" as="p" hint-placeholder-count="5">
-<div style="display: grid; grid-template-columns: minmax(150px, 1.3fr) 34px 46px 44px 44px 44px 40px minmax(150px, 2fr) 128px; gap: 10px; align-items: center; min-height: 44px; padding: 6px 0; border-bottom: 1px solid rgba(245,247,250,0.08)">
+<div style="display: grid; grid-template-columns: minmax(140px, 1.3fr) 34px 44px 44px 48px 44px 40px minmax(140px, 1.6fr) 190px; gap: 10px; align-items: center; min-height: 52px; padding: 6px 0; border-bottom: 1px solid rgba(245,247,250,0.08)">
 <span style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.name}}</span><span style="font-size: 11px; line-height: 1.3; color: #9AA7B4">{{p.tag}}</span></span>
 <span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #9AA7B4">{{p.role}}</span>
-<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right">{{p.ip}}</span>
-<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right">{{p.eraS}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right; font-weight: 600">{{p.eraS}}</span>
 <span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right; color: #9AA7B4">{{p.fipS}}</span>
-<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; font-weight: 600; text-align: right">{{p.xeraS}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right; color: #9AA7B4">{{p.sieraS}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right; color: #9AA7B4">{{p.xeraS}}</span>
 <span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right; color: #9AA7B4">{{p.pli}}</span>
 <span aria-hidden="true" style="position: relative; display: block; height: 20px">
 <span style="position: absolute; left: 0; right: 0; top: 9px; height: 2px; background: rgba(245,247,250,0.08)"></span>
-<span style="position: absolute; top: 8px; height: 4px; left: {{p.barL}}%; width: {{p.barW}}%; background: {{p.tone}}; opacity: 0.5; border-radius: 2px"></span>
+<span style="position: absolute; top: 5px; height: 10px; left: {{p.loX}}%; width: {{p.rangeW}}%; border-radius: 2px; background: rgba(245,247,250,0.18)"></span>
+<span style="position: absolute; top: 9px; height: 2px; left: {{p.barL}}%; width: {{p.barW}}%; background: {{p.tone}}"></span>
+<span style="position: absolute; top: 2px; left: {{p.midX}}%; width: 2px; height: 16px; margin-left: -1px; background: #F5F7FA"></span>
 <span style="position: absolute; top: 4px; left: {{p.eraX}}%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; border: 2px solid #F5F7FA; background: #121D24"></span>
-<span style="position: absolute; top: 4px; left: {{p.xX}}%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: {{p.tone}}"></span>
 </span>
-<span style="font-size: 13px; font-weight: 600; white-space: nowrap; color: {{p.sigColor}}">{{p.sig}}</span>
+<span style="display: flex; flex-direction: column; gap: 1px; min-width: 0"><span style="font-size: 13px; font-weight: 600; white-space: nowrap; color: {{p.sigColor}}">{{p.sig}}</span><span style="font-size: 12px; line-height: 1.35; color: #9AA7B4">{{p.why}}</span></span>
 </div>
 </sc-for>
 
 <p style="margin: 0; padding: 14px 0 4px; font-size: 13px; font-weight: 600; color: #9AA7B4">Bullpen, by leverage</p>
 <sc-for list="{{bullpen}}" as="p" hint-placeholder-count="8">
-<div style="display: grid; grid-template-columns: minmax(150px, 1.3fr) 34px 46px 44px 44px 44px 40px minmax(150px, 2fr) 128px; gap: 10px; align-items: center; min-height: 44px; padding: 6px 0; border-bottom: 1px solid rgba(245,247,250,0.08)">
+<div style="display: grid; grid-template-columns: minmax(140px, 1.3fr) 34px 44px 44px 48px 44px 40px minmax(140px, 1.6fr) 190px; gap: 10px; align-items: center; min-height: 52px; padding: 6px 0; border-bottom: 1px solid rgba(245,247,250,0.08)">
 <span style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.name}}</span><span style="font-size: 11px; line-height: 1.3; color: #9AA7B4">{{p.tag}}</span></span>
 <span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #9AA7B4">{{p.role}}</span>
-<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right">{{p.ip}}</span>
-<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right">{{p.eraS}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right; font-weight: 600">{{p.eraS}}</span>
 <span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right; color: #9AA7B4">{{p.fipS}}</span>
-<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; font-weight: 600; text-align: right">{{p.xeraS}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right; color: #9AA7B4">{{p.sieraS}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right; color: #9AA7B4">{{p.xeraS}}</span>
 <span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; text-align: right; color: #9AA7B4">{{p.pli}}</span>
 <span aria-hidden="true" style="position: relative; display: block; height: 20px">
 <span style="position: absolute; left: 0; right: 0; top: 9px; height: 2px; background: rgba(245,247,250,0.08)"></span>
-<span style="position: absolute; top: 8px; height: 4px; left: {{p.barL}}%; width: {{p.barW}}%; background: {{p.tone}}; opacity: 0.5; border-radius: 2px"></span>
+<span style="position: absolute; top: 5px; height: 10px; left: {{p.loX}}%; width: {{p.rangeW}}%; border-radius: 2px; background: rgba(245,247,250,0.18)"></span>
+<span style="position: absolute; top: 9px; height: 2px; left: {{p.barL}}%; width: {{p.barW}}%; background: {{p.tone}}"></span>
+<span style="position: absolute; top: 2px; left: {{p.midX}}%; width: 2px; height: 16px; margin-left: -1px; background: #F5F7FA"></span>
 <span style="position: absolute; top: 4px; left: {{p.eraX}}%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; border: 2px solid #F5F7FA; background: #121D24"></span>
-<span style="position: absolute; top: 4px; left: {{p.xX}}%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: {{p.tone}}"></span>
 </span>
-<span style="font-size: 13px; font-weight: 600; white-space: nowrap; color: {{p.sigColor}}">{{p.sig}}</span>
+<span style="display: flex; flex-direction: column; gap: 1px; min-width: 0"><span style="font-size: 13px; font-weight: 600; white-space: nowrap; color: {{p.sigColor}}">{{p.sig}}</span><span style="font-size: 12px; line-height: 1.35; color: #9AA7B4">{{p.why}}</span></span>
 </div>
 </sc-for>
 </div>
 </div>
 
-<p style="margin: 0; font-size: 13px; color: #9AA7B4">A signal fires when ERA and xERA sit a full run apart. Role check: Hsia carries the staff's top leverage (1.83 pLI) and 11 saves, while Inouye holds the CL tag with 1 save and 11 holds.</p>
+<p style="margin: 0; font-size: 13px; color: #9AA7B4">Signals compare ERA with the middle of FIP, SIERA and xERA. When that gap is under a run, or a pitcher has faced fewer than 70 batters, the Talent radar's read of his ratings decides.</p>
 </section>
 
 <section aria-labelledby="settings-title" style="flex: 2 1 360px; min-width: 0; display: flex; flex-direction: column; padding: 20px; background: #121D24; border: 1px solid rgba(245,247,250,0.08); border-radius: 6px">
@@ -201,7 +504,7 @@ button,input{font:inherit}
 </main>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1440}}'>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1780}}">
 class Component extends DCLogic {
   renderVals() {
     var MAX = 7.5;
@@ -212,49 +515,64 @@ class Component extends DCLogic {
       var parts = s.split('.');
       return Number(parts[0]) + (parts[1] ? Number(parts[1]) / 3 : 0);
     }
-    function arm(name, role, ip, era, fip, xera, pli) {
-      var gap = xera - era;
-      var dir = gap >= 1 ? 'down' : (gap <= -1 ? 'up' : 'flat');
-      var tone = dir === 'down' ? '#D9534F' : (dir === 'up' ? '#2ECC71' : '#9AA7B4');
+    function arm(name, role, bf, era, fip, siera, xera, pli, lean, why) {
+      var ests = [fip, siera, xera].sort(function (x, y) { return x - y; });
+      var lo = ests[0];
+      var mid = ests[1];
+      var hi = ests[2];
+      var gap = mid - era;
+      var small = bf < 70;
+      var dir = 0;
+      if (small) {
+        dir = lean;
+      } else if (Math.abs(gap) >= 1) {
+        dir = gap > 0 ? 1 : -1;
+      } else if (Math.abs(gap) >= 0.5 && lean !== 0 && (lean > 0) === (gap > 0)) {
+        dir = lean;
+      }
       return {
         name: name,
         role: role,
-        ip: ip,
         pli: pli,
+        tag: small ? 'Small sample, ' + bf + ' batters faced' : '',
         eraS: era.toFixed(2),
         fipS: fip.toFixed(2),
+        sieraS: siera.toFixed(2),
         xeraS: xera.toFixed(2),
         eraX: pct(era),
-        xX: pct(xera),
-        barL: pct(Math.min(era, xera)),
-        barW: pct(Math.abs(era - xera)),
-        tone: tone,
-        sig: dir === 'down' ? '▼ Should decline' : (dir === 'up' ? '▲ Should improve' : 'Holding steady'),
-        sigColor: dir === 'down' ? '#E8706C' : (dir === 'up' ? '#2ECC71' : '#9AA7B4'),
-        tag: innings(ip) < 20 ? 'Small sample' : ''
+        midX: pct(mid),
+        loX: pct(lo),
+        rangeW: Math.max(0.8, pct(hi) - pct(lo)),
+        barL: pct(Math.min(era, mid)),
+        barW: pct(Math.abs(era - mid)),
+        tone: dir > 0 ? '#D9534F' : (dir < 0 ? '#2ECC71' : '#9AA7B4'),
+        sig: dir > 0 ? '▼ Should decline' : (dir < 0 ? '▲ Should improve' : 'Holding steady'),
+        sigColor: dir > 0 ? '#E8706C' : (dir < 0 ? '#2ECC71' : '#9AA7B4'),
+        why: why
       };
     }
     return {
       rotation: [
-        arm('Su-shun Nie', 'SP', '57.1', 2.51, 4.19, 4.32, '1.03'),
-        arm('Chua chay Niu', 'SP', '53.0', 3.74, 3.93, 4.07, '0.95'),
-        arm('Hajime Ito', 'SP', '52.2', 3.59, 4.24, 4.56, '1.08'),
-        arm('Jeong Lee', 'SP', '45.0', 5.20, 4.18, 3.51, '0.98'),
-        arm('Yasuhiro Katayama', 'SP', '37.1', 5.30, 4.67, 2.63, '1.06')
+        arm('Su-shun Nie', 'SP', 232, 2.51, 4.19, 5.23, 4.32, '1.03', 0, 'Estimators run 1.8 above his ERA'),
+        arm('Chua chay Niu', 'SP', 221, 3.74, 3.93, 3.02, 4.07, '0.95', 1, 'Estimators agree with his ERA'),
+        arm('Hajime Ito', 'SP', 228, 3.59, 4.24, 4.19, 4.56, '1.08', 1, '8.9% HR per fly ball despite HR avoidance 3'),
+        arm('Jeong Lee', 'SP', 202, 5.20, 4.18, 3.30, 3.51, '0.98', -1, 'Estimators run 1.7 below; .366 BABIP'),
+        arm('Yasuhiro Katayama', 'SP', 167, 5.30, 4.67, 4.04, 2.63, '1.06', 1, 'Estimators run 1.3 below his ERA')
       ],
       bullpen: [
-        arm('Jimmy Hsia', 'RP', '15.2', 0.57, 0.06, 2.49, '1.83'),
-        arm('Hwi-gon Chun', 'RP', '12.1', 3.65, 4.38, 4.60, '1.52'),
-        arm('Xiong Loh', 'RP', '18.0', 1.00, 2.81, 2.70, '1.23'),
-        arm('Yoichibei Inouye', 'CL', '25.0', 6.84, 4.85, 3.20, '1.12'),
-        arm('Kiyohiro Kaneshiro', 'RP', '32.1', 4.73, 4.70, 3.94, '1.04'),
-        arm('Tse-peng Gong', 'RP', '19.0', 4.74, 5.51, 4.58, '0.86'),
-        arm('Midori Murakami', 'RP', '6.1', 0.00, 0.88, 0.42, '0.84'),
-        arm('Hyun-koo Ka', 'RP', '21.0', 5.14, 4.11, 4.56, '0.72')
+        arm('Jimmy Hsia', 'RP', 58, 0.57, 0.06, 0.10, 2.49, '1.83', 1, '43.1% K rate is far ahead of stuff 6'),
+        arm('Hwi-gon Chun', 'RP', 56, 3.65, 4.38, 3.85, 4.60, '1.52', 0, 'His reads conflict; too early to call'),
+        arm('Xiong Loh', 'RP', 70, 1.00, 2.81, 2.76, 2.70, '1.23', 1, 'Estimators run 1.8 above his ERA'),
+        arm('Yoichibei Inouye', 'CL', 116, 6.84, 4.85, 2.91, 3.20, '1.12', -1, 'Estimators run 3.6 below; .394 BABIP allowed'),
+        arm('Kiyohiro Kaneshiro', 'RP', 159, 4.73, 4.70, 4.72, 3.94, '1.04', 0, 'Estimators agree with his ERA'),
+        arm('Tse-peng Gong', 'RP', 82, 4.74, 5.51, 3.88, 4.58, '0.86', 1, 'Estimators agree with his ERA'),
+        arm('Midori Murakami', 'RP', 21, 0.00, 0.88, 0.15, 0.42, '0.84', 1, 'Every rate is ahead of his ratings'),
+        arm('Hyun-koo Ka', 'RP', 96, 5.14, 4.11, 5.03, 4.56, '0.72', 1, 'Estimators and ratings point opposite ways')
       ]
     };
   }
 }
 </script>
-</body>
-</html>
+
+
+</body></html>

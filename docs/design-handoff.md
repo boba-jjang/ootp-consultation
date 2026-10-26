@@ -67,7 +67,7 @@ Canvas: https://claude.ai/artifact/Q1MymJ7UG3qEdLxVXEq2D5 (11 boards). The Imple
   - locked features stay visible with a lock icon and say what unlocks them
   - 44px minimum tap targets
 
-## Not designed yet
+## Not designed yet (as of 3 October; see the 25 October notes below)
 - Talent radar: should show the estimator's prior vs. evidence, with confidence bands
 - The situational (inning band and score state) strategy view
 - Trends across snapshots
@@ -91,3 +91,10 @@ Notes added from the owner's Lineup card decision (18 October 2026):
 - The lineups by the starter's hand show through a Season / vs RHP / vs LHP selector above the Dugout's defensive alignment and batting order. Season is the default. Each hand's view marks what changed from the season lineup and shows its gain. The owner chose this over a separate two-card panel.
 - Without hitters' ratings the Lineup card locks and names the ratings view. This replaces the alignment's degradation rule above ("listed positions only, batting order from hitting alone, CF unassigned") and the DiamondNoRatings board: without `custom_bat_pot` no hitter has a batting estimate, so no order from hitting alone exists. Model gaps (no DH, a short lineup, no splits) are states inside the screen, not module locks.
 - The advisor drawer and the manager's card arrive with the advisor in Phase 5.
+
+Notes added from the canvas export of 25 October 2026 (`docs/design/boards/`, 12 boards):
+
+- A first Talent radar board: a roster table (filters All, Hitters, Pitchers, Flagged; biggest gap first) beside a player inspector with one 1–10 track per component (rating diamond, evidence dot, estimate bar and band), a stance pill per component (Stats move it, Stats move it slowly, Prior-driven) and the verdicts ▼ Running hot, ▲ Running cold, ◆ Below scouting and Consistent. Its numbers are Game 42 mock reads with four components a side. The build adds Gap, the rebuilt Contact and Movement, the shrunk prior, league percentiles and the degradation states per `docs/design/design-decisions-phase-4.md` § 2. Its line "barrel rate, chase rate and HR per fly ball have no threshold set yet" is wrong per the Knowledge Base (see that document's adoption notes).
+- The Dugout gained a Bench panel (backup catcher, utility infielder, pinch runner). The Lineup card already shows the backup catcher and the bench.
+- The Bullpen's regression monitor compares ERA with the middle of FIP, SIERA and xERA and defers to the Talent radar under a run of gap or 70 batters faced, and adds a "Decide who closes" choice (Hsia or Inouye). The Knowledge Base's regression signal (estimator first, xERA one input) still governs the build.
+- The Bullpen's Tactical settings (one value per slider, five sliders) are superseded by the strategy rules engine (#89): one set for the week with the three inning bands and four score states, per-runner overrides, four labels and the left-handers' note. The strategy view, the manager's card, trends and the league-file home are drawn in this repository from `docs/design/design-decisions-phase-4.md`, the design chat's answers to `docs/design/design-ask-phase-4.md`.

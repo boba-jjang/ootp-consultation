@@ -73,7 +73,10 @@ describe('the lock framework', () => {
         { side: 'hitters', set: 'stats' },
         { side: 'hitters', set: 'ratings' },
       ],
-      bullpen: [{ side: 'pitchers', set: 'stats' }],
+      bullpen: [
+        { side: 'hitters', set: 'stats' },
+        { side: 'hitters', set: 'ratings' },
+      ],
       'dev-lab': [
         { side: 'hitters', set: 'ratings' },
         { side: 'pitchers', set: 'ratings' },
@@ -130,12 +133,33 @@ describe('the lock framework', () => {
     for (const coverage of [fixtures('seattle-g42'), fixtures('seattle-g53')]) {
       for (const module of MODULES.slice(1)) {
         expect(gate(module, coverage)).toEqual(
-          module.id === 'lineup-card'
+          module.id === 'lineup-card' || module.id === 'bullpen'
             ? { kind: 'open' }
             : { kind: 'arrives', phase: 'Phase 4', missing: [] },
         );
       }
     }
+  });
+
+  it('opens Bullpen & tactics on hitter stats and ratings, like the Lineup card', () => {
+    const bullpen = MODULES[3];
+    expect(bullpen.id).toBe('bullpen');
+    expect(bullpen.label).toBe('Bullpen & tactics');
+    expect(bullpen.arrives).toBeNull();
+    expect(bullpen.needs).toEqual(MODULES[2].needs);
+    expect(gate(bullpen, withSets({ side: 'hitters', set: 'stats' }))).toEqual({
+      kind: 'locked',
+      missing: [{ side: 'hitters', set: 'ratings' }],
+    });
+    // Nothing on this screen reads the pitchers: their stats alone open nothing.
+    expect(gate(bullpen, withSets({ side: 'pitchers', set: 'stats' })).kind).toBe('locked');
+    expect(
+      gate(
+        bullpen,
+        withSets({ side: 'hitters', set: 'stats' }, { side: 'hitters', set: 'ratings' }),
+      ),
+    ).toEqual({ kind: 'open' });
+    expect(gate(bullpen, fixtures('seattle-g71'))).toEqual({ kind: 'open' });
   });
 
   it('opens the Lineup card on hitter stats and ratings, and locks it on either alone', () => {

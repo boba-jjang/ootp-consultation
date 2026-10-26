@@ -20,6 +20,17 @@ import {
 
 import { splitCard } from '../clubhouse/copy.ts';
 import type { BoardCard } from '../lineup/copy.ts';
+import type { BoardCard as StrategyBoardCard } from '../strategy/copy.ts';
+import type {
+  GridCell,
+  RunnerEntry,
+  RunnerRatings,
+  RunnerSlider,
+  RunningOverride,
+  SliderId,
+  StrategyLabel,
+  StrategySetting,
+} from '@ootp/core';
 import type { PendingFile } from '../setup/exports.ts';
 
 /**
@@ -520,4 +531,416 @@ export const SHEET_LINEUP_SHORT: BoardCard = {
       message: 'No eligible hitter for 1B: the lineup is short.',
     },
   ],
+};
+
+/* ---- The strategy view ---------------------------------------------------------------- */
+
+const INNING_BANDS = ['1-6', '7-8', '9+'] as const;
+const SCORE_STATES = ['tied', 'one-run', 'close', 'blowout'] as const;
+
+const setting = (
+  slider: SliderId,
+  value: number,
+  label: StrategyLabel,
+  reason: string,
+): StrategySetting => ({ slider, value, label, reason });
+
+const noRuleSetting = (slider: SliderId, name: string) =>
+  setting(slider, 5, 'no rule yet', `${name} has no rule yet, so it stays at 5.`);
+
+/** Twelve cells per slider, each at the team value: no rule varies by situation yet. */
+const gridOf = (sliders: readonly StrategySetting[]) =>
+  sliders.map((entry) => ({
+    slider: entry.slider,
+    cells: INNING_BANDS.flatMap((band) =>
+      SCORE_STATES.map((state): GridCell => ({ band, state, value: entry.value })),
+    ),
+  }));
+
+const HIT_AND_RUN_REASON =
+  "9 of the 9 read under the 9+ gate on avoid K's or Contact; the best reads are Shinn's avoid K's 6.66 and Yamanaka's Contact 6.96, so hit and run stays at 5.";
+
+/** The team's runners in roster order: name, speed, steal ability, baserunning, steal rate, SB, CS. */
+type RunnerSpec = [string, number, number, number, number, number, number];
+
+const RUNNER_SPECS: RunnerSpec[] = [
+  ['Yoshitsugu Ishida', 1, 2, 1, 2, 0, 0],
+  ['Jin-soo Shinn', 1, 1, 1, 1, 0, 0],
+  ['Han-lee Choi', 3, 5, 3, 4, 0, 0],
+  ['Manichiro Kawasaki', 3, 3, 5, 3, 0, 0],
+  ['Dong-hee Moon', 4, 6, 6, 8, 0, 0],
+  ['Tomofumi Kamimura', 4, 4, 3, 9, 0, 0],
+  ['Zhong-shan Geng', 7, 10, 10, 8, 14, 3],
+  ['Etsuji Obata', 9, 7, 10, 7, 2, 1],
+  ['Hideji Yamanaka', 2, 2, 1, 9, 0, 0],
+  ['Ling-lai Li', 3, 3, 9, 7, 0, 0],
+  ['Daniel Wang', 7, 8, 5, 6, 3, 1],
+  ['Yasuhiro Tsumoto', 1, 4, 4, 3, 0, 2],
+];
+
+/** Each runner's reads at Game 71: p̂, his stealing grade, UBR a time on base, his baserunning grade. */
+const RUNNER_READS: Record<string, [number, number, number, number]> = {
+  'Yoshitsugu Ishida': [0.48, 0, -0.0319, 0.45],
+  'Jin-soo Shinn': [0.429, 0, -0.0337, 0.08],
+  'Han-lee Choi': [0.637, 3.53, -0.0221, 2.4],
+  'Manichiro Kawasaki': [0.536, 0.17, -0.0165, 3.52],
+  'Dong-hee Moon': [0.686, 5.17, -0.0103, 4.76],
+  'Tomofumi Kamimura': [0.589, 1.93, -0.0188, 3.06],
+  'Zhong-shan Geng': [0.834, 10, 0.0087, 8.6],
+  'Etsuji Obata': [0.732, 6.71, 0.0137, 9.57],
+  'Hideji Yamanaka': [0.482, 0, -0.0294, 0.93],
+  'Ling-lai Li': [0.536, 0.17, -0.0039, 6.04],
+  'Daniel Wang': [0.77, 7.96, -0.0059, 6.4],
+  'Yasuhiro Tsumoto': [0.564, 1.1, -0.0224, 2.34],
+};
+
+const ratingsOf = (spec: RunnerSpec): RunnerRatings => ({
+  speed: spec[1],
+  stealAbility: spec[2],
+  baserunning: spec[3],
+  stealRate: spec[4],
+});
+
+const recordOf = (spec: RunnerSpec) => {
+  const tob = 80 + spec[1] * 20;
+  return {
+    sb: spec[5],
+    cs: spec[6],
+    attempts: spec[5] + spec[6],
+    ubr: (RUNNER_READS[spec[0]]?.[2] ?? 0) * tob,
+    stealOpportunities: tob,
+    runOpportunities: tob + 12,
+  };
+};
+
+/** A calibrated read: the grade rounded half up is his value, an override two or more steps off the team. */
+function calibratedRead(
+  read: number,
+  grade: number,
+  team: number,
+  own: number | null,
+  weight: number,
+): RunnerSlider {
+  const value = Math.floor(grade + 0.5);
+  const distance = Math.abs(grade - team);
+  const override = distance >= 2;
+  return {
+    ratingRead: read,
+    own,
+    weight,
+    read,
+    grade,
+    value,
+    distance,
+    override,
+    borderline: !override && distance >= 1.5,
+    label: !override && distance >= 1.5 ? 'borderline' : 'calibrated',
+    reason: '',
+  };
+}
+
+const SHEET_RUNNERS: RunnerEntry[] = RUNNER_SPECS.map((spec) => {
+  const [phat, stealGrade, ubr, baseGrade] = RUNNER_READS[spec[0]] ?? [0.5, 5, 0, 5];
+  const record = recordOf(spec);
+  const own = record.attempts > 0 ? record.sb / record.attempts : null;
+  return {
+    name: spec[0],
+    ratings: ratingsOf(spec),
+    record,
+    reason: null,
+    stealing: calibratedRead(phat, stealGrade, 0, own, record.attempts / (record.attempts + 55)),
+    baserunning: {
+      ...calibratedRead(
+        ubr,
+        baseGrade,
+        2,
+        ubr,
+        record.runOpportunities / (record.runOpportunities + 2000),
+      ),
+      label: 'research rule',
+    },
+  };
+});
+
+const overridesOf = (
+  slider: 'stealing' | 'baserunning',
+  runners: readonly RunnerEntry[],
+  label: StrategyLabel,
+): RunningOverride[] =>
+  runners
+    .flatMap((runner) => {
+      const read = runner[slider];
+      return read?.override && read.value !== null
+        ? [{ name: runner.name, slider, value: read.value, label, reason: '' }]
+        : [];
+    })
+    .sort((a, b) => b.value - a.value);
+
+const borderlineOf = (slider: 'stealing' | 'baserunning', runners: readonly RunnerEntry[]) =>
+  runners.flatMap((runner) => (runner[slider]?.borderline ? [runner.name] : []));
+
+const SHEET_STRATEGY_SLIDERS: StrategySetting[] = [
+  setting(
+    'stealing',
+    0,
+    'calibrated',
+    "Stealing 0 needs the fewest Player Strategy overrides, 5 of 12 rated hitters (calibrated on the league's steal success and break-even).",
+  ),
+  setting(
+    'baserunning',
+    2,
+    'research rule',
+    "Baserunning 2 needs the fewest Player Strategy overrides, 5 of 12 rated hitters (read on the league's UBR fit; the step to aggressiveness is a research rule).",
+  ),
+  setting('hitAndRun', 5, 'research rule', HIT_AND_RUN_REASON),
+  noRuleSetting('runAndHit', 'Run and hit'),
+  noRuleSetting('sacrificeBunt', 'Sacrifice bunt'),
+  noRuleSetting('buntForHit', 'Bunt for hit'),
+  setting(
+    'pitchAround',
+    5,
+    'research rule',
+    "Ishida's framing 7 is under the 9+ gate, so pitch around stays at 5.",
+  ),
+  setting(
+    'holdRunners',
+    5,
+    'research rule',
+    "Ishida's arm 7 is over the 3-or-lower gate, so hold runners stays at 5.",
+  ),
+  setting(
+    'infieldShift',
+    5,
+    'borderline',
+    "Moon's range 7 and Choi's range 7 are one step under the 8+ gate, so infield shift stays at 5 (borderline).",
+  ),
+  setting(
+    'guardLines',
+    5,
+    'research rule',
+    "Moon's range 7 and Choi's range 7 are under the 9+ gate, so guard lines stays at 5.",
+  ),
+  noRuleSetting('pinchHitting', 'Pinch hitting and platoons'),
+];
+
+const SHEET_NINE = [
+  'Yoshitsugu Ishida',
+  'Jin-soo Shinn',
+  'Han-lee Choi',
+  'Manichiro Kawasaki',
+  'Dong-hee Moon',
+  'Tomofumi Kamimura',
+  'Zhong-shan Geng',
+  'Etsuji Obata',
+  'Hideji Yamanaka',
+];
+
+/** The strategy card at Game 71 with its splits, as the sheet pretends it. */
+export const SHEET_STRATEGY: StrategyBoardCard = {
+  snapshot: 'Game 71',
+  team: { games_per_season: 152, dh_enabled: true, rating_scale: '1-10' },
+  lineup: {
+    source: 'season',
+    catcher: 'Yoshitsugu Ishida',
+    shortstop: 'Dong-hee Moon',
+    secondBase: 'Han-lee Choi',
+    nine: SHEET_NINE,
+  },
+  sliders: SHEET_STRATEGY_SLIDERS,
+  grid: gridOf(SHEET_STRATEGY_SLIDERS),
+  runners: SHEET_RUNNERS,
+  overrides: [
+    ...overridesOf('stealing', SHEET_RUNNERS, 'calibrated'),
+    ...overridesOf('baserunning', SHEET_RUNNERS, 'research rule'),
+  ],
+  running: {
+    stealing: {
+      slider: 'stealing',
+      calibrated: true,
+      value: 0,
+      label: 'calibrated',
+      reason: SHEET_STRATEGY_SLIDERS[0]?.reason ?? '',
+      counts: [5, 5, 7, 9, 10, 9, 9, 9, 10, 10, 11],
+      overrides: overridesOf('stealing', SHEET_RUNNERS, 'calibrated'),
+      borderline: borderlineOf('stealing', SHEET_RUNNERS),
+    },
+    baserunning: {
+      slider: 'baserunning',
+      calibrated: true,
+      value: 2,
+      label: 'research rule',
+      reason: SHEET_STRATEGY_SLIDERS[1]?.reason ?? '',
+      counts: [9, 7, 5, 7, 6, 7, 9, 9, 9, 10, 10],
+      overrides: overridesOf('baserunning', SHEET_RUNNERS, 'research rule'),
+      borderline: borderlineOf('baserunning', SHEET_RUNNERS),
+    },
+  },
+  leftHanders: {
+    kind: 'changes',
+    lineup: {
+      source: 'season',
+      catcher: 'Yasuhiro Tsumoto',
+      shortstop: 'Dong-hee Moon',
+      secondBase: 'Han-lee Choi',
+      nine: ['Yasuhiro Tsumoto', ...SHEET_NINE.slice(1)],
+    },
+    changes: [
+      setting(
+        'pitchAround',
+        8,
+        'research rule',
+        "Tsumoto's framing 9 reaches the 9+ gate, so pitch around 8.",
+      ),
+      setting(
+        'holdRunners',
+        5,
+        'borderline',
+        "Tsumoto's arm 4 is one step over the 3-or-lower gate, so hold runners stays at 5 (borderline).",
+      ),
+    ],
+    message: 'Against left-handers: pitch around 8 (research rule), hold runners 5 (borderline).',
+  },
+  fits: {
+    success: {},
+    breakEven: { value: 0.6812, source: 'fit' },
+    centre: { value: -0.009085, ubr: -142.3, opportunities: 15663, hitters: 251 },
+  },
+};
+
+/** A runner's stealing read without the league's steal fit: the research rule alone. */
+function fallbackRead(spec: RunnerSpec): RunnerSlider {
+  const { speed, stealAbility, stealRate } = ratingsOf(spec);
+  const who = spec[0].split(' ').at(-1) ?? spec[0];
+  const slow = stealRate >= 8 && speed <= 3;
+  const near = !slow && stealRate >= 7 && speed <= 4 && (stealRate < 8 || speed > 3);
+  const record = recordOf(spec);
+  return {
+    ratingRead: null,
+    own: record.attempts > 0 ? record.sb / record.attempts : null,
+    weight: null,
+    read: null,
+    grade: null,
+    value: slow ? 0 : null,
+    distance: null,
+    override: slow,
+    borderline: near,
+    label: near ? 'borderline' : 'research rule',
+    reason: slow
+      ? `${who}'s steal rate ${String(stealRate)} with speed ${String(speed)} meets the slow rule (8+ with 3 or less), so an override at 0.`
+      : near
+        ? `${who}'s steal rate ${String(stealRate)} with speed ${String(speed)} is one step short of the slow rule (8+ with 3 or less): borderline, no override.`
+        : `${who}'s speed ${String(speed)}, steal ability ${String(stealAbility)} and steal rate ${String(stealRate)} meet neither rule, so he plays at the team's 2.`,
+  };
+}
+
+const FALLBACK_RUNNERS: RunnerEntry[] = RUNNER_SPECS.map((spec) => ({
+  name: spec[0],
+  ratings: ratingsOf(spec),
+  record: recordOf(spec),
+  reason: null,
+  stealing: fallbackRead(spec),
+  baserunning: null,
+}));
+
+const FALLBACK_STEALING_REASON =
+  "The league rows carry no steal fit (speed, steal ability, SB and CS), so stealing is the research rule's 2: 9 for 10 speed and 10 steal ability, 0 for steal rate 8+ with speed 3 or less.";
+
+const FALLBACK_BASERUNNING_REASON =
+  'The league rows carry no UBR fit (baserunning, speed and UBR with the times on base), so baserunning has no rule yet.';
+
+const FALLBACK_SLIDERS: StrategySetting[] = [
+  setting('stealing', 2, 'research rule', FALLBACK_STEALING_REASON),
+  setting('baserunning', 5, 'no rule yet', FALLBACK_BASERUNNING_REASON),
+  setting('hitAndRun', 5, 'research rule', HIT_AND_RUN_REASON),
+  noRuleSetting('runAndHit', 'Run and hit'),
+  noRuleSetting('sacrificeBunt', 'Sacrifice bunt'),
+  noRuleSetting('buntForHit', 'Bunt for hit'),
+  setting(
+    'pitchAround',
+    8,
+    'research rule',
+    "Tsumoto's framing 9 reaches the 9+ gate, so pitch around 8.",
+  ),
+  setting(
+    'holdRunners',
+    5,
+    'borderline',
+    "Tsumoto's arm 4 is one step over the 3-or-lower gate, so hold runners stays at 5 (borderline).",
+  ),
+  setting(
+    'infieldShift',
+    5,
+    'borderline',
+    "Choi's range 7 and Geng's range 7 are one step under the 8+ gate, so infield shift stays at 5 (borderline).",
+  ),
+  setting(
+    'guardLines',
+    5,
+    'research rule',
+    "Choi's range 7 and Geng's range 7 are under the 9+ gate, so guard lines stays at 5.",
+  ),
+  noRuleSetting('pinchHitting', 'Pinch hitting and platoons'),
+];
+
+const FALLBACK_OVERRIDES = FALLBACK_RUNNERS.flatMap((runner) =>
+  runner.stealing?.override && runner.stealing.value !== null
+    ? [
+        {
+          name: runner.name,
+          slider: 'stealing' as const,
+          value: runner.stealing.value,
+          label: runner.stealing.label,
+          reason: runner.stealing.reason,
+        },
+      ]
+    : [],
+);
+
+/** The strategy card at Game 53: no league running columns and no splits, as the sheet pretends it. */
+export const SHEET_STRATEGY_FALLBACK: StrategyBoardCard = {
+  snapshot: 'Game 53',
+  team: { games_per_season: 152, dh_enabled: true, rating_scale: '1-10' },
+  lineup: {
+    source: 'season',
+    catcher: 'Yasuhiro Tsumoto',
+    shortstop: 'Han-lee Choi',
+    secondBase: 'Zhong-shan Geng',
+    nine: ['Yasuhiro Tsumoto', ...SHEET_NINE.slice(1)],
+  },
+  sliders: FALLBACK_SLIDERS,
+  grid: gridOf(FALLBACK_SLIDERS),
+  runners: FALLBACK_RUNNERS,
+  overrides: FALLBACK_OVERRIDES,
+  running: {
+    stealing: {
+      slider: 'stealing',
+      calibrated: false,
+      value: 2,
+      label: 'research rule',
+      reason: FALLBACK_STEALING_REASON,
+      counts: null,
+      overrides: FALLBACK_OVERRIDES,
+      borderline: borderlineOf('stealing', FALLBACK_RUNNERS),
+    },
+    baserunning: {
+      slider: 'baserunning',
+      calibrated: false,
+      value: 5,
+      label: 'no rule yet',
+      reason: FALLBACK_BASERUNNING_REASON,
+      counts: null,
+      overrides: [],
+      borderline: [],
+    },
+  },
+  leftHanders: {
+    kind: 'missing',
+    reason: 'no-splits',
+    message: "The batting splits are missing, so there is no left-handers' lineup to read.",
+  },
+  fits: {
+    success: null,
+    breakEven: { value: 0.6812, source: 'settings' },
+    centre: null,
+  },
 };

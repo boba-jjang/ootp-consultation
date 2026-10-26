@@ -15,6 +15,7 @@ import { focusFirstError } from '../setup/focus.ts';
 import setupStyles from '../setup/Setup.module.css';
 import { TeamSettingsForm } from '../setup/TeamSettingsForm.tsx';
 import { AppHeader } from '../ui/AppHeader.tsx';
+import { download } from '../ui/download.ts';
 import { Button } from '../ui/primitives.tsx';
 import { ExportPanel, RestorePanel, type RestorePreview } from './pieces.tsx';
 import styles from './Settings.module.css';
@@ -79,7 +80,7 @@ function TeamSettings({ team }: { team: TeamRow }) {
       {
         onSuccess: (bytes) => {
           const name = exportFileName(team.name, new Date());
-          download(bytes, name);
+          download(bytes, name, 'application/zip');
           setExportStatus(`Your download started: ${name}.`);
         },
       },
@@ -185,17 +186,4 @@ function TeamSettings({ team }: { team: TeamRow }) {
       </main>
     </>
   );
-}
-
-/** Hands the browser a file to save. */
-function download(bytes: Uint8Array, name: string) {
-  const url = URL.createObjectURL(new Blob([bytes.slice()], { type: 'application/zip' }));
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = name;
-  anchor.click();
-  // Safari reads the URL after the click returns; revoking it at once can empty the download.
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  }, 60_000);
 }

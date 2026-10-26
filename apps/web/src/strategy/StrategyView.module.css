@@ -1,0 +1,670 @@
+/* The strategy view: the Strategy and StrategyFallback boards' team set, on the tokens. */
+
+.main {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6) var(--gutter) var(--space-12);
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.title {
+  font-size: var(--text-32);
+  line-height: var(--leading-tight);
+  font-weight: var(--weight-semibold);
+  text-wrap: balance;
+}
+
+.lead {
+  max-width: 62ch;
+  font-size: var(--text-16);
+  color: var(--color-text-secondary);
+}
+
+.board {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--panel-padding);
+  background: var(--panel-bg);
+  border: var(--panel-border);
+  border-radius: var(--panel-radius);
+  min-width: 0;
+}
+
+.panelTitle {
+  font-size: var(--text-17);
+  font-weight: var(--weight-semibold);
+  text-wrap: balance;
+}
+
+.subtitle {
+  font-size: var(--text-14);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+}
+
+.muted {
+  font-size: var(--text-13);
+  color: var(--color-text-secondary);
+}
+
+.notice {
+  max-width: 72ch;
+  font-size: var(--text-14);
+  color: var(--color-text-body);
+}
+
+.working {
+  font-size: var(--text-14);
+  color: var(--color-text-secondary);
+}
+
+.error {
+  font-size: var(--text-14);
+  color: var(--color-negative-text);
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.gold {
+  color: var(--color-accent);
+}
+
+/* ---- The labels ------------------------------------------------------------------- */
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px var(--space-2);
+  border-radius: var(--chip-radius);
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.label[data-label='calibrated'] {
+  background: var(--label-calibrated-bg);
+  border: var(--label-calibrated-border);
+  color: var(--label-calibrated-fg);
+}
+
+.label[data-label='research rule'] {
+  border: var(--label-research-border);
+  color: var(--label-research-fg);
+}
+
+.label[data-label='borderline'] {
+  background: var(--label-borderline-bg);
+  border: var(--label-borderline-border);
+  color: var(--label-borderline-fg);
+}
+
+.label[data-label='no rule yet'] {
+  border: var(--label-none-border);
+  color: var(--label-none-fg);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+
+/* ---- The callout and the banner ------------------------------------------------------ */
+
+.callout {
+  padding: var(--space-3) var(--space-3-5);
+  background: var(--callout-bg);
+  border: var(--callout-border);
+  border-radius: var(--radius-4);
+  font-size: var(--text-13);
+  color: var(--color-text-body);
+}
+
+.banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-5);
+  padding: var(--space-2-5) var(--space-3-5);
+  background: var(--color-surface-sunken);
+  border: var(--border-muted);
+  border-radius: var(--radius-4);
+}
+
+.bannerText {
+  max-width: 80ch;
+  font-size: var(--text-13);
+  color: var(--color-text-body);
+}
+
+.bannerLine {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+
+/* ---- The running cards --------------------------------------------------------------- */
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: var(--space-4);
+}
+
+.card {
+  flex: 1 1 400px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5);
+  padding: var(--space-4);
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: var(--panel-radius);
+}
+
+.cardHead,
+.rowHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1-5) var(--space-3);
+}
+
+.cardName {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2-5);
+}
+
+.cardTitle {
+  font-size: var(--text-16);
+  font-weight: var(--weight-semibold);
+}
+
+.team {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.teamWord {
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+
+.teamValue,
+.value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  color: var(--color-accent);
+}
+
+.teamValue {
+  font-size: var(--text-22);
+}
+
+.value {
+  font-size: var(--text-19);
+}
+
+.valueMuted {
+  color: var(--color-text-secondary);
+}
+
+.bar {
+  position: relative;
+  height: 6px;
+  border-radius: var(--radius-3);
+  background: var(--bar-track);
+}
+
+.barFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--radius-3);
+  background: var(--color-accent);
+}
+
+.bar[data-muted='true'] .barFill {
+  background: var(--bar-muted);
+}
+
+.barTick {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 2px;
+  height: 16px;
+  margin-left: -1px;
+  background: var(--bar-tick);
+}
+
+.subline {
+  font-size: var(--text-13);
+  color: var(--color-text);
+}
+
+.reason {
+  font-size: var(--text-13);
+  color: var(--color-text-secondary);
+}
+
+.unlock {
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2-5) var(--space-3);
+  background: var(--color-surface);
+  border: var(--border-muted);
+  border-radius: var(--radius-4);
+}
+
+.boxTitle {
+  font-size: var(--text-12);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.overrides {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.override {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 36px;
+  padding: 0 var(--space-2-5) 0 var(--space-3);
+  background: var(--override-chip-bg);
+  border: var(--override-chip-border);
+  border-radius: var(--radius-4);
+  font-size: var(--text-13);
+}
+
+.overrideValue {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-15);
+  font-weight: var(--weight-semibold);
+  color: var(--color-accent);
+}
+
+.overrideWhy {
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+
+.footer {
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+
+/* ---- How each runner reads ----------------------------------------------------------- */
+
+.details {
+  background: var(--color-surface-sunken);
+  border: var(--border-muted);
+  border-radius: var(--panel-radius);
+}
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2-5);
+  min-height: var(--control);
+  padding: 0 var(--space-3-5);
+  cursor: pointer;
+  font-size: var(--text-14);
+  font-weight: var(--weight-semibold);
+}
+
+.summaryMeta {
+  font-size: var(--text-13);
+  font-weight: var(--weight-regular);
+  color: var(--color-text-secondary);
+}
+
+.details .tableWrap,
+.details .muted {
+  padding: 0 var(--space-3-5) var(--space-3);
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-13);
+}
+
+.table th,
+.table td {
+  padding: var(--space-2) var(--space-2);
+  border-bottom: var(--border-hairline);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table thead th {
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.table tbody th {
+  font-weight: var(--weight-regular);
+  color: var(--color-text);
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right !important;
+  white-space: nowrap;
+}
+
+.table td[data-override='true'],
+.table td[data-set='true'] {
+  color: var(--color-accent);
+  font-weight: var(--weight-semibold);
+}
+
+.table td[data-set='false'] {
+  color: var(--color-text-secondary);
+}
+
+.reads {
+  color: var(--color-text-secondary);
+}
+
+.reads[data-override='true'] {
+  color: var(--color-accent);
+}
+
+.runner {
+  min-width: 0;
+}
+
+.runnerName {
+  display: block;
+  font-size: var(--text-14);
+  font-weight: var(--weight-semibold);
+}
+
+.ratings {
+  display: block;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-11);
+  color: var(--color-text-secondary);
+}
+
+.reasonCell {
+  min-width: 24ch;
+  color: var(--color-text-secondary);
+}
+
+/* ---- The gated and no-rule sliders --------------------------------------------------- */
+
+.gated {
+  display: flex;
+  flex-direction: column;
+}
+
+.gatedRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  border-bottom: var(--border-hairline);
+}
+
+.rowName {
+  font-size: var(--text-14);
+  font-weight: var(--weight-semibold);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px var(--space-2);
+  border: var(--border-default);
+  border-radius: var(--chip-radius);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-11);
+  line-height: 1.6;
+  color: var(--color-text-body);
+  white-space: nowrap;
+}
+
+.noRule {
+  display: flex;
+  flex-direction: column;
+}
+
+.noRuleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  min-height: var(--control-sm);
+  padding: var(--space-1-5) 0;
+  border-bottom: var(--border-hairline);
+}
+
+.noRuleRow .rowName {
+  flex: 0 1 220px;
+}
+
+.noRuleRow .unlock {
+  flex: 1 1 320px;
+}
+
+/* ---- The situations drawer ----------------------------------------------------------- */
+
+.drawer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--panel-padding);
+  background: var(--panel-bg);
+  border: var(--panel-border);
+  border-radius: var(--panel-radius);
+}
+
+.drawerHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.selectLabel {
+  font-size: var(--text-14);
+  font-weight: var(--weight-semibold);
+}
+
+.select {
+  min-height: var(--control);
+  padding: 0 var(--space-3);
+  background: var(--input-bg);
+  border: var(--input-border);
+  border-radius: var(--input-radius);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.bands {
+  display: none;
+  gap: var(--space-1);
+}
+
+.bandTab {
+  flex: 1 1 0;
+  min-height: var(--control);
+  padding: 0 var(--space-2);
+  background: var(--color-surface-sunken);
+  border: var(--border-default);
+  border-radius: var(--radius-4);
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--text-13);
+  font-weight: var(--weight-semibold);
+}
+
+.bandTab[aria-selected='true'] {
+  background: var(--tint-accent);
+  border: var(--border-accent);
+  color: var(--color-text);
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.gridRow {
+  display: grid;
+  grid-template-columns: minmax(96px, 1fr) repeat(4, minmax(64px, 1fr));
+  gap: var(--space-1);
+}
+
+.gridHead,
+.gridLabel {
+  display: flex;
+  align-items: center;
+  min-height: var(--control-sm);
+  padding: 0 var(--space-2);
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+
+.gridHead {
+  font-weight: var(--weight-semibold);
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--control-sm);
+  background: var(--grid-cell-bg);
+  border: 1px solid transparent;
+  border-radius: var(--radius-3);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-14);
+  color: var(--color-text-secondary);
+}
+
+.cell[data-differs='true'] {
+  background: var(--grid-cell-differs-bg);
+  border: var(--grid-cell-differs-border);
+  color: var(--color-accent);
+  font-weight: var(--weight-semibold);
+}
+
+.teamCell {
+  color: var(--color-text);
+}
+
+/* ---- The manager's card -------------------------------------------------------------- */
+
+.managersHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+}
+
+.managersHead .lead {
+  margin-top: var(--space-1);
+  font-size: var(--text-14);
+}
+
+.downloadRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* ---- Below 720 px of panel width: the phone layout ---------------------------------- */
+
+@container (max-width: 719px) {
+  .wide {
+    display: none;
+  }
+
+  .bands {
+    display: flex;
+  }
+
+  .gridRow {
+    grid-template-columns: minmax(96px, 1fr) repeat(2, minmax(64px, 1fr));
+  }
+
+  .bandCol:not([data-active='true']) {
+    display: none;
+  }
+}

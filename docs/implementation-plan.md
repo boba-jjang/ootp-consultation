@@ -312,6 +312,7 @@ Phase 3.1 (v3.1), from the owner's Phase 3 review on 5 October 2026:
 Phase 4 screens, one pull request each, each built on its models' output:
 
 - [x] The Lineup card: the Dugout board's defensive alignment and batting order from lineup v2, worked out in a Web Worker, with a Season / vs RHP / vs LHP selector for the lineups by the starter's hand (Season by default; each hand marks what changed from the season lineup and shows its gain); each slot's batting and fielding runs with the estimate's band, the backup catcher, the bench, PA by spot and The Book's order, and locked states that name what unlocks them (Knowledge Base › Lineup optimization › Selection, › Ordering and › Lineups by the starter's hand).
+- [x] The strategy view on Bullpen & tactics: the week's team set from the strategy rules engine, worked out in a Web Worker from the cached lineup card, with the four labels and every value's reason; the Stealing and Baserunning cards with their Player Strategy overrides and borderline runners; the per-runner reads; the gated sliders with the left-handers' note; the no-rule sliders at 5; the inning-band and score-state grid; the manager's card (Team Strategy and Player Strategy) as a text download; and the fallback states without the league's running columns or the splits (Knowledge Base › Strategy rules; design decisions § 1).
 
 ## Testing and quality
 

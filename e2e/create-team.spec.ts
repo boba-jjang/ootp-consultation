@@ -343,6 +343,47 @@ test.describe('Create a Team from the fixtures', () => {
     ).toBeFocused();
   });
 
+  test('works the strategy view out in its worker, falling back without the league’s running columns', async ({
+    page,
+  }) => {
+    test.setTimeout(180_000);
+    if (!session || !clubhouse) {
+      throw new Error('the first test did not create the team');
+    }
+    await withSession(page, required().env, session);
+    await page.goto(clubhouse);
+    await expect(page.getByRole('heading', { level: 1, name: 'The Clubhouse' })).toBeVisible();
+
+    // Game 42 carries the hitters' stats and ratings, so the tab is open.
+    await page.getByRole('link', { name: 'Bullpen & tactics', exact: true }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Bullpen & tactics' })).toBeVisible();
+    // The lineup card comes first, then the strategy; the first result waits on Vite
+    // transforming core inside each worker.
+    await expect(
+      page.getByText('The league files on this snapshot carry no running columns.', {
+        exact: false,
+      }),
+    ).toBeVisible({ timeout: 120_000 });
+    const stealing = page.getByRole('article', { name: 'Stealing', exact: true });
+    await expect(stealing.getByText('Research rule', { exact: true })).toBeVisible();
+    await expect(stealing.getByRole('listitem')).toHaveCount(2);
+    await expect(stealing.getByRole('listitem').nth(0)).toHaveText(/^Mangjeol\s*0/);
+    await expect(stealing.getByRole('listitem').nth(1)).toHaveText(/^Yamanaka\s*0/);
+    const baserunning = page.getByRole('article', { name: 'Baserunning', exact: true });
+    await expect(baserunning.getByText('No rule yet', { exact: true })).toBeVisible();
+    await expect(
+      page.getByText(
+        'The batting splits are missing, so there is no left-handers’ lineup to read.',
+        {
+          exact: true,
+        },
+      ),
+    ).toBeVisible();
+    await expectAccessible(page);
+    await expectTargets(page);
+    await expectNoSideScroll(page);
+  });
+
   test('takes the first exports of a team set up without files', async ({ page }) => {
     test.setTimeout(120_000);
     if (!session) {

@@ -13,6 +13,8 @@ Reference markup exported from the Front Office Command Center canvas on 25 Octo
 | Screens | The Clubhouse | `Clubhouse.dc.html` |
 | Screens | Bullpen and tactics | `Bullpen.dc.html` |
 | Screens | Talent radar (first version, 25 October) | `TalentRadar.dc.html` |
+| Screens | Strategy view and manager's card (drawn in this repository, 26 October, from the engine's Game 71 output) | `Strategy.dc.html` |
+| When data is missing | Strategy view without the league's running columns (Game 53) | `StrategyFallback.dc.html` |
 | When data is missing | Defensive alignment without ratings | `DiamondNoRatings.dc.html` |
 | When data is missing | Regression monitor without pitching superstats | `MonitorNoSuperstats.dc.html` |
 | When data is missing | Dev Lab without ratings or potentials | `DevLabLocked.dc.html` |
@@ -24,4 +26,4 @@ Reference markup exported from the Front Office Command Center canvas on 25 Octo
 
 What changed between the two exports: the Talent radar board is new; the Dugout gained a Bench panel (backup catcher, utility infielder, pinch runner); the Bullpen's regression monitor now compares ERA with the middle of FIP, SIERA and xERA and adds a "Decide who closes" choice; the Clubhouse's pitcher upload prompts were reworded.
 
-The situational strategy view, trends and the league-file home are still to be drawn; `../design-ask-phase-4.md` asks for them and `../design-decisions-phase-4.md` settles how they should read.
+`Strategy.dc.html` and `StrategyFallback.dc.html` were drawn here rather than on the canvas, from `../design-decisions-phase-4.md` § 1 and the strategy rules engine's output on the fixtures (`strategyCard` in `packages/core`), so their numbers are real, not mock: Game 71's team set, overrides, labels, grid and left-handers' note, and Game 53's fallback. They render with the canvas runtime like the others. Trends and the league-file home are still to be drawn, from the same decisions.

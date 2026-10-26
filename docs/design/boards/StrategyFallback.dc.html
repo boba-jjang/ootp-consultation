@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Strategy view without the league's running columns</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+body{margin:0;background:#0A1118}
+*,*::before,*::after{box-sizing:border-box}
+a{color:#F5F7FA}a:hover{color:#E5A93C}
+button,input{font:inherit}
+:focus-visible{outline:2px solid #E5A93C;outline-offset:2px}
+.sv-chip{white-space:nowrap;padding:1px 8px;border-radius:3px;font-family:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #0A1118; color: #F5F7FA; font-family: 'Chakra Petch', 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.5; color-scheme: dark">
+<main style="max-width: 1000px; margin: 0 auto; padding: 24px clamp(16px, 3vw, 32px) 40px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<p style="margin: 0; font-size: 13px; color: #9AA7B4">Bullpen &amp; tactics · Snapshot <span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; color: #F5F7FA">Game 53</span> · an older export, before the league's running columns and the batting splits</p>
+<h1 style="margin: 0; font-size: 24px; line-height: 1.2; font-weight: 600">Team strategy for the week</h1>
+<p style="margin: 0; font-size: 14px; color: #9AA7B4">The view stays up. Each slider says which rule it falls back to and which league view would calibrate it; the gated sliders read as at Game 71, from this snapshot's lineup.</p>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 20px; padding: 10px 14px; background: #0D161D; border: 1px dashed rgba(229,169,60,0.55); border-radius: 4px; font-size: 13px; color: #C9D2DB">
+<span><strong style="color: #F5F7FA">The league files on this snapshot carry no running columns.</strong> Stealing falls back to the research rule and baserunning sits at 5. Upload the league's <strong style="color: #F5F7FA">batting stats</strong> (SB, CS, wSB, UBR) and <strong style="color: #F5F7FA">hitters' ratings</strong> (speed, steal ability, steal rate, baserunning) to calibrate both.</span>
+<a href="Clubhouse.dc.html#league-files" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border: 1px solid rgba(229,169,60,0.55); border-radius: 4px; color: #E5A93C; text-decoration: none; white-space: nowrap">League files in the Clubhouse</a>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: stretch; gap: 16px">
+<sc-for list="{{running}}" as="r" hint-placeholder-count="2">
+<article aria-labelledby="{{r.id}}-title" style="flex: 1 1 400px; min-width: 0; display: flex; flex-direction: column; gap: 10px; padding: 16px; background: #121D24; border: 1px solid rgba(245,247,250,0.10); border-radius: 6px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px"><h2 id="{{r.id}}-title" style="margin: 0; font-size: 16px; font-weight: 600">{{r.name}}</h2><span class="sv-chip" style="background: {{r.chipBg}}; border: 1px {{r.chipStyle}} {{r.chipBorder}}; color: {{r.chipColor}}">{{r.chip}}</span></div>
+<span style="display: flex; align-items: baseline; gap: 8px"><span style="font-size: 12px; color: #9AA7B4">Team</span><span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 24px; font-weight: 600; line-height: 1; color: {{r.valueColor}}">{{r.value}}</span></span>
+</div>
+<div aria-hidden="true" style="position: relative; height: 6px; border-radius: 3px; background: rgba(245,247,250,0.10)"><div style="position: absolute; top: 0; bottom: 0; left: 0; width: {{r.pct}}%; border-radius: 3px; background: {{r.barColor}}"></div><div style="position: absolute; top: -5px; left: 50%; width: 2px; height: 16px; margin-left: -1px; background: rgba(245,247,250,0.55)"></div></div>
+<p style="margin: 0; font-size: 13px; color: #F5F7FA">{{r.subline}}</p>
+<p style="margin: 0; font-size: 13px; color: #9AA7B4">{{r.reason}}</p>
+<div style="display: {{r.boxDisplay}}; flex-direction: column; gap: 8px; padding: 10px 12px; background: #0D161D; border: 1px solid rgba(245,247,250,0.10); border-radius: 4px">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #9AA7B4">{{r.overridesTitle}}</span>
+<ul style="display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none">
+<sc-for list="{{r.overrides}}" as="o" hint-placeholder-count="1">
+<li style="display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 10px 0 12px; background: rgba(229,169,60,0.10); border: 1px solid rgba(229,169,60,0.45); border-radius: 4px; font-size: 13px"><span>{{o.name}}</span><span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 15px; font-weight: 600; color: #E5A93C">{{o.value}}</span><span style="font-size: 11px; color: #9AA7B4">{{o.why}}</span></li>
+</sc-for>
+</ul>
+<p style="margin: 0; font-size: 12px; color: #9AA7B4"><span style="color: #E5A93C">◆ Borderline</span> (stay at the team's {{r.value}}): {{r.borderline}}</p>
+</div>
+<p style="margin: 0; display: {{r.unlockDisplay}}; font-size: 12px; color: #9AA7B4">{{r.unlock}}</p>
+</article>
+</sc-for>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 20px; padding: 10px 14px; background: #121D24; border: 1px solid rgba(245,247,250,0.10); border-radius: 4px; font-size: 13px; color: #C9D2DB">
+<span><strong style="color: #F5F7FA">No left-handers' note.</strong> The batting splits are missing, so there is no left-handers' lineup to read. Pitch around is 8 here because Tsumoto catches in this snapshot's season lineup (framing 9); hold runners is borderline on his arm (4).</span>
+<a href="Clubhouse.dc.html#split-window-left" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border: 1px solid rgba(245,247,250,0.22); border-radius: 4px; color: #F5F7FA; text-decoration: none; white-space: nowrap">Split windows</a>
+</div>
+
+<p style="margin: 0; font-size: 12px; color: #7D8A97">Game 42 reads the same way, with two slow-rule overrides: Mangjeol (steal rate 10, speed 2) and Yamanaka (9, 2). Without any rated hitter on the team, both sliders would read 5, no rule yet. The manager's card carries the fallback labels as they stand.</p>
+</main>
+</div>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:1000,&quot;height&quot;:760}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      running: [
+        {
+          id: 'stealing', name: 'Stealing', value: '2', pct: 20, valueColor: '#E5A93C', barColor: '#E5A93C',
+          chip: 'Research rule', chipBg: 'transparent', chipStyle: 'solid', chipBorder: 'rgba(245,247,250,0.18)', chipColor: '#9AA7B4',
+          subline: 'Team 2 from the research rule: 9 for a runner with 10 speed and 10 steal ability, 0 for a steal rate of 8 or more with speed 3 or less.',
+          reason: 'The league rows carry no steal fit (speed, steal ability, SB and CS), so stealing is the research rule’s 2.',
+          boxDisplay: 'flex', overridesTitle: 'Player Strategy overrides (1 runner)',
+          overrides: [{ name: 'Yamanaka', value: '0', why: 'steal rate 9, speed 2' }],
+          borderline: 'Kamimura (steal rate 9, speed 4), Moon (8, 4) and Li (7, 3), each one step short of the slow rule.',
+          unlockDisplay: 'none', unlock: ''
+        },
+        {
+          id: 'baserunning', name: 'Baserunning', value: '5', pct: 50, valueColor: '#9AA7B4', barColor: 'rgba(245,247,250,0.28)',
+          chip: 'No rule yet', chipBg: 'transparent', chipStyle: 'dashed', chipBorder: 'rgba(245,247,250,0.22)', chipColor: '#7D8A97',
+          subline: 'Stays at OOTP’s 5 for every hitter. No overrides.',
+          reason: 'The league rows carry no UBR fit (baserunning, speed and UBR with the times on base), so baserunning has no rule yet.',
+          boxDisplay: 'none', overridesTitle: '', overrides: [], borderline: '',
+          unlockDisplay: 'block', unlock: 'Calibrates from the league’s batting stats (UBR and times on base) and hitters’ ratings (baserunning, speed); at Game 71 that gives team 2 with five overrides.'
+        }
+      ]
+    };
+  }
+}
+</script>
+</x-dc>
+</body></html>

@@ -290,7 +290,7 @@ Frontend coding starts with what every screen shares: design tokens, the app she
 | Data coverage | A `packages/core` module: each player's five data sets (bio, stats, batted ball, swing decisions, ratings), the team badge, what to upload next, and the view descriptions the screens show. League files count separately |
 | Vocabulary | "Data coverage" is the top-bar badge (Low, Moderate, High). "Estimate confidence" is the band on a recommendation. |
 
-The canvas's Dugout alignment, batting order and luck reads are placeholders, so they get built from the models, not copied. Talent radar with its league percentiles, the situational strategy view, trends and the league-file upload still need designs before Phase 4 reaches them. Until the league upload is designed, league files go through the same drop zones as team views and show up in the import log.
+The canvas's Dugout alignment, batting order and luck reads are placeholders, so they get built from the models, not copied. Talent radar has a first board (25 October 2026); the situational strategy view, trends and the league-file home follow `docs/design/design-decisions-phase-4.md`, drawn as each screen's task comes up. Until the league-file home is built, league files go through the same drop zones as team views and show up in the import log.
 
 Build order, one pull request each:
 
@@ -302,7 +302,7 @@ Build order, one pull request each:
 - [x] The Clubhouse: upload, snapshot timeline, what to upload next, coverage matrices, import log, how columns were read, Run analysis.
 - [x] Team settings, Export team and restore from a zip.
 - [x] End-to-end and accessibility tests in `e2e.yml`: Create a Team from the fixtures yields a Game 42 snapshot with High coverage; locked states render; no serious axe violations; 44 px targets. The signed-in test runs as the staging test user below.
-- [ ] Ask the design chat for Talent radar (with league percentiles), the situational strategy view, trends and where league files are uploaded. The brief is `docs/design/design-ask-phase-4.md`; sending it is the owner's step.
+- [x] Ask the design chat for Talent radar (with league percentiles), the situational strategy view, trends and where league files are uploaded. The brief is `docs/design/design-ask-phase-4.md`. Done 25 October 2026: the canvas export brought a first Talent radar board, and the design chat's answers to the brief's questions are `docs/design/design-decisions-phase-4.md`; the strategy view, trends and the league-file home are drawn from those decisions.
 
 Phase 3.1 (v3.1), from the owner's Phase 3 review on 5 October 2026:
 

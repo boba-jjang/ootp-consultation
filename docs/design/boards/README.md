@@ -1,23 +1,27 @@
 # Design boards
 
-Reference markup exported from the Front Office Command Center canvas on 3 October 2026. Use it for layout, copy, spacing and design tokens.
+Reference markup exported from the Front Office Command Center canvas on 25 October 2026 (the first export was 3 October). Use it for layout, copy, spacing and design tokens.
 
-- Not runnable. The files use the canvas runtime's template syntax (`{{...}}`) and load a `support.js` that isn't included.
-- Numbers on the boards are mockup data. Where they disagree with the models or the Basis, the models win; `docs/design-handoff.md` lists the known differences.
+- Not runnable. The files use the canvas runtime's template syntax (`{{...}}`, `<sc-for>`) and load the runtime by an id that isn't included.
+- Numbers on the boards are mockup data from the Game 42 snapshot. Where they disagree with the models or the Knowledge Base, the models win; `docs/design-handoff.md` lists the known differences. The Bullpen board's Tactical settings are superseded by the strategy rules engine (Knowledge Base › Strategy rules).
 - `canvas.json` holds the board titles, sizes and sections.
+- The design decisions for the Phase 4 screens that aren't drawn yet are in `../design-decisions-phase-4.md`.
 
 | Section | Board | File |
 | --- | --- | --- |
-| Screens | The Dugout (all views loaded) | `Main.dc.html` |
-| Screens | Clubhouse (today: 9 of 11 views) | `Clubhouse.dc.html` |
-| Screens | Bullpen, tactics and Dev Lab (all views loaded) | `Bullpen.dc.html` |
-| When data is missing | Diamond without defensive ratings | `DiamondNoRatings.dc.html` |
+| Screens | The Dugout | `Main.dc.html` |
+| Screens | The Clubhouse | `Clubhouse.dc.html` |
+| Screens | Bullpen and tactics | `Bullpen.dc.html` |
+| Screens | Talent radar (first version, 25 October) | `TalentRadar.dc.html` |
+| When data is missing | Defensive alignment without ratings | `DiamondNoRatings.dc.html` |
 | When data is missing | Regression monitor without pitching superstats | `MonitorNoSuperstats.dc.html` |
 | When data is missing | Dev Lab without ratings or potentials | `DevLabLocked.dc.html` |
-| Create a team | Team menu (entry point) | `TeamMenu.dc.html` |
-| Create a team | Setup 1: add exports | `SetupStart.dc.html` |
-| Create a team | Setup 1: files read | `SetupFilesRead.dc.html` |
-| Create a team | Setup 2: team and league | `SetupLeague.dc.html` |
-| Create a team | Setup 3: review | `SetupReview.dc.html` |
+| Create a team | Team menu | `TeamMenu.dc.html` |
+| Create a team | Team setup: add exports | `SetupStart.dc.html` |
+| Create a team | Team setup: files read | `SetupFilesRead.dc.html` |
+| Create a team | Team setup: team and league | `SetupLeague.dc.html` |
+| Create a team | Team setup: review | `SetupReview.dc.html` |
 
-The boards the Phase 4 screens still need are asked for in `../design-ask-phase-4.md`.
+What changed between the two exports: the Talent radar board is new; the Dugout gained a Bench panel (backup catcher, utility infielder, pinch runner); the Bullpen's regression monitor now compares ERA with the middle of FIP, SIERA and xERA and adds a "Decide who closes" choice; the Clubhouse's pitcher upload prompts were reworded.
+
+The situational strategy view, trends and the league-file home are still to be drawn; `../design-ask-phase-4.md` asks for them and `../design-decisions-phase-4.md` settles how they should read.

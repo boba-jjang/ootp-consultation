@@ -6,7 +6,7 @@
       "expand": "fill",
       "h": 1440,
       "is_interactive": true,
-      "title": "Bullpen, tactics and Dev Lab (all views loaded)",
+      "title": "Bullpen and tactics",
       "w": 1440,
       "x": 3040,
       "y": 0
@@ -15,7 +15,7 @@
       "expand": "fill",
       "h": 2450,
       "is_interactive": true,
-      "title": "Clubhouse (today: 9 of 11 views)",
+      "title": "The Clubhouse",
       "w": 1440,
       "x": 0,
       "y": 0
@@ -31,7 +31,7 @@
     "DiamondNoRatings.dc.html": {
       "h": 580,
       "is_interactive": true,
-      "title": "Diamond without defensive ratings",
+      "title": "Defensive alignment without ratings",
       "w": 620,
       "x": 0,
       "y": 2830
@@ -40,7 +40,7 @@
       "expand": "fill",
       "h": 1200,
       "is_interactive": true,
-      "title": "The Dugout (all views loaded)",
+      "title": "The Dugout",
       "w": 1440,
       "x": 1520,
       "y": 0
@@ -57,7 +57,7 @@
       "expand": "fill",
       "h": 1240,
       "is_interactive": true,
-      "title": "Setup 1: files read",
+      "title": "Team setup: files read",
       "w": 1440,
       "x": 2020,
       "y": 4170
@@ -66,7 +66,7 @@
       "expand": "fill",
       "h": 1380,
       "is_interactive": true,
-      "title": "Setup 2: team and league",
+      "title": "Team setup: team and league",
       "w": 1440,
       "x": 3540,
       "y": 4170
@@ -75,7 +75,7 @@
       "expand": "fill",
       "h": 860,
       "is_interactive": true,
-      "title": "Setup 3: review",
+      "title": "Team setup: review",
       "w": 1440,
       "x": 5060,
       "y": 4170
@@ -84,7 +84,7 @@
       "expand": "fill",
       "h": 940,
       "is_interactive": true,
-      "title": "Setup 1: add exports",
+      "title": "Team setup: add exports",
       "w": 1440,
       "x": 500,
       "y": 4170
@@ -92,14 +92,23 @@
     "TeamMenu.dc.html": {
       "h": 320,
       "is_interactive": true,
-      "title": "Team menu (entry point)",
+      "title": "Team menu",
       "w": 420,
       "x": 0,
       "y": 4170
+    },
+    "TalentRadar.dc.html": {
+      "expand": "fill",
+      "h": 1600,
+      "is_interactive": true,
+      "title": "Talent radar (first version, 25 October)",
+      "w": 1440,
+      "x": 4560,
+      "y": 0
     }
   },
   "createdOnFiles": {
-    "at": "2026-10-03T17:55:00Z",
+    "at": "2026-10-25T22:44:00Z",
     "v": 1
   },
   "designSystems": [],
@@ -117,7 +126,7 @@
     },
     "screens": {
       "kind": "title1",
-      "maxW": 4480,
+      "maxW": 6000,
       "text": "Screens",
       "w": 240,
       "x": 0,
@@ -136,6 +145,7 @@
     "Main.dc.html",
     "Clubhouse.dc.html",
     "Bullpen.dc.html",
+    "TalentRadar.dc.html",
     "DiamondNoRatings.dc.html",
     "MonitorNoSuperstats.dc.html",
     "DevLabLocked.dc.html",

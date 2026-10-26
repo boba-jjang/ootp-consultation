@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Strategy view and manager's card</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+body{margin:0;background:#0A1118}
+*,*::before,*::after{box-sizing:border-box}
+a{color:#F5F7FA}a:hover{color:#E5A93C}
+nav a:hover{color:#F5F7FA !important}
+button,input{font:inherit}
+:focus-visible{outline:2px solid #E5A93C;outline-offset:2px}
+.sv-grid{display:grid;grid-template-columns:minmax(96px,1fr) repeat(4,minmax(64px,1fr));gap:4px}
+.sv-bands{display:none}
+.sv-runners{display:grid;grid-template-columns:minmax(130px,1.6fr) 64px 56px 44px 72px 44px minmax(150px,2fr);gap:10px;align-items:center}
+.sv-card-rows{display:grid;grid-template-columns:minmax(140px,1.4fr) 80px 90px minmax(160px,2fr);gap:10px;align-items:center}
+.sv-chip{white-space:nowrap}
+@media (max-width: 720px){
+  .sv-grid{grid-template-columns:minmax(96px,1fr) minmax(64px,1fr)}
+  .sv-grid .sv-band-col{display:none !important}
+  .sv-bands{display:flex;gap:4px}
+  .sv-runners{grid-template-columns:minmax(120px,1.4fr) 44px 44px;}
+  .sv-runners .sv-wide{display:none !important}
+  .sv-card-rows{grid-template-columns:minmax(110px,1.2fr) 44px auto}
+  .sv-card-rows .sv-wide{display:none !important}
+}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #0A1118; color: #F5F7FA; font-family: 'Chakra Petch', 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.5; color-scheme: dark">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 24px; padding: 4px clamp(16px, 3vw, 32px); border-bottom: 1px solid rgba(245,247,250,0.08)">
+<div style="display: flex; align-items: center; gap: 2px">
+<a href="Main.dc.html" aria-label="Lineup card" style="display: flex; align-items: center; justify-content: center; width: 40px; min-height: 48px; text-decoration: none"><svg sc-camel-view-box="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M5 19 L19 5 M9 5 L19 5 L19 15" style="fill: none; stroke: #E5A93C; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"></path></svg></a>
+<button type="button" aria-haspopup="menu" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 10px; background: transparent; color: #F5F7FA; border: 0; border-radius: 4px; cursor: pointer">
+<span style="font-size: 17px; font-weight: 700; letter-spacing: 0.02em">Seattle Arrows</span>
+<span style="padding: 1px 6px; border: 1px solid rgba(245,247,250,0.20); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 11px; color: #9AA7B4">RSL</span>
+<svg sc-camel-view-box="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false"><path d="M6 9 L12 15 L18 9" style="fill: none; stroke: #9AA7B4; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"></path></svg>
+</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 20px; font-size: 13px; color: #9AA7B4">
+<div style="display: flex; align-items: center">
+<label for="snapshot" style="padding-right: 4px">Snapshot</label>
+<button type="button" aria-label="Previous snapshot" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: transparent; color: #9AA7B4; border: 0; cursor: pointer"><svg sc-camel-view-box="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M15 6 L9 12 L15 18" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"></path></svg></button>
+<sc-raw-select id="snapshot" style="min-height: 44px; padding: 0 10px; background: #0D161D; color: #F5F7FA; border: 1px solid rgba(245,247,250,0.18); border-radius: 4px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px">
+<option value="71">Game 71 (latest)</option>
+<option value="53">Game 53</option>
+<option value="42">Game 42</option>
+</sc-raw-select>
+<button type="button" aria-label="Next snapshot" disabled="{{ true }}" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: transparent; color: #9AA7B4; border: 0; opacity: 0.4; cursor: not-allowed"><svg sc-camel-view-box="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M9 6 L15 12 L9 18" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"></path></svg></button>
+</div>
+<a href="Clubhouse.dc.html" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 1px solid rgba(245,247,250,0.14); border-radius: 4px; color: #9AA7B4; text-decoration: none">Data coverage<span aria-hidden="true" style="display: flex; gap: 3px"><span style="width: 14px; height: 6px; border-radius: 1px; background: #2ECC71"></span><span style="width: 14px; height: 6px; border-radius: 1px; background: #2ECC71"></span><span style="width: 14px; height: 6px; border-radius: 1px; background: #2ECC71"></span></span><span style="font-weight: 600; color: #2ECC71">High</span></a>
+<span style="display: flex; align-items: center; gap: 6px">DH<span style="color: #F5F7FA">on</span></span>
+<span style="display: flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 7px; height: 7px; border-radius: 50%; background: #2ECC71"></span>Advisor online</span>
+</div>
+</header>
+
+<nav aria-label="Modules" style="padding: 0 clamp(2px, 2vw, 18px); border-bottom: 1px solid rgba(245,247,250,0.08)">
+<ul style="display: flex; flex-wrap: wrap; margin: 0; padding: 0; list-style: none">
+<li><a href="Clubhouse.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-bottom: 2px solid transparent; font-size: 14px; color: #9AA7B4; text-decoration: none">Clubhouse</a></li>
+<li><a href="TalentRadar.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-bottom: 2px solid transparent; font-size: 14px; color: #9AA7B4; text-decoration: none">Talent radar</a></li>
+<li><a href="Main.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-bottom: 2px solid transparent; font-size: 14px; color: #9AA7B4; text-decoration: none">Lineup card</a></li>
+<li><a href="Strategy.dc.html" aria-current="page" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-bottom: 2px solid #E5A93C; font-size: 14px; font-weight: 600; color: #F5F7FA; text-decoration: none">Bullpen &amp; tactics</a></li>
+<li><a href="#dev-lab" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-bottom: 2px solid transparent; font-size: 14px; color: #9AA7B4; text-decoration: none">Dev lab</a></li>
+</ul>
+</nav>
+
+<main style="max-width: 1440px; margin: 0 auto; padding: 24px clamp(16px, 3vw, 32px) 40px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 32px; line-height: 1.15; font-weight: 600">Bullpen &amp; tactics</h1>
+<p style="margin: 0; color: #9AA7B4">The strategy values to set in OOTP this week, each with its reason and how far to trust it. The pitching regression monitor is above this panel, unchanged from <a href="Bullpen.dc.html">the Bullpen board</a>.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px">
+<button type="button" sc-camel-on-click="{{toggleGrid}}" aria-expanded="{{gridExpanded}}" aria-controls="situations" style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; background: transparent; color: #F5F7FA; border: 1px solid rgba(245,247,250,0.22); border-radius: 4px; font-size: 14px; cursor: pointer">{{gridButton}}</button>
+<button type="button" sc-camel-on-click="{{toggleCard}}" aria-expanded="{{cardExpanded}}" aria-controls="managers-card" style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; background: #E5A93C; color: #0A1118; border: 0; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer">Manager's card</button>
+</div>
+</div>
+
+<section aria-labelledby="strategy-title" style="display: flex; flex-direction: column; gap: 16px; padding: 20px; background: #121D24; border: 1px solid rgba(245,247,250,0.08); border-radius: 6px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px">
+<h2 id="strategy-title" style="margin: 0; font-size: 17px; font-weight: 600">Team strategy for the week</h2>
+<ul aria-label="Labels" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 0; padding: 0; list-style: none; font-size: 12px; color: #9AA7B4">
+<li style="display: flex; align-items: center; gap: 6px"><span class="sv-chip" style="padding: 1px 8px; border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 11px; background: rgba(245,247,250,0.08); border: 1px solid rgba(245,247,250,0.28); color: #F5F7FA">Calibrated</span>fitted on the league's results</li>
+<li style="display: flex; align-items: center; gap: 6px"><span class="sv-chip" style="padding: 1px 8px; border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 11px; background: transparent; border: 1px solid rgba(245,247,250,0.18); color: #9AA7B4">Research rule</span>a gate from the research, untested</li>
+<li style="display: flex; align-items: center; gap: 6px"><span class="sv-chip" style="padding: 1px 8px; border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 11px; background: rgba(229,169,60,0.08); border: 1px solid rgba(229,169,60,0.55); color: #E5A93C">◆ Borderline</span>missed by one step, or within half a step of an override</li>
+<li style="display: flex; align-items: center; gap: 6px"><span class="sv-chip" style="padding: 1px 8px; border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 11px; background: transparent; border: 1px dashed rgba(245,247,250,0.22); color: #7D8A97">No rule yet</span>stays at OOTP's 5</li>
+</ul>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 20px; padding: 10px 14px; background: #0D161D; border: 1px solid rgba(245,247,250,0.10); border-radius: 4px; font-size: 13px; color: #C9D2DB">
+<span><strong style="color: #F5F7FA">One set for the week</strong>, from the season lineup (Ishida catching; right-handers start about three games in four). OOTP's Team Strategy screen can't switch by the starter's hand, and runner differences go on Player Strategy, which OOTP applies whenever that player plays.</span>
+<span style="display: inline-flex; align-items: center; gap: 8px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #9AA7B4"><span aria-hidden="true" style="width: 7px; height: 7px; border-radius: 50%; background: #9AA7B4"></span>All 12 situations match · innings 1–6, 7–8, 9+ × tied, one run, within three, blowout</span>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: stretch; gap: 16px">
+<sc-for list="{{running}}" as="r" hint-placeholder-count="2">
+<article aria-labelledby="{{r.id}}-title" style="flex: 1 1 440px; min-width: 0; display: flex; flex-direction: column; gap: 10px; padding: 16px; background: #0D161D; border: 1px solid rgba(245,247,250,0.10); border-radius: 6px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px"><h3 id="{{r.id}}-title" style="margin: 0; font-size: 16px; font-weight: 600">{{r.name}}</h3><span class="sv-chip" style="padding: 1px 8px; border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 11px; background: {{r.chipBg}}; border: 1px solid {{r.chipBorder}}; color: {{r.chipColor}}">{{r.chip}}</span></div>
+<span style="display: flex; align-items: baseline; gap: 8px"><span style="font-size: 12px; color: #9AA7B4">Team</span><span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 24px; font-weight: 600; line-height: 1; color: #E5A93C">{{r.value}}</span></span>
+</div>
+<div aria-hidden="true" style="position: relative; height: 6px; border-radius: 3px; background: rgba(245,247,250,0.10)"><div style="position: absolute; top: 0; bottom: 0; left: 0; width: {{r.pct}}%; border-radius: 3px; background: #E5A93C"></div><div style="position: absolute; top: -5px; left: 50%; width: 2px; height: 16px; margin-left: -1px; background: rgba(245,247,250,0.55)"></div></div>
+<p style="margin: 0; font-size: 13px; color: #F5F7FA">{{r.subline}}</p>
+<p style="margin: 0; font-size: 13px; color: #9AA7B4">{{r.reason}}</p>
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; background: #121D24; border: 1px solid rgba(245,247,250,0.10); border-radius: 4px">
+<span style="font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #9AA7B4">{{r.overridesTitle}}</span>
+<ul style="display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none">
+<sc-for list="{{r.overrides}}" as="o" hint-placeholder-count="5">
+<li style="display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 10px 0 12px; background: rgba(229,169,60,0.10); border: 1px solid rgba(229,169,60,0.45); border-radius: 4px; font-size: 13px"><span>{{o.name}}</span><span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 15px; font-weight: 600; color: #E5A93C">{{o.value}}</span></li>
+</sc-for>
+</ul>
+<p style="margin: 0; font-size: 12px; color: #9AA7B4"><span style="color: #E5A93C">◆ Borderline</span> (stays at the team's {{r.value}}): {{r.borderline}}</p>
+</div>
+</article>
+</sc-for>
+</div>
+
+<details style="border: 1px solid rgba(245,247,250,0.10); border-radius: 6px; background: #0D161D">
+<summary style="display: flex; align-items: center; min-height: 44px; padding: 0 14px; font-size: 14px; font-weight: 600; cursor: pointer; list-style: none">How each runner reads <span style="padding-left: 10px; font-size: 13px; font-weight: 400; color: #9AA7B4">12 hitters · steal success against the league's break-even (68.1%), UBR a time on base against the league's centre (−0.009)</span></summary>
+<div style="display: flex; flex-direction: column; padding: 0 14px 12px">
+<div class="sv-runners" aria-hidden="true" style="min-height: 36px; padding: 6px 0; border-bottom: 1px solid rgba(245,247,250,0.10); font-size: 12px; color: #9AA7B4"><span>Runner</span><span class="sv-wide" style="text-align: right">SB–CS</span><span class="sv-wide" style="text-align: right">p̂</span><span style="text-align: right">Steal</span><span class="sv-wide" style="text-align: right">UBR / TOB</span><span style="text-align: right">Base</span><span class="sv-wide">Reads as</span></div>
+<sc-for list="{{runners}}" as="p" hint-placeholder-count="12">
+<div class="sv-runners" style="min-height: 44px; padding: 6px 0; border-bottom: 1px solid rgba(245,247,250,0.06); font-size: 13px">
+<span style="display: flex; flex-direction: column; min-width: 0"><span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.name}}</span><span style="font-size: 11px; color: #9AA7B4">{{p.ratings}}</span></span>
+<span class="sv-wide" style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; text-align: right; color: #9AA7B4">{{p.sbcs}}</span>
+<span class="sv-wide" style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; text-align: right; color: #9AA7B4">{{p.phat}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; text-align: right; font-weight: 600; color: {{p.stealColor}}">{{p.steal}}</span>
+<span class="sv-wide" style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; text-align: right; color: #9AA7B4">{{p.ubr}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; text-align: right; font-weight: 600; color: {{p.baseColor}}">{{p.base}}</span>
+<span class="sv-wide" style="font-size: 12px; color: {{p.noteColor}}">{{p.note}}</span>
+</div>
+</sc-for>
+<p style="margin: 10px 0 0; font-size: 12px; color: #9AA7B4">Gold values are Player Strategy overrides; the rest ride the team value. p̂ is the fitted steal success from steal ability and speed, moved toward the runner's own record by n ÷ (n + 55). Grades step 0.03 of success and 0.005 UBR a time on base per slider point.</p>
+</div>
+</details>
+
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h3 style="margin: 6px 0 4px; font-size: 14px; font-weight: 600; color: #9AA7B4">Gated on the week's lineup</h3>
+<sc-for list="{{gated}}" as="s" hint-placeholder-count="5">
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-bottom: 1px solid rgba(245,247,250,0.08)">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px"><span style="font-size: 15px; font-weight: 600">{{s.name}}</span><span class="sv-chip" style="padding: 1px 8px; border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 11px; background: {{s.chipBg}}; border: 1px solid {{s.chipBorder}}; color: {{s.chipColor}}">{{s.chip}}</span><span style="display: {{s.lhDisplay}}; align-items: center; gap: 6px; padding: 1px 8px; border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 11px; border: 1px solid rgba(245,247,250,0.18); color: #C9D2DB">{{s.lhText}}</span></div>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 20px; font-weight: 600; line-height: 1; color: #E5A93C">{{s.value}}</span>
+</div>
+<div aria-hidden="true" style="position: relative; height: 6px; border-radius: 3px; background: rgba(245,247,250,0.10)"><div style="position: absolute; top: 0; bottom: 0; left: 0; width: {{s.pct}}%; border-radius: 3px; background: #E5A93C"></div><div style="position: absolute; top: -5px; left: 50%; width: 2px; height: 16px; margin-left: -1px; background: rgba(245,247,250,0.55)"></div><div style="position: absolute; top: -3px; left: {{s.gatePct}}%; width: 8px; height: 12px; margin-left: -4px; border: 1.5px solid rgba(245,247,250,0.45); border-radius: 2px; background: #121D24; display: {{s.gateDisplay}}"></div></div>
+<span style="font-size: 13px; color: #9AA7B4">{{s.reason}}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h3 style="margin: 6px 0 4px; font-size: 14px; font-weight: 600; color: #9AA7B4">At neutral (5), no rule yet</h3>
+<sc-for list="{{neutral}}" as="n" hint-placeholder-count="4">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 16px; min-height: 44px; padding: 6px 0; border-bottom: 1px solid rgba(245,247,250,0.06)">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px"><span style="font-size: 14px; font-weight: 600">{{n.name}}</span><span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 14px; font-weight: 600; color: #9AA7B4">5</span><span class="sv-chip" style="padding: 1px 8px; border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 11px; border: 1px dashed rgba(245,247,250,0.22); color: #7D8A97">No rule yet</span></div>
+<span style="font-size: 12px; color: #9AA7B4">{{n.unlock}}</span>
+</div>
+</sc-for>
+</div>
+
+<div id="situations" style="display: {{gridDisplay}}; flex-direction: column; gap: 10px; padding: 14px; background: #0D161D; border: 1px solid rgba(245,247,250,0.10); border-radius: 6px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px">
+<div style="display: flex; align-items: center; gap: 10px"><label for="grid-slider" style="font-size: 14px; font-weight: 600">By situation</label>
+<sc-raw-select id="grid-slider" style="min-height: 44px; padding: 0 10px; background: #121D24; color: #F5F7FA; border: 1px solid rgba(245,247,250,0.18); border-radius: 4px; font-size: 13px">
+<option value="stealing">Stealing</option><option value="baserunning">Baserunning</option><option value="hitAndRun">Hit and run</option><option value="runAndHit">Run and hit</option><option value="sacrificeBunt">Sacrifice bunt</option><option value="buntForHit">Bunt for hit</option><option value="pitchAround">Pitch around</option><option value="holdRunners">Hold runners</option><option value="infieldShift">Infield shift</option><option value="guardLines">Guard lines</option><option value="pinchHitting">Pinch hitting and platoons</option>
+</sc-raw-select></div>
+<span style="font-size: 12px; color: #9AA7B4">Grey cells match the slider's team value. A cell turns gold when a rule varies by inning or score; none does yet. The sacrifice bunt (innings 7+, tied or within one) will be the first.</span>
+</div>
+<div class="sv-bands" role="tablist" aria-label="Inning band">
+<button type="button" role="tab" aria-selected="true" style="flex: 1; min-height: 44px; background: rgba(229,169,60,0.12); color: #F5F7FA; border: 1px solid #E5A93C; border-radius: 4px; font-size: 13px">Innings 1–6</button>
+<button type="button" role="tab" aria-selected="false" style="flex: 1; min-height: 44px; background: transparent; color: #9AA7B4; border: 1px solid rgba(245,247,250,0.18); border-radius: 4px; font-size: 13px">7–8</button>
+<button type="button" role="tab" aria-selected="false" style="flex: 1; min-height: 44px; background: transparent; color: #9AA7B4; border: 1px solid rgba(245,247,250,0.18); border-radius: 4px; font-size: 13px">9 and extras</button>
+</div>
+<div class="sv-grid" role="table" aria-label="Stealing by inning band and score state">
+<span role="columnheader" style="font-size: 12px; color: #9AA7B4; padding: 6px 8px">Score state</span>
+<span role="columnheader" style="font-size: 12px; color: #9AA7B4; padding: 6px 8px; text-align: center">Innings 1–6</span>
+<span role="columnheader" class="sv-band-col" style="font-size: 12px; color: #9AA7B4; padding: 6px 8px; text-align: center">7–8</span>
+<span role="columnheader" class="sv-band-col" style="font-size: 12px; color: #9AA7B4; padding: 6px 8px; text-align: center">9 and extras</span>
+<span role="columnheader" class="sv-band-col" style="font-size: 12px; color: #9AA7B4; padding: 6px 8px; text-align: center">Team</span>
+<sc-for list="{{gridRows}}" as="g" hint-placeholder-count="4">
+<span role="rowheader" style="display: flex; align-items: center; min-height: 44px; padding: 0 8px; font-size: 13px">{{g.state}}</span>
+<span role="cell" style="display: flex; align-items: center; justify-content: center; min-height: 44px; background: #121D24; border: 1px solid rgba(245,247,250,0.06); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 15px; color: #9AA7B4">{{g.v1}}</span>
+<span role="cell" class="sv-band-col" style="display: flex; align-items: center; justify-content: center; min-height: 44px; background: #121D24; border: 1px solid rgba(245,247,250,0.06); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 15px; color: #9AA7B4">{{g.v2}}</span>
+<span role="cell" class="sv-band-col" style="display: flex; align-items: center; justify-content: center; min-height: 44px; background: #121D24; border: 1px solid rgba(245,247,250,0.06); border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 15px; color: #9AA7B4">{{g.v3}}</span>
+<span role="cell" class="sv-band-col" style="display: flex; align-items: center; justify-content: center; min-height: 44px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 15px; font-weight: 600; color: #E5A93C">{{g.team}}</span>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section id="managers-card" aria-labelledby="card-title" style="display: {{cardDisplay}}; flex-direction: column; gap: 16px; padding: 20px; background: #121D24; border: 1px solid rgba(229,169,60,0.35); border-radius: 6px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 id="card-title" style="margin: 0; font-size: 17px; font-weight: 600">Manager's card · Game 71, week of the next sim</h2>
+<p style="margin: 0; font-size: 13px; color: #9AA7B4">Type these into OOTP. Part 1 follows the Team Strategy screen top to bottom, Part 2 the Player Strategy screen one player at a time. Nothing imports them.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px">
+<button type="button" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; background: transparent; color: #F5F7FA; border: 1px solid rgba(245,247,250,0.22); border-radius: 4px; font-size: 14px; cursor: pointer">Download the card</button>
+<button type="button" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; background: #E5A93C; color: #0A1118; border: 0; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer">Mark as applied</button>
+</div>
+</div>
+<p style="margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: #9AA7B4"><span aria-hidden="true" style="width: 7px; height: 7px; border-radius: 50%; border: 1.5px dashed #E5A93C"></span>Not yet applied for Game 71. Marking it records the date, so the next export's running stats can be read against the settings in force.</p>
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px">
+<div style="flex: 3 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 14px; font-weight: 600">Part 1 · Team Strategy</h3>
+<p style="margin: 0 0 4px; font-size: 12px; color: #9AA7B4">One value for every inning band and score state. Set All Times and All Scores first; OOTP copies them into each situation. The row order below is OOTP's, to confirm from the game.</p>
+<div class="sv-card-rows" aria-hidden="true" style="min-height: 32px; border-bottom: 1px solid rgba(245,247,250,0.10); font-size: 12px; color: #9AA7B4"><span>Slider</span><span style="text-align: right">Value</span><span>Label</span><span class="sv-wide">Reason</span></div>
+<sc-for list="{{cardTeam}}" as="t" hint-placeholder-count="11">
+<div class="sv-card-rows" style="min-height: 40px; padding: 4px 0; border-bottom: 1px solid rgba(245,247,250,0.06); font-size: 13px">
+<span>{{t.name}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 16px; font-weight: 600; text-align: right; color: {{t.color}}">{{t.value}}</span>
+<span><span class="sv-chip" style="padding: 1px 8px; border-radius: 3px; font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 11px; background: {{t.chipBg}}; border: 1px solid {{t.chipBorder}}; color: {{t.chipColor}}">{{t.chip}}</span></span>
+<span class="sv-wide" style="font-size: 12px; color: #9AA7B4">{{t.reason}}</span>
+</div>
+</sc-for>
+<p style="margin: 6px 0 0; font-size: 12px; color: #C9D2DB">Against left-handers: pitch around 8 (research rule) and hold runners 5 (borderline), with Tsumoto catching. One set is kept, since the screen can't switch by the starter's hand.</p>
+</div>
+
+<div style="flex: 2 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 14px; font-weight: 600">Part 2 · Player Strategy</h3>
+<p style="margin: 0 0 4px; font-size: 12px; color: #9AA7B4">Six players, two sliders each. A dash means he keeps the team value. Everyone else stays on Team Strategy.</p>
+<div style="display: grid; grid-template-columns: minmax(140px, 1.6fr) 72px 90px; gap: 10px; min-height: 32px; border-bottom: 1px solid rgba(245,247,250,0.10); font-size: 12px; color: #9AA7B4"><span>Player</span><span style="text-align: right">Stealing</span><span style="text-align: right">Baserunning</span></div>
+<sc-for list="{{cardPlayers}}" as="c" hint-placeholder-count="6">
+<div style="display: grid; grid-template-columns: minmax(140px, 1.6fr) 72px 90px; gap: 10px; align-items: center; min-height: 44px; padding: 4px 0; border-bottom: 1px solid rgba(245,247,250,0.06); font-size: 13px">
+<span style="font-weight: 600">{{c.name}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 16px; font-weight: 600; text-align: right; color: {{c.stealColor}}">{{c.steal}}</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 16px; font-weight: 600; text-align: right; color: {{c.baseColor}}">{{c.base}}</span>
+</div>
+</sc-for>
+<p style="margin: 6px 0 0; font-size: 12px; color: #9AA7B4">Borderline, no override: Kamimura (stealing); Shinn, Kawasaki and Ishida (baserunning). Leave them on the team value.</p>
+</div>
+</div>
+</section>
+</main>
+</div>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:2600}}">
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var s = this.state || {};
+    var gridOpen = s.gridOpen !== false;
+    var cardOpen = s.cardOpen !== false;
+    var CHIP = {
+      calibrated: { text: 'Calibrated', bg: 'rgba(245,247,250,0.08)', border: 'rgba(245,247,250,0.28)', color: '#F5F7FA' },
+      research: { text: 'Research rule', bg: 'transparent', border: 'rgba(245,247,250,0.18)', color: '#9AA7B4' },
+      borderline: { text: '◆ Borderline', bg: 'rgba(229,169,60,0.08)', border: 'rgba(229,169,60,0.55)', color: '#E5A93C' },
+      none: { text: 'No rule yet', bg: 'transparent', border: 'rgba(245,247,250,0.22)', color: '#7D8A97' }
+    };
+    function chip(o, k) { var c = CHIP[k]; o.chip = c.text; o.chipBg = c.bg; o.chipBorder = c.border; o.chipColor = c.color; return o; }
+    var GOLD = '#E5A93C', GREY = '#9AA7B4', CHALK = '#F5F7FA';
+
+    // Game 71, from the strategy rules engine (packages/core/src/strategy).
+    var running = [
+      chip({ id: 'stealing', name: 'Stealing', value: 0, pct: 0,
+        subline: 'Default for 7 of 12 hitters. 0 holds the rest of the roster, so only five runners need a Player Strategy override.',
+        reason: 'Stealing 0 needs the fewest overrides, 5 of 12 rated hitters, calibrated on the league’s steal success and its break-even (68.1%).',
+        overridesTitle: 'Player Strategy overrides (5 runners)',
+        overrides: [{ name: 'Geng', value: 10 }, { name: 'Wang', value: 8 }, { name: 'Obata', value: 7 }, { name: 'Moon', value: 5 }, { name: 'Choi', value: 4 }],
+        borderline: 'Kamimura, grade 1.93, within half a step of the override gate (2).' }, 'calibrated'),
+      chip({ id: 'baserunning', name: 'Baserunning', value: 2, pct: 20,
+        subline: 'Default for 7 of 12 hitters. The read is calibrated on the league’s UBR; the step from read to slider is a research rule.',
+        reason: 'Baserunning 2 needs the fewest overrides, 5 of 12 rated hitters, read on the league’s UBR fit against its centre (−0.009 a time on base).',
+        overridesTitle: 'Player Strategy overrides (5 runners)',
+        overrides: [{ name: 'Obata', value: 10 }, { name: 'Geng', value: 9 }, { name: 'Li', value: 6 }, { name: 'Wang', value: 6 }, { name: 'Moon', value: 5 }],
+        borderline: 'Shinn (0.08), Kawasaki (3.52) and Ishida (0.45), each within half a step of the override gate.' }, 'research')
+    ];
+
+    var RUNNERS = [
+      ['Zhong-shan Geng', 'speed 7 · steal 10 · run 10', '14–3', '.834', 10, true, '+0.0087', 9, true, ''],
+      ['Daniel Wang', 'speed 7 · steal 8 · run 5', '3–1', '.770', 8, true, '−0.0059', 6, true, ''],
+      ['Etsuji Obata', 'speed 9 · steal 7 · run 10', '2–1', '.732', 7, true, '+0.0137', 10, true, ''],
+      ['Dong-hee Moon', 'speed 4 · steal 6 · run 6', '0–0', '.686', 5, true, '−0.0103', 5, true, ''],
+      ['Han-lee Choi', 'speed 3 · steal 5 · run 3', '0–0', '.637', 4, true, '−0.0221', 2, false, ''],
+      ['Tomofumi Kamimura', 'speed 4 · steal 4 · run 3', '0–0', '.589', 2, false, '−0.0188', 3, false, 'Borderline on stealing, no override'],
+      ['Yasuhiro Tsumoto', 'speed 1 · steal 4 · run 4', '0–2', '.564', 1, false, '−0.0224', 2, false, ''],
+      ['Ling-lai Li', 'speed 3 · steal 3 · run 9', '0–0', '.536', 0, false, '−0.0039', 6, true, ''],
+      ['Manichiro Kawasaki', 'speed 3 · steal 3 · run 5', '0–0', '.536', 0, false, '−0.0165', 4, false, 'Borderline on baserunning, no override'],
+      ['Hideji Yamanaka', 'speed 2 · steal 2 · run 1', '0–0', '.482', 0, false, '−0.0294', 1, false, ''],
+      ['Yoshitsugu Ishida', 'speed 1 · steal 2 · run 1', '0–0', '.480', 0, false, '−0.0319', 0, false, 'Borderline on baserunning, no override'],
+      ['Jin-soo Shinn', 'speed 1 · steal 1 · run 1', '0–0', '.429', 0, false, '−0.0337', 0, false, 'Borderline on baserunning, no override']
+    ];
+    var runners = RUNNERS.map(function (r) {
+      return {
+        name: r[0], ratings: r[1], sbcs: r[2], phat: r[3],
+        steal: String(r[4]), stealColor: r[5] ? GOLD : GREY,
+        ubr: r[6], base: String(r[7]), baseColor: r[8] ? GOLD : GREY,
+        note: r[9] || (r[5] || r[8] ? 'Override' : 'Team value'),
+        noteColor: r[9] ? GOLD : GREY
+      };
+    });
+
+    var gated = [
+      chip({ name: 'Infield shift', value: 5, pct: 50, gatePct: 100, gateDisplay: 'block', lhDisplay: 'none', lhText: '',
+        reason: 'Moon’s range 7 and Choi’s range 7 are one step under the 8+ gate, so infield shift stays at 5 (borderline). Would be 10 if both reached 8.' }, 'borderline'),
+      chip({ name: 'Pitch around', value: 5, pct: 50, gatePct: 80, gateDisplay: 'block', lhDisplay: 'inline-flex', lhText: 'vs LHP · Tsumoto framing 9 → 8',
+        reason: 'Ishida’s framing 7 is under the 9+ gate, so pitch around stays at 5.' }, 'research'),
+      chip({ name: 'Hold runners', value: 5, pct: 50, gatePct: 80, gateDisplay: 'block', lhDisplay: 'inline-flex', lhText: 'vs LHP · Tsumoto arm 4 → 5 ◆ Borderline',
+        reason: 'Ishida’s arm 7 is over the 3-or-lower gate, so hold runners stays at 5.' }, 'research'),
+      chip({ name: 'Guard lines', value: 5, pct: 50, gatePct: 80, gateDisplay: 'block', lhDisplay: 'none', lhText: '',
+        reason: 'Moon’s range 7 and Choi’s range 7 are under the 9+ gate, so guard lines stays at 5.' }, 'research'),
+      chip({ name: 'Hit and run', value: 5, pct: 50, gatePct: 80, gateDisplay: 'block', lhDisplay: 'none', lhText: '',
+        reason: '9 of the 9 read under the 9+ gate on avoid K’s or Contact; the best reads are Shinn’s avoid K’s 6.66 and Yamanaka’s Contact 6.96, so hit and run stays at 5.' }, 'research')
+    ];
+
+    var neutral = [
+      { name: 'Pinch hitting and platoons', unlock: 'Splits are on file; the first rule to land reads each hitter’s wOBA against each hand.' },
+      { name: 'Sacrifice bunt', unlock: 'Stays at 5 until the late-and-close rule (innings 7+, tied or within one) lands.' },
+      { name: 'Bunt for hit', unlock: 'Stays at 5; awaits a league fit on bunt-for-hit and speed.' },
+      { name: 'Run and hit', unlock: 'Stays at 5; no export records the play.' }
+    ];
+
+    var gridRows = ['Tied', 'Up or down one', 'Within three', 'Blowout'].map(function (st) {
+      return { state: st, v1: '0', v2: '0', v3: '0', team: '0' };
+    });
+
+    var cardTeam = [
+      ['Stealing', 0, 'calibrated', 'Fewest overrides at 0; five runners on Player Strategy'],
+      ['Baserunning', 2, 'research', 'Fewest overrides at 2; five runners on Player Strategy'],
+      ['Hit and run', 5, 'research', 'Nobody in the nine reads 9+ on both avoid K’s and Contact'],
+      ['Run and hit', 5, 'none', ''],
+      ['Sacrifice bunt', 5, 'none', ''],
+      ['Bunt for hit', 5, 'none', ''],
+      ['Pitch around', 5, 'research', 'Ishida’s framing 7, under the 9+ gate'],
+      ['Hold runners', 5, 'research', 'Ishida’s arm 7, over the 3-or-lower gate'],
+      ['Infield shift', 5, 'borderline', 'Moon and Choi at range 7, one under the 8+ gate'],
+      ['Guard lines', 5, 'research', 'Moon and Choi at range 7, under the 9+ gate'],
+      ['Pinch hitting', 5, 'none', '']
+    ].map(function (t) {
+      return chip({ name: t[0], value: String(t[1]), color: t[1] === 5 ? GREY : GOLD, reason: t[3] }, t[2]);
+    });
+
+    var cardPlayers = [
+      ['Zhong-shan Geng', '10', true, '9', true],
+      ['Etsuji Obata', '7', true, '10', true],
+      ['Daniel Wang', '8', true, '6', true],
+      ['Dong-hee Moon', '5', true, '5', true],
+      ['Han-lee Choi', '4', true, '—', false],
+      ['Ling-lai Li', '—', false, '6', true]
+    ].map(function (c) {
+      return { name: c[0], steal: c[1], stealColor: c[2] ? GOLD : GREY, base: c[3], baseColor: c[4] ? GOLD : GREY };
+    });
+
+    return {
+      running: running,
+      runners: runners,
+      gated: gated,
+      neutral: neutral,
+      gridRows: gridRows,
+      cardTeam: cardTeam,
+      cardPlayers: cardPlayers,
+      gridDisplay: gridOpen ? 'flex' : 'none',
+      gridExpanded: gridOpen ? 'true' : 'false',
+      gridButton: gridOpen ? 'Hide the situations' : 'By situation (3 × 4)',
+      toggleGrid: function () { self.setState({ gridOpen: !gridOpen }); },
+      cardDisplay: cardOpen ? 'flex' : 'none',
+      cardExpanded: cardOpen ? 'true' : 'false',
+      toggleCard: function () { self.setState({ cardOpen: !cardOpen }); }
+    };
+  }
+}
+</script>
+</x-dc>
+</body></html>

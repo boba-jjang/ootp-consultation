@@ -105,6 +105,23 @@
       "w": 1440,
       "x": 4560,
       "y": 0
+    },
+    "Strategy.dc.html": {
+      "expand": "fill",
+      "h": 2600,
+      "is_interactive": true,
+      "title": "Strategy view and manager's card (Game 71, from the engine)",
+      "w": 1440,
+      "x": 6080,
+      "y": 0
+    },
+    "StrategyFallback.dc.html": {
+      "h": 760,
+      "is_interactive": true,
+      "title": "Strategy view without the league's running columns (Game 53)",
+      "w": 1000,
+      "x": 2780,
+      "y": 2830
     }
   },
   "createdOnFiles": {
@@ -126,7 +143,7 @@
     },
     "screens": {
       "kind": "title1",
-      "maxW": 6000,
+      "maxW": 7600,
       "text": "Screens",
       "w": 240,
       "x": 0,
@@ -134,7 +151,7 @@
     },
     "states": {
       "kind": "title1",
-      "maxW": 2700,
+      "maxW": 3800,
       "text": "When data is missing",
       "w": 240,
       "x": 0,
@@ -146,9 +163,11 @@
     "Clubhouse.dc.html",
     "Bullpen.dc.html",
     "TalentRadar.dc.html",
+    "Strategy.dc.html",
     "DiamondNoRatings.dc.html",
     "MonitorNoSuperstats.dc.html",
     "DevLabLocked.dc.html",
+    "StrategyFallback.dc.html",
     "TeamMenu.dc.html",
     "SetupStart.dc.html",
     "SetupFilesRead.dc.html",

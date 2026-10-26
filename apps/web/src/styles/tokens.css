@@ -226,4 +226,26 @@
   --slot-card-empty-border: var(--border-accent-dashed); /* nobody eligible */
   --changed-chip-fg: var(--color-accent);
   --changed-chip-border: var(--border-accent-muted);
+
+  /* The strategy view's four labels (design decisions § 1.3): borders, never emerald or crimson. */
+  --label-calibrated-bg: rgb(var(--chalk-rgb) / 0.08);
+  --label-calibrated-border: 1px solid rgb(var(--chalk-rgb) / 0.28);
+  --label-calibrated-fg: var(--color-text);
+  --label-research-border: 1px solid rgb(var(--chalk-rgb) / 0.18);
+  --label-research-fg: var(--color-text-secondary);
+  --label-borderline-bg: var(--tint-accent-faint);
+  --label-borderline-border: var(--border-accent);
+  --label-borderline-fg: var(--color-accent);
+  --label-none-border: 1px dashed rgb(var(--chalk-rgb) / 0.22);
+  --label-none-fg: var(--color-text-tertiary);
+  --override-chip-bg: var(--tint-accent);
+  --override-chip-border: 1px solid rgb(var(--gold-rgb) / 0.45);
+  --callout-bg: var(--tint-accent-faint);
+  --callout-border: var(--border-accent-dashed);
+  --bar-track: rgb(var(--chalk-rgb) / 0.1);
+  --bar-tick: var(--line-marker);
+  --bar-muted: rgb(var(--chalk-rgb) / 0.28);
+  --grid-cell-bg: var(--color-surface-sunken);
+  --grid-cell-differs-bg: var(--tint-accent);
+  --grid-cell-differs-border: var(--border-accent);
 }

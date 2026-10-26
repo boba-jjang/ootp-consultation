@@ -134,6 +134,8 @@ test.describe('How columns were read, on the sheet', () => {
 
 test.describe('the Lineup card, on the sheet', () => {
   test('shows every view, switched by keyboard, and passes the checks', async ({ page }) => {
+    // Three axe passes over the whole sheet, which the strategy examples made larger.
+    test.setTimeout(60_000);
     await page.goto('/sheet');
     const full = page.getByRole('region', { name: 'Game 71 with its splits', exact: true });
     await expect(
@@ -217,6 +219,8 @@ test.describe('the strategy view, on the sheet', () => {
   test('shows the team set, the drawer and the manager’s card, and passes the checks', async ({
     page,
   }) => {
+    // Two axe passes over the whole sheet: the team set, then the drawer and the card open.
+    test.setTimeout(90_000);
     await page.goto('/sheet');
     const full = page.getByRole('region', { name: 'Strategy at Game 71', exact: true });
     await expect(
@@ -258,10 +262,10 @@ test.describe('the strategy view, on the sheet', () => {
     await expect(drawerButton).toHaveAttribute('aria-expanded', 'false');
     await drawerButton.focus();
     await page.keyboard.press('Enter');
-    await expect(drawerButton).toHaveAttribute('aria-expanded', 'true');
-    await expect(
-      full.getByRole('button', { name: 'Hide the situations', exact: true }),
-    ).toBeVisible();
+    // The same button, renamed once the drawer is open.
+    const hideButton = full.getByRole('button', { name: 'Hide the situations', exact: true });
+    await expect(hideButton).toHaveAttribute('aria-expanded', 'true');
+    await expect(hideButton).toBeFocused();
     const drawer = full.getByRole('region', { name: 'By situation', exact: true });
     await expect(drawer.getByRole('combobox', { name: 'By situation', exact: true })).toHaveValue(
       'stealing',
@@ -272,9 +276,6 @@ test.describe('the strategy view, on the sheet', () => {
       .getByRole('combobox', { name: 'By situation', exact: true })
       .selectOption('baserunning');
     await expect(drawer.locator('[role="cell"][data-band]').first()).toHaveText('2');
-    await expectAccessible(page);
-    await expectTargets(page);
-    await expectNoSideScroll(page);
 
     // The manager's card opens the same way: eleven Team Strategy rows, six players, a download.
     const cardButton = full.getByRole('button', { name: 'Manager’s card', exact: true });

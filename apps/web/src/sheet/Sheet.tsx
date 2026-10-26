@@ -16,6 +16,7 @@ import { BestFirstUpload, DropZone, FilesRead, FoundInFiles } from '../setup/pie
 import { Gate } from '../shell/Gate.tsx';
 import { Tabs } from '../shell/Tabs.tsx';
 import { TopBar } from '../shell/TopBar.tsx';
+import { StrategyBoard } from '../strategy/pieces.tsx';
 
 import { ArrowMark, DiamondMark, PlusIcon, SlidersIcon, UploadIcon } from '../ui/icons.tsx';
 import {
@@ -46,6 +47,8 @@ import {
   SHEET_PENDING,
   SHEET_RESULTS,
   SHEET_SPLIT_CARD,
+  SHEET_STRATEGY,
+  SHEET_STRATEGY_FALLBACK,
 } from './mock.ts';
 import styles from './Sheet.module.css';
 
@@ -254,6 +257,53 @@ export function Sheet() {
             card={null}
             status={{ kind: 'failed', message: 'the worker stopped', onRetry: () => undefined }}
             clubhouse="/sheet"
+          />
+        </Example>
+      </Section>
+
+      <Section
+        title="Strategy view"
+        note="Bullpen & tactics' team set on a pretend Game 71, the fallback at Game 53, and the states"
+      >
+        <Example label="Strategy at Game 71">
+          <StrategyBoard
+            card={SHEET_STRATEGY}
+            status={{ kind: 'ready' }}
+            clubhouse="/sheet"
+            onDownload={() => undefined}
+            downloaded={null}
+          />
+        </Example>
+        <Example label="Strategy at Game 53">
+          <StrategyBoard
+            card={SHEET_STRATEGY_FALLBACK}
+            status={{ kind: 'ready' }}
+            clubhouse="/sheet"
+            onDownload={() => undefined}
+            downloaded="Your download started: seattle-arrows-strategy-game-53.txt."
+          />
+        </Example>
+        <Example label="Strategy working">
+          <StrategyBoard
+            card={null}
+            status={{ kind: 'working', stage: 'strategy' }}
+            clubhouse="/sheet"
+            onDownload={() => undefined}
+            downloaded={null}
+          />
+        </Example>
+        <Example label="Strategy failed">
+          <StrategyBoard
+            card={null}
+            status={{
+              kind: 'failed',
+              stage: 'strategy',
+              message: 'the worker stopped',
+              onRetry: () => undefined,
+            }}
+            clubhouse="/sheet"
+            onDownload={() => undefined}
+            downloaded={null}
           />
         </Example>
       </Section>

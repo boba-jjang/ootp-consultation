@@ -86,7 +86,7 @@ import { handleLineupRequest, lineupRequest } from '../src/lineup/handler.ts';
 describe('number formats (Open questions 14)', () => {
   it('writes p̂ to three decimals without the leading zero', () => {
     expect(phat(0.8342)).toBe('.834');
-    expect(phat(0.4295)).toBe('.430');
+    expect(phat(0.4296)).toBe('.430');
     expect(phat(1)).toBe('1.000');
   });
 

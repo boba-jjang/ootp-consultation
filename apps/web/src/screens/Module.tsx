@@ -6,6 +6,7 @@ import { Gate } from '../shell/Gate.tsx';
 import { useShell } from '../shell/context.ts';
 import { gate, moduleById, modulePath } from '../shell/modules.ts';
 import styles from '../shell/Shell.module.css';
+import { StrategyView } from '../strategy/StrategyView.tsx';
 import { NotBuiltText } from './ComingSoon.tsx';
 import { NotFound } from './NotFound.tsx';
 
@@ -24,6 +25,10 @@ export function ModuleScreen() {
   if (module.id === 'lineup-card' && gate(module, snapshot.coverage).kind === 'open') {
     // Its selector goes back to Season with a new snapshot.
     return <LineupCard key={snapshotId} />;
+  }
+  if (module.id === 'bullpen' && gate(module, snapshot.coverage).kind === 'open') {
+    // Its drawer and manager's card close again with a new snapshot.
+    return <StrategyView key={snapshotId} />;
   }
   return (
     <main id="main" className={styles.main}>

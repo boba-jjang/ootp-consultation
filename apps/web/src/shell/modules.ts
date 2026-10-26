@@ -44,8 +44,12 @@ export const MODULES = [
   {
     id: 'bullpen',
     label: 'Bullpen & tactics',
-    needs: [{ side: 'pitchers', set: 'stats' }],
-    arrives: 'Phase 4',
+    // The strategy view reads the hitters alone; the pitching monitor is a later task.
+    needs: [
+      { side: 'hitters', set: 'stats' },
+      { side: 'hitters', set: 'ratings' },
+    ],
+    arrives: null,
   },
   {
     id: 'dev-lab',

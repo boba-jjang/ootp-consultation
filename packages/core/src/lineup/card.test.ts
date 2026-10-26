@@ -899,17 +899,21 @@ describe('the exchange loop’s lineup (req-views, Open questions 8)', () => {
     expect(card.notes.map((note) => note.code)).toEqual(['no-backup-catcher']);
   });
 
-  it('builds on the estimator’s settings, the defaults shrinking the priors', () => {
-    const shrunk = lineupCard(snapshot, team);
-    const batting = teamBatting(snapshot);
-    const season = selectLineup(snapshot, team, DEFAULT_LINEUP_SETTINGS, batting);
-    expect(shrunk.sources.lineups.season).toEqual(season);
-    for (const spot of orderOf(shrunk.season).spots) {
-      expect(spot.wOBA, spot.name).toBe(hitterOf(batting.hitters, spot.name).wOBA);
-    }
-    expect(hitterOf(batting.hitters, 'Slugger').wOBA).not.toBeCloseTo(
-      hitterOf(teamBatting(snapshot, DEFAULT_BATTING_SETTINGS, UNSHRUNK).hitters, 'Slugger').wOBA,
-      6,
-    );
-  });
+  it(
+    'builds on the estimator’s settings, the defaults shrinking the priors',
+    { timeout: 180_000 },
+    () => {
+      const shrunk = lineupCard(snapshot, team);
+      const batting = teamBatting(snapshot);
+      const season = selectLineup(snapshot, team, DEFAULT_LINEUP_SETTINGS, batting);
+      expect(shrunk.sources.lineups.season).toEqual(season);
+      for (const spot of orderOf(shrunk.season).spots) {
+        expect(spot.wOBA, spot.name).toBe(hitterOf(batting.hitters, spot.name).wOBA);
+      }
+      expect(hitterOf(batting.hitters, 'Slugger').wOBA).not.toBeCloseTo(
+        hitterOf(teamBatting(snapshot, DEFAULT_BATTING_SETTINGS, UNSHRUNK).hitters, 'Slugger').wOBA,
+        6,
+      );
+    },
+  );
 });

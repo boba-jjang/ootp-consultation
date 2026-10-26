@@ -213,6 +213,145 @@ test.describe('the Lineup card, on the sheet', () => {
   });
 });
 
+test.describe('the strategy view, on the sheet', () => {
+  test('shows the team set, the drawer and the manager’s card, and passes the checks', async ({
+    page,
+  }) => {
+    await page.goto('/sheet');
+    const full = page.getByRole('region', { name: 'Strategy at Game 71', exact: true });
+    await expect(
+      full.getByRole('heading', { name: 'Team strategy for the week', exact: true }),
+    ).toBeVisible();
+    await expect(full.getByText('One set for the week', { exact: false })).toBeVisible();
+    await expect(full.getByText(/^All 12 situations match/)).toBeVisible();
+
+    // The two running cards, five override chips each, and the borderline runners in the footers.
+    const stealing = full.getByRole('article', { name: 'Stealing', exact: true });
+    const baserunning = full.getByRole('article', { name: 'Baserunning', exact: true });
+    await expect(stealing).toBeVisible();
+    await expect(baserunning).toBeVisible();
+    const overrides = full.getByRole('list', { name: /^Player Strategy overrides/ });
+    await expect(overrides).toHaveCount(2);
+    await expect(overrides.getByRole('listitem')).toHaveCount(10);
+    await expect(stealing.getByRole('listitem').first()).toHaveText(/^Geng\s*10$/);
+    await expect(baserunning.getByRole('listitem').first()).toHaveText(/^Obata\s*10$/);
+    const footers = full.getByText(/^◆ Borderline \(stays at the team’s \d+\):/);
+    await expect(footers).toHaveCount(2);
+    await expect(footers.nth(0)).toContainText('Kamimura (1.93)');
+    await expect(footers.nth(1)).toContainText('Ishida (0.45), Shinn (0.08) and Kawasaki (3.52)');
+
+    // Five gated rows with two vs LHP pills, and four rows without a rule.
+    const gated = full.getByRole('list', { name: 'Gated on the week’s lineup', exact: true });
+    await expect(gated.getByRole('listitem')).toHaveCount(5);
+    await expect(gated.getByText(/^vs LHP: /)).toHaveCount(2);
+    await expect(gated.getByText('vs LHP: 8 (research rule)', { exact: true })).toBeVisible();
+    await expect(gated.getByText('vs LHP: 5 (borderline)', { exact: true })).toBeVisible();
+    const noRule = full.getByRole('list', { name: 'At neutral (5), no rule yet', exact: true });
+    await expect(noRule.getByRole('listitem')).toHaveCount(4);
+    await expect(full.getByText(/[▲▼]/)).toHaveCount(0);
+    await expectAccessible(page);
+    await expectTargets(page);
+    await expectNoSideScroll(page);
+
+    // The situations drawer opens from the keyboard: a select over the sliders and the 3 × 4 grid.
+    const drawerButton = full.getByRole('button', { name: 'By situation (3 × 4)', exact: true });
+    await expect(drawerButton).toHaveAttribute('aria-expanded', 'false');
+    await drawerButton.focus();
+    await page.keyboard.press('Enter');
+    await expect(drawerButton).toHaveAttribute('aria-expanded', 'true');
+    await expect(
+      full.getByRole('button', { name: 'Hide the situations', exact: true }),
+    ).toBeVisible();
+    const drawer = full.getByRole('region', { name: 'By situation', exact: true });
+    await expect(drawer.getByRole('combobox', { name: 'By situation', exact: true })).toHaveValue(
+      'stealing',
+    );
+    await expect(drawer.locator('[role="cell"][data-band]')).toHaveCount(12);
+    await expect(drawer.getByText(/^Grey cells match the slider’s team value/)).toBeVisible();
+    await drawer
+      .getByRole('combobox', { name: 'By situation', exact: true })
+      .selectOption('baserunning');
+    await expect(drawer.locator('[role="cell"][data-band]').first()).toHaveText('2');
+    await expectAccessible(page);
+    await expectTargets(page);
+    await expectNoSideScroll(page);
+
+    // The manager's card opens the same way: eleven Team Strategy rows, six players, a download.
+    const cardButton = full.getByRole('button', { name: 'Manager’s card', exact: true });
+    await expect(cardButton).toHaveAttribute('aria-expanded', 'false');
+    await cardButton.focus();
+    await page.keyboard.press('Enter');
+    await expect(cardButton).toHaveAttribute('aria-expanded', 'true');
+    const card = full.getByRole('region', { name: 'Manager’s card · Game 71', exact: true });
+    await expect(card).toBeVisible();
+    await expect(
+      card.getByRole('table', { name: 'Part 1 · Team Strategy', exact: true }).locator('tbody tr'),
+    ).toHaveCount(11);
+    await expect(
+      card
+        .getByRole('table', { name: 'Part 2 · Player Strategy', exact: true })
+        .locator('tbody tr'),
+    ).toHaveCount(6);
+    await expect(card.getByText(/^Borderline, no override: Kamimura \(stealing\)/)).toBeVisible();
+    await expect(
+      card.getByRole('button', { name: 'Download the card', exact: true }),
+    ).toBeVisible();
+    await expect(card.getByRole('button', { name: /Mark as applied/ })).toHaveCount(0);
+    await expectAccessible(page);
+    await expectTargets(page);
+    await expectNoSideScroll(page);
+  });
+
+  test('shows the fallback without the league’s running columns, and the other states', async ({
+    page,
+  }) => {
+    await page.goto('/sheet');
+    const fallback = page.getByRole('region', { name: 'Strategy at Game 53', exact: true });
+    await expect(
+      fallback.getByText('The league files on this snapshot carry no running columns.', {
+        exact: false,
+      }),
+    ).toBeVisible();
+    await expect(
+      fallback.getByRole('link', { name: 'League files in the Clubhouse', exact: true }),
+    ).toBeVisible();
+    const stealing = fallback.getByRole('article', { name: 'Stealing', exact: true });
+    await expect(stealing.getByRole('listitem')).toHaveCount(1);
+    await expect(stealing.getByRole('listitem')).toHaveText(
+      /^Yamanaka\s*0\s*·\s*steal rate 9, speed 2$/,
+    );
+    await expect(stealing.getByText(/^◆ Borderline \(stays at the team’s 2\):/)).toContainText(
+      'steal rate',
+    );
+    const baserunning = fallback.getByRole('article', { name: 'Baserunning', exact: true });
+    await expect(baserunning.getByText('No rule yet', { exact: true })).toBeVisible();
+    await expect(
+      baserunning.getByText('Stays at OOTP’s 5 for every hitter. No overrides.', { exact: true }),
+    ).toBeVisible();
+    await expect(
+      fallback.getByText(
+        'The batting splits are missing, so there is no left-handers’ lineup to read.',
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await expect(
+      fallback.getByRole('link', { name: 'Add batting splits', exact: true }),
+    ).toBeVisible();
+
+    await expect(
+      page.getByRole('region', { name: 'Strategy working', exact: true }).getByRole('status'),
+    ).toHaveText('Working out the strategy…');
+    const failed = page.getByRole('region', { name: 'Strategy failed', exact: true });
+    await expect(failed.getByRole('alert')).toHaveText(
+      'The strategy couldn’t be worked out: the worker stopped',
+    );
+    await expect(failed.getByRole('button', { name: 'Try again', exact: true })).toBeVisible();
+    await expectAccessible(page);
+    await expectTargets(page);
+    await expectNoSideScroll(page);
+  });
+});
+
 test.describe('sign-in', () => {
   test('is where a visitor without a session lands', async ({ page }) => {
     await page.goto('/');

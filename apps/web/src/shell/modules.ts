@@ -58,7 +58,8 @@ export const MODULES = [
       { side: 'hitters', set: 'ratings' },
       { side: 'pitchers', set: 'ratings' },
     ],
-    arrives: 'Phase 4',
+    // The development planner is deferred (Knowledge Base › Product vision and scope › Later).
+    arrives: 'a later release',
   },
 ] as const satisfies readonly Module[];
 

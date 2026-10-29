@@ -131,7 +131,7 @@ test.describe('Create a Team from the fixtures', () => {
     await expectNoSideScroll(page);
 
     await page.getByRole('link', { name: 'Dev lab (locked)' }).click();
-    await expect(page.getByText('Dev lab arrives in Phase 4')).toBeVisible();
+    await expect(page.getByText('Dev lab arrives in a later release')).toBeVisible();
     await expectAccessible(page);
     await expectTargets(page);
   });

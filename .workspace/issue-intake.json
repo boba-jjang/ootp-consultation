@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "project_id": "ootp-consultation",
+  "default_route": "plan-task",
+  "routes": {
+    "plan-task": {
+      "inserts": [
+        "core-logic",
+        "database",
+        "screen"
+      ]
+    }
+  },
+  "title_prefix": "[CAO] ",
+  "labels": [
+    "cao-intake"
+  ],
+  "operation": "github.issue_create"
+}

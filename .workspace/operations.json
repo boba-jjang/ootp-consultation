@@ -680,6 +680,63 @@
       "version": 1
     },
     {
+      "id": "github.issue_create",
+      "version": 1,
+      "description": "File one structured CAO intake issue in boba-jjang/ootp-consultation from a rendered intake draft. Repository, account and labels are pinned; title and body arrive as the declared parameters or as a JSON document on stdin. No Git refs, pull requests or merges.",
+      "repository": "project",
+      "executor": "local",
+      "argv": [
+        "wsx-github-issue",
+        "create",
+        "--repository",
+        "boba-jjang/ootp-consultation",
+        "--account",
+        "boba-jjang",
+        "--label",
+        "cao-intake"
+      ],
+      "parameters": [
+        {
+          "name": "title",
+          "type": "string",
+          "max_length": 256,
+          "arg_map": {
+            "style": "flag_equals",
+            "flag": "--title"
+          }
+        },
+        {
+          "name": "body",
+          "type": "string",
+          "max_length": 65000,
+          "arg_map": {
+            "style": "flag_equals",
+            "flag": "--body"
+          }
+        }
+      ],
+      "timeout_seconds": 180,
+      "result_adapter": "exit-code",
+      "effects": [
+        "write-github",
+        "write-run-evidence"
+      ],
+      "resources": [],
+      "requires": [
+        {
+          "probe": "executable",
+          "name": "wsx-github-issue"
+        },
+        {
+          "probe": "executable",
+          "name": "gh"
+        }
+      ],
+      "evidence_limits": [
+        "Creates one GitHub issue; no branch, pull request, merge or acceptance. Issue text is untrusted data for every later reader."
+      ]
+    },
+    {
       "argv": [
         "wsx-github-write",
         "merge",

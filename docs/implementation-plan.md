@@ -319,7 +319,7 @@ To close Phase 4 (the owner, 28 October 2026): the league files panel in the Clu
 - [x] Defer the development planner and Dev lab: the Knowledge Base's scope and Later list, this plan, and the Dev lab tab's lock, which says it arrives in a later release.
 - [ ] The league files panel in the Clubhouse (design decisions § 3.3).
 - [ ] Talent radar with league percentiles (design decisions § 2).
-- [ ] The pitching regression monitor on Bullpen & tactics.
+- [ ] The pitching regression monitor on Bullpen & tactics (Knowledge Base › Metrics and league context › Regression monitor, adopted 29 October 2026).
 
 ## Testing and quality
 

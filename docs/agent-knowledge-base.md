@@ -2,7 +2,7 @@
 
 Oct 4, 2026 · @Jay
 
-> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 28 October 2026.
+> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 29 October 2026.
 
 ## Agent brief
 
@@ -394,6 +394,17 @@ HR/FB against barrel rate compares a player's HR/FB with the rate his barrels pr
 - Team values are totals or weighted means: BACON from hits and BIP, xBACON weighted by BIP, wOBA and xwOBA by PA, ERA from earned runs and outs, and xERA by outs. ERA − FIP and HR/FB against barrels need no team baseline, because FIP carries the league's constant and xHR/FB the league's home runs per barrel.
 - A pitcher's regression signal comes from the talent estimator (FIP, SIERA and ratings), with xERA as one input, because pitchers' contact superstats don't track their contact ratings (section 7).
 - Game 42's league files carry no hits, so there is no league-wide contact baseline there. Game 53's carry H and HA; using them is a later decision, and the team baseline stays the rule.
+
+### Regression monitor
+
+The Bullpen & tactics monitor reads each pitcher's ERA against what his skills predict. The owner adopted this rule on 29 October 2026; its thresholds are research rules, and each one is a setting.
+
+- **Expected ERA** is the mean of FIP, SIERA and xERA, with xERA first moved by the staff's ERA − xERA offset (Luck baselines above; +0.15 at Game 42). Without xERA (no pitching superstats) it is the mean of FIP and SIERA, and without SIERA it is FIP alone.
+- **The signal.** The gap is expected ERA minus ERA. A gap of a run or more is ▼ should decline: his ERA is running below his skills. A gap of minus a run or less is ▲ should improve. Between half a run and a run either way, the talent estimator decides: a flagged Stuff or Control estimate that points the same way (below his scouting for a decline, above it for an improvement) confirms the signal. Otherwise, and under half a run, he is holding steady.
+- **Small samples.** Under 70 batters faced, Stuff's stabilization point, the ERA gap isn't read. A flagged Stuff or Control estimate gives the direction on its own, and the row is tagged small sample.
+- **Roles and order.** Starters and relievers come from usage, as in League percentiles › Peer pools (half his games or more as starts); closers count as relievers, with the listed CL shown. The rotation is ordered by games started and the bullpen by leverage (pLI), highest first.
+- **Settings:** the signal gap (1.0 run), the estimator band (0.5 run), the small-sample floor (70 batters faced) and the xERA offset, measured from the staff.
+- The canvas's "Decide who closes" card isn't built: no rule backs it.
 
 ### Stabilization
 

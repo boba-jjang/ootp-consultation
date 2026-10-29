@@ -233,7 +233,7 @@ Hobby functions can run for [300 seconds](https://vercel.com/docs/functions/limi
 | 7 | Defensive model and eligibility matrix | Defensive model (§ 9) | Lineup card | 4 |
 | 8 | Strategy rules engine | Strategy rules (§ 10) | Bullpen & tactics | 4 |
 | 9 | Lineup optimizer, in a Web Worker | Lineup optimization (§ 11) | Lineup card | 4 |
-| 10 | Development planner | Development planner (§ 12) | Dev lab | 4 |
+| 10 | Development planner (deferred, 28 October 2026) | Development planner (§ 12) | Dev lab | Later |
 | 11 | Consultation output and the manager's card | Product vision and scope (§ 2) | Every screen, advisor | 4–5 |
 | 12 | Backtest | Delivery plan (§ 15) | Trends | 6 |
 
@@ -314,6 +314,13 @@ Phase 4 screens, one pull request each, each built on its models' output:
 - [x] The Lineup card: the Dugout board's defensive alignment and batting order from lineup v2, worked out in a Web Worker, with a Season / vs RHP / vs LHP selector for the lineups by the starter's hand (Season by default; each hand marks what changed from the season lineup and shows its gain); each slot's batting and fielding runs with the estimate's band, the backup catcher, the bench, PA by spot and The Book's order, and locked states that name what unlocks them (Knowledge Base › Lineup optimization › Selection, › Ordering and › Lineups by the starter's hand).
 - [x] The strategy view on Bullpen & tactics: the week's team set from the strategy rules engine, worked out in a Web Worker from the cached lineup card, with the four labels and every value's reason; the Stealing and Baserunning cards with their Player Strategy overrides and borderline runners; the per-runner reads; the gated sliders with the left-handers' note; the no-rule sliders at 5; the inning-band and score-state grid; the manager's card (Team Strategy and Player Strategy) as a text download; and the fallback states without the league's running columns or the splits (Knowledge Base › Strategy rules; design decisions § 1).
 
+To close Phase 4 (the owner, 28 October 2026): the league files panel in the Clubhouse, Talent radar, and the pitching regression monitor on Bullpen & tactics, one pull request each. The development planner and the Dev lab screen are deferred: the league's development settings and Lab outcomes appear in no export, so no rule could be calibrated.
+
+- [x] Defer the development planner and Dev lab: the Knowledge Base's scope and Later list, this plan, and the Dev lab tab's lock, which says it arrives in a later release.
+- [ ] The league files panel in the Clubhouse (design decisions § 3.3).
+- [ ] Talent radar with league percentiles (design decisions § 2).
+- [ ] The pitching regression monitor on Bullpen & tactics (Knowledge Base › Metrics and league context › Regression monitor, adopted 29 October 2026).
+
 ## Testing and quality
 
 The Seattle game-42 exports are the golden fixtures: every parser rule, identity check and model output is tested against them. Each row of the Knowledge Base's "Columns that need special handling" table becomes at least one test; that table is the checklist.
@@ -362,7 +369,7 @@ Frontend coding starts in Phase 3, after the platform and data foundation. A pha
 | 1. Walking skeleton | Repo, CI, Vercel deploys, GitHub sign-in; two Supabase projects, migration 0001 | Sign in on production, save and reload a team; a pull request shows green checks and a preview |
 | 2. Data foundation | Importer for the team views and the league files, golden fixtures, full policy tests; upload, import log and Export team | The 11 Seattle files make a Game 42 snapshot; the hitter capture routes as supplemental; the four league files load |
 | 3. Frontend foundation | Tokens, shell, routing, lock framework; Team menu, Create a Team, Clubhouse | Setup and Clubhouse match the canvas on real data; end-to-end and accessibility tests pass |
-| 4. Models and screens | Metrics, percentiles, estimator, defense, strategy, optimizer, development; each with its screen | Every screen shows model output with evidence and confidence; no placeholders left |
+| 4. Models and screens | Metrics, percentiles, estimator, defense, strategy, optimizer; each with its screen. The development planner and Dev lab are deferred (Knowledge Base › Product vision and scope › Later) | Every screen shows model output with evidence and confidence; no placeholders left but the deferred Dev lab tab, which says so |
 | 5. Advisor | Advisor function, prompt contract, daily cap; manager's card export | Answers cite snapshot numbers and name any missing data |
 | 6. Trends and backtest | Snapshot comparisons and trend views; backtest against later exports | A second snapshot shows trends; the backtest scores the Game 42 projections |
 

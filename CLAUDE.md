@@ -2,7 +2,7 @@
 
 ## Project
 
-OOTP CSV Consultation is a personal, free-tier web app. It turns one team's Out of the Park Baseball screen-view CSV exports into consultation: positions, batting order, strategy sliders with per-player overrides, and development priorities. Every recommendation shows its evidence and its confidence. Single user, no commercial use.
+OOTP CSV Consultation is a personal, free-tier web app. It turns one team's Out of the Park Baseball screen-view CSV exports into consultation: positions, batting order, strategy sliders with per-player overrides, and pitcher usage notes (development priorities are deferred). Every recommendation shows its evidence and its confidence. Single user, no commercial use.
 
 ## Read before working
 

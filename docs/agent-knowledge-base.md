@@ -2,7 +2,7 @@
 
 Oct 4, 2026 · @Jay
 
-> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 25 October 2026.
+> Exported from the [Agent Knowledge Base Claude Doc](https://claude.ai/artifact/55qcBRFbHvAiZWsD6eFAKo) on 29 October 2026.
 
 ## Agent brief
 
@@ -58,7 +58,7 @@ The app is a persistent franchise assistant for Out of the Park Baseball (OOTP 2
 
 - Ingests OOTP screen-view CSV exports for one team, plus league-wide sortable stats.
 - Estimates each player's current talent. Some leagues, including the user's, hide current batting and pitching ratings and show only potentials.
-- Recommends a starting lineup with positions and batting order, slider settings by game situation with per-player overrides, pitcher usage notes, and development priorities.
+- Recommends a starting lineup with positions and batting order, slider settings by game situation with per-player overrides, and pitcher usage notes. Development priorities are deferred (Later, below).
 - Ranks players against the league with percentiles, in separate pools for hitters, starters and relievers.
 
 ### The persistent team model
@@ -80,6 +80,7 @@ The app is a persistent franchise assistant for Out of the Park Baseball (OOTP 2
 - OOTP database-dump imports (full league tables keyed by player ID).
 - Trade and contract valuation.
 - Opponent-specific advice, which needs opponent exports, pinch-hitting rules by the pitcher's hand are promoted, the first strategy rule to come from the splits (section 10), and the lineups by the starter's hand are in (section 11).
+- The development planner and the Dev lab (section 12), deferred on 28 October 2026. The league's development settings (the Development Lab's program improvement magnitude, and how development weighs work ethic and IQ) appear in no export, and no export records a program's outcome, so no rule could be calibrated the way the running reads are. Section 12 stays as research notes until the feature is promoted.
 
 ### Constraints
 
@@ -106,7 +107,7 @@ Exports pass validation into the team store. The store feeds metrics, percentile
 | Defensive model | Fielding ratings, DEF, DEF Pot | Player × position eligibility and fielding-run estimates |
 | Lineup optimizer | Estimates, eligibility, league settings | Starting nine with positions and batting order, and the lineups against right- and left-handed starters |
 | Strategy rules | Estimates, the week's lineup, fielding and running ratings, the league's running stats and ratings | One team set by situation with a value, reason and label per slider, per-player overrides, and the left-handers' note |
-| Development planner | Potentials, risk, work ethic, IQ, age | Development priorities and suggested levers |
+| Development planner (deferred) | Potentials, risk, work ethic, IQ, age | Development priorities and suggested levers |
 | Consultation output | Every module's results | Recommendations, each with evidence and confidence |
 
 ### Platform direction
@@ -393,6 +394,17 @@ HR/FB against barrel rate compares a player's HR/FB with the rate his barrels pr
 - Team values are totals or weighted means: BACON from hits and BIP, xBACON weighted by BIP, wOBA and xwOBA by PA, ERA from earned runs and outs, and xERA by outs. ERA − FIP and HR/FB against barrels need no team baseline, because FIP carries the league's constant and xHR/FB the league's home runs per barrel.
 - A pitcher's regression signal comes from the talent estimator (FIP, SIERA and ratings), with xERA as one input, because pitchers' contact superstats don't track their contact ratings (section 7).
 - Game 42's league files carry no hits, so there is no league-wide contact baseline there. Game 53's carry H and HA; using them is a later decision, and the team baseline stays the rule.
+
+### Regression monitor
+
+The Bullpen & tactics monitor reads each pitcher's ERA against what his skills predict. The owner adopted this rule on 29 October 2026; its thresholds are research rules, and each one is a setting.
+
+- **Expected ERA** is the mean of FIP, SIERA and xERA, with xERA first moved by the staff's ERA − xERA offset (Luck baselines above; +0.15 at Game 42). Without xERA (no pitching superstats) it is the mean of FIP and SIERA, and without SIERA it is FIP alone.
+- **The signal.** The gap is expected ERA minus ERA. A gap of a run or more is ▼ should decline: his ERA is running below his skills. A gap of minus a run or less is ▲ should improve. Between half a run and a run either way, the talent estimator decides: a flagged Stuff or Control estimate that points the same way (below his scouting for a decline, above it for an improvement) confirms the signal. Otherwise, and under half a run, he is holding steady.
+- **Small samples.** Under 70 batters faced, Stuff's stabilization point, the ERA gap isn't read. A flagged Stuff or Control estimate gives the direction on its own, and the row is tagged small sample.
+- **Roles and order.** Starters and relievers come from usage, as in League percentiles › Peer pools (half his games or more as starts); closers count as relievers, with the listed CL shown. The rotation is ordered by games started and the bullpen by leverage (pLI), highest first.
+- **Settings:** the signal gap (1.0 run), the estimator band (0.5 run), the small-sample floor (70 batters faced) and the xERA offset, measured from the staff.
+- The canvas's "Decide who closes" card isn't built: no rule backs it.
 
 ### Stabilization
 
@@ -735,7 +747,7 @@ The season evaluation never reads the splits: estimates, batting runs, the seaso
 
 ## Development planner
 
-The planner turns potentials, development risk, work ethic, IQ and age into priorities for OOTP's two levers: the development sliders and the Development Lab. The research's priorities are community claims to validate.
+The planner turns potentials, development risk, work ethic, IQ and age into priorities for OOTP's two levers: the development sliders and the Development Lab. The research's priorities are community claims to validate. Deferred on 28 October 2026 (Product vision and scope › Later): nothing in this section is built until it is promoted.
 
 ### Levers
 
@@ -921,8 +933,8 @@ Phase gates close in order. Inside a phase, modules follow the Depends on column
 | Batting order: Markov model with The Book fallback | 11 | 4 | Lineup selection, event rates and batting runs | Run expectancy matches hand-computed toy lineups (homer-or-strikeout gives 3h ÷ (1 − h) runs per inning); Game 71's order is Yamanaka, Obata, Kawasaki, Shinn, Kamimura, Geng, Moon, Tsumoto, Choi, the best of all 9! orders, with 732 PA at #1 to 598 at #9 |
 | Lineup v2: selection on the league-wOBA batting runs, the defensive blend, the catcher share and the exchange loop | 9, 11 | 4 | Event rates and batting runs, batting order | On Game 71: C Tsumoto (backup Ishida), 1B Shinn, 2B Choi, 3B Kawasaki, SS Moon, LF Kamimura, CF Geng, RF Obata, DH Yamanaka |
 | Lineups by the starter's hand: league platoon ratios, each hitter's own split weighted by the league's spread, the lineup v2 search per hand, and What to upload next's card for the batting splits | 11 | 4 | Split exports, lineup v2 | On Game 71 the ratios, weights and both lineups are section 11's: against right-handers Ishida catches, +4.99 runs per 152 games; against left-handers the season nine in a new order, +3.59; the season lineup unchanged |
-| Development planner | 12 | 4 | Talent estimator, defensive model, strategy rules engine (its gates) | Selection rules from section 12 reproduce the sample example |
-| Consultation output | 3 | 4–5 | Strategy rules, lineup and batting order, development planner | Every recommendation shows its evidence and confidence |
+| Development planner | 12 | Later | Talent estimator, defensive model, strategy rules engine (its gates) | Selection rules from section 12 reproduce the sample example |
+| Consultation output | 3 | 4–5 | Strategy rules, lineup and batting order | Every recommendation shows its evidence and confidence |
 | Backtest across snapshots | 2 | 6 | Team store, talent estimator | Adding a second snapshot reports estimator error per player |
 
 Tasks that depend on an open question (section 14) carry it in their charter and build behind a setting until it is answered.

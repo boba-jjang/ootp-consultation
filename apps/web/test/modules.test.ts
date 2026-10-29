@@ -88,7 +88,7 @@ describe('the lock framework', () => {
     const devLab = MODULES[4];
     expect(gate(devLab, withSets({ side: 'hitters', set: 'ratings' }))).toEqual({
       kind: 'arrives',
-      phase: 'Phase 4',
+      phase: 'a later release',
       missing: [{ side: 'pitchers', set: 'ratings' }],
     });
     expect(
@@ -96,7 +96,7 @@ describe('the lock framework', () => {
         devLab,
         withSets({ side: 'hitters', set: 'ratings' }, { side: 'pitchers', set: 'ratings' }),
       ),
-    ).toEqual({ kind: 'arrives', phase: 'Phase 4', missing: [] });
+    ).toEqual({ kind: 'arrives', phase: 'a later release', missing: [] });
   });
 
   it('locks a built module on the sets it needs, in its own order', () => {
@@ -135,7 +135,7 @@ describe('the lock framework', () => {
         expect(gate(module, coverage)).toEqual(
           module.id === 'lineup-card' || module.id === 'bullpen'
             ? { kind: 'open' }
-            : { kind: 'arrives', phase: 'Phase 4', missing: [] },
+            : { kind: 'arrives', phase: module.arrives, missing: [] },
         );
       }
     }

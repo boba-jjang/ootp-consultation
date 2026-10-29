@@ -2,4 +2,4 @@ blank_issues_enabled: false
 contact_links:
   - name: "How CAO tasks are authored"
     url: "https://github.com/jjang3/cao-mcp-hub/blob/main/QUICKSTART.md"
-    about: "A filed intake issue is read by cao-task-issue-gen-* and fed to the project's task author; nothing runs from the issue itself."
+    about: "A filed intake issue is read by cao-issue-gen-* and fed to the project's task author; nothing runs from the issue itself."

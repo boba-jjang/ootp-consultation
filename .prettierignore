@@ -1,6 +1,8 @@
 # Generated
 pnpm-lock.yaml
 apps/web/src/database.types.ts
+# Written by cao-mcp-hub's issue intake (#95); kept byte for byte
+.github/ISSUE_TEMPLATE/
 dist/
 coverage/
 

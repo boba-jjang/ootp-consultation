@@ -1,0 +1,75 @@
+name: "CAO task intake"
+description: "Seed a goal for an AI host to compile a validated CAO task through cao-mcp-hub."
+title: "[CAO] "
+labels:
+  - "cao-intake"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Task handoffs are not hand-written. This form seeds a goal for an AI host connected to
+        the project's `cao-task-author-*` server; the hub assembles the kit, the host drafts the
+        Schema v2 contract, and validation checks requirement-to-check traceability. Only
+        **Task kind** and **Goal** are required. Filing an issue grants no execution or Git authority.
+  - type: dropdown
+    id: task_kind
+    attributes:
+      label: "Task kind"
+      description: "inspection reads and reports; change may write files inside the declared scope."
+      options:
+        - "change"
+        - "inspection"
+    validations:
+      required: true
+  - type: input
+    id: route_hint
+    attributes:
+      label: "Route hint"
+      description: "Optional route ID from the project's .workspace/task-authoring.json; blank selects the default route."
+      placeholder: "leave blank for the default route"
+    validations:
+      required: false
+  - type: textarea
+    id: request_goal
+    attributes:
+      label: "Goal"
+      description: "The outcome you want and why it matters. The AI host decomposes this into identified requirements."
+      placeholder: |
+        Outcome:
+        Why it matters:
+    validations:
+      required: true
+  - type: textarea
+    id: scope_boundaries
+    attributes:
+      label: "Scope and file boundaries"
+      description: "Optional. What is included, what is excluded, which paths to inspect, which files may be written."
+      placeholder: |
+        Included:
+        Excluded:
+        Inspect:
+        May write:
+    validations:
+      required: false
+  - type: textarea
+    id: verification_checks
+    attributes:
+      label: "Verification and acceptance seeds"
+      description: "Optional. How completion is proven: commands, evidence and explicit pass conditions. 'A report exists' is rejected downstream."
+      placeholder: |
+        Check:
+        Evidence:
+        Passes when:
+    validations:
+      required: false
+  - type: textarea
+    id: preparation_gaps_and_deps
+    attributes:
+      label: "Known unknowns, dependencies and scenario impact"
+      description: "Optional. Facts not yet established and how to resolve them; related issues; affected scenarios."
+      placeholder: |
+        Unknown:
+        Resolve by:
+        Depends on:
+    validations:
+      required: false

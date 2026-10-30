@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "project_id": "ootp-consultation",
+  "default_draft_version": 3,
+  "generated_paths": ["fixtures/seattle-*/**", "build/**", "node_modules/**", "dist/**", "apps/web/dist/**", "test-results/**", "playwright-report/**"],
+  "test_globs": ["**/*.test.ts", "**/*.test.tsx", "e2e/**/*.spec.ts"],
+  "test_commands": [
+    {"command": "pnpm test:core", "covers": ["packages/core/**"]},
+    {"command": "pnpm test:apps", "covers": ["apps/**"]},
+    {"command": "pnpm test", "covers": ["packages/**", "apps/**"]},
+    {"command": "pnpm e2e", "covers": ["e2e/**"]}
+  ]
+}

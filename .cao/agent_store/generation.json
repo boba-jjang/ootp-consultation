@@ -1,12 +1,12 @@
 {
-  "generation": "6c1059d1bc1172b9fc2512d4fc5b2759f6e0b2fdee4ca5e8575e8b1b270dd270",
+  "generation": "0a888ef3ae0177ec8d0c5eae3d62ac84589154c09e3eede2808d91d0840718b7",
   "inputs": {
     ".cao/roles/cao-callback-protocol.md": "6e881b78676039c5433feb0fc90cd1796c4ac32244fb7663587f88980a9223b0",
     ".cao/roles/ootp_code_owner.md": "59c4600857d512772296e12ceaca9240435e46a4b80780b7f11acff2b7d3a72a",
     ".cao/roles/ootp_developer.md": "23d0861c491f8c5416963c980b481285e69a83ca721bd12f0f1d732f8fa2bdec",
     ".cao/roles/ootp_qa.md": "59139a59e0141c1c0dc781d6bff2cdeba946bfda86ec0d8ac93980f452ae67e1",
     ".cao/roles/project.md": "acf4fd2f2605e17fe764da8c9aeb17c6856d81d8edfbc7fdc7c47596de20f2d3",
-    ".workspace/agent-contract.json": "7438261b1c30b490d62d590901de10c190c1cf8d2eb43748541af25db83dde52",
+    ".workspace/agent-contract.json": "eacc7a40a75ee23770e170963ead1259c43f5fe31973c0eb9f2ac5a6d6471592",
     ".workspace/native-agents.json": "17a5d75db703acb60eeadbe84d4ecd785d8b359cd1ce072be07f40ca0043b81b",
     ".workspace/role-bindings.json": "9c7145bb6dfe5db8fb802ca187b93c6ec789fa39230ccf06aa37c4661022031d",
     "CLAUDE.md": "9aabeac32cac00c26c8d09abe0846f5b22d9cf66138757ef150f97ce5f8ac619",
@@ -14,11 +14,14 @@
   },
   "outputs": {
     ".cao/agent_store/_base.md": "726a4344472f83185099fa6b41b89f6c878ff9ab3ec36e747c562445aa694144",
-    ".cao/agent_store/ootp_code_owner.md": "0831ba14d625f61743243b7e067fa976b6851f9888e53402d26c3100f97985e8",
+    ".cao/agent_store/ootp_code_owner.md": "3e6a0aaa82e68c43905e5c6bc11db5f0a4a6a69649fed88a717e6cd4c718baf4",
+    ".cao/agent_store/ootp_code_owner_agy.md": "906703158d4e98a8d217bd0128aa80e86a01a9a3f6fca84a49b4ff8572398d32",
     ".cao/agent_store/ootp_code_owner_claude.md": "77e61930bc5ef7e2809b2b92367fd0d29646f96e3066d8cf92b7b84c48795ea3",
-    ".cao/agent_store/ootp_developer.md": "cd12bbdc64112a444688871486f3cb9fb7feb8d232e2a1a75ecb20cb1439271f",
+    ".cao/agent_store/ootp_developer.md": "762e7017eb5168964b47b9f35ed558203519d9256cf851da55b565307a92ae40",
+    ".cao/agent_store/ootp_developer_agy.md": "2e2e225c91f5e7161d638460c5b8a2cc387879156511113ce5efc21ebb954a55",
     ".cao/agent_store/ootp_developer_claude.md": "0f0baf3c4afe846b46a449f1fda704f38849c556f83fe562c07926c09b4f3e8a",
-    ".cao/agent_store/ootp_qa.md": "a42687c6a6e11130c450ca23c59fb2ecb7243145f008b09cd52e18d9e55aec4d",
+    ".cao/agent_store/ootp_qa.md": "2e06188d3f28b418433527299f6baf55c094b240efef1a2f277fcbc8674e03a2",
+    ".cao/agent_store/ootp_qa_agy.md": "7dc92f7f8928eead9ec4083e861df6113426deb5a279877d194e8964dfd2fb39",
     ".cao/agent_store/ootp_qa_claude.md": "7040bb298d3b8f57e7f906eb269647b2bed524b3e5da1a1fce7da8ac9cf23cb6",
     ".claude/agents/ootp-code-owner.md": "f88c82be9f09e44b3a74c8f32083a66840d29265ab35bd28cad72b801a6589ba",
     ".claude/agents/ootp-developer.md": "5b8d2cec7c2d05fef85e8a8df46847b02db9ea06223d0e36647a4f4185dd8f6b",
@@ -40,9 +43,8 @@
           "mcp_servers.cao-mcp-server.tools.handoff.approval_mode": "approve",
           "mcp_servers.cao-mcp-server.tools.load_skill.approval_mode": "approve",
           "mcp_servers.cao-mcp-server.tools.send_message.approval_mode": "approve",
-          "sandbox_mode": "read-only"
+          "sandbox_mode": "danger-full-access"
         },
-        "codexProfile": "cao-readonly",
         "description": "Read-only coordinator: reads the task, delegates the implementation and the independent QA, verifies every callback and reports readiness to the owner.",
         "mcpServers": {
           "cao-mcp-server": {
@@ -65,6 +67,43 @@
         },
         "name": "ootp_code_owner",
         "provider": "codex",
+        "role": "supervisor",
+        "rolePolicy": {
+          "sandbox_mode": "read-only"
+        }
+      }
+    },
+    "ootp_code_owner_agy": {
+      "launch_root": ".",
+      "metadata": {
+        "allowedTools": [
+          "fs_read",
+          "fs_list",
+          "execute_bash",
+          "@cao-mcp-server"
+        ],
+        "description": "Read-only coordinator: reads the task, delegates the implementation and the independent QA, verifies every callback and reports readiness to the owner.",
+        "mcpServers": {
+          "cao-mcp-server": {
+            "args": [
+              "mcp-server"
+            ],
+            "command": "cao",
+            "type": "stdio"
+          },
+          "workspace-execution": {
+            "args": [
+              "--workspace",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
+              "--role",
+              "ootp_code_owner"
+            ],
+            "command": "wsx-mcp",
+            "type": "stdio"
+          }
+        },
+        "name": "ootp_code_owner_agy",
+        "provider": "antigravity_cli",
         "role": "supervisor"
       }
     },
@@ -117,9 +156,8 @@
           "approval_policy": "never",
           "mcp_servers.cao-mcp-server.tools.load_skill.approval_mode": "approve",
           "mcp_servers.cao-mcp-server.tools.send_message.approval_mode": "approve",
-          "sandbox_mode": "workspace-write"
+          "sandbox_mode": "danger-full-access"
         },
-        "codexProfile": "cao-workspace-write",
         "description": "Implements one task on its task branch, tests first, and delivers scoped commits and a draft pull request through the hub's GitHub task operations.",
         "mcpServers": {
           "cao-mcp-server": {
@@ -142,6 +180,43 @@
         },
         "name": "ootp_developer",
         "provider": "codex",
+        "role": "developer",
+        "rolePolicy": {
+          "sandbox_mode": "workspace-write"
+        }
+      }
+    },
+    "ootp_developer_agy": {
+      "launch_root": ".",
+      "metadata": {
+        "allowedTools": [
+          "@builtin",
+          "fs_*",
+          "execute_bash",
+          "@cao-mcp-server"
+        ],
+        "description": "Implements one task on its task branch, tests first, and delivers scoped commits and a draft pull request through the hub's GitHub task operations.",
+        "mcpServers": {
+          "cao-mcp-server": {
+            "args": [
+              "mcp-server"
+            ],
+            "command": "cao",
+            "type": "stdio"
+          },
+          "workspace-execution": {
+            "args": [
+              "--workspace",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
+              "--role",
+              "ootp_developer"
+            ],
+            "command": "wsx-mcp",
+            "type": "stdio"
+          }
+        },
+        "name": "ootp_developer_agy",
+        "provider": "antigravity_cli",
         "role": "developer"
       }
     },
@@ -196,9 +271,8 @@
           "approval_policy": "never",
           "mcp_servers.cao-mcp-server.tools.load_skill.approval_mode": "approve",
           "mcp_servers.cao-mcp-server.tools.send_message.approval_mode": "approve",
-          "sandbox_mode": "workspace-write"
+          "sandbox_mode": "danger-full-access"
         },
-        "codexProfile": "cao-workspace-write",
         "description": "Independently verifies one delivery at its exact commits with the repository's own checks and reports a verdict with evidence.",
         "mcpServers": {
           "cao-mcp-server": {
@@ -221,6 +295,44 @@
         },
         "name": "ootp_qa",
         "provider": "codex",
+        "role": "reviewer",
+        "rolePolicy": {
+          "sandbox_mode": "workspace-write"
+        }
+      }
+    },
+    "ootp_qa_agy": {
+      "launch_root": ".",
+      "metadata": {
+        "allowedTools": [
+          "@builtin",
+          "fs_read",
+          "fs_list",
+          "execute_bash",
+          "@cao-mcp-server"
+        ],
+        "description": "Independently verifies one delivery at its exact commits with the repository's own checks and reports a verdict with evidence.",
+        "mcpServers": {
+          "cao-mcp-server": {
+            "args": [
+              "mcp-server"
+            ],
+            "command": "cao",
+            "type": "stdio"
+          },
+          "workspace-execution": {
+            "args": [
+              "--workspace",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
+              "--role",
+              "ootp_qa"
+            ],
+            "command": "wsx-mcp",
+            "type": "stdio"
+          }
+        },
+        "name": "ootp_qa_agy",
+        "provider": "antigravity_cli",
         "role": "reviewer"
       }
     },

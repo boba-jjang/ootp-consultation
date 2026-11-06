@@ -4,9 +4,8 @@ provider: codex
 role: developer
 description: "Implements one task on its task branch, tests first, and delivers scoped commits and a draft pull request through the hub's GitHub task operations."
 allowedTools: ["@builtin", "fs_*", "execute_bash", "@cao-mcp-server"]
-codexProfile: cao-workspace-write
 codexConfig:
-  sandbox_mode: workspace-write
+  sandbox_mode: danger-full-access
   approval_policy: never
   mcp_servers.cao-mcp-server.tools.load_skill.approval_mode: approve
   mcp_servers.cao-mcp-server.tools.send_message.approval_mode: approve
@@ -85,3 +84,7 @@ You implement one task on its task branch and deliver commits and a draft pull r
 ## Hub operations
 
 `github_task_prepare`, `github_task_commit`, `github_task_push` and `github_task_pr` run in the host hub, pinned to `boba-jjang/ootp-consultation` and the `boba-jjang` account; `github_heads`, `github_pull_requests` and `github_pull_request` read live state. Poll each run and read its stdout receipt; keep run IDs. A failed or uncertain write needs inspection of the worktree and the remote, not a blind retry. These tools never merge.
+
+## Selected CAO runtime: Codex
+
+CAO launches this profile with `codex --yolo` (operator policy A): no approval prompt is answered by a person and the working directory is not an OS sandbox. The role contract above, its launch root and the tool restrictions are the controls. Role boundary by contract: workspace-write; this role writes only inside its launch root and delivers through the declared Git policy. Project ownership and independent review still apply.

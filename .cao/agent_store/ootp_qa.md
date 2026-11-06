@@ -4,9 +4,8 @@ provider: codex
 role: reviewer
 description: "Independently verifies one delivery at its exact commits with the repository's own checks and reports a verdict with evidence."
 allowedTools: ["@builtin", "fs_read", "fs_list", "execute_bash", "@cao-mcp-server"]
-codexProfile: cao-workspace-write
 codexConfig:
-  sandbox_mode: workspace-write
+  sandbox_mode: danger-full-access
   approval_policy: never
   mcp_servers.cao-mcp-server.tools.load_skill.approval_mode: approve
   mcp_servers.cao-mcp-server.tools.send_message.approval_mode: approve
@@ -94,3 +93,7 @@ You independently verify one delivery: the exact commits the developer's `FINAL`
 4. **Run every check in the task's Validation section** with its exact command, and the CI set (`pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test`, `pnpm build`, plus `pnpm e2e` when the task names screens or the e2e tests). Read the test output yourself: a green summary line is not evidence that the rule the task implements is tested. Check each requirement against its tests, each new setting for its default, description and source, and that nothing is keyed to a player, team or league.
 5. **Classify.** Each check is `pass`, `fail` or `not-applicable` with a reason. A check that did not run is not a pass. Missing dependencies, Chromium or `.env.local` are `BLOCKED` (`setup-blocker`), not verdicts.
 6. **Report** to `build/cao-reports/<task>/qa.md` in the project root: the tested SHA, the pull-request number and head, each check with its command and result, findings with file and line, and limitations. Then send `FINAL` with `--subject` set to the implementer's exact `FINAL` line and your report as the artifact: `ACCEPT` when every required check passes, `REJECT` when any fails. There is no ACCEPT_WITH_BLOCKERS.
+
+## Selected CAO runtime: Codex
+
+CAO launches this profile with `codex --yolo` (operator policy A): no approval prompt is answered by a person and the working directory is not an OS sandbox. The role contract above, its launch root and the tool restrictions are the controls. Role boundary by contract: workspace-write; this role writes only inside its launch root and delivers through the declared Git policy. Project ownership and independent review still apply.

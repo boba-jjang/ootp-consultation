@@ -1,5 +1,5 @@
 {
-  "generation": "705ebb3d8256bc29f57ab840a83525478cfab433aa832cce0541bf103b1fbc4e",
+  "generation": "51a741a60f2270836ef30332da786e691a563b98104269c36229269faba79e84",
   "inputs": {
     ".cao/roles/cao-callback-protocol.md": "6e881b78676039c5433feb0fc90cd1796c4ac32244fb7663587f88980a9223b0",
     ".cao/roles/ootp_code_owner.md": "82d7c24dbb5853df7eab5f843ae97bd2a6f973a94b476ee8fc9d5afe5df8b956",
@@ -14,15 +14,15 @@
   },
   "outputs": {
     ".cao/agent_store/_base.md": "726a4344472f83185099fa6b41b89f6c878ff9ab3ec36e747c562445aa694144",
-    ".cao/agent_store/ootp_code_owner.md": "9ffd2302a6bebeacdb83df09dc4eb9202eeded42df547ec5cb91bcd05a1658a4",
-    ".cao/agent_store/ootp_code_owner_agy.md": "d3c2b03baa2c4269d2459b1f4906cc994409088873ac3cbd0cba27ebbe9ff1f2",
-    ".cao/agent_store/ootp_code_owner_claude.md": "57c172834d7c0d4aabb725663782f426a19b88e4c56f7fefe500071e28672f26",
-    ".cao/agent_store/ootp_developer.md": "bb63b7b4df5a1c47b153a4d36d32d805624ef724f43d9587c693c4d6d75bf6ef",
-    ".cao/agent_store/ootp_developer_agy.md": "8df481a6aaebb71c20be4549729863e75075efc0c40eda94a6db61248a5ffa09",
-    ".cao/agent_store/ootp_developer_claude.md": "c8edbd5083c6b11693ade27aee606bcc5652a87641ed34fb6d034008104fe4ed",
-    ".cao/agent_store/ootp_qa.md": "bc09b300905e63b508817ba054340615c7331d2033b5b9902f0f244bb5a2ebf4",
-    ".cao/agent_store/ootp_qa_agy.md": "276ea77a4940211f6425d0f555816b4f248a7c65eab9d1f47bdb6e65d6d7e2e8",
-    ".cao/agent_store/ootp_qa_claude.md": "7193179144ce494b452a8d11711688cae9409796744f4a9f348c24ceeb92a37f",
+    ".cao/agent_store/ootp_code_owner.md": "2da1a6e067ab1e079c313ee62064a1ad641f4678be23085bcd64617f519e225d",
+    ".cao/agent_store/ootp_code_owner_agy.md": "3dfff7434f5c5d8e2498a9a92d8dbd0e2b741a7385de84c37e85d0d8f36459dc",
+    ".cao/agent_store/ootp_code_owner_claude.md": "73c8581a79aa603f623d5d4de381b6d3c3937692d165a0877eb49fb147c85612",
+    ".cao/agent_store/ootp_developer.md": "762e7017eb5168964b47b9f35ed558203519d9256cf851da55b565307a92ae40",
+    ".cao/agent_store/ootp_developer_agy.md": "2e2e225c91f5e7161d638460c5b8a2cc387879156511113ce5efc21ebb954a55",
+    ".cao/agent_store/ootp_developer_claude.md": "0f0baf3c4afe846b46a449f1fda704f38849c556f83fe562c07926c09b4f3e8a",
+    ".cao/agent_store/ootp_qa.md": "2e06188d3f28b418433527299f6baf55c094b240efef1a2f277fcbc8674e03a2",
+    ".cao/agent_store/ootp_qa_agy.md": "7dc92f7f8928eead9ec4083e861df6113426deb5a279877d194e8964dfd2fb39",
+    ".cao/agent_store/ootp_qa_claude.md": "7040bb298d3b8f57e7f906eb269647b2bed524b3e5da1a1fce7da8ac9cf23cb6",
     ".claude/agents/ootp-code-owner.md": "d37824183e5fb69f7cbaf42e61b6c95b0965f1ec7074a8e757330139f813e9ee",
     ".claude/agents/ootp-developer.md": "5b8d2cec7c2d05fef85e8a8df46847b02db9ea06223d0e36647a4f4185dd8f6b",
     ".claude/agents/ootp-qa.md": "ba9aceb4090db6f394ee5df3dc2bdb6cba6a21ca4083b09a2fea18cfe6330ee2"
@@ -57,7 +57,7 @@
           "workspace-execution": {
             "args": [
               "--workspace",
-              "/Users/jay/Documents/checkpoint-automation/ootp",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
               "--role",
               "ootp_code_owner"
             ],
@@ -94,7 +94,7 @@
           "workspace-execution": {
             "args": [
               "--workspace",
-              "/Users/jay/Documents/checkpoint-automation/ootp",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
               "--role",
               "ootp_code_owner"
             ],
@@ -130,7 +130,7 @@
           "workspace-execution": {
             "args": [
               "--workspace",
-              "/Users/jay/Documents/checkpoint-automation/ootp",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
               "--role",
               "ootp_code_owner"
             ],
@@ -170,7 +170,7 @@
           "workspace-execution": {
             "args": [
               "--workspace",
-              "/Users/jay/Documents/checkpoint-automation/ootp",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
               "--role",
               "ootp_developer"
             ],
@@ -207,7 +207,7 @@
           "workspace-execution": {
             "args": [
               "--workspace",
-              "/Users/jay/Documents/checkpoint-automation/ootp",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
               "--role",
               "ootp_developer"
             ],
@@ -244,7 +244,7 @@
           "workspace-execution": {
             "args": [
               "--workspace",
-              "/Users/jay/Documents/checkpoint-automation/ootp",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
               "--role",
               "ootp_developer"
             ],
@@ -285,7 +285,7 @@
           "workspace-execution": {
             "args": [
               "--workspace",
-              "/Users/jay/Documents/checkpoint-automation/ootp",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
               "--role",
               "ootp_qa"
             ],
@@ -323,7 +323,7 @@
           "workspace-execution": {
             "args": [
               "--workspace",
-              "/Users/jay/Documents/checkpoint-automation/ootp",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
               "--role",
               "ootp_qa"
             ],
@@ -361,7 +361,7 @@
           "workspace-execution": {
             "args": [
               "--workspace",
-              "/Users/jay/Documents/checkpoint-automation/ootp",
+              "/Users/jay/Documents/boba_workspace/ootp-consultation",
               "--role",
               "ootp_qa"
             ],

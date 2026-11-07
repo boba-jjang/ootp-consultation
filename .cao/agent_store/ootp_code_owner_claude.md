@@ -4,7 +4,7 @@ provider: "claude_code"
 role: "supervisor"
 description: "Read-only coordinator: reads the task, delegates the implementation and the independent QA, verifies every callback and reports readiness to the owner."
 allowedTools: ["fs_read", "fs_list", "@cao-mcp-server"]
-mcpServers: {"workspace-execution": {"type": "stdio", "command": "wsx-mcp", "args": ["--workspace", "/Users/jay/Documents/checkpoint-automation/ootp", "--role", "ootp_code_owner"]}, "cao-mcp-server": {"type": "stdio", "command": "cao", "args": ["mcp-server"]}}
+mcpServers: {"workspace-execution": {"type": "stdio", "command": "wsx-mcp", "args": ["--workspace", "/Users/jay/Documents/boba_workspace/ootp-consultation", "--role", "ootp_code_owner"]}, "cao-mcp-server": {"type": "stdio", "command": "cao", "args": ["mcp-server"]}}
 claudeConfig: {"wsx_role_tools": "cao-only-v1"}
 ---
 

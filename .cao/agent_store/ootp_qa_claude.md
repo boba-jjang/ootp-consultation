@@ -4,7 +4,7 @@ provider: "claude_code"
 role: "reviewer"
 description: "Independently verifies one delivery at its exact commits with the repository's own checks and reports a verdict with evidence."
 allowedTools: ["@builtin", "fs_read", "fs_list", "execute_bash", "@cao-mcp-server"]
-mcpServers: {"workspace-execution": {"type": "stdio", "command": "wsx-mcp", "args": ["--workspace", "/Users/jay/Documents/checkpoint-automation/ootp", "--role", "ootp_qa"]}, "cao-mcp-server": {"type": "stdio", "command": "cao", "args": ["mcp-server"]}}
+mcpServers: {"workspace-execution": {"type": "stdio", "command": "wsx-mcp", "args": ["--workspace", "/Users/jay/Documents/boba_workspace/ootp-consultation", "--role", "ootp_qa"]}, "cao-mcp-server": {"type": "stdio", "command": "cao", "args": ["mcp-server"]}}
 claudeConfig: {"wsx_role_tools": "cao-only-v1"}
 ---
 

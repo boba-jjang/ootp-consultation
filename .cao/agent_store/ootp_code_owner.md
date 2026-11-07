@@ -4,9 +4,8 @@ provider: codex
 role: supervisor
 description: "Read-only coordinator: reads the task, delegates the implementation and the independent QA, verifies every callback and reports readiness to the owner."
 allowedTools: ["fs_read", "fs_list", "execute_bash", "@cao-mcp-server"]
-codexProfile: cao-readonly
 codexConfig:
-  sandbox_mode: read-only
+  sandbox_mode: danger-full-access
   approval_policy: never
   mcp_servers.cao-mcp-server.tools.assign.approval_mode: approve
   mcp_servers.cao-mcp-server.tools.handoff.approval_mode: approve
@@ -277,3 +276,7 @@ The callback routing table and project gates still control advancement.
 Observation, ACKs and watchdog messages never grant write, merge, waiver,
 publication or acceptance authority.
 <!-- wsx:cao-watch-setup:coordinator-v1:end -->
+
+## Selected CAO runtime: Codex
+
+CAO launches this profile with `codex --yolo` (operator policy A): no approval prompt is answered by a person and the working directory is not an OS sandbox. The role contract above, its launch root and the tool restrictions are the controls. Role boundary by contract: read-only; this role is read-only by contract: it does not edit files, run Git mutations or install anything. Project ownership and independent review still apply.

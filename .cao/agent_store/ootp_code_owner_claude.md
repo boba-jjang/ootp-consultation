@@ -4,7 +4,7 @@ provider: "claude_code"
 role: "supervisor"
 description: "Read-only coordinator: reads the task, delegates the implementation and the independent QA, verifies every callback and reports readiness to the owner."
 allowedTools: ["fs_read", "fs_list", "@cao-mcp-server"]
-mcpServers: {"workspace-execution": {"type": "stdio", "command": "wsx-mcp", "args": ["--workspace", "/Users/jay/Documents/boba_workspace/ootp-consultation", "--role", "ootp_code_owner"]}, "cao-mcp-server": {"type": "stdio", "command": "cao", "args": ["mcp-server"]}}
+mcpServers: {"workspace-execution": {"type": "stdio", "command": "wsx-mcp", "args": ["--workspace", "/Users/jay/Documents/checkpoint-automation/ootp", "--role", "ootp_code_owner"]}, "cao-mcp-server": {"type": "stdio", "command": "cao", "args": ["mcp-server"]}}
 claudeConfig: {"wsx_role_tools": "cao-only-v1"}
 ---
 
@@ -270,6 +270,32 @@ The callback routing table and project gates still control advancement.
 Observation, ACKs and watchdog messages never grant write, merge, waiver,
 publication or acceptance authority.
 <!-- wsx:cao-watch-setup:coordinator-v1:end -->
+
+## Automatic implementation checkpoint
+
+For a newly authorized ordinary implementation task starting from clean, synced
+`main`, the coordinator invokes `github_checkpoint_create` before implementation
+delegation. Supply `task_id` as the packet's stable lowercase slug and
+`expected_head` as the exact live-verified main commit. The host operation owns
+name generation and tag publication; record its successful run ID, tag, commit,
+operation ID and `remote_verified: true` in the initial handoff. This is the
+coordinator's narrow exception for host-mediated Git ref creation; product-file
+writes remain delegated. Do not ask the operator to choose or push a tag.
+
+The task must explicitly authorize this operation. On uncertain publication,
+retry only the same task ID and expected commit so the durable journal can
+reconcile it. Dirty or unsynchronized main, unavailable remote evidence, a
+conflicting reserved tag or missing authority blocks delegation with the named
+reason. Never stash, reset, force, move an existing tag or create another identity
+to evade recovery. The operation creates lightweight tags in the
+`stable-before-cao-YYYY-MM-DD-<task-id>-<identity>` namespace using UTC dates.
+
+Read-only work and explicitly exempt native infrastructure audits do not create
+checkpoints. Existing branch chains, integration branches and local-only LLVM
+slices retain their recorded bases and publication restrictions; never force
+them onto main, move LLVM pins or push LLVM upstream. A new main-based TRIDENT
+task checkpoints TRIDENT only; LLVM state is separately recorded and governed
+by its existing two-repository rules.
 
 ## Selected CAO runtime: Claude Code
 

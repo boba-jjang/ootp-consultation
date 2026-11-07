@@ -859,6 +859,66 @@
       "result_adapter": "exit-code",
       "timeout_seconds": 2100,
       "version": 2
+    },
+    {
+      "id": "github.checkpoint_create",
+      "version": 1,
+      "description": "Create or reconcile one automatic stable checkpoint on clean, live-synchronized main; return verified tag/commit evidence.",
+      "repository": "project",
+      "executor": "local",
+      "argv": [
+        "wsx-git-checkpoint",
+        "--repository",
+        "boba-jjang/ootp-consultation",
+        "--account",
+        "boba-jjang",
+        "--remote-url",
+        "git@github.com-boba:boba-jjang/ootp-consultation.git",
+        "--base",
+        "main"
+      ],
+      "parameters": [
+        {
+          "name": "task_id",
+          "type": "string",
+          "max_length": 80,
+          "arg_map": {
+            "style": "flag_equals",
+            "flag": "--task-id"
+          }
+        },
+        {
+          "name": "expected_head",
+          "type": "string",
+          "max_length": 64,
+          "arg_map": {
+            "style": "flag_equals",
+            "flag": "--expected-head"
+          }
+        }
+      ],
+      "timeout_seconds": 180,
+      "result_adapter": "exit-code",
+      "effects": [
+        "write-git-refs",
+        "write-checkpoint-evidence"
+      ],
+      "resources": [
+        "project-checkout"
+      ],
+      "requires": [
+        {
+          "probe": "executable",
+          "name": "wsx-git-checkpoint"
+        },
+        {
+          "probe": "executable",
+          "name": "git"
+        }
+      ],
+      "evidence_limits": [
+        "Requires explicit task authority for automatic checkpoint creation. Only the configured main base is supported. No branch push, force, overwrite, deletion, checkout or data mutation. Retry the identical task and commit after an uncertain result; never invent a new task identity to evade reconciliation."
+      ]
     }
   ],
   "schema_version": 1

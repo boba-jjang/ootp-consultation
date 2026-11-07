@@ -128,3 +128,22 @@ The coordinator stops, with a question posted through the hub's notifier, when t
 - Every new setting has a default, a one-line description and its source.
 - No logic is keyed to a specific player, team or league.
 - Remaining owner steps are listed in the pull-request summary.
+
+## Automatic checkpoints for new implementation tasks
+
+New ordinary implementation tasks starting from clean, live-synchronized main
+authorize the coordinator's restricted `github_checkpoint_create` host operation
+when the task explicitly grants checkpoint authority. The coordinator supplies
+the stable task slug and exact expected commit, then records the returned tag,
+commit, operation ID and successful run ID before delegating implementation.
+Name generation and publication are automatic; no operator-supplied name is
+required. This introduces a checkpoint step for new main-based tasks, rather
+than claiming it was a historical requirement.
+
+The operation creates only a new lightweight OOTP repository tag under
+`stable-before-cao-YYYY-MM-DD-<task-id>-<identity>` (UTC), refusing dirty or
+unsynchronized state and preserving all branches and existing tags. Retry an
+uncertain result using the same task ID and expected commit. A tag is verified
+only after remote read-back; journal intent or a local tag alone is not proof.
+Read-only work, exempt native audits and existing chains retain their documented
+bases. No LLVM pin, branch or upstream remote is changed by this operation.

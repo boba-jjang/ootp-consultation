@@ -4,7 +4,7 @@ provider: "claude_code"
 role: "developer"
 description: "Implements one task on its task branch, tests first, and delivers scoped commits and a draft pull request through the hub's GitHub task operations."
 allowedTools: ["@builtin", "fs_*", "execute_bash", "@cao-mcp-server"]
-mcpServers: {"workspace-execution": {"type": "stdio", "command": "wsx-mcp", "args": ["--workspace", "/Users/jay/Documents/boba_workspace/ootp-consultation", "--role", "ootp_developer"]}, "cao-mcp-server": {"type": "stdio", "command": "cao", "args": ["mcp-server"]}}
+mcpServers: {"workspace-execution": {"type": "stdio", "command": "wsx-mcp", "args": ["--workspace", "/Users/jay/Documents/checkpoint-automation/ootp", "--role", "ootp_developer"]}, "cao-mcp-server": {"type": "stdio", "command": "cao", "args": ["mcp-server"]}}
 claudeConfig: {"wsx_role_tools": "cao-only-v1"}
 ---
 

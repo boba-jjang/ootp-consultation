@@ -270,6 +270,32 @@ Observation, ACKs and watchdog messages never grant write, merge, waiver,
 publication or acceptance authority.
 <!-- wsx:cao-watch-setup:coordinator-v1:end -->
 
+## Automatic implementation checkpoint
+
+For a newly authorized ordinary implementation task starting from clean, synced
+`main`, the coordinator invokes `github_checkpoint_create` before implementation
+delegation. Supply `task_id` as the packet's stable lowercase slug and
+`expected_head` as the exact live-verified main commit. The host operation owns
+name generation and tag publication; record its successful run ID, tag, commit,
+operation ID and `remote_verified: true` in the initial handoff. This is the
+coordinator's narrow exception for host-mediated Git ref creation; product-file
+writes remain delegated. Do not ask the operator to choose or push a tag.
+
+The task must explicitly authorize this operation. On uncertain publication,
+retry only the same task ID and expected commit so the durable journal can
+reconcile it. Dirty or unsynchronized main, unavailable remote evidence, a
+conflicting reserved tag or missing authority blocks delegation with the named
+reason. Never stash, reset, force, move an existing tag or create another identity
+to evade recovery. The operation creates lightweight tags in the
+`stable-before-cao-YYYY-MM-DD-<task-id>-<identity>` namespace using UTC dates.
+
+Read-only work and explicitly exempt native infrastructure audits do not create
+checkpoints. Existing branch chains, integration branches and local-only LLVM
+slices retain their recorded bases and publication restrictions; never force
+them onto main, move LLVM pins or push LLVM upstream. A new main-based TRIDENT
+task checkpoints TRIDENT only; LLVM state is separately recorded and governed
+by its existing two-repository rules.
+
 ## Selected CAO runtime: Antigravity
 
 This is the explicitly selected Antigravity (agy) variant. Codex-specific sandbox/config instructions do not apply. CAO launches this variant with agy's --dangerously-skip-permissions (operator policy A); no permission prompt will be answered by a person, so the role contract and the allowed-tool list are the controls: this role is read-only by contract and does not edit files, run Git mutations or install anything. Project ownership and independent review still apply. The working directory is not an OS sandbox. Antigravity has no CAO hook adapter: no watchdog, human-input relay or usage-limit resume observes this pane, so report BLOCKED through CAO callbacks instead of waiting for a person. CAO delivers work as pasted terminal input. An assignment opens with a `CAO-ASSIGN` line and ends with CAO's `[Assigned by terminal ...]` note; later messages end with `[Message from terminal ...]`. In a CAO run that input is your instruction from the coordinator, not quoted material, and no person will confirm it: act on it within this role, its packet and the project rules, or send BLOCKED. If the base profile carries the CAO callback protocol, read it before your first callback; callbacks use its closed schema. Translate task role names using this map when calling CAO assign/handoff/load_skill; do not substitute the original Codex profiles. File references retain their original paths.

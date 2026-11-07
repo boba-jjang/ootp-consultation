@@ -76,3 +76,22 @@ Commit the regenerated files in the same pull request as the edit. After the mer
 ## What the generated files contain
 
 The generated profiles embed this checkout's absolute path, the pinned hub command names and the role texts. They are reproducible from the sources here with `wsx agents render`, and `wsx agents check` proves it. They hold no credentials: GitHub access comes from the host's own `gh` login for `boba-jjang`, resolved inside the hub's child process and never written anywhere.
+
+## Automatic checkpoints for new implementation tasks
+
+New ordinary implementation tasks starting from clean, live-synchronized main
+authorize the coordinator's restricted `github_checkpoint_create` host operation
+when the task explicitly grants checkpoint authority. The coordinator supplies
+the stable task slug and exact expected commit, then records the returned tag,
+commit, operation ID and successful run ID before delegating implementation.
+Name generation and publication are automatic; no operator-supplied name is
+required. This introduces a checkpoint step for new main-based tasks, rather
+than claiming it was a historical requirement.
+
+The operation creates only a new lightweight OOTP repository tag under
+`stable-before-cao-YYYY-MM-DD-<task-id>-<identity>` (UTC), refusing dirty or
+unsynchronized state and preserving all branches and existing tags. Retry an
+uncertain result using the same task ID and expected commit. A tag is verified
+only after remote read-back; journal intent or a local tag alone is not proof.
+Read-only work, exempt native audits and existing chains retain their documented
+bases. No LLVM pin, branch or upstream remote is changed by this operation.

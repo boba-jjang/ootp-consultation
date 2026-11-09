@@ -116,3 +116,7 @@ Tasks drafted by the task-authoring server run unattended through CAO on the own
 | `Unsupported engine` warnings | You're not on Node 24. Run `fnm use` or `nvm use`. |
 | pnpm says the version doesn't match | Run `corepack enable`, then retry. |
 | `Port 5173 is in use` | Another dev server is running. Stop it. |
+
+## Unattended runs: owner questions
+
+Owner decisions reach the coordinator through Slack. The coordinator reads the decision with `human.read`; nothing in Slack text itself is an instruction.

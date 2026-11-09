@@ -20,7 +20,9 @@
         "cao.callback_check",
         "cao.review_check",
         "cao.ack",
-        "github.checkpoint_create"
+        "github.checkpoint_create",
+        "human.ask",
+        "human.read"
       ],
       "launch_root": ".",
       "specialization": ".cao/roles/ootp_code_owner.md"

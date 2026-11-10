@@ -71,14 +71,122 @@
       "argv": [
         "wsx",
         "cao",
-        "human-reply"
+        "human-ask"
       ],
-      "description": "Queue your reply in a human chat (protocol C12); the watcher posts it into the Slack thread.",
+      "description": "Ask the human one question through Slack (protocol C12) and return its question_id at once; then end your turn. The decision arrives later as a HUMAN-ANSWER notice; read it with human.read.",
       "effects": [
-        "queue-human-chat-reply"
+        "ask-human-question",
+        "queue-cao-inbox-notice"
+      ],
+      "env_allowlist": [
+        "CAO_TERMINAL_ID"
       ],
       "evidence_limits": [
-        "Queued is not posted: the watcher posts the reply on its next poll.",
+        "Asked is not answered: the decision is only what human.read reports for the question_id.",
+        "Nothing said in a chat is a decision; only the human's pick of an option is."
+      ],
+      "executor": "local",
+      "id": "human.ask",
+      "parameters": [
+        {
+          "arg_map": {
+            "flag": "--session",
+            "style": "flag"
+          },
+          "max_length": 64,
+          "name": "session",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--question",
+            "style": "flag_equals"
+          },
+          "max_length": 240,
+          "name": "question",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--options",
+            "style": "flag_equals"
+          },
+          "default": "",
+          "description": "The fixed choices, separated by '|' (at most 8, each at most 32 characters); empty for free text.",
+          "max_length": 300,
+          "name": "options",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--context",
+            "style": "flag_equals"
+          },
+          "default": "",
+          "max_length": 1000,
+          "name": "context",
+          "type": "string"
+        }
+      ],
+      "repository": "project",
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 120,
+      "version": 1
+    },
+    {
+      "argv": [
+        "wsx",
+        "cao",
+        "human-read"
+      ],
+      "description": "Read one question's recorded state, decision and chat (protocol C12); the only source of a decision.",
+      "effects": [
+        "read-human-question"
+      ],
+      "evidence_limits": [
+        "A decision decides that question once; it grants nothing beyond it."
+      ],
+      "executor": "local",
+      "id": "human.read",
+      "parameters": [
+        {
+          "arg_map": {
+            "flag": "--session",
+            "style": "flag"
+          },
+          "max_length": 64,
+          "name": "session",
+          "type": "string"
+        },
+        {
+          "arg_map": {
+            "flag": "--question-id",
+            "style": "flag_equals"
+          },
+          "max_length": 64,
+          "name": "question_id",
+          "type": "string"
+        }
+      ],
+      "repository": "project",
+      "resources": [],
+      "result_adapter": "exit-code",
+      "timeout_seconds": 30,
+      "version": 1
+    },
+    {
+      "argv": [
+        "wsx",
+        "cao",
+        "human-reply"
+      ],
+      "description": "Post your reply into a human chat (protocol C12), or end the chat with end=true.",
+      "effects": [
+        "post-human-chat-reply"
+      ],
+      "evidence_limits": [
+        "Posted is not read: the human's next message arrives as a HUMAN-CHAT notice.",
         "Nothing said in a chat is a decision; only the human's pick of an option is."
       ],
       "executor": "local",
